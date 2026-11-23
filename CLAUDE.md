@@ -32,12 +32,22 @@ yes-man: flag weak ideas, scope creep, and shortcuts that will cost later.
 - Supabase: Row Level Security on every table; the browser gets read-only access via the
   publishable key. The service-role key is used only in server functions and ingest jobs.
 
-## Data sources (verify each is current before building on it)
-- Members, terms, IDs: unitedstates/congress-legislators (crosswalk of bioguide, FEC, etc.)
-- Bills, sponsors, actions, CRS summaries: Congress.gov API
-- Roll-call votes: House Clerk and Senate roll-call XML (or Congress.gov where available)
-- Campaign finance: OpenFEC API
-- Address → district: Geocodio (returns congressional district)
+## Data sources (checked Nov 2026)
+- Members, terms, IDs: unitedstates/congress-legislators (public domain; crosswalk of
+  bioguide, FEC, GovTrack, etc.)
+- Bills, sponsors, actions, CRS summaries: Congress.gov API (free api.data.gov key)
+- House roll-call votes: Congress.gov `/house-vote` (beta, 118th Congress onward) or House
+  Clerk XML. Senate roll-call votes: senate.gov XML — Congress.gov has no Senate vote endpoint.
+- Campaign finance: OpenFEC API (~1,000 calls/hour with a key). FEC rules bar using
+  individual contributor names for solicitation or commercial purposes — display is fine.
+- Address → district: Geocodio `cd` field (free tier 2,500 lookups/day). Results may be stored.
+- Do not use: ProPublica Congress API (no new keys issued). Prefer the official sources above
+  over third-party aggregators.
+
+## Congress transitions
+- The 120th Congress convenes Jan 3, 2027. Several states redrew districts mid-decade
+  (incl. CA, TX, OH, NC, MO, UT). Store `congress` on every term, district, and vote; never
+  assume "current" is fixed. Geocodio's `cd` default flips to the 120th on Jan 3, 2027.
 
 ## Conventions
 - Small, reviewable commits. Explain *why* in commit messages.
