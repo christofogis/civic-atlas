@@ -1,9 +1,10 @@
-// Ingest current members of Congress and all of their terms.
+// Ingest members of Congress and all of their terms: everyone serving now, plus anyone
+// who served from the 118th Congress (2023) on, so their recorded votes have a member.
 // Source: unitedstates/congress-legislators (public domain).
 //
 //   node scripts/ingest/members.mjs             # write to Supabase
 //   node scripts/ingest/members.mjs --dry-run   # fetch + map only, print counts
-//   node scripts/ingest/members.mjs --dry-run --file local.yaml --out rows.json
+//   node scripts/ingest/members.mjs --dry-run --dir local/ --out rows.json
 //
 // Idempotent: rows are inserted or updated only when something changed. Members who
 // leave Congress are kept (their votes and history still reference them).
@@ -11,8 +12,8 @@ import { readFileSync, writeFileSync } from "node:fs";
 import YAML from "yaml";
 import { getClient, fetchAll, upsertBatches, withRun, changed } from "./lib.mjs";
 
-const SOURCE_URL =
-  "https://raw.githubusercontent.com/unitedstates/congress-legislators/main/legislators-current.yaml";
+const BASE = "https://raw.githubusercontent.com/unitedstates/congress-legislators/main/";
+const HISTORY_FROM = "2023-01-03"; // start of the 118th Congress
 
 const MEMBER_FIELDS = [
   "lis_id", "govtrack_id", "thomas_id", "icpsr_id", "wikidata_id", "fec_candidate_ids",
@@ -66,11 +67,11 @@ export function mapLegislators(legislators) {
   return { members, terms };
 }
 
-async function loadSource(file) {
-  if (file) return readFileSync(file, "utf8");
-  const res = await fetch(SOURCE_URL);
-  if (!res.ok) throw new Error(`fetch source: HTTP ${res.status}`);
-  return res.text();
+async function load(name, dir) {
+  if (dir) return YAML.parse(readFileSync(`${dir}/${name}`, "utf8"));
+  const res = await fetch(BASE + name);
+  if (!res.ok) throw new Error(`fetch ${name}: HTTP ${res.status}`);
+  return YAML.parse(await res.text());
 }
 
 const termKey = (t) => `${t.bioguide_id}|${t.chamber}|${t.start_date}`;
@@ -80,8 +81,11 @@ async function main() {
   const dryRun = args.includes("--dry-run");
   const arg = (name) => (args.includes(name) ? args[args.indexOf(name) + 1] : undefined);
 
-  const { members, terms } = mapLegislators(YAML.parse(await loadSource(arg("--file"))));
-  console.log(`source: ${members.length} members, ${terms.length} terms`);
+  const current = await load("legislators-current.yaml", arg("--dir"));
+  const recentFormer = (await load("legislators-historical.yaml", arg("--dir")))
+    .filter((m) => m.terms.at(-1).end >= HISTORY_FROM);
+  const { members, terms } = mapLegislators([...current, ...recentFormer]);
+  console.log(`source: ${current.length} current + ${recentFormer.length} former members, ${terms.length} terms`);
 
   if (dryRun) {
     if (arg("--out")) writeFileSync(arg("--out"), JSON.stringify({ members, terms }));

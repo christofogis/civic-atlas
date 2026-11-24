@@ -1,0 +1,46 @@
+name: Ingest votes
+
+on:
+  schedule:
+    - cron: "47 12 * * *"   # daily, 4:47am Pacific — after members and committees
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "Fetch and parse a few votes only; write nothing"
+        type: boolean
+        default: false
+      congress:
+        description: "Congress to ingest (blank = current)"
+        type: string
+        default: ""
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ingest-votes
+  cancel-in-progress: false
+
+jobs:
+  ingest:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    env:
+      SUPABASE_URL: https://fkbzxaoeyrtzviyfzulq.supabase.co
+      SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Votes
+        env:
+          DRY_RUN: ${{ inputs.dry_run }}
+          CONGRESS: ${{ inputs.congress }}
+        run: |
+          ARGS=()
+          if [ "$DRY_RUN" = "true" ]; then ARGS+=(--dry-run --limit 3); fi
+          if [[ "$CONGRESS" =~ ^[0-9]+$ ]]; then ARGS+=(--congress "$CONGRESS"); fi
+          node scripts/ingest/votes.mjs "${ARGS[@]}"
