@@ -21,7 +21,7 @@
 - [x] Party-line rate on party-split votes, with chamber medians
 - [x] Missed-vote rate
 - [x] Methods page (/methods)
-- [ ] Label procedural vs. final votes
+- [x] Label procedural vs. final votes (src/lib/voteKind.js), with "final votes only" filter
 - [ ] Bipartisan cosponsorship rate
 - [ ] Members' statements beside their votes
 

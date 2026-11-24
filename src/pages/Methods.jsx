@@ -1,8 +1,13 @@
-import { Link } from "react-router-dom";
+import { useEffect } from "react";
+import { Link, useLocation } from "react-router-dom";
 
 // How every number on the site is produced. Keep this in step with the code:
 // supabase/migrations/*_member_vote_stats.sql and scripts/ingest/*.
 export default function Methods() {
+  const { hash } = useLocation();
+  useEffect(() => {
+    if (hash) document.getElementById(hash.slice(1))?.scrollIntoView();
+  }, [hash]);
   return (
     <main className="page prose">
       <p><Link to="/">← Search</Link></p>
@@ -48,6 +53,21 @@ export default function Methods() {
         Commissioner can vote only on certain amendment votes, so their figures are not compared
         with the chamber.
       </p>
+
+      <h2 id="vote-types">Vote types</h2>
+      <p>
+        Many roll calls are about procedure rather than a bill itself, and a "no" on a procedural
+        vote is not a "no" on the bill. Each vote is labeled from the clerk's own wording:
+      </p>
+      <ul className="plain">
+        <li><strong>Final passage:</strong> whether to pass a bill or resolution, or accept the other chamber's version. "Two-thirds" marks House votes under expedited rules, which need two-thirds to pass.</li>
+        <li><strong>Veto override:</strong> whether to pass a bill over the President's veto. Needs two-thirds.</li>
+        <li><strong>Confirmation:</strong> whether the Senate confirms a nominee.</li>
+        <li><strong>Cloture:</strong> whether the Senate ends debate. Needs 60 votes for most bills and a simple majority for nominations.</li>
+        <li><strong>Amendment:</strong> whether to change a bill's text.</li>
+        <li><strong>Procedural:</strong> how the chamber proceeds, such as taking up a bill, setting it aside (tabling), sending it back to committee, waiving a budget rule, or adopting a House "rule" that sets the terms of debate for another bill.</li>
+      </ul>
+      <p>"Final votes only" on a member page shows final passage, veto overrides and confirmations.</p>
 
       <h2>Where the data comes from</h2>
       <ul className="plain">

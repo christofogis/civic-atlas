@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { voteKind, isFinal } from "../lib/voteKind.js";
 import { Link, useParams } from "react-router-dom";
 import { db } from "../lib/db.js";
 import { seatLabel, date, money, billLabel, ordinal } from "../lib/format.js";
@@ -42,7 +43,7 @@ async function loadMember(id) {
     one(db.from("committee_memberships").select("congress,title,side,rank,committee:committees(committee_id,name,parent_id,url)").eq("bioguide_id", id)),
     one(db.from("votes")
       .select("vote_id,chamber,question,result,voted_at,description,document_name,source_url,vote_positions!inner(position)")
-      .eq("vote_positions.bioguide_id", id).order("voted_at", { ascending: false }).limit(15)),
+      .eq("vote_positions.bioguide_id", id).order("voted_at", { ascending: false }).limit(120)),
     one(db.from("bills").select("congress,bill_type,number,title,introduced_date,latest_action_date,latest_action_text,source_url")
       .eq("sponsor_bioguide_id", id).order("introduced_date", { ascending: false }).limit(10)),
     db.from("bills").select("*", { count: "exact", head: true }).eq("sponsor_bioguide_id", id).then((r) => r.count),
@@ -68,6 +69,7 @@ function Section({ title, source, children }) {
 export default function Member() {
   const { bioguide } = useParams();
   const [state, setState] = useState({ status: "loading" });
+  const [finalOnly, setFinalOnly] = useState(false);
 
   useEffect(() => {
     if (!BIOGUIDE.test(bioguide ?? "")) { setState({ status: "missing" }); return; }
@@ -154,15 +156,21 @@ export default function Member() {
         )}
       </Section>
 
-      <Section title="Recent roll-call votes" source={`House Clerk and Senate.gov roll-call records; positions as recorded.${voteJob ? updated(voteJob) : ""}`}>
+      <Section title="Recent roll-call votes" source={<>House Clerk and Senate.gov roll-call records; positions as recorded.{voteJob ? updated(voteJob) : ""} <Link to="/methods#vote-types">About vote types</Link>.</>}>
         {votes.length === 0 ? <p>No roll-call votes on record since 2023.</p> : (
+          <>
+          <div className="toggle" role="group" aria-label="Which votes to show">
+            <button type="button" className={finalOnly ? "" : "on"} onClick={() => setFinalOnly(false)}>All votes</button>
+            <button type="button" className={finalOnly ? "on" : ""} onClick={() => setFinalOnly(true)}>Final votes only</button>
+          </div>
           <table>
             <thead><tr><th>Date</th><th>Question</th><th>Vote</th><th>Result</th></tr></thead>
             <tbody>
-              {votes.map((v) => (
+              {votes.filter((v) => !finalOnly || isFinal(v)).slice(0, 15).map((v) => (
                 <tr key={v.vote_id}>
                   <td>{date(v.voted_at)}</td>
                   <td>
+                    <span className={`kind kind-${voteKind(v).kind}`} title={voteKind(v).explain}>{voteKind(v).label}</span>
                     <a href={v.source_url}>{v.question}</a>
                     {(v.document_name || v.description) && <div className="fine">{[v.document_name, v.description].filter(Boolean).join(" · ")}</div>}
                   </td>
@@ -172,6 +180,8 @@ export default function Member() {
               ))}
             </tbody>
           </table>
+          {finalOnly && votes.filter(isFinal).length === 0 && <p className="fine">No final votes among the most recent 120 roll calls.</p>}
+          </>
         )}
       </Section>
 
