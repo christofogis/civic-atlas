@@ -46,7 +46,9 @@ async function run(db) {
   for (const office of ["H", "S"]) {
     let page = 1, pages = 1;
     do {
-      const q = new URLSearchParams({ election_year: String(year), office, per_page: "100", page: String(page), sort: "name", is_active_candidate: "true" });
+      // election_full=false: totals for the two-year period ending in the election year only, so
+      // senators (six-year terms) and House members are counted over the same span.
+      const q = new URLSearchParams({ election_year: String(year), cycle: String(year), election_full: "false", office, per_page: "100", page: String(page), sort: "name", is_active_candidate: "true" });
       const data = await getJson(`${API}/candidates/totals/?${q}`, key);
       pages = data.pagination?.pages ?? 1;
       for (const c of data.results ?? []) {
