@@ -71,7 +71,9 @@ async function memberList(bioguide, kind, key, maxPages = Infinity) {
       const cs = page.map((i) => parseInt(i.congress, 10)).filter(Boolean);
       console.log(`  ${bioguide} ${kind} offset=${offset} items=${page.length} congress ${Math.max(...cs)}..${Math.min(...cs)} first=${page[0]?.introducedDate} last=${page.at(-1)?.introducedDate} total=${data?.pagination?.count}`);
     }
-    const reachedOld = page.some((i) => i.introducedDate && i.introducedDate < FROM_DATE);
+    // A few old items appear out of order, so judge by the page's last (oldest) entry.
+    const lastDate = page.at(-1)?.introducedDate;
+    const reachedOld = Boolean(lastDate && lastDate < FROM_DATE);
     if (page.length < PAGE || reachedOld || !data?.pagination?.next) break;
   }
   return items.filter((i) => parseInt(i.congress, 10) >= FROM_CONGRESS);
