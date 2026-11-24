@@ -86,40 +86,40 @@ async function main() {
     const todo = members.filter((b) => serving.has(b) || !withBills.has(b)).slice(0, limit);
     console.log(`members to refresh: ${todo.length} (${serving.size} serving)`);
 
-    const sponsored = new Map();   // bill key -> row with sponsor
-    const cosponsoredOnly = new Map();
-    const cosponsors = [];
+    // Saved member by member, so a failure late in the run keeps what was already done.
     const k = (b) => `${b.congress}|${b.bill_type}|${b.number}`;
-    let done = 0;
+    const known = dryRun ? new Set() : new Set((await fetchAll(db, "bills", "congress,bill_type,number")).map(k));
+    let sponsoredTotal = 0, cosponsorTotal = 0, done = 0;
     for (const bioguide of todo) {
+      const sponsored = new Map();
       for (const item of await memberList(bioguide, "sponsored", key)) {
         const bill = mapItem(item);
         if (bill) sponsored.set(k(bill), { ...bill, sponsor_bioguide_id: bioguide });
       }
+      const cosponsoredOnly = new Map();
+      const cosponsors = new Map(); // keyed, in case a list shifts between pages
       for (const item of await memberList(bioguide, "cosponsored", key)) {
         const bill = mapItem(item);
         if (!bill) continue;
-        cosponsoredOnly.set(k(bill), bill);
-        cosponsors.push({ congress: bill.congress, bill_type: bill.bill_type, number: bill.number, bioguide_id: bioguide });
+        if (!known.has(k(bill)) && !sponsored.has(k(bill))) cosponsoredOnly.set(k(bill), bill);
+        cosponsors.set(k(bill), { congress: bill.congress, bill_type: bill.bill_type, number: bill.number, bioguide_id: bioguide });
       }
+      if (dryRun) {
+        if (done === 0) console.log("sample bill:", JSON.stringify([...sponsored.values()][0] ?? null));
+      } else {
+        // Separate batches so a cosponsor-only row never blanks out a known sponsor.
+        await upsertBatches(db, "bills", [...sponsored.values()], "congress,bill_type,number");
+        await upsertBatches(db, "bills", [...cosponsoredOnly.values()], "congress,bill_type,number");
+        await upsertBatches(db, "bill_cosponsors", [...cosponsors.values()], "congress,bill_type,number,bioguide_id");
+      }
+      for (const key2 of [...sponsored.keys(), ...cosponsoredOnly.keys()]) known.add(key2);
+      sponsoredTotal += sponsored.size;
+      cosponsorTotal += cosponsors.size;
       if (++done % 50 === 0) console.log(`  ${done}/${todo.length} members`);
     }
-    for (const key2 of sponsored.keys()) cosponsoredOnly.delete(key2);
-    console.log(`bills: ${sponsored.size} with sponsor, ${cosponsoredOnly.size} cosponsored only; ${cosponsors.length} cosponsorships`);
-
-    if (dryRun) {
-      console.log("sample bill:", JSON.stringify([...sponsored.values()][0] ?? null));
-      console.log("dry run: nothing written");
-      return { rows_inserted: 0, rows_updated: 0 };
-    }
-    // Separate batches so a cosponsor-only row never blanks out a known sponsor.
-    await upsertBatches(db, "bills", [...sponsored.values()], "congress,bill_type,number");
-    if (cosponsoredOnly.size) {
-      const existing = new Set((await fetchAll(db, "bills", "congress,bill_type,number")).map(k));
-      await upsertBatches(db, "bills", [...cosponsoredOnly.values()].filter((b) => !existing.has(k(b))), "congress,bill_type,number");
-    }
-    await upsertBatches(db, "bill_cosponsors", cosponsors, "congress,bill_type,number,bioguide_id");
-    return { rows_inserted: 0, rows_updated: sponsored.size + cosponsoredOnly.size + cosponsors.length };
+    console.log(`bills: ${sponsoredTotal} sponsored; ${cosponsorTotal} cosponsorships`);
+    if (dryRun) console.log("dry run: nothing written");
+    return { rows_inserted: 0, rows_updated: sponsoredTotal + cosponsorTotal };
   };
 
   if (dryRun) await run();
