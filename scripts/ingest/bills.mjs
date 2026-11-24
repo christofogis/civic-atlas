@@ -73,7 +73,8 @@ async function memberList(bioguide, kind, key, maxPages = Infinity) {
     }
     // A few old items appear out of order, so judge by the page's last (oldest) entry.
     const lastDate = page.at(-1)?.introducedDate;
-    const reachedOld = Boolean(lastDate && lastDate < FROM_DATE);
+    const anyInWindow = page.some((i) => (i.introducedDate ?? "") >= FROM_DATE || parseInt(i.congress, 10) >= FROM_CONGRESS);
+    const reachedOld = Boolean(lastDate && lastDate < FROM_DATE) || !anyInWindow;
     if (page.length < PAGE || reachedOld || !data?.pagination?.next) break;
   }
   return items.filter((i) => parseInt(i.congress, 10) >= FROM_CONGRESS);
