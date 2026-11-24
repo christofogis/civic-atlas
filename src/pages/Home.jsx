@@ -1,5 +1,7 @@
 import { useState } from "react";
 import OfficialCard from "../components/OfficialCard.jsx";
+import Turnstile from "../components/Turnstile.jsx";
+import { TURNSTILE_SITE_KEY } from "../lib/config.js";
 import { STATE_NAMES } from "../lib/format.js";
 
 export default function Home() {
@@ -7,14 +9,19 @@ export default function Home() {
   const [status, setStatus] = useState("idle"); // idle | loading | done | error
   const [result, setResult] = useState(null);
   const [error, setError] = useState("");
+  const [token, setToken] = useState("");
+  const [lookups, setLookups] = useState(0);
+  const needsCheck = Boolean(TURNSTILE_SITE_KEY);
 
   async function handleSubmit(e) {
     e.preventDefault();
-    if (!address.trim()) return;
+    if (!address.trim() || (needsCheck && !token)) return;
     setStatus("loading");
     setError("");
     try {
-      const res = await fetch(`/api/lookup?address=${encodeURIComponent(address.trim())}`);
+      const res = await fetch(`/api/lookup?address=${encodeURIComponent(address.trim())}`, {
+        headers: needsCheck ? { "CF-Turnstile-Token": token } : {},
+      });
       const body = await res.json();
       if (!res.ok) throw new Error(body.error ?? "Lookup failed.");
       setResult(body);
@@ -22,6 +29,8 @@ export default function Home() {
     } catch (err) {
       setError(err.message);
       setStatus("error");
+    } finally {
+      setLookups((n) => n + 1); // triggers a fresh bot-check token
     }
   }
 
@@ -46,10 +55,11 @@ export default function Home() {
             value={address}
             onChange={(e) => setAddress(e.target.value)}
           />
-          <button type="submit" disabled={status === "loading"}>
+          <button type="submit" disabled={status === "loading" || (needsCheck && !token)}>
             {status === "loading" ? "Looking up…" : "Look up"}
           </button>
         </div>
+        {needsCheck && <Turnstile siteKey={TURNSTILE_SITE_KEY} onToken={setToken} resetSignal={lookups} />}
         <p className="fine">Your address is used only to find your district. It isn't stored.</p>
       </form>
 

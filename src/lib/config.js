@@ -3,3 +3,7 @@
 // service-role key or any other secret here.
 export const SUPABASE_URL = "https://fkbzxaoeyrtzviyfzulq.supabase.co";
 export const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_M_uX1gyqB4R-7cqapPLdTQ_D4lbhVdT";
+
+// Cloudflare Turnstile site key (public by design). Empty = bot check not shown.
+// The matching secret key lives only in the Pages project's environment variables.
+export const TURNSTILE_SITE_KEY = "";

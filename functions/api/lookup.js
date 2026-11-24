@@ -3,6 +3,7 @@
 // Privacy: the address is sent to Geocodio to find the district and is never stored,
 // logged, or cached here. Only the district and the officials are returned.
 import { districtsFromGeocodio } from "../../lib/geocodio.js";
+import { verifyTurnstile } from "../../lib/turnstile.js";
 import { SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY } from "../../src/lib/config.js";
 
 const json = (body, status = 200) =>
@@ -22,6 +23,11 @@ export async function onRequestGet({ request, env }) {
     return json({ error: "Enter a street address, city and state, or a ZIP code." }, 400);
   }
   if (!env.GEOCODIO_API_KEY) return json({ error: "Address lookup is not configured." }, 500);
+  // Bot check before spending a Geocodio lookup. Enforced once TURNSTILE_SECRET_KEY is set.
+  const token = request.headers.get("CF-Turnstile-Token");
+  if (!(await verifyTurnstile(token, env.TURNSTILE_SECRET_KEY, request.headers.get("CF-Connecting-IP")))) {
+    return json({ error: "Please complete the verification and try again." }, 403);
+  }
 
   const geo = await fetch(
     `https://api.geocod.io/v2.1/geocode?q=${encodeURIComponent(address)}&fields=cd&limit=1&api_key=${env.GEOCODIO_API_KEY}`

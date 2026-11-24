@@ -32,6 +32,9 @@ yes-man: flag weak ideas, scope creep, and shortcuts that will cost later.
 - Server-only secrets never use the `VITE_` prefix (Vite exposes `VITE_*` to the browser).
 - No API calls to OpenAI or other keyed services from the browser.
 - Google Maps/Places browser keys must be restricted by HTTP referrer in Google Cloud.
+- `/api/lookup` requires a Cloudflare Turnstile token once `TURNSTILE_SECRET_KEY` is set in
+  Pages; the public site key is `TURNSTILE_SITE_KEY` in `src/lib/config.js`. Set the site key
+  first, then the secret, or lookups will be refused.
 - Supabase: Row Level Security on every table; the browser gets read-only access via the
   publishable key, which is committed in `src/lib/config.js` by design. The service-role
   key is used only in ingest jobs (GitHub secret).
