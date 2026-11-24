@@ -9,7 +9,7 @@ const rate = (x) => `${Math.round(100 * x)}%`;
 // A plain-language summary at the top of a member page. Every sentence is filled in by code
 // from the records below, in the same words for every member; a sentence is left out only
 // when there's no record for it. Nothing here is written by AI.
-export default function AtAGlance({ terms, voteStats, medians, billStats, laws, finance, bySize, tradeSummary, delegate }) {
+export default function AtAGlance({ terms, voteStats, medians, billStats, laws, finance, bySize, tradeSummary, delegate, note = "Filled in from the records below, in the same words for every member." }) {
   const lines = [];
   const first = terms.length ? terms.reduce((a, t) => (t.start_date < a ? t.start_date : a), terms[0].start_date) : null;
   if (first) lines.push(<>First took office in Congress in {first.slice(0, 4)}.</>);
@@ -64,7 +64,7 @@ export default function AtAGlance({ terms, voteStats, medians, billStats, laws, 
     <section className="glance">
       <h2>At a glance</h2>
       <ul>{lines.map((l, i) => <li key={i}>{l}</li>)}</ul>
-      <p className="fine">Filled in from the records below, in the same words for every member.</p>
+      <p className="fine">{note}</p>
     </section>
   );
 }

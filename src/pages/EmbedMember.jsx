@@ -48,14 +48,15 @@ export default function EmbedMember() {
         {seat?.seat_status === "serving" ? `${seatLabel(seat)} · ${seat.party}` : latest ? `Former member · ${seatLabel(latest)} · ${latest.party}` : ""}
       </p>
       <AtAGlance terms={terms} voteStats={d.voteStats} medians={d.medians} billStats={d.billStats} laws={d.laws}
-        finance={d.finance} bySize={d.bySize} tradeSummary={d.tradeSummary} delegate={latest?.chamber === "house" && TERRITORIES.has(latest.state)} />
+        finance={d.finance} bySize={d.bySize} tradeSummary={d.tradeSummary} delegate={latest?.chamber === "house" && TERRITORIES.has(latest.state)}
+        note="Filled in from official records, in the same words for every member." />
       {votes.length > 0 && (
         <>
           <h2>Recent roll-call votes</h2>
           <ul className="plain">
             {votes.map((v) => (
               <li key={v.vote_id}>
-                <strong>{v.position}</strong> · {v.document_name ? `${v.document_name}: ` : ""}{v.question} · <span className="fine">{v.result}, {date(v.voted_at)}</span>
+                <strong>{v.position}</strong> · {v.document_name && !v.question?.includes(v.document_name) ? `${v.document_name}: ` : ""}{v.question} · <span className="fine">{v.result}, {date(v.voted_at)}</span>
               </li>
             ))}
           </ul>

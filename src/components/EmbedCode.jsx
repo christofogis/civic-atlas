@@ -1,7 +1,7 @@
 import { useState } from "react";
 
 // "Embed on your site": iframe code a news site can paste into an article.
-export default function EmbedCode({ path, title, height = 520 }) {
+export default function EmbedCode({ path, title, height = 900 }) {
   const [copied, setCopied] = useState(false);
   const code = `<iframe src="${window.location.origin}${path}" title="${title.replace(/"/g, "&quot;")}" width="100%" height="${height}" style="border:0;max-width:640px" loading="lazy"></iframe>`;
   return (
