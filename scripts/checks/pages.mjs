@@ -19,6 +19,7 @@ export const PAGES = [
   ["/hearing/338900", ["export controls", "Senate committees post witness lists", "committee's website"]],
   ["/embed/member/P000145", ["Alex Padilla", "Recent roll-call votes", "Full record"]],
   // Spanish (the language choice is per browser, and each check opens a fresh one).
+  ["/?lang=es", ["Buscar", "English"]],
   ["/member/P000145?lang=es", ["En resumen", "Contacto", "Senado de EE. UU."]],
   ["/bills?lang=es", ["Proyectos de ley", "Última acción"]],
   ["/methods?lang=es", ["Cómo funciona este sitio", "Tasa de voto con el partido"]],

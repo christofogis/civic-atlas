@@ -30,7 +30,7 @@ for (const [path, expected] of PAGES) {
   });
   try {
     // The bot check on the home page keeps polling, so "network idle" never comes there.
-    await page.goto(BASE + path, { waitUntil: path === "/" ? "load" : "networkidle", timeout: 45_000 });
+    await page.goto(BASE + path, { waitUntil: /^\/(\?|$)/.test(path) ? "load" : "networkidle", timeout: 45_000 });
     await page.waitForFunction(() => !document.body.innerText.includes("Loading…"), null, { timeout: 30_000 }).catch(() => {});
     const text = await page.innerText("body");
     const missing = expected.filter((t) => !text.includes(t));

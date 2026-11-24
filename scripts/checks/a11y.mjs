@@ -15,7 +15,7 @@ for (const [path] of PAGES) {
     const context = await browser.newContext({ viewport: { width, height: 900 } });   // axe needs a context
     const page = await context.newPage();
     try {
-      await page.goto(BASE + path, { waitUntil: path === "/" ? "load" : "networkidle", timeout: 45_000 });
+      await page.goto(BASE + path, { waitUntil: /^\/(\?|$)/.test(path) ? "load" : "networkidle", timeout: 45_000 });
       await page.waitForFunction(() => !document.body.innerText.includes("Loading…"), null, { timeout: 30_000 }).catch(() => {});
       const { violations } = await new AxeBuilder({ page })
         .withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"])

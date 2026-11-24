@@ -14,7 +14,7 @@ page.on("pageerror", (e) => console.log(`PAGEERROR ${e.message}`));
 await page.goto(BASE);
 await page.evaluate(() => localStorage.setItem("civic-atlas:my-reps", JSON.stringify(["P000145", "S001150"])));
 for (const path of PATHS) {
-  await page.goto(BASE + path, { waitUntil: path === "/" ? "load" : "networkidle" });
+  await page.goto(BASE + path, { waitUntil: /^\/(\?|$)/.test(path) ? "load" : "networkidle" });
   await page.waitForTimeout(1500);
   const buf = await page.screenshot({ fullPage: true, type: "jpeg", quality: 55 });
   const b64 = buf.toString("base64");
