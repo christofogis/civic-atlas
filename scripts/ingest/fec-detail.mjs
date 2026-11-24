@@ -41,7 +41,8 @@ async function getJson(path, params, key) {
   throw new Error(`GET ${path}: failed after retries`);
 }
 
-// One candidate ID and cycle -> rows for each table.
+// One candidate ID and cycle -> rows for each table. election_full=false asks for the two-year
+// period itself; the default covers a senator's whole six-year term and is empty off-years.
 async function detail(candId, cycle, bioguide, key, probe) {
   const show = (label, data) => probe && console.log(`\n# ${label}\n`, JSON.stringify((data?.results ?? []).slice(0, 2), null, 1));
 
@@ -49,7 +50,7 @@ async function detail(candId, cycle, bioguide, key, probe) {
   show("principal committees", comms);
   const committee = comms?.results?.[0]?.committee_id ?? null;
 
-  const size = await getJson("/schedules/schedule_a/by_size/by_candidate/", { candidate_id: candId, cycle, per_page: 20 }, key);
+  const size = await getJson("/schedules/schedule_a/by_size/by_candidate/", { candidate_id: candId, cycle, election_full: false, per_page: 20 }, key);
   show("by size", size);
   const bySize = (size?.results ?? []).map((r) => ({
     fec_candidate_id: candId, cycle, bioguide_id: bioguide,
@@ -87,7 +88,7 @@ async function detail(candId, cycle, bioguide, key, probe) {
     }));
   }
 
-  const ie = await getJson("/schedules/schedule_e/by_candidate/", { candidate_id: candId, cycle, per_page: 100, sort: "-total" }, key);
+  const ie = await getJson("/schedules/schedule_e/by_candidate/", { candidate_id: candId, cycle, election_full: false, per_page: 100, sort: "-total" }, key);
   show("outside spending", ie);
   const outside = (ie?.results ?? [])
     .filter((r) => r.committee_id && ["S", "O"].includes(r.support_oppose_indicator))
