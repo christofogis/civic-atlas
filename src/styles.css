@@ -195,3 +195,4 @@ td { border-bottom: 1px solid var(--border); padding: 8px 8px 8px 0; vertical-al
 .my-reps li { padding: 8px 0; border-bottom: 1px solid var(--border); }
 .my-reps li:last-child { border-bottom: 0; }
 .my-rep-name { font-weight: 600; font-size: 1.05rem; }
+header.site nav a { white-space: nowrap; }

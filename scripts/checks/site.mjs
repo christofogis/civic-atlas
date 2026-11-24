@@ -6,7 +6,8 @@ import { chromium } from "playwright";
 const BASE = process.argv[2] ?? "https://civic-atlas-cub.pages.dev";
 const PAGES = [
   ["/", ["Civic Atlas", "Look up"]],
-  ["/member/P000145", ["Alex Padilla", "At a glance", "Contact", "Voting record", "next up for election"]],
+  ["/member/P000145", ["Alex Padilla", "At a glance", "Contact", "next up for election", "Overview"]],
+  ["/member/P000145#votes", ["Voting record", "Recent roll-call votes"]],
   ["/member/P000145/votes", ["Roll-call votes", "Issue"]],
   ["/bill/119/hr/1", ["Became law", "Cosponsors", "Roll-call votes", "Lobbying reports naming this bill"]],
   ["/bills", ["Bills", "Latest action"]],

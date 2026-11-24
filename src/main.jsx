@@ -1,4 +1,4 @@
-import { StrictMode, lazy } from "react";
+import { StrictMode, lazy as lazyReact } from "react";
 import { createRoot } from "react-dom/client";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Home from "./pages/Home.jsx";
@@ -8,7 +8,14 @@ import "@fontsource/public-sans/600.css";
 import "@fontsource/public-sans/700.css";
 import "./styles.css";
 
-// Each page loads its own code when first visited, so phones download less up front.
+// Each page loads its own code when first visited, so phones download less up front. If a
+// page's code can't be fetched (usually because a new version was just deployed), reload once
+// to pick up the new version instead of showing a broken page.
+const lazy = (load) => lazyReact(() => load().catch((err) => {
+  const key = "civic-atlas:reloaded";
+  if (!sessionStorage.getItem(key)) { sessionStorage.setItem(key, "1"); window.location.reload(); return new Promise(() => {}); }
+  throw err;
+}).then((m) => { sessionStorage.removeItem("civic-atlas:reloaded"); return m; }));
 const Member = lazy(() => import("./pages/Member.jsx"));
 const Bill = lazy(() => import("./pages/Bill.jsx"));
 const MemberVotes = lazy(() => import("./pages/MemberVotes.jsx"));
