@@ -24,7 +24,7 @@ export async function onRequestGet({ request, env }) {
   if (!env.GEOCODIO_API_KEY) return json({ error: "Address lookup is not configured." }, 500);
 
   const geo = await fetch(
-    `https://api.geocod.io/v2/geocode?q=${encodeURIComponent(address)}&fields=cd&limit=1&api_key=${env.GEOCODIO_API_KEY}`
+    `https://api.geocod.io/v2.1/geocode?q=${encodeURIComponent(address)}&fields=cd&limit=1&api_key=${env.GEOCODIO_API_KEY}`
   );
   if (geo.status === 422) return json({ error: "That address couldn't be found." }, 404);
   if (!geo.ok) return json({ error: "The address service is unavailable. Try again shortly." }, 502);
