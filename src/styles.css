@@ -251,3 +251,4 @@ header.site nav { flex-wrap: wrap; row-gap: 4px; }
 
 .member-photo { float: left; margin: 4px 14px 6px 0; border-radius: 6px; object-fit: cover; }
 .member-photo.small { margin-right: 10px; }
+.tabs { clear: both; }   /* start below the member photo */
