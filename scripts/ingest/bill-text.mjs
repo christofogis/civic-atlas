@@ -1,13 +1,14 @@
 // Compare consecutive full-text versions of each bill, section by section, from GPO's XML.
 // Runs daily after the bills job; only bills with a version not yet compared are read, so it
 // is safe to re-run and resumes where a capped run stopped.
-//   node scripts/ingest/bill-text.mjs [--limit N] [--dry-run]
+//   node scripts/ingest/bill-text.mjs [--limit N] [--dry-run] [--recompute]
 import { getClient, fetchAll, upsertBatches, withRun } from "./lib.mjs";
 import { sectionsFromXml, compareSections } from "../../lib/billtext.js";
 
 const args = process.argv.slice(2);
 const arg = (n) => (args.includes(n) ? args[args.indexOf(n) + 1] : undefined);
 const DRY = args.includes("--dry-run");
+const RECOMPUTE = args.includes("--recompute");   // compare every bill again (after a change to the method)
 const LIMIT = arg("--limit") ? parseInt(arg("--limit"), 10) : 4000;   // bills per run
 const CONCURRENCY = 4;
 const UA = { headers: { "User-Agent": "civic-atlas ingest (github.com/christofogis/civic-atlas)" } };
@@ -38,7 +39,7 @@ async function mapLimit(items, n, fn) {
 const db = getClient();
 const run = async () => {
   const versions = await fetchAll(db, "bill_text_versions", "congress,bill_type,number,version_code,seq,version_name,version_date,xml_url,full_text");
-  const done = new Set((await fetchAll(db, "bill_version_changes", "congress,bill_type,number,from_code,to_code"))
+  const done = RECOMPUTE ? new Set() : new Set((await fetchAll(db, "bill_version_changes", "congress,bill_type,number,from_code,to_code"))
     .map((c) => `${c.congress}|${c.bill_type}|${c.number}|${c.from_code}|${c.to_code}`));
   const byBill = new Map();
   for (const v of versions) {
@@ -51,7 +52,7 @@ const run = async () => {
   for (const [k, vs] of byBill) {
     if (vs.length < 2) continue;
     vs.sort((a, z) => a.seq - z.seq);
-    const full = vs.filter((v) => v.full_text !== false);
+    const full = vs.filter((v) => RECOMPUTE || v.full_text !== false);
     const pending = full.some((v) => v.full_text == null) || full.slice(1).some((v, i) => !done.has(`${k}|${full[i].version_code}|${v.version_code}`));
     if (pending) todo.push(vs);
   }
@@ -74,7 +75,7 @@ const run = async () => {
     const sections = new Map();
     let gap = false;
     for (const v of vs) {
-      if (v.full_text === false) continue;
+      if (v.full_text === false && !RECOMPUTE) continue;
       const xml = await get(v.xml_url);
       if (xml == null) { missing++; gap = true; continue; }   // not published yet; tried again next run
       const s = sectionsFromXml(xml);

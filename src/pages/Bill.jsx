@@ -1,6 +1,7 @@
 import { Fragment, useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { db } from "../lib/db.js";
+import TextVersions from "../components/TextVersions.jsx";
 import DownloadCsv from "../components/DownloadCsv.jsx";
 import { date, billLabel, ordinal, partyTag } from "../lib/format.js";
 import VoteBreakdown from "../components/VoteBreakdown.jsx";
@@ -112,6 +113,8 @@ export default function Bill() {
           ? <p>{b.crs_summary}</p>
           : <p>The Congressional Research Service hasn't published a summary of this bill yet. The bill text is at Congress.gov.</p>}
       </Section>
+
+      <TextVersions congress={congress} type={type} number={number} />
 
       <Section title="Cosponsors" source={`GovInfo Bill Status (Library of Congress).${updated("bills")} Party and seat as of the day each member signed on.`}>
         {current.length === 0 ? <p>No cosponsors.</p> : (

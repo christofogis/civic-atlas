@@ -13,6 +13,10 @@ on:
         description: "Re-read every bill (first load or repair)"
         type: boolean
         default: false
+      text_recompute:
+        description: "Compare every bill's text versions again (after a method change)"
+        type: boolean
+        default: false
       text_limit:
         description: "Bills whose text versions to compare this run"
         type: string
@@ -51,6 +55,7 @@ jobs:
         env:
           DRY_RUN: ${{ inputs.dry_run }}
           TEXT_LIMIT: ${{ inputs.text_limit || '4000' }}
+          RECOMPUTE: ${{ inputs.text_recompute && '--recompute' || '' }}
         run: |
           if [ "$DRY_RUN" = "true" ]; then node scripts/ingest/bill-text.mjs --dry-run --limit 3
-          else node scripts/ingest/bill-text.mjs --limit "$TEXT_LIMIT"; fi
+          else node scripts/ingest/bill-text.mjs --limit "$TEXT_LIMIT" $RECOMPUTE; fi

@@ -47,3 +47,16 @@ test("amendment-only documents and bodies without sections", () => {
   const r = sectionsFromXml(`<resolution><resolution-body><text>Resolved, That the House honors X.</text></resolution-body></resolution>`);
   assert.equal(r[0].header, "Full text");
 });
+
+test("Senate reported: struck body and committee body", () => {
+  const xml = `<bill><legis-body><section changed="deleted"><enum>1.</enum><header>Old</header><text>old text</text></section></legis-body>` +
+    `<legis-body><section changed="added"><enum>1.</enum><header>New</header><text>new text here</text></section></legis-body></bill>`;
+  assert.deepEqual(sectionsFromXml(xml).map((s) => [s.header, s.words]), [["New", 4]]);
+});
+
+test("renamed titles: sections still match by heading", () => {
+  const a = sectionsFromXml(bill(`<title><enum>I</enum><header>Committee on Agriculture</header>${sec(101, "Thrifty food plan", "x")}</title>`));
+  const b = sectionsFromXml(bill(`<title><enum>I</enum><header>Committee on Agriculture, Nutrition, and Forestry</header>${sec(10101, "Thrifty food plan", "y")}</title>`));
+  const c = compareSections(a, b);
+  assert.deepEqual([c.added_count, c.removed_count, c.changed_count], [0, 0, 1]);
+});

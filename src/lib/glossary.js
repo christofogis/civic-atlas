@@ -1,5 +1,8 @@
 // Plain explanations of terms used on the site. Each describes the procedure or record only.
 export const GLOSSARY = {
+  "text-version": { term: "Bill text version", text: "A bill is reprinted each time it moves a step: as introduced, as reported by a committee (with the committee's changes), as passed by one chamber (\"engrossed\"), and in its final form sent to the President (\"enrolled\"). Each version is an official document." },
+  engrossed: { term: "Engrossed", text: "The official text of a bill as passed by one chamber. An \"engrossed amendment\" is a document listing only the changes the second chamber made." },
+  enrolled: { term: "Enrolled", text: "The final text passed in identical form by both chambers and sent to the President to sign or veto." },
   "roll-call": { term: "Roll-call vote", text: "A vote where each member's Yea or Nay is recorded by name. Many decisions are made by voice vote instead, with no individual record." },
   "party-split": { term: "Party-split vote", text: "A roll call where most Democrats voted one way and most Republicans voted the other. The party-line rate on this site counts only these votes." },
   cloture: { term: "Cloture", text: "A Senate vote to end debate so a measure can move to a final vote. It usually needs 60 votes for bills and a simple majority for nominations. Voting for cloture is not the same as voting for the bill." },
