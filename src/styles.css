@@ -230,4 +230,5 @@ header.site nav { flex-wrap: wrap; row-gap: 4px; }
 }
 
 /* Language toggle at the top of the home page (the header link does the same on every page). */
-.home-lang { float: right; margin: 4px 0 8px 12px; }
+.home-title { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 8px 16px; }
+.home-title h1 { margin-right: auto; }

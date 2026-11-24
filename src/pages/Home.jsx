@@ -58,11 +58,13 @@ export default function Home() {
   return (
     <main className="page">
       <header>
-        <div className="toggle home-lang" role="group" aria-label="Language / Idioma">
-          <button type="button" lang="en" aria-pressed={lang === "en"} className={lang === "en" ? "on" : ""} onClick={() => setLang("en")}>English</button>
-          <button type="button" lang="es" aria-pressed={lang === "es"} className={lang === "es" ? "on" : ""} onClick={() => setLang("es")}>Español</button>
+        <div className="home-title">
+          <h1>Civic Atlas</h1>
+          <div className="toggle home-lang" role="group" aria-label="Language / Idioma">
+            <button type="button" lang="en" aria-pressed={lang === "en"} className={lang === "en" ? "on" : ""} onClick={() => setLang("en")}>English</button>
+            <button type="button" lang="es" aria-pressed={lang === "es"} className={lang === "es" ? "on" : ""} onClick={() => setLang("es")}>Español</button>
+          </div>
         </div>
-        <h1>Civic Atlas</h1>
         <p className="lede">
           {t("Enter an address to see who represents you in Congress, with their votes, bills, committees, and campaign finance, drawn from official sources.",
             "Escriba una dirección para ver quién le representa en el Congreso, con sus votos, proyectos de ley, comités y finanzas de campaña, según fuentes oficiales.")}
