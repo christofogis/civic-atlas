@@ -228,3 +228,6 @@ header.site nav { flex-wrap: wrap; row-gap: 4px; }
 @media (max-width: 600px) {
   main table { display: block; max-width: 100%; overflow-x: auto; }
 }
+
+/* Language toggle at the top of the home page (the header link does the same on every page). */
+.home-lang { float: right; margin: 4px 0 8px 12px; }

@@ -29,7 +29,7 @@ export default function Home() {
   const [lookups, setLookups] = useState(0);
   const needsCheck = Boolean(TURNSTILE_SITE_KEY);
   const [mine, setMine] = useState(() => myRepresentatives());
-  const { t } = useLang();
+  const { t, lang, setLang } = useLang();
 
   async function handleSubmit(e) {
     e.preventDefault();
@@ -58,6 +58,10 @@ export default function Home() {
   return (
     <main className="page">
       <header>
+        <div className="toggle home-lang" role="group" aria-label="Language / Idioma">
+          <button type="button" lang="en" aria-pressed={lang === "en"} className={lang === "en" ? "on" : ""} onClick={() => setLang("en")}>English</button>
+          <button type="button" lang="es" aria-pressed={lang === "es"} className={lang === "es" ? "on" : ""} onClick={() => setLang("es")}>Español</button>
+        </div>
         <h1>Civic Atlas</h1>
         <p className="lede">
           {t("Enter an address to see who represents you in Congress, with their votes, bills, committees, and campaign finance, drawn from official sources.",
