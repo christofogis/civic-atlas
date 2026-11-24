@@ -2,18 +2,17 @@ name: Ingest bills
 
 on:
   schedule:
-    - cron: "23 13 * * 1-6"  # Mon-Sat 5:23am Pacific: recent pages only
-    - cron: "23 13 * * 0"    # Sundays: full re-read back to 2023
+    - cron: "23 13 * * *"   # daily, 5:23am Pacific: bills changed since the last run
   workflow_dispatch:
     inputs:
       dry_run:
-        description: "Fetch two members only; write nothing"
+        description: "List and parse a few files only; write nothing"
         type: boolean
         default: false
-      member:
-        description: "Dry run one member by bioguide ID and print paging details"
-        type: string
-        default: ""
+      full:
+        description: "Re-read every bill (first load or repair)"
+        type: boolean
+        default: false
 
 permissions:
   contents: read
@@ -25,11 +24,10 @@ concurrency:
 jobs:
   ingest:
     runs-on: ubuntu-latest
-    timeout-minutes: 180
+    timeout-minutes: 120
     env:
       SUPABASE_URL: https://fkbzxaoeyrtzviyfzulq.supabase.co
       SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
-      DATA_GOV_API_KEY: ${{ secrets.DATA_GOV_API_KEY }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -40,10 +38,8 @@ jobs:
       - name: Bills
         env:
           DRY_RUN: ${{ inputs.dry_run }}
-          MEMBER: ${{ inputs.member }}
-          SCHEDULE: ${{ github.event.schedule }}
+          FULL: ${{ inputs.full }}
         run: |
-          if [[ "$MEMBER" =~ ^[A-Z][0-9]{6}$ ]]; then DEBUG_PAGES=1 node scripts/ingest/bills.mjs --dry-run --member "$MEMBER"
-          elif [ "$DRY_RUN" = "true" ]; then node scripts/ingest/bills.mjs --dry-run --limit 2
-          elif [ "$SCHEDULE" = "23 13 * * 1-6" ]; then node scripts/ingest/bills.mjs --max-pages 2
+          if [ "$DRY_RUN" = "true" ]; then node scripts/ingest/bills.mjs --dry-run --limit 3
+          elif [ "$FULL" = "true" ]; then node scripts/ingest/bills.mjs --full
           else node scripts/ingest/bills.mjs; fi
