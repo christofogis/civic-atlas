@@ -36,7 +36,7 @@ function VoteStats({ s, median, delegate, independent }) {
 
 async function loadMember(id) {
   const one = (q) => q.then(({ data, error }) => { if (error) throw error; return data; });
-  const [member, terms, seat, memberships, votes, bills, sponsoredCount, cosponsoredCount, finance, freshness, voteStats, medians, billStats, billMedians, trades, filings] = await Promise.all([
+  const [member, terms, seat, memberships, votes, bills, sponsoredCount, cosponsoredCount, finance, freshness, voteStats, medians, billStats, billMedians, trades, filings, tradeSummary] = await Promise.all([
     one(db.from("members").select("*").eq("bioguide_id", id).maybeSingle()),
     one(db.from("terms").select("chamber,state,district,party,start_date,end_date").eq("bioguide_id", id).order("start_date", { ascending: false })),
     one(db.from("seat_holders").select("*").eq("bioguide_id", id).maybeSingle()),
@@ -54,11 +54,12 @@ async function loadMember(id) {
     one(db.from("chamber_vote_medians").select("*")),
     one(db.from("member_bill_stats").select("*").eq("bioguide_id", id).order("congress", { ascending: false })),
     one(db.from("chamber_bill_medians").select("*")),
-    one(db.from("stock_transactions").select("filing_id,row_num,owner,asset_name,ticker,transaction_type,transaction_date,amount_text,filed_date,days_to_file")
-      .eq("bioguide_id", id).order("transaction_date", { ascending: false }).limit(500)),
-    one(db.from("ptr_filings").select("filing_id,filed_date,format,source_url,transaction_count").eq("bioguide_id", id).order("filed_date", { ascending: false })),
+    one(db.from("stock_trades_dedup").select("filing_id,row_num,owner,asset_name,ticker,transaction_type,transaction_date,amount_text,filed_date,days_to_file,is_amendment,source_url")
+      .eq("bioguide_id", id).order("transaction_date", { ascending: false }).limit(25)),
+    one(db.from("ptr_filings").select("filing_id,filed_date,format,source_url").eq("bioguide_id", id).eq("format", "scanned").order("filed_date", { ascending: false })),
+    one(db.from("member_trade_summary").select("*").eq("bioguide_id", id).maybeSingle()),
   ]);
-  return { member, terms, seat, memberships, votes, bills, sponsoredCount, cosponsoredCount, finance, freshness, voteStats, medians, billStats, billMedians, trades, filings };
+  return { member, terms, seat, memberships, votes, bills, sponsoredCount, cosponsoredCount, finance, freshness, voteStats, medians, billStats, billMedians, trades, filings, tradeSummary };
 }
 
 function Section({ title, source, children }) {
@@ -88,10 +89,7 @@ export default function Member() {
   if (state.status === "missing") return <main className="page"><h1>Member not found</h1><p><Link to="/">Back to search</Link></p></main>;
   if (state.status === "error") return <main className="page"><p className="notice">Couldn't load this page right now. Try again shortly.</p></main>;
 
-  const { member: m, terms, seat, memberships, votes, bills, sponsoredCount, cosponsoredCount, finance, freshness, voteStats, medians, billStats, billMedians, trades, filings } = state.data;
-  const filingUrl = Object.fromEntries(filings.map((f) => [f.filing_id, f.source_url]));
-  const lateTrades = trades.filter((t) => t.days_to_file > 45);
-  const scannedFilings = filings.filter((f) => f.format === "scanned");
+  const { member: m, terms, seat, memberships, votes, bills, sponsoredCount, cosponsoredCount, finance, freshness, voteStats, medians, billStats, billMedians, trades, filings: scannedFilings, tradeSummary: ts } = state.data;
   const delegate = latest => latest?.chamber === "house" && TERRITORIES.has(latest.state);
   const name = m.official_full_name ?? `${m.first_name} ${m.last_name}`;
   const latest = terms[0];
@@ -231,23 +229,23 @@ export default function Member() {
       </Section>
 
       <Section title="Stock trades" source={<>Periodic Transaction Reports filed under the STOCK Act with the House Clerk and Senate, 2025 on.{updated("trades")} <Link to="/methods#trades">About this data</Link>.</>}>
-        {filings.length === 0 ? <p>No periodic transaction reports on record since 2025.</p> : (
+        {!ts ? <p>No periodic transaction reports on record since 2025.</p> : (
           <>
             <p>
-              {filings.length} report{filings.length === 1 ? "" : "s"} filed, listing {trades.length.toLocaleString()} transaction{trades.length === 1 ? "" : "s"}.
-              {trades.length > 0 && <> Reported more than 45 days after the transaction: <strong>{lateTrades.length}</strong> of {trades.length}.</>}
+              {ts.filings} report{ts.filings === 1 ? "" : "s"} filed, listing {ts.trades.toLocaleString()} transaction{ts.trades === 1 ? "" : "s"}.
+              {ts.trades_with_dates > 0 && <> Reported more than 45 days after the transaction: <strong>{ts.reported_after_45_days.toLocaleString()}</strong> of {ts.trades_with_dates.toLocaleString()}.</>}
             </p>
             {scannedFilings.length > 0 && (
               <p className="fine">
                 {scannedFilings.length} report{scannedFilings.length === 1 ? " was" : "s were"} filed on paper and {scannedFilings.length === 1 ? "is" : "are"} linked
-                below but not itemized here: {scannedFilings.map((f, i) => <span key={f.filing_id}>{i ? ", " : ""}<a href={f.source_url}>{date(f.filed_date)}</a></span>)}.
+                but not itemized: {scannedFilings.map((f, i) => <span key={f.filing_id}>{i ? ", " : ""}<a href={f.source_url}>{date(f.filed_date)}</a></span>)}.
               </p>
             )}
             {trades.length > 0 && (
               <table>
                 <thead><tr><th>Traded</th><th>Asset</th><th>Type</th><th>Amount</th><th>Owner</th><th>Reported</th></tr></thead>
                 <tbody>
-                  {trades.slice(0, 25).map((t) => (
+                  {trades.map((t) => (
                     <tr key={`${t.filing_id}-${t.row_num}`}>
                       <td>{date(t.transaction_date)}</td>
                       <td>{t.ticker ? <><strong>{t.ticker}</strong> · </> : null}{t.asset_name}</td>
@@ -255,8 +253,9 @@ export default function Member() {
                       <td>{t.amount_text}</td>
                       <td>{t.owner}</td>
                       <td>
-                        <a href={filingUrl[t.filing_id]}>{date(t.filed_date)}</a>
-                        {t.days_to_file != null && t.days_to_file >= 0 && <div className={t.days_to_file > 45 ? "fine late" : "fine"}>{t.days_to_file} days{t.days_to_file > 45 ? " (over 45)" : ""}</div>}
+                        <a href={t.source_url}>{date(t.filed_date)}</a>
+                        {t.is_amendment && <div className="fine">in an amended report</div>}
+                        {!t.is_amendment && t.days_to_file != null && t.days_to_file >= 0 && <div className={t.days_to_file > 45 ? "fine late" : "fine"}>{t.days_to_file} days{t.days_to_file > 45 ? " (over 45)" : ""}</div>}
                         {t.days_to_file != null && t.days_to_file < 0 && <div className="fine">Trade date as filed is after the report date</div>}
                       </td>
                     </tr>
@@ -264,7 +263,7 @@ export default function Member() {
                 </tbody>
               </table>
             )}
-            {trades.length > 25 && <p className="fine">Showing the 25 most recent of {trades.length.toLocaleString()}. Every report is linked from its date.</p>}
+            {ts.trades > trades.length && <p className="fine">Showing the {trades.length} most recent of {ts.trades.toLocaleString()}. Each links to its report.</p>}
           </>
         )}
       </Section>

@@ -97,7 +97,13 @@ export default function Methods() {
         figures are not disclosed), and who owned it. "Days to report" counts from the transaction date to
         the date the report was filed; more than 45 is noted, since that is the law's outer limit. The
         records don't show whether a late fee was paid or waived. When a report lists a trade date after
-        its own filing date, the dates are shown as filed and not counted either way. Reports filed on paper are linked but not
+        its own filing date, the dates are shown as filed and not counted either way.
+      </p>
+      <p>
+        Amended reports often repeat trades from an earlier report. Each trade is shown once, from the
+        first report that listed it. Trades that first appear in an amended report are never counted
+        as reported after 45 days, since an amendment's date can reflect a correction rather than when
+        the trade was first disclosed. Reports filed on paper are linked but not
         itemized. Coverage starts January 2025.
       </p>
       <p>
