@@ -63,6 +63,6 @@
 - [x] Nightly browser check of key pages; failures and job failures open a GitHub issue
 - [x] Coming up: House floor schedule, Senate convening, committee hearings/markups
 - [x] Quiz: do you vote like your representatives? (fixed-rule bill selection)
-- [ ] Follow a member or bill: RSS feed and calendar (.ics) links, no account
-- [ ] Topic pages (e.g. Immigration in the 119th); 2028 challengers from FEC filings
+- [x] Follow a member, bill or committee: RSS feeds and calendar subscriptions, no account
+- [x] Topic pages (/topics); 2028 candidates from FEC filings (/elections)
 - [ ] Installable app with notifications; Spanish
