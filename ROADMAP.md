@@ -66,3 +66,7 @@
 - [x] Follow a member, bill or committee: RSS feeds and calendar subscriptions, no account
 - [x] Topic pages (/topics); 2028 candidates from FEC filings (/elections)
 - [ ] Installable app with notifications; Spanish
+- [x] Design pass: party-neutral palette, Public Sans, member page tabs, scales with typical-member marker
+- [x] Home page remembers your representatives (member IDs on the device only)
+- [x] Public corrections log; weekly automated accuracy check shown on /methods
+- [ ] Run the usability sessions (kit in Claude Docs: "Civic Atlas usability test kit")
