@@ -74,7 +74,7 @@ export default function MapPage() {
   useEffect(() => {
     let m;
     try {
-      m = new maplibregl.Map({ container: box.current, style: BASEMAP, center: [-98.5, 39.5], zoom: 3, minZoom: 2, maxZoom: 16,
+      m = new maplibregl.Map({ container: box.current, style: BASEMAP, bounds: [[-125, 24], [-66.5, 49.5]], fitBoundsOptions: { padding: 10 }, minZoom: 2, maxZoom: 16,
         attributionControl: { compact: true }, cooperativeGestures: true });
     } catch { setFailed(true); return undefined; }
     map.current = m;
@@ -199,6 +199,11 @@ export default function MapPage() {
             <p>{tr(`Members elected in November take office on January 3. Their records appear here once they're sworn in.`, `Los miembros elegidos en noviembre asumen el cargo el 3 de enero. Sus registros aparecerán aquí cuando juren el cargo.`)}</p>
           ) : (
             <>
+              {sel.cd != null && house.filter((p) => (p.district ?? 0) === sel.cd).map((p) => (
+                <p key={p.bioguide_id} className="map-rep">
+                  {tr("Represented in the House by", "Representado en la Cámara por")} <Link to={`/member/${p.bioguide_id}`}><strong>{p.name}</strong></Link> <PartyTag p={p} />
+                </p>
+              ))}
               {past && <p className="fine">{tr(`These are the ${ordinal(congress)} Congress's lines; the members listed are those serving now.`, `Estas son las líneas del ${ordinal(congress)} Congreso; los miembros que se muestran son los que están en el cargo ahora.`)}</p>}
               <h3 className="small">{tr("Senators (whole state)", "Senadores (todo el estado)")}</h3>
               <ul className="plain">{senators.map((p) => <li key={p.bioguide_id}><Link to={`/member/${p.bioguide_id}`}>{p.name}</Link> <PartyTag p={p} /></li>)}</ul>
