@@ -42,7 +42,8 @@ export default function Bills() {
 
   useEffect(() => {
     setState((s) => ({ ...s, status: "loading" }));
-    let q = db.from("bill_list")
+    // "Most lobbying" reads a view that starts from the per-bill totals (fast); others read all bills.
+    let q = db.from(sort === "lobbying" ? "bill_list_lobbied" : "bill_list")
       .select("congress,bill_type,number,title,short_title,introduced_date,latest_action_date,latest_action_text,policy_area,sponsor_bioguide_id,sponsor_name,sponsor_party,sponsor_chamber,sponsor_state,sponsor_district,lobbying_clients")
       .eq("congress", congress);
     if (issue) q = q.eq("policy_area", issue);
