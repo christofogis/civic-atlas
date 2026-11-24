@@ -4,7 +4,8 @@ import { db } from "../lib/db.js";
 import TextVersions from "../components/TextVersions.jsx";
 import MeetingList from "../components/MeetingList.jsx";
 import DownloadCsv from "../components/DownloadCsv.jsx";
-import { date, billLabel, ordinal, partyTag } from "../lib/format.js";
+import { date, billLabel, ordinal, partyTag, partyName } from "../lib/format.js";
+import { tr } from "../lib/lang.js";
 import VoteBreakdown from "../components/VoteBreakdown.jsx";
 import StatusBar from "../components/StatusBar.jsx";
 import Follow from "../components/Follow.jsx";
@@ -42,7 +43,7 @@ function Section({ title, source, children }) {
     <section className="section">
       <h2>{title}</h2>
       {children}
-      {source && <p className="fine">Source: {source}</p>}
+      {source && <p className="fine">{tr("Source", "Fuente")}: {source}</p>}
     </section>
   );
 }
@@ -64,13 +65,13 @@ export default function Bill() {
       .catch(() => setState({ status: "error" }));
   }, [congress, type, number, valid]);
 
-  if (state.status === "loading") return <main className="page"><p>Loading…</p></main>;
-  if (state.status === "missing") return <main className="page"><h1>Bill not found</h1><p>Bills from the 118th Congress (2023) on are covered. <Link to="/">Back to search</Link></p></main>;
-  if (state.status === "error") return <main className="page"><p className="notice">Couldn't load this page right now. Try again shortly.</p></main>;
+  if (state.status === "loading") return <main className="page"><p>{tr("Loading…", "Cargando…")}</p></main>;
+  if (state.status === "missing") return <main className="page"><h1>{tr("Bill not found", "Proyecto no encontrado")}</h1><p>{tr("Bills from the 118th Congress (2023) on are covered.", "Se incluyen los proyectos desde el 118.º Congreso (2023).")} <Link to="/">{tr("Back to search", "Volver a la búsqueda")}</Link></p></main>;
+  if (state.status === "error") return <main className="page"><p className="notice">{tr("Couldn't load this page right now. Try again shortly.", "No se pudo cargar esta página. Inténtelo de nuevo en un momento.")}</p></main>;
 
   const { bill: b, sponsor, cosponsors, votes, lobbying, lobbyTotal, freshness, scheduled, meetings } = state.data;
   const fresh = Object.fromEntries(freshness.map((f) => [f.job, f.last_success_at]));
-  const updated = (job) => (fresh[job] ? ` Updated ${date(fresh[job])}.` : "");
+  const updated = (job) => (fresh[job] ? tr(` Updated ${date(fresh[job])}.`, ` Actualizado el ${date(fresh[job])}.`) : "");
   const current = cosponsors.filter((x) => !x.withdrawn_date);
   const withdrawn = cosponsors.filter((x) => x.withdrawn_date);
   const byParty = Object.entries(current.reduce((acc, x) => ({ ...acc, [x.party ?? "Unknown"]: (acc[x.party ?? "Unknown"] ?? 0) + 1 }), {}))
@@ -83,80 +84,80 @@ export default function Bill() {
   return (
     <main className="page">
       <header>
-        <p className="fine">{billLabel(b)} · {ordinal(b.congress)} Congress · <Explain id="bill-types">What's an {billLabel(b).replace(/\s*\d+$/, "")}?</Explain></p>
+        <p className="fine">{billLabel(b)} · {ordinal(b.congress)} {tr("Congress", "Congreso")} · <Explain id="bill-types">{tr(`What's an ${billLabel(b).replace(/\s*\d+$/, "")}?`, `¿Qué es un ${billLabel(b).replace(/\s*\d+$/, "")}?`)}</Explain></p>
         <h1 className="bill-title">{b.short_title ?? b.title}</h1>
         {b.short_title && b.short_title !== b.title && <p className="lede">{b.title}</p>}
-        {sponsor && <p>Sponsor: {person(sponsor)}</p>}
+        {sponsor && <p>{tr("Sponsor", "Patrocinador")}: {person(sponsor)}</p>}
         <p className="fine">
-          Introduced {date(b.introduced_date)}{b.policy_area && <> · Policy area: {b.policy_area}</>}
+          {tr("Introduced", "Presentado el")} {date(b.introduced_date)}{b.policy_area && <> · {tr("Policy area", "Área de política")}: {b.policy_area}</>}
         </p>
-        {b.latest_action_text && <p>Latest action ({date(b.latest_action_date)}): {b.latest_action_text}</p>}
-        <p className="fine"><a href={b.source_url}>Full text, actions and history at Congress.gov</a></p>
+        {b.latest_action_text && <p>{tr("Latest action", "Última acción")} ({date(b.latest_action_date)}): {b.latest_action_text}</p>}
+        <p className="fine"><a href={b.source_url}>{tr("Full text, actions and history at Congress.gov", "Texto completo, acciones e historial en Congress.gov (en inglés)")}</a></p>
         <Follow feed={`/api/feed/bill/${b.congress}/${b.bill_type}/${b.number}`} />
       </header>
 
       <StatusBar bill={b} />
       {scheduled.length > 0 && (
         <div className="notice-box">
-          <strong>Scheduled</strong>
+          <strong>{tr("Scheduled", "Programado")}</strong>
           <ul className="plain">
             {scheduled.map((e) => (
               <li key={e.event_id}>
                 {e.kind === "floor"
-                  ? <>On the House floor schedule for the week of {date(e.event_date)}{e.category === "suspension" ? " as a fast-track vote (needs two-thirds)" : e.category === "rule" ? " under a rule" : ""}.</>
-                  : <>{e.chamber === "house" ? "House" : "Senate"} {e.committee_id ? <Link to={`/committee/${e.committee_id}`}>{e.committee_name}</Link> : e.committee_name} {e.kind}, {date(e.event_date)}{e.event_time ? ` at ${e.event_time} ET` : ""}.</>}
-                {" "}<a href={e.source_url} className="fine">Schedule</a>
+                  ? <>{tr("On the House floor schedule for the week of", "En la agenda del pleno de la Cámara para la semana del")} {date(e.event_date)}{e.category === "suspension" ? tr(" as a fast-track vote (needs two-thirds)", " como votación por vía rápida (requiere dos tercios)") : e.category === "rule" ? tr(" under a rule", " bajo una regla") : ""}.</>
+                  : <>{e.chamber === "house" ? tr("House", "Cámara") : tr("Senate", "Senado")} {e.committee_id ? <Link to={`/committee/${e.committee_id}`}>{e.committee_name}</Link> : e.committee_name} {tr(e.kind, { hearing: "audiencia", markup: "sesión de enmiendas", meeting: "reunión" }[e.kind])}, {date(e.event_date)}{e.event_time ? tr(` at ${e.event_time} ET`, ` a las ${e.event_time} (hora del Este)`) : ""}.</>}
+                {" "}<a href={e.source_url} className="fine">{tr("Schedule", "Agenda")}</a>
               </li>
             ))}
           </ul>
         </div>
       )}
 
-      <Section title="Summary" source={<>Congressional Research Service, via GovInfo Bill Status. <Explain id="crs-summary">About these summaries</Explain></>}>
+      <Section title={tr("Summary", "Resumen")} source={<>{tr("Congressional Research Service, via GovInfo Bill Status.", "Servicio de Investigación del Congreso, vía GovInfo Bill Status. Los resúmenes se publican solo en inglés.")} <Explain id="crs-summary">{tr("About these summaries", "Sobre estos resúmenes")}</Explain></>}>
         {b.crs_summary
           ? <p>{b.crs_summary}</p>
-          : <p>The Congressional Research Service hasn't published a summary of this bill yet. The bill text is at Congress.gov.</p>}
+          : <p>{tr("The Congressional Research Service hasn't published a summary of this bill yet. The bill text is at Congress.gov.", "El Servicio de Investigación del Congreso todavía no ha publicado un resumen de este proyecto. El texto está en Congress.gov.")}</p>}
       </Section>
 
       <TextVersions congress={congress} type={type} number={number} />
 
-      <Section title="Cosponsors" source={`GovInfo Bill Status (Library of Congress).${updated("bills")} Party and seat as of the day each member signed on.`}>
-        {current.length === 0 ? <p>No cosponsors.</p> : (
+      <Section title={tr("Cosponsors", "Copatrocinadores")} source={tr(`GovInfo Bill Status (Library of Congress).${updated("bills")} Party and seat as of the day each member signed on.`, `GovInfo Bill Status (Biblioteca del Congreso).${updated("bills")} Partido y escaño a la fecha en que cada miembro se sumó.`)}>
+        {current.length === 0 ? <p>{tr("No cosponsors.", "Sin copatrocinadores.")}</p> : (
           <>
-            <p>{current.length} cosponsor{current.length === 1 ? "" : "s"}: {byParty.map(([p, k]) => `${k} ${p}`).join(", ")}.</p>
+            <p>{tr(`${current.length} cosponsor${current.length === 1 ? "" : "s"}`, `${current.length} copatrocinador${current.length === 1 ? "" : "es"}`)}: {byParty.map(([p, k]) => `${k} ${partyName(p)}`).join(", ")}.</p>
             <ul className="plain columns">
               {current.map((x) => (
-                <li key={x.bioguide_id}>{person(x)} <span className="fine">· {date(x.sponsored_date)}{x.is_original ? " · original" : ""}</span></li>
+                <li key={x.bioguide_id}>{person(x)} <span className="fine">· {date(x.sponsored_date)}{x.is_original ? tr(" · original", " · original") : ""}</span></li>
               ))}
             </ul>
           </>
         )}
         {withdrawn.length > 0 && (
-          <p className="fine">Withdrawn: {withdrawn.map((x, i) => <span key={x.bioguide_id}>{i ? "; " : ""}{x.name} ({date(x.withdrawn_date)})</span>)}</p>
+          <p className="fine">{tr("Withdrawn", "Retirados")}: {withdrawn.map((x, i) => <span key={x.bioguide_id}>{i ? "; " : ""}{x.name} ({date(x.withdrawn_date)})</span>)}</p>
         )}
       </Section>
 
       {meetings.length > 0 && (
-        <Section title="Committee hearings and markups" source="Congress.gov committee meeting records, where the meeting lists this bill.">
+        <Section title={tr("Committee hearings and markups", "Audiencias y sesiones de comités")} source={tr("Congress.gov committee meeting records, where the meeting lists this bill.", "Registros de reuniones de comités de Congress.gov que mencionan este proyecto.")}>
           <MeetingList meetings={meetings} />
         </Section>
       )}
 
-      <Section title="Roll-call votes" source={<>House Clerk and Senate.gov roll-call records. <Link to="/methods#vote-types">About vote types</Link>.</>}>
-        {votes.length === 0 ? <p>No recorded roll-call votes on this bill. Many bills pass by voice vote or never reach the floor.</p> : (
+      <Section title={tr("Roll-call votes", "Votaciones nominales")} source={<>{tr("House Clerk and Senate.gov roll-call records.", "Registros de votaciones del Secretario de la Cámara y de Senate.gov.")} <Link to="/methods#vote-types">{tr("About vote types", "Sobre los tipos de votación")}</Link>.</>}>
+        {votes.length === 0 ? <p>{tr("No recorded roll-call votes on this bill. Many bills pass by voice vote or never reach the floor.", "No hay votaciones nominales registradas sobre este proyecto. Muchos proyectos se aprueban a viva voz o nunca llegan al pleno.")}</p> : (
           <table>
-            <thead><tr><th>Date</th><th>Chamber</th><th>Question</th><th>Result</th><th>Yea–Nay</th></tr></thead>
+            <thead><tr><th>{tr("Date", "Fecha")}</th><th>{tr("Chamber", "Cámara")}</th><th>{tr("Question", "Asunto")}</th><th>{tr("Result", "Resultado")}</th><th>{tr("Yea–Nay", "Sí–No")}</th></tr></thead>
             <tbody>
               {votes.map((v) => (
                 <Fragment key={v.vote_id}>
                   <tr>
                     <td>{date(v.voted_at)}</td>
-                    <td>{v.chamber === "house" ? "House" : "Senate"}</td>
+                    <td>{v.chamber === "house" ? tr("House", "Cámara") : tr("Senate", "Senado")}</td>
                     <td>
                       <a href={v.source_url}>{v.question}</a>
                       <div><button className="link fine" aria-expanded={openVote === v.vote_id}
                         onClick={() => setOpenVote(openVote === v.vote_id ? null : v.vote_id)}>
-                        {openVote === v.vote_id ? "Hide how members voted" : "How members voted"}
+                        {openVote === v.vote_id ? tr("Hide how members voted", "Ocultar cómo votaron") : tr("How members voted", "Cómo votaron los miembros")}
                       </button></div>
                     </td>
                     <td>{v.result}</td>
@@ -170,26 +171,26 @@ export default function Bill() {
         )}
       </Section>
 
-      <Section title="Lobbying reports naming this bill"
-        source={<>Quarterly lobbying reports (LD-2) filed under the Lobbying Disclosure Act, retrieved from LDA.gov.{updated("lobbying")} The Senate Office of Public Records can't vouch for data or analyses derived from these reports after they're retrieved. <Link to="/methods#lobbying">About this data</Link>.</>}>
-        {lobbying == null ? <p className="notice">Lobbying reports didn't load. Reload the page to try again.</p>
-          : lobbying.length === 0 ? <p>No lobbying reports on file name this bill.</p> : (
+      <Section title={tr("Lobbying reports naming this bill", "Informes de cabildeo que mencionan este proyecto")}
+        source={<>{tr("Quarterly lobbying reports (LD-2) filed under the Lobbying Disclosure Act, retrieved from LDA.gov.", "Informes trimestrales de cabildeo (LD-2) presentados según la Ley de Divulgación de Cabildeo, obtenidos de LDA.gov.")}{updated("lobbying")} {tr("The Senate Office of Public Records can't vouch for data or analyses derived from these reports after they're retrieved.", "La Oficina de Registros Públicos del Senado no puede garantizar los datos ni los análisis derivados de estos informes después de obtenerlos.")} <Link to="/methods#lobbying">{tr("About this data", "Sobre estos datos")}</Link>.</>}>
+        {lobbying == null ? <p className="notice">{tr("Lobbying reports didn't load. Reload the page to try again.", "Los informes de cabildeo no se cargaron. Vuelva a cargar la página para intentarlo de nuevo.")}</p>
+          : lobbying.length === 0 ? <p>{tr("No lobbying reports on file name this bill.", "Ningún informe de cabildeo registrado menciona este proyecto.")}</p> : (
           <>
             <p>
-              {lobbyTotal.toLocaleString()} organization{lobbyTotal === 1 ? "" : "s"} reported lobbying on this bill.
-              A report lists the bill; it doesn't say whether the organization supported or opposed it.
+              {tr(`${lobbyTotal.toLocaleString()} organization${lobbyTotal === 1 ? "" : "s"} reported lobbying on this bill. A report lists the bill; it doesn't say whether the organization supported or opposed it.`,
+                `${lobbyTotal.toLocaleString()} organizaci${lobbyTotal === 1 ? "ón informó" : "ones informaron"} cabildeo sobre este proyecto. Un informe menciona el proyecto; no dice si la organización lo apoyaba o se oponía.`)}
             </p>
             <table>
-              <thead><tr><th>Client</th><th>Lobbying done by</th><th>Quarters</th><th>Report</th></tr></thead>
+              <thead><tr><th>{tr("Client", "Cliente")}</th><th>{tr("Lobbying done by", "Cabildeo realizado por")}</th><th>{tr("Quarters", "Trimestres")}</th><th>{tr("Report", "Informe")}</th></tr></thead>
               <tbody>
                 {shownLobbying.map((l) => {
                   const firms = l.registrants.filter((r) => r !== l.client_name);
                   return (
                     <tr key={l.client_id}>
                       <td>{l.client_name}</td>
-                      <td>{firms.length ? firms.join("; ") : <span className="fine">In-house</span>}</td>
+                      <td>{firms.length ? firms.join("; ") : <span className="fine">{tr("In-house", "Interno")}</span>}</td>
                       <td>{l.quarters === 1 ? quarter(l.first_quarter_key) : `${l.quarters} (${quarter(l.first_quarter_key)}–${quarter(l.last_quarter_key)})`}</td>
-                      <td><a href={filingUrl(l.latest_filing_uuid)}>Latest</a></td>
+                      <td><a href={filingUrl(l.latest_filing_uuid)}>{tr("Latest", "Último")}</a></td>
                     </tr>
                   );
                 })}
@@ -202,11 +203,11 @@ export default function Bill() {
             ]} />
             {lobbying.length > LOBBY_PREVIEW && !allLobbying && (
               <p><button className="link" onClick={() => setAllLobbying(true)}>
-                {lobbying.length < lobbyTotal ? `Show ${lobbying.length.toLocaleString()} with the most quarters` : `Show all ${lobbying.length.toLocaleString()}`}
+                {lobbying.length < lobbyTotal ? tr(`Show ${lobbying.length.toLocaleString()} with the most quarters`, `Mostrar ${lobbying.length.toLocaleString()} con más trimestres`) : tr(`Show all ${lobbying.length.toLocaleString()}`, `Mostrar los ${lobbying.length.toLocaleString()}`)}
               </button></p>
             )}
             {allLobbying && lobbying.length < lobbyTotal && (
-              <p className="fine">Showing {lobbying.length.toLocaleString()} of {lobbyTotal.toLocaleString()}. Search every report at <a href="https://lda.gov/filings/public/filing/search/">LDA.gov</a>.</p>
+              <p className="fine">{tr(`Showing ${lobbying.length.toLocaleString()} of ${lobbyTotal.toLocaleString()}. Search every report at`, `Se muestran ${lobbying.length.toLocaleString()} de ${lobbyTotal.toLocaleString()}. Busque todos los informes en`)} <a href="https://lda.gov/filings/public/filing/search/">LDA.gov</a>.</p>
             )}
           </>
         )}

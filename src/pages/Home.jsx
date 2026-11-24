@@ -9,6 +9,17 @@ import { rememberRepresentatives, myRepresentatives } from "../lib/myReps.js";
 import MyReps from "../components/MyReps.jsx";
 import AddressInput from "../components/AddressInput.jsx";
 
+// Lookup errors come from /api/lookup in English; these are their Spanish versions.
+const ERR_ES = {
+  "Enter a street address, city and state, or a ZIP code.": "Escriba una dirección con ciudad y estado, o un código postal.",
+  "Address lookup is not configured.": "La búsqueda de direcciones no está configurada.",
+  "Please complete the verification and try again.": "Complete la verificación e inténtelo de nuevo.",
+  "That address couldn't be found.": "No se encontró esa dirección.",
+  "The address service is unavailable. Try again shortly.": "El servicio de direcciones no está disponible. Inténtelo en un momento.",
+  "Couldn't load officials right now. Try again shortly.": "No se pudieron cargar los funcionarios. Inténtelo en un momento.",
+  "Lookup failed.": "La búsqueda falló.",
+};
+
 export default function Home() {
   const [address, setAddress] = useState("");
   const [status, setStatus] = useState("idle"); // idle | loading | done | error
@@ -37,7 +48,7 @@ export default function Home() {
       setMine(new Set(ids));
       setStatus("done");
     } catch (err) {
-      setError(err.message);
+      setError(t(err.message, ERR_ES[err.message] ?? "La búsqueda falló. Inténtelo de nuevo."));
       setStatus("error");
     } finally {
       setLookups((n) => n + 1); // triggers a fresh bot-check token

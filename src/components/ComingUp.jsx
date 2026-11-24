@@ -3,13 +3,14 @@ import { Link } from "react-router-dom";
 import { db } from "../lib/db.js";
 import { date } from "../lib/format.js";
 import { Explain } from "./Explain.jsx";
+import { tr, locale } from "../lib/lang.js";
 
 const todayEastern = () => new Intl.DateTimeFormat("en-CA", { timeZone: "America/New_York" }).format(new Date());
-const KIND = { hearing: "Hearing", markup: "Markup", meeting: "Meeting" };
+const KIND = () => ({ hearing: tr("Hearing", "Audiencia"), markup: tr("Markup", "Sesión de enmiendas"), meeting: tr("Meeting", "Reunión") });
 const FLOOR_GROUPS = [
-  ["suspension", <>Fast-track votes (need two-thirds) <Explain id="suspension" /></>],
-  ["rule", <>Debated under a rule <Explain id="rule" /></>],
-  ["other", "Other items"],
+  ["suspension", <>{tr("Fast-track votes (need two-thirds)", "Votaciones por vía rápida (requieren dos tercios)")} <Explain id="suspension" /></>],
+  ["rule", <>{tr("Debated under a rule", "Debatidos bajo una regla")} <Explain id="rule" /></>],
+  ["other", tr("Other items", "Otros asuntos")],
 ];
 const billPath = (ref) => { const [c, t, n] = ref.split("-"); return `/bill/${c}/${t}/${n}`; };
 
@@ -37,20 +38,20 @@ export default function ComingUp({ myCommittees = new Set() }) {
       });
   }, []);
 
-  if (state.status === "loading") return <p>Loading…</p>;
-  if (state.status === "error") return <p className="notice">Couldn't load the schedule right now.</p>;
+  if (state.status === "loading") return <p>{tr("Loading…", "Cargando…")}</p>;
+  if (state.status === "error") return <p className="notice">{tr("Couldn't load the schedule right now.", "No se pudo cargar la agenda en este momento.")}</p>;
   const { floor, convene, meetings } = state;
   const weeks = [...new Set(floor.map((e) => e.event_date))];
   const byDay = meetings.reduce((m, e) => m.set(e.event_date, [...(m.get(e.event_date) ?? []), e]), new Map());
 
   return (
     <>
-      <h3 className="small">House floor</h3>
+      <h3 className="small">{tr("House floor", "Pleno de la Cámara")}</h3>
       {weeks.length === 0
-        ? <p>The House hasn't published a floor schedule for this week or next. It usually comes out the Friday before.</p>
+        ? <p>{tr("The House hasn't published a floor schedule for this week or next. It usually comes out the Friday before.", "La Cámara no ha publicado la agenda del pleno para esta semana ni la próxima. Suele publicarse el viernes anterior.")}</p>
         : weeks.map((wk) => (
           <div key={wk}>
-            <p><strong>Week of {date(wk)}</strong> <span className="fine">· may be considered; the schedule can change</span></p>
+            <p><strong>{tr("Week of", "Semana del")} {date(wk)}</strong> <span className="fine">· {tr("may be considered; the schedule can change", "podría considerarse; la agenda puede cambiar")}</span></p>
             {FLOOR_GROUPS.map(([cat, label]) => {
               const items = floor.filter((e) => e.event_date === wk && e.category === cat);
               return items.length > 0 && (
@@ -66,20 +67,20 @@ export default function ComingUp({ myCommittees = new Set() }) {
             })}
           </div>
         ))}
-      <p className="fine">Source: <a href="https://docs.house.gov/floor/">House Majority Leader's floor schedule</a> (docs.house.gov).</p>
+      <p className="fine">{tr("Source", "Fuente")}: <a href="https://docs.house.gov/floor/">{tr("House Majority Leader's floor schedule", "agenda del pleno del Líder de la Mayoría de la Cámara")}</a> (docs.house.gov).</p>
 
-      <h3 className="small">Senate floor</h3>
-      <p>{convene ? <>The Senate next meets {date(convene.event_date)} at {convene.event_time}.</> : "The Senate hasn't announced when it next meets."}</p>
-      <p className="fine">Source: <a href="https://www.senate.gov/legislative/schedule/floor_schedule.htm">Senate floor schedule</a>.</p>
+      <h3 className="small">{tr("Senate floor", "Pleno del Senado")}</h3>
+      <p>{convene ? <>{tr("The Senate next meets", "El Senado se reúne de nuevo el")} {date(convene.event_date)} {tr("at", "a las")} {convene.event_time}.</> : tr("The Senate hasn't announced when it next meets.", "El Senado no ha anunciado cuándo se reúne de nuevo.")}</p>
+      <p className="fine">{tr("Source", "Fuente")}: <a href="https://www.senate.gov/legislative/schedule/floor_schedule.htm">{tr("Senate floor schedule", "agenda del pleno del Senado")}</a>.</p>
 
-      <h3 className="small">Committee hearings and markups</h3>
-      {byDay.size === 0 ? <p>None scheduled yet.</p> : [...byDay].map(([day, list]) => (
+      <h3 className="small">{tr("Committee hearings and markups", "Audiencias y sesiones de comités")}</h3>
+      {byDay.size === 0 ? <p>{tr("None scheduled yet.", "Nada programado todavía.")}</p> : [...byDay].map(([day, list]) => (
         <div key={day}>
-          <p><strong>{new Date(`${day}T12:00:00Z`).toLocaleDateString("en-US", { weekday: "long", month: "short", day: "numeric", timeZone: "UTC" })}</strong></p>
+          <p><strong>{new Date(`${day}T12:00:00Z`).toLocaleDateString(locale(), { weekday: "long", month: "short", day: "numeric", timeZone: "UTC" })}</strong></p>
           <ul className="plain">
             {list.map((e) => (
               <li key={e.event_id} className={myCommittees.has(e.committee_id) || myCommittees.has(e.committee_id?.slice(0, 4)) ? "mine-row" : ""}>
-                <span className="fine">{e.event_time ?? ""} · {e.chamber === "house" ? "House" : "Senate"} · {KIND[e.kind]}</span><br />
+                <span className="fine">{e.event_time ?? ""} · {e.chamber === "house" ? tr("House", "Cámara") : tr("Senate", "Senado")} · {KIND()[e.kind]}</span><br />
                 {e.committee_id ? <Link to={`/committee/${e.committee_id}`}>{e.committee_name}</Link> : e.committee_name}: <a href={e.source_url}>{e.title}</a>
                 {e.status && e.status !== "Scheduled" && <strong> ({e.status})</strong>}
                 {(myCommittees.has(e.committee_id) || myCommittees.has(e.committee_id?.slice(0, 4))) && <span className="fine"> · one of your representatives sits on this committee</span>}
@@ -88,7 +89,7 @@ export default function ComingUp({ myCommittees = new Set() }) {
           </ul>
         </div>
       ))}
-      <p className="fine">Sources: senate.gov hearings schedule; House committee meeting notices (docs.house.gov). Times are Eastern.</p>
+      <p className="fine">{tr("Sources: senate.gov hearings schedule; House committee meeting notices (docs.house.gov). Times are Eastern.", "Fuentes: agenda de audiencias de senate.gov; avisos de reuniones de comités de la Cámara (docs.house.gov). Horas en la zona del Este.")}</p>
     </>
   );
 }

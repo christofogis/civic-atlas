@@ -6,6 +6,7 @@ import { isFinal } from "../lib/voteKind.js";
 import { KindLabel } from "../components/Explain.jsx";
 import { myRepresentatives } from "../lib/myReps.js";
 import ComingUp from "../components/ComingUp.jsx";
+import { tr } from "../lib/lang.js";
 
 const DAY = 86400000;
 const iso = (d) => d.toISOString().slice(0, 10);
@@ -50,56 +51,56 @@ export default function Week() {
     })().catch(() => setState({ status: "error" }));
   }, [mine]);
 
-  if (state.status === "loading") return <main className="page"><h1>This week in Congress</h1><p>Loading…</p></main>;
-  if (state.status === "error") return <main className="page"><h1>This week in Congress</h1><p className="notice">Couldn't load this right now.</p></main>;
+  if (state.status === "loading") return <main className="page"><h1>{tr("This week in Congress", "Esta semana en el Congreso")}</h1><p>{tr("Loading…", "Cargando…")}</p></main>;
+  if (state.status === "error") return <main className="page"><h1>{tr("This week in Congress", "Esta semana en el Congreso")}</h1><p className="notice">{tr("Couldn't load this right now.", "No se pudo cargar en este momento.")}</p></main>;
   const { votes, laws = [], passed = [], vetoed = [], positions = [], myCommittees } = state;
   const shown = votes.filter((v) => allVotes || isFinal(v));
   const billLink = (b) => <Link to={`/bill/${b.congress}/${b.bill_type}/${b.number}`}>{billLabel(b)}</Link>;
-  const passedWhere = (b) => [b.passed_house_date >= state.from && b.passed_house_date <= state.to && `House (${date(b.passed_house_date)})`,
-    b.passed_senate_date >= state.from && b.passed_senate_date <= state.to && `Senate (${date(b.passed_senate_date)})`].filter(Boolean).join(" and ");
+  const passedWhere = (b) => [b.passed_house_date >= state.from && b.passed_house_date <= state.to && tr(`House (${date(b.passed_house_date)})`, `Cámara (${date(b.passed_house_date)})`),
+    b.passed_senate_date >= state.from && b.passed_senate_date <= state.to && tr(`Senate (${date(b.passed_senate_date)})`, `Senado (${date(b.passed_senate_date)})`)].filter(Boolean).join(tr(" and ", " y "));
 
   return (
     <main className="page wide">
-      <h1>This week in Congress</h1>
+      <h1>{tr("This week in Congress", "Esta semana en el Congreso")}</h1>
       <section className="section">
-        <h2>Coming up</h2>
+        <h2>{tr("Coming up", "Próximamente")}</h2>
         <ComingUp myCommittees={myCommittees} />
       </section>
 
-      {votes.length === 0 ? <p>No votes on record yet.</p> : (
+      {votes.length === 0 ? <p>{tr("No votes on record yet.", "Todavía no hay votos registrados.")}</p> : (
         <>
-          <h2 className="week-head">Last week with votes: {date(state.from)} to {date(state.to)}</h2>
+          <h2 className="week-head">{tr("Last week with votes", "Última semana con votaciones")}: {date(state.from)} {tr("to", "al")} {date(state.to)}</h2>
 
           <section className="section">
-            <h2>Became law</h2>
-            {laws.length === 0 ? <p>None this week.</p> : (
-              <ul className="plain">{laws.map((b) => <li key={`${b.bill_type}${b.number}`}>{billLink(b)} {b.short_title ?? b.title} · {b.law_number} · signed {date(b.became_law_date)}</li>)}</ul>
+            <h2>{tr("Became law", "Se convirtieron en ley")}</h2>
+            {laws.length === 0 ? <p>{tr("None this week.", "Ninguno esta semana.")}</p> : (
+              <ul className="plain">{laws.map((b) => <li key={`${b.bill_type}${b.number}`}>{billLink(b)} {b.short_title ?? b.title} · {b.law_number} · {tr("signed", "firmado el")} {date(b.became_law_date)}</li>)}</ul>
             )}
-            {vetoed.length > 0 && <p>Vetoed: {vetoed.map((b, i) => <span key={b.number}>{i ? "; " : ""}{billLink(b)} {b.short_title ?? b.title} ({date(b.vetoed_date)})</span>)}</p>}
+            {vetoed.length > 0 && <p>{tr("Vetoed", "Vetados")}: {vetoed.map((b, i) => <span key={b.number}>{i ? "; " : ""}{billLink(b)} {b.short_title ?? b.title} ({date(b.vetoed_date)})</span>)}</p>}
           </section>
 
           <section className="section">
-            <h2>Passed a chamber</h2>
-            {passed.length === 0 ? <p>None this week.</p> : (
-              <ul className="plain">{passed.map((b) => <li key={`${b.bill_type}${b.number}`}>{billLink(b)} {b.short_title ?? b.title} <span className="fine">· passed the {passedWhere(b)}</span></li>)}</ul>
+            <h2>{tr("Passed a chamber", "Aprobados por una cámara")}</h2>
+            {passed.length === 0 ? <p>{tr("None this week.", "Ninguno esta semana.")}</p> : (
+              <ul className="plain">{passed.map((b) => <li key={`${b.bill_type}${b.number}`}>{billLink(b)} {b.short_title ?? b.title} <span className="fine">· {tr("passed the", "aprobado por:")} {passedWhere(b)}</span></li>)}</ul>
             )}
-            <p className="fine">Includes bills and resolutions passed by voice vote, which have no roll call.</p>
+            <p className="fine">{tr("Includes bills and resolutions passed by voice vote, which have no roll call.", "Incluye proyectos y resoluciones aprobados a viva voz, que no tienen votación nominal.")}</p>
           </section>
 
           <section className="section">
-            <h2>Roll-call votes</h2>
-            <div className="toggle" role="group" aria-label="Which votes to show">
-              <button type="button" aria-pressed={!allVotes} className={allVotes ? "" : "on"} onClick={() => setAllVotes(false)}>Final votes</button>
-              <button type="button" aria-pressed={allVotes} className={allVotes ? "on" : ""} onClick={() => setAllVotes(true)}>All {votes.length} votes</button>
+            <h2>{tr("Roll-call votes", "Votaciones nominales")}</h2>
+            <div className="toggle" role="group" aria-label={tr("Which votes to show", "Qué votos mostrar")}>
+              <button type="button" aria-pressed={!allVotes} className={allVotes ? "" : "on"} onClick={() => setAllVotes(false)}>{tr("Final votes", "Votos finales")}</button>
+              <button type="button" aria-pressed={allVotes} className={allVotes ? "on" : ""} onClick={() => setAllVotes(true)}>{tr(`All ${votes.length} votes`, `Los ${votes.length} votos`)}</button>
             </div>
-            {mine.size === 0 && <p className="fine"><Link to="/">Look up your address</Link> to see how your representatives voted.</p>}
-            {shown.length === 0 ? <p>No final votes this week.</p> : (
+            {mine.size === 0 && <p className="fine"><Link to="/">{tr("Look up your address", "Busque su dirección")}</Link> {tr("to see how your representatives voted.", "para ver cómo votaron sus representantes.")}</p>}
+            {shown.length === 0 ? <p>{tr("No final votes this week.", "No hubo votos finales esta semana.")}</p> : (
               <table>
-                <thead><tr><th>Date</th><th>Vote</th><th>Result</th>{mine.size > 0 && <th>Your representatives</th>}</tr></thead>
+                <thead><tr><th>{tr("Date", "Fecha")}</th><th>{tr("Vote", "Votación")}</th><th>{tr("Result", "Resultado")}</th>{mine.size > 0 && <th>{tr("Your representatives", "Sus representantes")}</th>}</tr></thead>
                 <tbody>
                   {shown.map((v) => (
                     <tr key={v.vote_id}>
-                      <td>{date(v.voted_at)}<div className="fine">{v.chamber === "house" ? "House" : "Senate"}</div></td>
+                      <td>{date(v.voted_at)}<div className="fine">{v.chamber === "house" ? tr("House", "Cámara") : tr("Senate", "Senado")}</div></td>
                       <td>
                         <KindLabel v={v} /> <a href={v.source_url}>{v.question}</a>
                         <div className="fine">{v.bill_type ? billLink({ congress: v.bill_congress, bill_type: v.bill_type, number: v.bill_number }) : v.description}</div>
@@ -112,7 +113,7 @@ export default function Week() {
               </table>
             )}
           </section>
-          <p className="fine">Sources: House Clerk and Senate.gov roll-call records; GovInfo Bill Status (Library of Congress).</p>
+          <p className="fine">{tr("Sources: House Clerk and Senate.gov roll-call records; GovInfo Bill Status (Library of Congress).", "Fuentes: registros de votaciones del Secretario de la Cámara y de Senate.gov; GovInfo Bill Status (Biblioteca del Congreso).")}</p>
         </>
       )}
     </main>

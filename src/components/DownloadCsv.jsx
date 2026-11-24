@@ -2,6 +2,7 @@
 // Sheets open. Built in the browser; nothing is sent anywhere.
 // columns: [[header, row => value], ...]
 import { toCsv } from "../lib/csv.js";
+import { tr } from "../lib/lang.js";
 
 export default function DownloadCsv({ rows, columns, filename, note }) {
   if (!rows?.length) return null;
@@ -13,7 +14,7 @@ export default function DownloadCsv({ rows, columns, filename, note }) {
   };
   return (
     <p className="fine download">
-      <button type="button" className="link fine" onClick={download}>Download {rows.length.toLocaleString()} row{rows.length === 1 ? "" : "s"} as a spreadsheet (CSV)</button>
+      <button type="button" className="link fine" onClick={download}>{tr(`Download ${rows.length.toLocaleString()} row${rows.length === 1 ? "" : "s"} as a spreadsheet (CSV)`, `Descargar ${rows.length.toLocaleString()} fila${rows.length === 1 ? "" : "s"} como hoja de cálculo (CSV)`)}</button>
       {note && <> · {note}</>}
     </p>
   );

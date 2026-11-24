@@ -8,40 +8,42 @@ import EmbedCode from "../components/EmbedCode.jsx";
 import Scale from "../components/Scale.jsx";
 import Follow from "../components/Follow.jsx";
 import { KindLabel } from "../components/Explain.jsx";
-import { seatLabel, date, money, billLabel, ordinal, STATE_NAMES } from "../lib/format.js";
+import { seatLabel, date, money, billLabel, ordinal, stateName, partyName } from "../lib/format.js";
+import { tr } from "../lib/lang.js";
 
 const BIOGUIDE = /^[A-Z][0-9]{6}$/;
 const TERRITORIES = new Set(["DC", "PR", "GU", "VI", "AS", "MP"]);
 const MIN_SPLIT_VOTES = 20; // below this, a rate says more about the sample than the member
 const pct = (n, d) => (d ? `${(Math.round((1000 * n) / d) / 10).toFixed(1)}%` : "—");
-const partyAdj = (p) => (p === "Democrat" ? "Democratic" : p);
+const partyAdj = (p) => tr(p === "Democrat" ? "Democratic" : p, { Democrat: "demócrata", Republican: "republicana", Independent: "independiente" }[p] ?? p);
+const chamberName = (c) => (c === "house" ? tr("House", "Cámara") : tr("Senate", "Senado"));
 
 // One Congress and chamber of party-line and attendance figures, in plain sentences.
 function VoteStats({ s, median, delegate, independent }) {
   const party = partyAdj(s.scoring_party);
   return (
     <div className="stat-block">
-      <h3>{ordinal(s.congress)} Congress, {s.chamber === "house" ? "House" : "Senate"}</h3>
+      <h3>{ordinal(s.congress)} {tr("Congress", "Congreso")}, {chamberName(s.chamber)}</h3>
       {s.party_split_votes < MIN_SPLIT_VOTES ? (
-        <p>Party-line rate: not calculated ({s.party_split_votes} party-split votes; at least {MIN_SPLIT_VOTES} needed).</p>
+        <p>{tr(`Party-line rate: not calculated (${s.party_split_votes} party-split votes; at least ${MIN_SPLIT_VOTES} needed).`, `Tasa de voto con el partido: no calculada (${s.party_split_votes} votaciones divididas por partido; se necesitan al menos ${MIN_SPLIT_VOTES}).`)}</p>
       ) : (
         <p>
-          Voted with the {party} majority on <strong>{pct(s.with_party, s.party_split_votes)}</strong> of
-          party-split votes ({s.with_party.toLocaleString()} of {s.party_split_votes.toLocaleString()})
-          {independent && <> — the party this member caucuses with</>}.
-          {median && !delegate && <> Chamber median: {pct(median.median_party_line_rate * 1000, 1000)}.</>}
+          {tr(`Voted with the ${party} majority on `, `Votó con la mayoría ${party} en el `)}<strong>{pct(s.with_party, s.party_split_votes)}</strong>{tr(" of party-split votes", " de las votaciones divididas por partido")}{" "}
+          ({s.with_party.toLocaleString()} {tr("of", "de")} {s.party_split_votes.toLocaleString()})
+          {independent && <>{tr(" — the party this member caucuses with", " — el partido con el que se agrupa este miembro")}</>}.
+          {median && !delegate && <> {tr("Chamber median", "Mediana de la cámara")}: {pct(median.median_party_line_rate * 1000, 1000)}.</>}
         </p>
       )}
       {s.party_split_votes >= MIN_SPLIT_VOTES && (
         <Scale value={s.with_party / s.party_split_votes} typical={median && !delegate ? median.median_party_line_rate : null}
-          label={`with the ${party} majority`} typicalLabel="chamber median" />
+          label={tr(`with the ${party} majority`, `con la mayoría ${party}`)} typicalLabel={tr("chamber median", "mediana de la cámara")} />
       )}
       <p>
-        Missed <strong>{pct(s.missed, s.roll_calls)}</strong> of roll-call votes ({s.missed.toLocaleString()} of {s.roll_calls.toLocaleString()}).
-        {median && !delegate && <> Chamber median: {pct(median.median_missed_rate * 1000, 1000)}.</>}
+        {tr("Missed ", "No votó en el ")}<strong>{pct(s.missed, s.roll_calls)}</strong>{tr(" of roll-call votes", " de las votaciones nominales")} ({s.missed.toLocaleString()} {tr("of", "de")} {s.roll_calls.toLocaleString()}).
+        {median && !delegate && <> {tr("Chamber median", "Mediana de la cámara")}: {pct(median.median_missed_rate * 1000, 1000)}.</>}
       </p>
       {s.roll_calls > 0 && <Scale value={s.missed / s.roll_calls} typical={median && !delegate ? median.median_missed_rate : null}
-        label="of roll calls missed" typicalLabel="chamber median" />}
+        label={tr("of roll calls missed", "de votaciones sin votar")} typicalLabel={tr("chamber median", "mediana de la cámara")} />}
     </div>
   );
 }
@@ -82,7 +84,7 @@ async function loadMember(id) {
   return { member, terms, seat, memberships, votes, bills, sponsoredCount, cosponsoredCount, finance, freshness, voteStats, medians, billStats, billMedians, trades, filings, tradeSummary, bySize, employers, pacs, outside, laws, candidacies };
 }
 
-const SIZE_LABEL = { 0: "Under $200", 200: "$200–$499", 500: "$500–$999", 1000: "$1,000–$1,999", 2000: "$2,000 and over" };
+const SIZE_LABEL = () => ({ 0: tr("Under $200", "Menos de $200"), 200: "$200–$499", 500: "$500–$999", 1000: "$1,000–$1,999", 2000: tr("$2,000 and over", "$2,000 o más") });
 
 // Where the money came from in one cycle: size of individual gifts, donors' employers, PACs,
 // and outside groups' spending. All figures are FEC aggregates; no donor is named.
@@ -93,14 +95,14 @@ function FinanceDetail({ cycle, bySize, employers, pacs, outside, fecId }) {
   const sum = (rows) => rows.reduce((a, r) => a + Number(r.total ?? 0), 0);
   return (
     <div className="finance-detail">
-      <h3>{cycle} cycle in detail</h3>
+      <h3>{tr(`${cycle} cycle in detail`, `Ciclo ${cycle} en detalle`)}</h3>
       {bySize.length > 0 && (
         <>
-          <h4>Individual contributions by size</h4>
+          <h4>{tr("Individual contributions by size", "Contribuciones individuales por monto")}</h4>
           <table>
             <tbody>
               {[...bySize].sort((a, b) => a.size_bucket - b.size_bucket).map((r) => (
-                <tr key={r.size_bucket}><td>{SIZE_LABEL[r.size_bucket] ?? `$${r.size_bucket}+`}</td><td>{money(Number(r.total))}</td><td>{sizeTotal ? `${Math.round((100 * Number(r.total)) / sizeTotal)}%` : ""}</td></tr>
+                <tr key={r.size_bucket}><td>{SIZE_LABEL()[r.size_bucket] ?? `$${r.size_bucket}+`}</td><td>{money(Number(r.total))}</td><td>{sizeTotal ? `${Math.round((100 * Number(r.total)) / sizeTotal)}%` : ""}</td></tr>
               ))}
             </tbody>
           </table>
@@ -108,16 +110,16 @@ function FinanceDetail({ cycle, bySize, employers, pacs, outside, fecId }) {
       )}
       {employers.length > 0 && (
         <>
-          <h4>Donors' employers</h4>
-          <p className="fine">Contributions from individuals who listed these employers. Companies can't give directly to federal campaigns.</p>
+          <h4>{tr("Donors' employers", "Empleadores de los donantes")}</h4>
+          <p className="fine">{tr("Contributions from individuals who listed these employers. Companies can't give directly to federal campaigns.", "Contribuciones de personas que indicaron estos empleadores. Las empresas no pueden donar directamente a campañas federales.")}</p>
           <ol className="plain">
-            {employers.slice(0, 10).map((e) => <li key={e.rank}>{e.employer} · {money(Number(e.total))} from {e.contributions?.toLocaleString() ?? "—"} contributions</li>)}
+            {employers.slice(0, 10).map((e) => <li key={e.rank}>{e.employer} · {money(Number(e.total))} {tr("from", "de")} {e.contributions?.toLocaleString() ?? "—"} {tr("contributions", "contribuciones")}</li>)}
           </ol>
         </>
       )}
       {pacs.length > 0 && (
         <>
-          <h4>PACs and other committees giving the most</h4>
+          <h4>{tr("PACs and other committees giving the most", "PAC y otros comités que más donaron")}</h4>
           <ol className="plain">
             {pacs.slice(0, 10).map((p) => <li key={p.rank}><a href={`https://www.fec.gov/data/committee/${p.contributor_committee_id}/`}>{p.contributor_name}</a> · {money(Number(p.total))}</li>)}
           </ol>
@@ -125,15 +127,15 @@ function FinanceDetail({ cycle, bySize, employers, pacs, outside, fecId }) {
       )}
       {outside.length > 0 && (
         <>
-          <h4>Outside spending</h4>
-          <p className="fine">Independent expenditures by groups not coordinating with the campaign.</p>
-          <p>Supporting: <strong>{money(sum(support))}</strong> · Opposing: <strong>{money(sum(oppose))}</strong></p>
+          <h4>{tr("Outside spending", "Gasto externo")}</h4>
+          <p className="fine">{tr("Independent expenditures by groups not coordinating with the campaign.", "Gastos independientes de grupos que no coordinan con la campaña.")}</p>
+          <p>{tr("Supporting", "A favor")}: <strong>{money(sum(support))}</strong> · {tr("Opposing", "En contra")}: <strong>{money(sum(oppose))}</strong></p>
           <ul className="plain">
-            {outside.slice(0, 8).map((o) => <li key={`${o.committee_id}-${o.support_oppose}`}><a href={`https://www.fec.gov/data/committee/${o.committee_id}/`}>{o.committee_name}</a> · {o.support_oppose === "support" ? "supporting" : "opposing"} · {money(Number(o.total))}</li>)}
+            {outside.slice(0, 8).map((o) => <li key={`${o.committee_id}-${o.support_oppose}`}><a href={`https://www.fec.gov/data/committee/${o.committee_id}/`}>{o.committee_name}</a> · {o.support_oppose === "support" ? tr("supporting", "a favor") : tr("opposing", "en contra")} · {money(Number(o.total))}</li>)}
           </ul>
         </>
       )}
-      {fecId && <p className="fine"><a href={`https://www.fec.gov/data/candidate/${fecId}/?cycle=${cycle}`}>Full records at FEC.gov</a></p>}
+      {fecId && <p className="fine"><a href={`https://www.fec.gov/data/candidate/${fecId}/?cycle=${cycle}`}>{tr("Full records at FEC.gov", "Registros completos en FEC.gov (en inglés)")}</a></p>}
     </div>
   );
 }
@@ -152,32 +154,32 @@ function Contact({ term, member }) {
   if (!term?.phone && !term?.contact_form && !term?.address && accounts.length === 0) return null;
   return (
     <section className="contact">
-      <h2>Contact</h2>
-      {term.phone && <p>Washington office: <a href={`tel:+1-${term.phone}`}>{term.phone}</a></p>}
+      <h2>{tr("Contact", "Contacto")}</h2>
+      {term.phone && <p>{tr("Washington office", "Oficina en Washington")}: <a href={`tel:+1-${term.phone}`}>{term.phone}</a></p>}
       {term.address && <p className="fine">{term.address}</p>}
       <p>
-        {term.contact_form && <><a href={term.contact_form}>Email through the official contact form</a></>}
+        {term.contact_form && <><a href={term.contact_form}>{tr("Email through the official contact form", "Escribir mediante el formulario oficial de contacto")}</a></>}
         {term.contact_form && term.url && " · "}
-        {term.url && <a href={term.url}>Official website</a>}
+        {term.url && <a href={term.url}>{tr("Official website", "Sitio web oficial")}</a>}
       </p>
       {accounts.length > 0 && (
-        <p className="fine">Official accounts: {accounts.map(([k, label, link], i) => (
+        <p className="fine">{tr("Official accounts", "Cuentas oficiales")}: {accounts.map(([k, label, link], i) => (
           <span key={k}>{i ? " · " : ""}<a href={link(member[k])} rel="noopener noreferrer">{label}</a></span>
         ))}</p>
       )}
-      <p className="fine">Source: unitedstates/congress-legislators. Offices usually ask for your address to confirm you're a constituent.</p>
+      <p className="fine">{tr("Source", "Fuente")}: unitedstates/congress-legislators. {tr("Offices usually ask for your address to confirm you're a constituent.", "Las oficinas suelen pedir su dirección para confirmar que vive en su distrito o estado.")}</p>
     </section>
   );
 }
 
-const TABS = [["overview", "Overview"], ["votes", "Votes"], ["bills", "Bills"], ["money", "Money"], ["trades", "Stock trades"]];
+const TABS = [["overview", "Overview", "Resumen"], ["votes", "Votes", "Votos"], ["bills", "Bills", "Proyectos"], ["money", "Money", "Dinero"], ["trades", "Stock trades", "Acciones"]];
 
 function Section({ title, source, children }) {
   return (
     <section className="section">
       <h2>{title}</h2>
       {children}
-      {source && <p className="fine">Source: {source}</p>}
+      {source && <p className="fine">{tr("Source", "Fuente")}: {source}</p>}
     </section>
   );
 }
@@ -208,9 +210,9 @@ export default function Member() {
       .catch(() => setState({ status: "error" }));
   }, [bioguide]);
 
-  if (state.status === "loading") return <main className="page"><p>Loading…</p></main>;
-  if (state.status === "missing") return <main className="page"><h1>Member not found</h1><p><Link to="/">Back to search</Link></p></main>;
-  if (state.status === "error") return <main className="page"><p className="notice">Couldn't load this page right now. Try again shortly.</p></main>;
+  if (state.status === "loading") return <main className="page"><p>{tr("Loading…", "Cargando…")}</p></main>;
+  if (state.status === "missing") return <main className="page"><h1>{tr("Member not found", "Miembro no encontrado")}</h1><p><Link to="/">{tr("Back to search", "Volver a la búsqueda")}</Link></p></main>;
+  if (state.status === "error") return <main className="page"><p className="notice">{tr("Couldn't load this page right now. Try again shortly.", "No se pudo cargar esta página. Inténtelo de nuevo en un momento.")}</p></main>;
 
   const { member: m, terms, seat, memberships, votes, bills, sponsoredCount, cosponsoredCount, finance, freshness, voteStats, medians, billStats, billMedians, trades, filings: scannedFilings, tradeSummary: ts, bySize, employers, pacs, outside, laws, candidacies } = state.data;
   // Finance detail is shown for the most recent cycle with detail on file.
@@ -226,7 +228,7 @@ export default function Member() {
   const fullCommittees = committees.filter((c) => !c.committee.parent_id);
   const subsByParent = (pid) => committees.filter((c) => c.committee.parent_id === pid);
   const fresh = Object.fromEntries(freshness.map((f) => [f.job, f.last_success_at]));
-  const updated = (job) => (fresh[job] ? ` Updated ${date(fresh[job])}.` : "");
+  const updated = (job) => (fresh[job] ? tr(` Updated ${date(fresh[job])}.`, ` Actualizado el ${date(fresh[job])}.`) : "");
   const voteJob = Object.keys(fresh).find((j) => j.startsWith("votes-"));
 
   return (
@@ -234,19 +236,19 @@ export default function Member() {
       <header>
         <h1>{name}</h1>
         {seat?.seat_status === "serving" ? (
-          <p className="lede">{seatLabel(seat)} · {seat.party} · Current term {date(seat.start_date)} – {date(seat.end_date)}</p>
+          <p className="lede">{seatLabel(seat)} · {partyName(seat.party)} · {tr("Current term", "Período actual")} {date(seat.start_date)} – {date(seat.end_date)}</p>
         ) : (
-          <p className="lede">Not currently serving. Most recent: {seatLabel(latest)}, {date(latest.start_date)} – {date(latest.end_date)} ({latest.party})</p>
+          <p className="lede">{tr("Not currently serving. Most recent", "No está en el cargo. Último cargo")}: {seatLabel(latest)}, {date(latest.start_date)} – {date(latest.end_date)} ({partyName(latest.party)})</p>
         )}
       </header>
 
       {/* Arrow keys, Home and End move between tabs (the standard tab pattern); Tab moves into the panel. */}
-      <nav className="tabs" role="tablist" aria-label="Sections of this page">
-        {TABS.map(([id, label]) => (
+      <nav className="tabs" role="tablist" aria-label={tr("Sections of this page", "Secciones de esta página")}>
+        {TABS.map(([id, label, labelEs]) => (
           <button key={id} type="button" role="tab" id={`tab-${id}`} aria-selected={tab === id} aria-controls={`panel-${id}`}
             tabIndex={tab === id ? 0 : -1} onKeyDown={tabKeys}
             className={tab === id ? "on" : ""} onClick={() => navigate({ hash: id === "overview" ? "" : id }, { replace: true })}>
-            {label}
+            {tr(label, labelEs)}
           </button>
         ))}
       </nav>
@@ -254,36 +256,36 @@ export default function Member() {
       <div role="tabpanel" id={`panel-${tab}`} aria-labelledby={`tab-${tab}`}>
       {tab === "overview" && <>
       <Follow feed={`/api/feed/member/${m.bioguide_id}`} calendar={`/api/calendar/member/${m.bioguide_id}`}
-        calendarLabel="Add their committees' hearings to your calendar" />
+        calendarLabel={tr("Add their committees' hearings to your calendar", "Agregar a su calendario las audiencias de sus comités")} />
       {seat?.seat_status === "serving" && <Contact term={terms[0]} member={m} />}
 
       <AtAGlance terms={terms} voteStats={voteStats} medians={medians} billStats={billStats} laws={laws}
         finance={finance} bySize={bySize} tradeSummary={ts} delegate={delegate(latest)} />
-      <EmbedCode path={`/embed/member/${m.bioguide_id}`} title={`${name} on Civic Atlas`} />
+      <EmbedCode path={`/embed/member/${m.bioguide_id}`} title={`${name} · Civic Atlas`} />
 
-      <Section title="Service in Congress" source={<>unitedstates/congress-legislators.{updated("members")} Biography: <a href={m.source_url}>Biographical Directory of the U.S. Congress</a>.</>}>
+      <Section title={tr("Service in Congress", "Servicio en el Congreso")} source={<>unitedstates/congress-legislators.{updated("members")} {tr("Biography", "Biografía")}: <a href={m.source_url}>Biographical Directory of the U.S. Congress</a>.</>}>
         {seat?.seat_status === "serving" && (() => {
           const upIn = seatNextUp(seat.chamber, seat.senate_class);
           const filed = candidacies.find((c) => c.election_year === upIn);
           return upIn && (
             <p>
-              This seat is next up for election in {upIn}.
+              {tr(`This seat is next up for election in ${upIn}.`, `Este escaño se elige de nuevo en ${upIn}.`)}
               {upIn === nextElectionYear() && (filed
-                ? <> Has filed with the FEC to run in {upIn}{filed.office === "S" ? " for the Senate" : ` for the House${filed.district ? `, District ${filed.district}` : ""}`} (<a href={`https://www.fec.gov/data/candidate/${filed.fec_candidate_id}/`}>FEC</a>).</>
-                : <> Hasn't filed with the FEC for {upIn} yet.</>)}
-              {" "}<Link to={`/elections?state=${seat.state}`}>Who has filed in {STATE_NAMES[seat.state] ?? seat.state}</Link>
+                ? <> {tr(`Has filed with the FEC to run in ${upIn}`, `Se inscribió ante la FEC para postularse en ${upIn}`)}{filed.office === "S" ? tr(" for the Senate", " al Senado") : tr(` for the House${filed.district ? `, District ${filed.district}` : ""}`, ` a la Cámara${filed.district ? `, distrito ${filed.district}` : ""}`)} (<a href={`https://www.fec.gov/data/candidate/${filed.fec_candidate_id}/`}>FEC</a>).</>
+                : <> {tr(`Hasn't filed with the FEC for ${upIn} yet.`, `Todavía no se ha inscrito ante la FEC para ${upIn}.`)}</>)}
+              {" "}<Link to={`/elections?state=${seat.state}`}>{tr("Who has filed in", "Quién se ha inscrito en")} {stateName(seat.state)}</Link>
             </p>
           );
         })()}
         <ul className="plain">
           {terms.map((t) => (
-            <li key={`${t.chamber}-${t.start_date}`}>{seatLabel(t)} · {t.party} · {date(t.start_date)} – {date(t.end_date)}</li>
+            <li key={`${t.chamber}-${t.start_date}`}>{seatLabel(t)} · {partyName(t.party)} · {date(t.start_date)} – {date(t.end_date)}</li>
           ))}
         </ul>
       </Section>
 
-      <Section title={currentCongress ? `Committees (${ordinal(currentCongress)} Congress)` : "Committees"} source={`unitedstates/congress-legislators.${updated("committees")}`}>
-        {fullCommittees.length === 0 ? <p>No committee assignments on record.</p> : (
+      <Section title={currentCongress ? tr(`Committees (${ordinal(currentCongress)} Congress)`, `Comités (${ordinal(currentCongress)} Congreso)`) : tr("Committees", "Comités")} source={`unitedstates/congress-legislators.${updated("committees")}`}>
+        {fullCommittees.length === 0 ? <p>{tr("No committee assignments on record.", "No hay asignaciones a comités registradas.")}</p> : (
           <ul className="plain">
             {fullCommittees.map((c) => (
               <li key={c.committee.committee_id}>
@@ -303,13 +305,13 @@ export default function Member() {
       </>}
 
       {tab === "votes" && <>
-      <Section title="Voting record" source={<>Calculated from House Clerk and Senate.gov roll-call records. <Link to="/methods">How these are calculated</Link>.</>}>
-        {voteStats.length === 0 ? <p>No roll-call votes on record since 2023.</p> : (
+      <Section title={tr("Voting record", "Historial de votos")} source={<>{tr("Calculated from House Clerk and Senate.gov roll-call records.", "Calculado a partir de los registros de votaciones nominales del Secretario de la Cámara y de Senate.gov.")} <Link to="/methods">{tr("How these are calculated", "Cómo se calculan")}</Link>.</>}>
+        {voteStats.length === 0 ? <p>{tr("No roll-call votes on record since 2023.", "No hay votaciones nominales registradas desde 2023.")}</p> : (
           <>
             {delegate(latest) && (
               <p className="notice">
-                Delegates and the Resident Commissioner can vote only on certain amendment votes, so these
-                figures cover far fewer roll calls than a member's and aren't compared with the chamber.
+                {tr("Delegates and the Resident Commissioner can vote only on certain amendment votes, so these figures cover far fewer roll calls than a member's and aren't compared with the chamber.",
+                  "Los delegados y el Comisionado Residente solo pueden votar en ciertas votaciones de enmiendas, así que estas cifras abarcan muchas menos votaciones que las de un miembro y no se comparan con la cámara.")}
               </p>
             )}
             {voteStats.map((s) => (
@@ -322,15 +324,15 @@ export default function Member() {
         )}
       </Section>
 
-      <Section title="Recent roll-call votes" source={<>House Clerk and Senate.gov roll-call records; positions as recorded.{voteJob ? updated(voteJob) : ""} <Link to="/methods#vote-types">About vote types</Link>.</>}>
-        {votes.length === 0 ? <p>No roll-call votes on record since 2023.</p> : (
+      <Section title={tr("Recent roll-call votes", "Votaciones nominales recientes")} source={<>{tr("House Clerk and Senate.gov roll-call records; positions as recorded.", "Registros de votaciones del Secretario de la Cámara y de Senate.gov; votos tal como se registraron (Yea = sí, Nay = no).")}{voteJob ? updated(voteJob) : ""} <Link to="/methods#vote-types">{tr("About vote types", "Sobre los tipos de votación")}</Link>.</>}>
+        {votes.length === 0 ? <p>{tr("No roll-call votes on record since 2023.", "No hay votaciones nominales registradas desde 2023.")}</p> : (
           <>
-          <div className="toggle" role="group" aria-label="Which votes to show">
-            <button type="button" aria-pressed={!finalOnly} className={finalOnly ? "" : "on"} onClick={() => setFinalOnly(false)}>All votes</button>
-            <button type="button" aria-pressed={finalOnly} className={finalOnly ? "on" : ""} onClick={() => setFinalOnly(true)}>Final votes only</button>
+          <div className="toggle" role="group" aria-label={tr("Which votes to show", "Qué votos mostrar")}>
+            <button type="button" aria-pressed={!finalOnly} className={finalOnly ? "" : "on"} onClick={() => setFinalOnly(false)}>{tr("All votes", "Todos los votos")}</button>
+            <button type="button" aria-pressed={finalOnly} className={finalOnly ? "on" : ""} onClick={() => setFinalOnly(true)}>{tr("Final votes only", "Solo votos finales")}</button>
           </div>
           <table>
-            <thead><tr><th>Date</th><th>Question</th><th>Vote</th><th>Result</th></tr></thead>
+            <thead><tr><th>{tr("Date", "Fecha")}</th><th>{tr("Question", "Asunto")}</th><th>{tr("Vote", "Voto")}</th><th>{tr("Result", "Resultado")}</th></tr></thead>
             <tbody>
               {votes.filter((v) => !finalOnly || isFinal(v)).slice(0, 15).map((v) => (
                 <tr key={v.vote_id}>
@@ -346,8 +348,8 @@ export default function Member() {
               ))}
             </tbody>
           </table>
-          {finalOnly && votes.filter(isFinal).length === 0 && <p className="fine">No final votes among the most recent 120 roll calls.</p>}
-          <p><Link to={`/member/${m.bioguide_id}/votes`}>All votes, searchable by issue →</Link></p>
+          {finalOnly && votes.filter(isFinal).length === 0 && <p className="fine">{tr("No final votes among the most recent 120 roll calls.", "No hay votos finales entre las 120 votaciones más recientes.")}</p>}
+          <p><Link to={`/member/${m.bioguide_id}/votes`}>{tr("All votes, searchable by issue →", "Todos los votos, con búsqueda por tema (en inglés) →")}</Link></p>
           </>
         )}
       </Section>
@@ -355,37 +357,35 @@ export default function Member() {
       </>}
 
       {tab === "bills" && <>
-      <Section title="Legislation" source={`GovInfo Bill Status (Library of Congress), 118th Congress on.${updated("bills")}`}>
-        <p>Sponsored: {sponsoredCount ?? 0} · Cosponsored: {cosponsoredCount ?? 0}</p>
+      <Section title={tr("Legislation", "Legislación")} source={tr(`GovInfo Bill Status (Library of Congress), 118th Congress on.${updated("bills")}`, `GovInfo Bill Status (Biblioteca del Congreso), desde el 118.º Congreso.${updated("bills")}`)}>
+        <p>{tr("Sponsored", "Patrocinados")}: {sponsoredCount ?? 0} · {tr("Cosponsored", "Copatrocinados")}: {cosponsoredCount ?? 0}</p>
         {billStats.map((b) => {
           const med = billMedians.find((x) => x.congress === b.congress && x.chamber === b.chamber);
           return (
             <div className="stat-block" key={`${b.congress}-${b.chamber}`}>
-              <h3>{ordinal(b.congress)} Congress, {b.chamber === "house" ? "House" : "Senate"}</h3>
+              <h3>{ordinal(b.congress)} {tr("Congress", "Congreso")}, {chamberName(b.chamber)}</h3>
               {b.cosponsored >= 20 ? (
                 <p>
-                  Of the {b.cosponsored.toLocaleString()} bills they cosponsored, <strong>{pct(b.cosponsored_other_party, b.cosponsored)}</strong> were
-                  introduced by a member of the other party.
-                  {med?.median_cross_party_cosponsor_rate != null && <> Chamber median: {pct(med.median_cross_party_cosponsor_rate * 1000, 1000)}.</>}
+                  {tr(`Of the ${b.cosponsored.toLocaleString()} bills they cosponsored, `, `De los ${b.cosponsored.toLocaleString()} proyectos que copatrocinó, el `)}<strong>{pct(b.cosponsored_other_party, b.cosponsored)}</strong>{tr(" were introduced by a member of the other party.", " fue presentado por un miembro del otro partido.")}
+                  {med?.median_cross_party_cosponsor_rate != null && <> {tr("Chamber median", "Mediana de la cámara")}: {pct(med.median_cross_party_cosponsor_rate * 1000, 1000)}.</>}
                 </p>
-              ) : <p>Cosponsored {b.cosponsored} bills (too few to calculate a cross-party rate).</p>}
+              ) : <p>{tr(`Cosponsored ${b.cosponsored} bills (too few to calculate a cross-party rate).`, `Copatrocinó ${b.cosponsored} proyectos (muy pocos para calcular una tasa entre partidos).`)}</p>}
               {b.sponsored >= 10 ? (
                 <p>
-                  Of the {b.sponsored.toLocaleString()} bills they introduced, <strong>{pct(b.sponsored_with_other_party, b.sponsored)}</strong> had
-                  at least one cosponsor from the other party.
-                  {med?.median_cross_party_support_rate != null && <> Chamber median: {pct(med.median_cross_party_support_rate * 1000, 1000)}.</>}
+                  {tr(`Of the ${b.sponsored.toLocaleString()} bills they introduced, `, `De los ${b.sponsored.toLocaleString()} proyectos que presentó, el `)}<strong>{pct(b.sponsored_with_other_party, b.sponsored)}</strong>{tr(" had at least one cosponsor from the other party.", " tuvo al menos un copatrocinador del otro partido.")}
+                  {med?.median_cross_party_support_rate != null && <> {tr("Chamber median", "Mediana de la cámara")}: {pct(med.median_cross_party_support_rate * 1000, 1000)}.</>}
                 </p>
-              ) : b.sponsored > 0 && <p>Introduced {b.sponsored} bills (too few to calculate a cross-party rate).</p>}
+              ) : b.sponsored > 0 && <p>{tr(`Introduced ${b.sponsored} bills (too few to calculate a cross-party rate).`, `Presentó ${b.sponsored} proyectos (muy pocos para calcular una tasa entre partidos).`)}</p>}
             </div>
           );
         })}
-        <p className="fine"><Link to="/methods#cosponsorship">How these are calculated</Link>.</p>
+        <p className="fine"><Link to="/methods#cosponsorship">{tr("How these are calculated", "Cómo se calculan")}</Link>.</p>
         {bills.length > 0 && (
           <ul className="plain">
             {bills.map((b) => (
               <li key={`${b.congress}-${b.bill_type}-${b.number}`}>
                 <Link to={`/bill/${b.congress}/${b.bill_type}/${b.number}`}>{billLabel(b)}</Link> ({ordinal(b.congress)}) · {b.short_title ?? b.title}{b.law_number && <> · <strong>{b.law_number}</strong></>}
-                <div className="fine">Introduced {date(b.introduced_date)}{b.latest_action_text && <> · Latest action {date(b.latest_action_date)}: {b.latest_action_text}</>}</div>
+                <div className="fine">{tr("Introduced", "Presentado el")} {date(b.introduced_date)}{b.latest_action_text && <> · {tr("Latest action", "Última acción")} {date(b.latest_action_date)}: {b.latest_action_text}</>}</div>
               </li>
             ))}
           </ul>
@@ -395,22 +395,21 @@ export default function Member() {
       </>}
 
       {tab === "trades" && <>
-      <Section title="Stock trades" source={<>Periodic Transaction Reports filed under the STOCK Act with the House Clerk and Senate, 2025 on.{updated("trades")} <Link to="/methods#trades">About this data</Link>.</>}>
-        {!ts ? <p>No periodic transaction reports on record since 2025.</p> : (
+      <Section title={tr("Stock trades", "Compraventa de acciones")} source={<>{tr("Periodic Transaction Reports filed under the STOCK Act with the House Clerk and Senate, 2025 on.", "Informes periódicos de transacciones presentados según la Ley STOCK ante el Secretario de la Cámara y el Senado, desde 2025.")}{updated("trades")} <Link to="/methods#trades">{tr("About this data", "Sobre estos datos")}</Link>.</>}>
+        {!ts ? <p>{tr("No periodic transaction reports on record since 2025.", "No hay informes periódicos de transacciones registrados desde 2025.")}</p> : (
           <>
             <p>
-              {ts.filings} report{ts.filings === 1 ? "" : "s"} filed, listing {ts.trades.toLocaleString()} transaction{ts.trades === 1 ? "" : "s"}.
-              {ts.trades_with_dates > 0 && <> Reported more than 45 days after the transaction: <strong>{ts.reported_after_45_days.toLocaleString()}</strong> of {ts.trades_with_dates.toLocaleString()}.</>}
+              {tr(`${ts.filings} report${ts.filings === 1 ? "" : "s"} filed, listing ${ts.trades.toLocaleString()} transaction${ts.trades === 1 ? "" : "s"}.`, `${ts.filings} informe${ts.filings === 1 ? "" : "s"} presentado${ts.filings === 1 ? "" : "s"}, con ${ts.trades.toLocaleString()} transacci${ts.trades === 1 ? "ón" : "ones"}.`)}
+              {ts.trades_with_dates > 0 && <> {tr("Reported more than 45 days after the transaction", "Informadas más de 45 días después de la transacción")}: <strong>{ts.reported_after_45_days.toLocaleString()}</strong> {tr("of", "de")} {ts.trades_with_dates.toLocaleString()}.</>}
             </p>
             {scannedFilings.length > 0 && (
               <p className="fine">
-                {scannedFilings.length} report{scannedFilings.length === 1 ? " was" : "s were"} filed on paper and {scannedFilings.length === 1 ? "is" : "are"} linked
-                but not itemized: {scannedFilings.map((f, i) => <span key={f.filing_id}>{i ? ", " : ""}<a href={f.source_url}>{date(f.filed_date)}</a></span>)}.
+                {tr(`${scannedFilings.length} report${scannedFilings.length === 1 ? " was" : "s were"} filed on paper and ${scannedFilings.length === 1 ? "is" : "are"} linked but not itemized`, `${scannedFilings.length} informe${scannedFilings.length === 1 ? " se presentó" : "s se presentaron"} en papel; se enlaza${scannedFilings.length === 1 ? "" : "n"} pero no se detalla${scannedFilings.length === 1 ? "" : "n"}`)}: {scannedFilings.map((f, i) => <span key={f.filing_id}>{i ? ", " : ""}<a href={f.source_url}>{date(f.filed_date)}</a></span>)}.
               </p>
             )}
             {trades.length > 0 && (
               <table>
-                <thead><tr><th>Traded</th><th>Asset</th><th>Type</th><th>Amount</th><th>Owner</th><th>Reported</th></tr></thead>
+                <thead><tr><th>{tr("Traded", "Fecha")}</th><th>{tr("Asset", "Activo")}</th><th>{tr("Type", "Tipo")}</th><th>{tr("Amount", "Monto")}</th><th>{tr("Owner", "Titular")}</th><th>{tr("Reported", "Informado")}</th></tr></thead>
                 <tbody>
                   {trades.map((t) => (
                     <tr key={`${t.filing_id}-${t.row_num}`}>
@@ -421,16 +420,16 @@ export default function Member() {
                       <td>{t.owner}</td>
                       <td>
                         <a href={t.source_url}>{date(t.filed_date)}</a>
-                        {t.is_amendment && <div className="fine">in an amended report</div>}
-                        {!t.is_amendment && t.days_to_file != null && t.days_to_file >= 0 && <div className={t.days_to_file > 45 ? "fine late" : "fine"}>{t.days_to_file} days{t.days_to_file > 45 ? " (over 45)" : ""}</div>}
-                        {t.days_to_file != null && t.days_to_file < 0 && <div className="fine">Trade date as filed is after the report date</div>}
+                        {t.is_amendment && <div className="fine">{tr("in an amended report", "en un informe enmendado")}</div>}
+                        {!t.is_amendment && t.days_to_file != null && t.days_to_file >= 0 && <div className={t.days_to_file > 45 ? "fine late" : "fine"}>{t.days_to_file} {tr("days", "días")}{t.days_to_file > 45 ? tr(" (over 45)", " (más de 45)") : ""}</div>}
+                        {t.days_to_file != null && t.days_to_file < 0 && <div className="fine">{tr("Trade date as filed is after the report date", "La fecha de la transacción, tal como se presentó, es posterior a la del informe")}</div>}
                       </td>
                     </tr>
                   ))}
                 </tbody>
               </table>
             )}
-            {ts.trades > trades.length && <p className="fine">Showing the {trades.length} most recent of {ts.trades.toLocaleString()}. Each links to its report.</p>}
+            {ts.trades > trades.length && <p className="fine">{tr(`Showing the ${trades.length} most recent of ${ts.trades.toLocaleString()}. Each links to its report.`, `Se muestran las ${trades.length} más recientes de ${ts.trades.toLocaleString()}. Cada una enlaza a su informe.`)}</p>}
           </>
         )}
       </Section>
@@ -438,10 +437,10 @@ export default function Member() {
       </>}
 
       {tab === "money" && <>
-      <Section title="Campaign finance" source={<>Federal Election Commission (OpenFEC).{updated("fec-summaries")} <Link to="/methods#money">About this data</Link>.</>}>
-        {finance.length === 0 ? <p>No FEC filings on record for this member.</p> : (
+      <Section title={tr("Campaign finance", "Finanzas de campaña")} source={<>{tr("Federal Election Commission (OpenFEC).", "Comisión Federal de Elecciones (OpenFEC).")}{updated("fec-summaries")} <Link to="/methods#money">{tr("About this data", "Sobre estos datos")}</Link>.</>}>
+        {finance.length === 0 ? <p>{tr("No FEC filings on record for this member.", "No hay declaraciones ante la FEC registradas para este miembro.")}</p> : (
           <table>
-            <thead><tr><th>Cycle</th><th>Raised</th><th>Spent</th><th>Cash on hand</th><th>Individuals</th><th>PACs</th><th>Through</th></tr></thead>
+            <thead><tr><th>{tr("Cycle", "Ciclo")}</th><th>{tr("Raised", "Recaudado")}</th><th>{tr("Spent", "Gastado")}</th><th>{tr("Cash on hand", "Efectivo disponible")}</th><th>{tr("Individuals", "Personas")}</th><th>PAC</th><th>{tr("Through", "Hasta")}</th></tr></thead>
             <tbody>
               {finance.map((f) => (
                 <tr key={`${f.fec_candidate_id}-${f.cycle}`}>
@@ -458,8 +457,8 @@ export default function Member() {
           </table>
         )}
         {detailCycles.length > 1 && (
-          <div className="toggle" role="group" aria-label="Election cycle to show in detail">
-            {detailCycles.map((c) => <button key={c} type="button" aria-pressed={c === detailCycle} className={c === detailCycle ? "on" : ""} onClick={() => setPickedCycle(c)}>{c} cycle</button>)}
+          <div className="toggle" role="group" aria-label={tr("Election cycle to show in detail", "Ciclo electoral a mostrar en detalle")}>
+            {detailCycles.map((c) => <button key={c} type="button" aria-pressed={c === detailCycle} className={c === detailCycle ? "on" : ""} onClick={() => setPickedCycle(c)}>{tr(`${c} cycle`, `Ciclo ${c}`)}</button>)}
           </div>
         )}
         {detailCycle > 0 && <FinanceDetail cycle={detailCycle} bySize={inCycle(bySize)} employers={inCycle(employers)} pacs={inCycle(pacs)} outside={inCycle(outside)} fecId={finance.find((f) => f.cycle === detailCycle)?.fec_candidate_id} />}

@@ -2,6 +2,11 @@
 // Node scripts and tests can import those helpers too. Components use useLang() from i18n.jsx.
 const KEY = "civic-atlas:lang";
 const read = () => {
+  // A link can choose the language (?lang=es), e.g. one shared by a Spanish-language outlet or an embed.
+  try {
+    const q = new URLSearchParams(globalThis.location?.search ?? "").get("lang");
+    if (q === "es" || q === "en") { globalThis.localStorage?.setItem(KEY, q); return q; }
+  } catch { /* no URL or storage */ }
   try { const v = globalThis.localStorage?.getItem(KEY); if (v === "es" || v === "en") return v; } catch { /* storage off */ }
   return "en";
 };

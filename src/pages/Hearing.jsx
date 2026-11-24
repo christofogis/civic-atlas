@@ -4,9 +4,12 @@ import { db } from "../lib/db.js";
 import { billLabel, ordinal } from "../lib/format.js";
 import { statementFor, meetingHeading } from "../../lib/meetings.js";
 import { meetingTime } from "../components/MeetingList.jsx";
+import { tr } from "../lib/lang.js";
 
 const videoLabel = (url) => /youtube\.com|youtu\.be/.test(url) ? "Video (YouTube)"
-  : /senate\.gov\/isvp/.test(url) ? "Video (Senate)" : /congress\.gov\/event/.test(url) ? "Video and record (Congress.gov)" : "Video";
+  : /senate\.gov\/isvp/.test(url) ? tr("Video (Senate)", "Video (Senado)") : /congress\.gov\/event/.test(url) ? tr("Video and record (Congress.gov)", "Video y registro (Congress.gov)") : "Video";
+const TYPE_ES = { "hearing": "audiencia", "open hearing": "audiencia abierta", "closed hearing": "audiencia cerrada", "markup": "sesión de enmiendas",
+  "meeting": "reunión", "open business meeting": "reunión de trabajo abierta", "closed business meeting": "reunión de trabajo cerrada", "business meeting": "reunión de trabajo" };
 
 // One committee hearing, markup or business meeting.
 export default function Hearing() {
@@ -30,12 +33,13 @@ export default function Hearing() {
     })().catch(() => setState({ status: "error" }));
   }, [id]);
 
-  if (state.status === "loading") return <main className="page"><p>Loading…</p></main>;
-  if (state.status === "missing") return <main className="page"><h1>Meeting not found</h1><p>Committee meetings from the 118th Congress (2023) on are covered. <Link to="/committees">Committees</Link></p></main>;
-  if (state.status === "error") return <main className="page"><p className="notice">Couldn't load this meeting right now. Try again shortly.</p></main>;
+  if (state.status === "loading") return <main className="page"><p>{tr("Loading…", "Cargando…")}</p></main>;
+  if (state.status === "missing") return <main className="page"><h1>{tr("Meeting not found", "Reunión no encontrada")}</h1><p>{tr("Committee meetings from the 118th Congress (2023) on are covered.", "Se incluyen las reuniones de comités desde el 118.º Congreso (2023).")} <Link to="/committees">{tr("Committees", "Comités")}</Link></p></main>;
+  if (state.status === "error") return <main className="page"><p className="notice">{tr("Couldn't load this meeting right now. Try again shortly.", "No se pudo cargar esta reunión. Inténtelo de nuevo en un momento.")}</p></main>;
 
   const { m, committees, refs, bills } = state;
   const chamberName = m.chamber === "house" ? "House" : "Senate";
+  const typeLower = (m.meeting_type ?? "meeting").toLowerCase();
   const billFor = (r) => bills.find((b) => b.congress === r.congress && b.bill_type === r.bill_type && b.number === r.number);
   // Where a Senate committee posts its witnesses: the committee's own site (the parent's for a subcommittee).
   const site = committees.map((c) => c.url ?? c.parent?.url).find(Boolean);
@@ -45,7 +49,7 @@ export default function Hearing() {
   return (
     <main className="page">
       <p className="fine">
-        {chamberName} committee {(m.meeting_type ?? "meeting").toLowerCase()} · {ordinal(m.congress)} Congress
+        {tr(`${chamberName} committee ${typeLower}`, `${TYPE_ES[typeLower] ?? typeLower} de comité del ${m.chamber === "house" ? "la Cámara" : "Senado"}`.replace(/^./, (c) => c.toUpperCase()))} · {ordinal(m.congress)} {tr("Congress", "Congreso")}
       </p>
       <h1>{heading}</h1>
       {agenda && <ul className="plain agenda">{agenda.map((l, i) => <li key={i}>{l}</li>)}</ul>}
@@ -63,14 +67,14 @@ export default function Hearing() {
 
       {m.videos.length > 0 && (
         <section className="section">
-          <h2>Watch</h2>
+          <h2>{tr("Watch", "Ver")}</h2>
           <ul className="plain">{m.videos.map((v) => <li key={v.url}><a href={v.url}>{videoLabel(v.url)}</a></li>)}</ul>
         </section>
       )}
 
       {(m.witnesses.length > 0 || (m.chamber === "senate" && isHearing)) && (
         <section className="section">
-          <h2>Witnesses</h2>
+          <h2>{tr("Witnesses", "Testigos")}</h2>
           {m.witnesses.length > 0 ? (
             <ul className="plain">
               {m.witnesses.map((w, i) => {
@@ -78,24 +82,24 @@ export default function Hearing() {
                 return (
                   <li key={i}>
                     <strong>{w.name}</strong>{[w.position, w.organization].filter(Boolean).length > 0 && <>, {[w.position, w.organization].filter(Boolean).join(", ")}</>}
-                    {st && <> · <a href={st}>Written statement</a></>}
+                    {st && <> · <a href={st}>{tr("Written statement", "Declaración escrita (en inglés)")}</a></>}
                   </li>
                 );
               })}
             </ul>
           ) : (
             <p>
-              Senate committees post witness lists on their own websites; the central congressional record doesn't
-              include them.{site && <> See the <a href={site}>committee's website</a>.</>}
+              {tr("Senate committees post witness lists on their own websites; the central congressional record doesn't include them.", "Los comités del Senado publican las listas de testigos en sus propios sitios web; el registro central del Congreso no las incluye.")}
+              {site && <> {tr("See the", "Vea el")} <a href={site}>{tr("committee's website", "sitio web del comité")}</a>.</>}
             </p>
           )}
-          {m.witnesses.length > 0 && m.statements.length > 0 && <p className="fine">Biographies and disclosure forms are on the <a href={m.source_url}>Congress.gov page</a>.</p>}
+          {m.witnesses.length > 0 && m.statements.length > 0 && <p className="fine">{tr("Biographies and disclosure forms are on the", "Las biografías y los formularios de divulgación están en la")} <a href={m.source_url}>{tr("Congress.gov page", "página de Congress.gov")}</a>.</p>}
         </section>
       )}
 
       {(refs.length > 0 || m.nomination_refs.length > 0) && (
         <section className="section">
-          <h2>On the agenda</h2>
+          <h2>{tr("On the agenda", "En la agenda")}</h2>
           <ul className="plain">
             {refs.map((r) => {
               const b = billFor(r);
@@ -107,14 +111,14 @@ export default function Hearing() {
                 </li>
               );
             })}
-            {m.nomination_refs.length > 0 && <li>Nominations: {m.nomination_refs.join(", ")} (<Link to={`/nominations?congress=${m.congress}`}>Senate votes on nominations</Link>)</li>}
+            {m.nomination_refs.length > 0 && <li>{tr("Nominations", "Nominaciones")}: {m.nomination_refs.join(", ")} (<Link to={`/nominations?congress=${m.congress}`}>{tr("Senate votes on nominations", "Votaciones del Senado sobre nominaciones")}</Link>)</li>}
           </ul>
         </section>
       )}
 
       {m.documents.length > 0 && (
         <section className="section">
-          <h2>Documents</h2>
+          <h2>{tr("Documents", "Documentos")}</h2>
           <ul className="plain">
             {m.documents.map((d, i) => (
               <li key={i}>{d.url ? <a href={d.url}>{d.name ?? d.type ?? "Document"}</a> : (d.name ?? d.type)}{d.type && d.name && d.type !== d.name && <span className="fine"> · {d.type}</span>}</li>
@@ -123,9 +127,9 @@ export default function Hearing() {
         </section>
       )}
 
-      {m.has_transcript && <p>A printed transcript has been published; it's linked from the <a href={m.source_url}>Congress.gov page</a>.</p>}
+      {m.has_transcript && <p>{tr("A printed transcript has been published; it's linked from the", "Se publicó una transcripción impresa; está enlazada desde la")} <a href={m.source_url}>{tr("Congress.gov page", "página de Congress.gov")}</a>.</p>}
 
-      <p className="fine">Source: <a href={m.source_url}>Congress.gov committee meeting record</a>. Times are Eastern. <Link to="/methods#hearings">About this data</Link>.</p>
+      <p className="fine">{tr("Source", "Fuente")}: <a href={m.source_url}>{tr("Congress.gov committee meeting record", "registro de reunión de comité en Congress.gov")}</a>. {tr("Times are Eastern.", "Horas en la zona del Este.")} <Link to="/methods#hearings">{tr("About this data", "Sobre estos datos")}</Link>.</p>
     </main>
   );
 }

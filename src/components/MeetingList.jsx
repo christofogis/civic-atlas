@@ -1,10 +1,11 @@
 import { Link } from "react-router-dom";
 import { date } from "../lib/format.js";
+import { tr, locale } from "../lib/lang.js";
 import { meetingHeading } from "../../lib/meetings.js";
 
 export const meetingTime = (m) => m.meeting_at
-  ? `${date(m.meeting_at)}, ${new Date(m.meeting_at).toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit", timeZone: "America/New_York" })} ET`
-  : "Date not set";
+  ? `${date(m.meeting_at)}, ${new Date(m.meeting_at).toLocaleTimeString(locale(), { hour: "numeric", minute: "2-digit", timeZone: "America/New_York" })} ${tr("ET", "(hora del Este)")}`
+  : tr("Date not set", "Fecha por definir");
 
 // Committee meetings as a list linking to their pages.
 export default function MeetingList({ meetings, showCommittee = false, committees = {} }) {

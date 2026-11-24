@@ -1,5 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
+import { tr } from "../lib/lang.js";
+import { partyName } from "../lib/format.js";
 import { db } from "../lib/db.js";
 import { myRepresentatives } from "../lib/myReps.js";
 
@@ -30,28 +32,28 @@ export default function VoteBreakdown({ voteId }) {
     return { positions, parties, table, byPosition, states };
   }, [rows, stateFilter]);
 
-  if (error) return <p className="fine">Couldn't load how members voted.</p>;
-  if (!rows) return <p className="fine">Loading…</p>;
+  if (error) return <p className="fine">{tr("Couldn't load how members voted.", "No se pudo cargar cómo votaron los miembros.")}</p>;
+  if (!rows) return <p className="fine">{tr("Loading…", "Cargando…")}</p>;
   const myRows = rows.filter((r) => mine.has(r.bioguide_id));
 
   return (
     <div className="breakdown">
       {myRows.length > 0 && (
-        <p><strong>Your representatives:</strong> {myRows.map((r, i) => (
+        <p><strong>{tr("Your representatives", "Sus representantes")}:</strong> {myRows.map((r, i) => (
           <span key={r.bioguide_id}>{i ? "; " : ""}<Link to={`/member/${r.bioguide_id}`}>{r.name}</Link> — {r.position}</span>
         ))}</p>
       )}
       <table>
-        <thead><tr><th>Party</th>{positions.map((p) => <th key={p}>{p}</th>)}</tr></thead>
+        <thead><tr><th>{tr("Party", "Partido")}</th>{positions.map((p) => <th key={p}>{p}</th>)}</tr></thead>
         <tbody>
           {parties.map((party) => (
-            <tr key={party}><td>{party}</td>{positions.map((p) => <td key={p}>{table[party][p]}</td>)}</tr>
+            <tr key={party}><td>{partyName(party)}</td>{positions.map((p) => <td key={p}>{table[party][p]}</td>)}</tr>
           ))}
         </tbody>
       </table>
-      <label className="fine">State{" "}
+      <label className="fine">{tr("State", "Estado")}{" "}
         <select value={stateFilter} onChange={(e) => setStateFilter(e.target.value)}>
-          <option value="">All</option>
+          <option value="">{tr("All", "Todos")}</option>
           {states.map((s) => <option key={s} value={s}>{s}</option>)}
         </select>
       </label>
@@ -67,7 +69,7 @@ export default function VoteBreakdown({ voteId }) {
           </p>
         </div>
       ))}
-      <p className="fine">Party and state as recorded by the clerk at the time of the vote.</p>
+      <p className="fine">{tr("Party and state as recorded by the clerk at the time of the vote.", "Partido y estado tal como los registró el secretario al momento de la votación. Yea/Aye = sí; Nay/No = no.")}</p>
     </div>
   );
 }
