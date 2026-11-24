@@ -21,7 +21,7 @@ const MEMBER_FIELDS = [
   "birthday", "gender", "source_url",
 ];
 const TERM_FIELDS = [
-  "state", "district", "senate_class", "state_rank", "party", "end_date", "how", "url",
+  "state", "district", "senate_class", "state_rank", "party", "caucus", "end_date", "how", "url",
 ];
 
 export function mapLegislators(legislators) {
@@ -57,6 +57,7 @@ export function mapLegislators(legislators) {
         senate_class: house ? null : t.class ?? null,
         state_rank: t.state_rank ?? null,
         party: t.party,
+        caucus: t.caucus ?? null, // set for independents: the party they caucus with
         start_date: t.start,
         end_date: t.end,
         how: t.how ?? null,
