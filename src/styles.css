@@ -87,3 +87,26 @@ table.dim { opacity: 0.5; }
 h3.small { font-size: 0.95rem; margin: 12px 0 4px; }
 .names { font-size: 0.85rem; margin: 0; }
 .names .mine { font-weight: 700; background: #fff3c4; }
+button.kind { border: 0; cursor: pointer; font: inherit; }
+.explain-btn { background: none; border: 0; padding: 0; font: inherit; color: inherit; cursor: pointer; text-decoration: underline dotted; text-underline-offset: 3px; }
+.explain-i { display: inline-block; margin-left: 3px; width: 1.1em; height: 1.1em; line-height: 1.1em; text-align: center; border-radius: 50%; background: #e6ecf2; color: var(--accent); font-size: 0.75em; font-weight: 700; vertical-align: 1px; }
+.explain-text { display: block; margin: 4px 0 6px; padding: 8px 10px; background: #f4f7fa; border-left: 3px solid var(--accent); font-size: 0.875rem; color: var(--text); font-weight: normal; }
+.glance { margin-top: 20px; padding: 14px 18px; border: 1px solid var(--border); border-radius: 8px; background: #fbfbfb; }
+.glance h2 { font-size: 1.05rem; margin: 0 0 6px; }
+.glance ul { margin: 0; padding-left: 18px; }
+.glance li { margin: 4px 0; }
+.status-bar { list-style: none; padding: 0; margin: 20px 0 8px; display: flex; flex-wrap: wrap; gap: 0; }
+.status-bar .step { flex: 1 1 110px; padding: 8px 10px 6px; border-top: 4px solid #d8d8d8; font-size: 0.85rem; }
+.status-bar .step.done { border-top-color: #2f7d4a; }
+.status-bar .step.failed { border-top-color: #9b2c2c; }
+.status-bar .step.skipped { border-top-color: #b9cfc0; border-top-style: dashed; }
+.status-bar .step-label { display: block; font-weight: 600; }
+.status-bar .step.todo .step-label { color: var(--muted); font-weight: 400; }
+.status-bar .step-date { display: block; color: var(--muted); font-size: 0.8rem; }
+dl.glossary dt { font-weight: 700; margin-top: 16px; }
+dl.glossary dd { margin: 4px 0 0; }
+.site-footer { border-top: 1px solid var(--border); margin-top: 48px; padding: 8px 0 24px; font-size: 0.875rem; }
+.site-footer .site-inner { align-items: flex-start; }
+.report textarea { width: 100%; max-width: 480px; display: block; margin: 6px 0; padding: 8px; font: inherit; border: 1px solid var(--border); border-radius: 6px; }
+.row-inline { display: flex; gap: 12px; align-items: center; }
+.report button[type=submit] { padding: 6px 14px; border: 0; border-radius: 6px; background: var(--accent); color: #fff; cursor: pointer; }

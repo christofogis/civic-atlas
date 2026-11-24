@@ -13,6 +13,8 @@ import Compare from "./pages/Compare.jsx";
 import Committees from "./pages/Committees.jsx";
 import Committee from "./pages/Committee.jsx";
 import Layout from "./components/Layout.jsx";
+import Week from "./pages/Week.jsx";
+import Glossary from "./pages/Glossary.jsx";
 import NotFound from "./pages/NotFound.jsx";
 import "./styles.css";
 
@@ -26,6 +28,8 @@ createRoot(document.getElementById("root")).render(
         <Route path="/members" element={<Members />} />
         <Route path="/bills" element={<Bills />} />
         <Route path="/compare" element={<Compare />} />
+        <Route path="/week" element={<Week />} />
+        <Route path="/glossary" element={<Glossary />} />
         <Route path="/committees" element={<Committees />} />
         <Route path="/committee/:id" element={<Committee />} />
         <Route path="/member/:bioguide" element={<Member />} />

@@ -1,8 +1,8 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { db } from "../lib/db.js";
+import { KindLabel } from "../components/Explain.jsx";
 import { billLabel, ordinal, partyTag, date } from "../lib/format.js";
-import { voteKind } from "../lib/voteKind.js";
 
 const BIOGUIDE = /^[A-Z][0-9]{6}$/;
 const pct = (n, d) => (d ? `${Math.round((1000 * n) / d) / 10}%` : "—");
@@ -105,12 +105,11 @@ export default function Compare() {
                       <thead><tr><th>Date</th><th>Question</th><th>{short(ma)}</th><th>{short(mb)}</th></tr></thead>
                       <tbody>
                         {result.differed.slice(0, shown).map((v) => {
-                          const k = voteKind(v);
                           return (
                             <tr key={v.vote_id}>
                               <td>{date(v.voted_at)}</td>
                               <td>
-                                <span className={`kind kind-${k.kind}`} title={k.explain}>{k.label}</span>
+                                <KindLabel v={v} />
                                 <a href={v.source_url}>{v.question}</a>
                                 <div className="fine">
                                   {v.bill_type ? <Link to={`/bill/${v.bill_congress}/${v.bill_type}/${v.bill_number}`}>{billLabel({ bill_type: v.bill_type, number: v.bill_number })}</Link> : v.description}

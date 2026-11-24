@@ -3,6 +3,8 @@ import { Link, useParams } from "react-router-dom";
 import { db } from "../lib/db.js";
 import { date, billLabel, ordinal, partyTag } from "../lib/format.js";
 import VoteBreakdown from "../components/VoteBreakdown.jsx";
+import StatusBar from "../components/StatusBar.jsx";
+import { Explain } from "../components/Explain.jsx";
 
 const TYPES = new Set(["hr", "s", "hres", "sres", "hjres", "sjres", "hconres", "sconres"]);
 const LOBBY_PREVIEW = 40;
@@ -71,7 +73,7 @@ export default function Bill() {
   return (
     <main className="page">
       <header>
-        <p className="fine">{billLabel(b)} · {ordinal(b.congress)} Congress</p>
+        <p className="fine">{billLabel(b)} · {ordinal(b.congress)} Congress · <Explain id="bill-types">What's an {billLabel(b).replace(/\s*\d+$/, "")}?</Explain></p>
         <h1 className="bill-title">{b.short_title ?? b.title}</h1>
         {b.short_title && b.short_title !== b.title && <p className="lede">{b.title}</p>}
         {sponsor && <p>Sponsor: {person(sponsor)}</p>}
@@ -82,7 +84,9 @@ export default function Bill() {
         <p className="fine"><a href={b.source_url}>Full text, actions and history at Congress.gov</a></p>
       </header>
 
-      <Section title="Summary" source="Congressional Research Service, via GovInfo Bill Status.">
+      <StatusBar bill={b} />
+
+      <Section title="Summary" source={<>Congressional Research Service, via GovInfo Bill Status. <Explain id="crs-summary">About these summaries</Explain></>}>
         {b.crs_summary
           ? <p>{b.crs_summary}</p>
           : <p>The Congressional Research Service hasn't published a summary of this bill yet. The bill text is at Congress.gov.</p>}

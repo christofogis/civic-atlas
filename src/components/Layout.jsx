@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Link, NavLink, Outlet, useNavigate, useLocation } from "react-router-dom";
+import ReportError from "./ReportError.jsx";
 
 // Site header on every page: name, main sections, and a search box for members and bills.
 export default function Layout() {
@@ -18,11 +19,11 @@ export default function Layout() {
         <div className="site-inner">
           <Link to="/" className="brand">Civic Atlas</Link>
           <nav>
+            <NavLink to="/week">This week</NavLink>
             <NavLink to="/members">Members</NavLink>
             <NavLink to="/bills">Bills</NavLink>
             <NavLink to="/committees">Committees</NavLink>
             <NavLink to="/compare">Compare</NavLink>
-            <NavLink to="/methods">Methods</NavLink>
           </nav>
           {location.pathname !== "/search" && (
             <form onSubmit={submit} role="search" className="site-search">
@@ -33,6 +34,13 @@ export default function Layout() {
         </div>
       </header>
       <Outlet />
+      <footer className="site-footer">
+        <div className="site-inner">
+          <Link to="/methods">How this site works</Link>
+          <Link to="/glossary">Glossary</Link>
+          <ReportError />
+        </div>
+      </footer>
     </>
   );
 }

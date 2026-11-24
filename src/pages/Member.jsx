@@ -2,6 +2,8 @@ import { useEffect, useState } from "react";
 import { voteKind, isFinal } from "../lib/voteKind.js";
 import { Link, useParams } from "react-router-dom";
 import { db } from "../lib/db.js";
+import AtAGlance from "../components/AtAGlance.jsx";
+import { KindLabel } from "../components/Explain.jsx";
 import { seatLabel, date, money, billLabel, ordinal } from "../lib/format.js";
 
 const BIOGUIDE = /^[A-Z][0-9]{6}$/;
@@ -36,7 +38,7 @@ function VoteStats({ s, median, delegate, independent }) {
 
 async function loadMember(id) {
   const one = (q) => q.then(({ data, error }) => { if (error) throw error; return data; });
-  const [member, terms, seat, memberships, votes, bills, sponsoredCount, cosponsoredCount, finance, freshness, voteStats, medians, billStats, billMedians, trades, filings, tradeSummary, bySize, employers, pacs, outside] = await Promise.all([
+  const [member, terms, seat, memberships, votes, bills, sponsoredCount, cosponsoredCount, finance, freshness, voteStats, medians, billStats, billMedians, trades, filings, tradeSummary, bySize, employers, pacs, outside, laws] = await Promise.all([
     one(db.from("members").select("*").eq("bioguide_id", id).maybeSingle()),
     one(db.from("terms").select("chamber,state,district,party,start_date,end_date").eq("bioguide_id", id).order("start_date", { ascending: false })),
     one(db.from("seat_holders").select("*").eq("bioguide_id", id).maybeSingle()),
@@ -44,7 +46,7 @@ async function loadMember(id) {
     one(db.from("votes")
       .select("vote_id,chamber,question,result,voted_at,description,document_name,source_url,vote_positions!inner(position)")
       .eq("vote_positions.bioguide_id", id).order("voted_at", { ascending: false }).limit(120)),
-    one(db.from("bills").select("congress,bill_type,number,title,introduced_date,latest_action_date,latest_action_text,source_url")
+    one(db.from("bills").select("congress,bill_type,number,title,short_title,introduced_date,latest_action_date,latest_action_text,source_url,law_number")
       .eq("sponsor_bioguide_id", id).order("introduced_date", { ascending: false }).limit(10)),
     db.from("bills").select("*", { count: "exact", head: true }).eq("sponsor_bioguide_id", id).then((r) => r.count),
     db.from("bill_cosponsors").select("*", { count: "exact", head: true }).eq("bioguide_id", id).is("withdrawn_date", null).then((r) => r.count),
@@ -62,8 +64,9 @@ async function loadMember(id) {
     one(db.from("finance_top_employers").select("*").eq("bioguide_id", id).order("rank")),
     one(db.from("finance_committee_contributions").select("*").eq("bioguide_id", id).order("rank")),
     one(db.from("outside_spending").select("*").eq("bioguide_id", id).order("total", { ascending: false })),
+    one(db.from("bills").select("congress,bill_type,number").eq("sponsor_bioguide_id", id).not("became_law_date", "is", null)),
   ]);
-  return { member, terms, seat, memberships, votes, bills, sponsoredCount, cosponsoredCount, finance, freshness, voteStats, medians, billStats, billMedians, trades, filings, tradeSummary, bySize, employers, pacs, outside };
+  return { member, terms, seat, memberships, votes, bills, sponsoredCount, cosponsoredCount, finance, freshness, voteStats, medians, billStats, billMedians, trades, filings, tradeSummary, bySize, employers, pacs, outside, laws };
 }
 
 const SIZE_LABEL = { 0: "Under $200", 200: "$200–$499", 500: "$500–$999", 1000: "$1,000–$1,999", 2000: "$2,000 and over" };
@@ -149,7 +152,7 @@ export default function Member() {
   if (state.status === "missing") return <main className="page"><h1>Member not found</h1><p><Link to="/">Back to search</Link></p></main>;
   if (state.status === "error") return <main className="page"><p className="notice">Couldn't load this page right now. Try again shortly.</p></main>;
 
-  const { member: m, terms, seat, memberships, votes, bills, sponsoredCount, cosponsoredCount, finance, freshness, voteStats, medians, billStats, billMedians, trades, filings: scannedFilings, tradeSummary: ts, bySize, employers, pacs, outside } = state.data;
+  const { member: m, terms, seat, memberships, votes, bills, sponsoredCount, cosponsoredCount, finance, freshness, voteStats, medians, billStats, billMedians, trades, filings: scannedFilings, tradeSummary: ts, bySize, employers, pacs, outside, laws } = state.data;
   // Finance detail is shown for the most recent cycle with detail on file.
   const detailCycle = Math.max(0, ...[...bySize, ...employers, ...pacs, ...outside].map((r) => r.cycle));
   const inCycle = (rows) => rows.filter((r) => r.cycle === detailCycle);
@@ -178,6 +181,9 @@ export default function Member() {
           {seat?.url && <> · <a href={seat.url}>Official website</a></>}
         </p>
       </header>
+
+      <AtAGlance terms={terms} voteStats={voteStats} medians={medians} billStats={billStats} laws={laws}
+        finance={finance} bySize={bySize} tradeSummary={ts} delegate={delegate(latest)} />
 
       <Section title="Service in Congress" source={`unitedstates/congress-legislators.${updated("members")}`}>
         <ul className="plain">
@@ -238,7 +244,7 @@ export default function Member() {
                 <tr key={v.vote_id}>
                   <td>{date(v.voted_at)}</td>
                   <td>
-                    <span className={`kind kind-${voteKind(v).kind}`} title={voteKind(v).explain}>{voteKind(v).label}</span>
+                    <KindLabel v={v} />
                     <a href={v.source_url}>{v.question}</a>
                     {(v.document_name || v.description) && <div className="fine">{[v.document_name, v.description].filter(Boolean).join(" · ")}</div>}
                   </td>
@@ -283,7 +289,7 @@ export default function Member() {
           <ul className="plain">
             {bills.map((b) => (
               <li key={`${b.congress}-${b.bill_type}-${b.number}`}>
-                <Link to={`/bill/${b.congress}/${b.bill_type}/${b.number}`}>{billLabel(b)}</Link> ({ordinal(b.congress)}) · {b.title}
+                <Link to={`/bill/${b.congress}/${b.bill_type}/${b.number}`}>{billLabel(b)}</Link> ({ordinal(b.congress)}) · {b.short_title ?? b.title}{b.law_number && <> · <strong>{b.law_number}</strong></>}
                 <div className="fine">Introduced {date(b.introduced_date)}{b.latest_action_text && <> · Latest action {date(b.latest_action_date)}: {b.latest_action_text}</>}</div>
               </li>
             ))}

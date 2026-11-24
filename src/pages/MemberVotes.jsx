@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link, useParams, useSearchParams } from "react-router-dom";
 import { db } from "../lib/db.js";
+import { KindLabel } from "../components/Explain.jsx";
 import { date, billLabel, ordinal } from "../lib/format.js";
 import { voteKind, isFinal } from "../lib/voteKind.js";
 
@@ -132,12 +133,11 @@ export default function MemberVotes() {
               <thead><tr><th>Date</th><th>Question</th><th>Vote</th><th>Result</th></tr></thead>
               <tbody>
                 {filtered.slice(0, shown).map((v) => {
-                  const k = voteKind(v);
                   return (
                     <tr key={v.vote_id}>
                       <td>{date(v.voted_at)}</td>
                       <td>
-                        <span className={`kind kind-${k.kind}`} title={k.explain}>{k.label}</span>
+                        <KindLabel v={v} />
                         <a href={v.source_url}>{v.question}</a>
                         <div className="fine">
                           {v.bill_type
