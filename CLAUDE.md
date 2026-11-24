@@ -57,6 +57,9 @@ yes-man: flag weak ideas, scope creep, and shortcuts that will cost later.
   anonymous, 120/min with `LDA_API_KEY`. Bills are read from LD-2 issue text by number only.
   No per-bill dollar amounts (a report's income covers all its issues). Pages must say the Senate
   Office of Public Records can't vouch for data or analyses derived after retrieval.
+- Earmarks (deferred): House Appropriations posts a consolidated CPF requests .xlsx per fiscal
+  year; appropriations.senate.gov returns "Access Denied" to automated requests. Don't work
+  around the block; House-only coverage would break equal treatment of members.
 - Address → district: Geocodio `cd` field (free tier 2,500 lookups/day). Results may be stored.
 - Do not use: ProPublica Congress API (no new keys issued). Prefer the official sources above
   over third-party aggregators.

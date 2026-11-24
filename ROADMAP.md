@@ -30,7 +30,8 @@
 - [x] Donors: contributions by size, donors' employers, top PACs (FEC has no industry codes)
 - [x] Outside spending for / against
 - [x] Lobbying on bills (LDA.gov LD-2 reports naming a bill; bill pages)
-- [ ] Earmark requests
+- [ ] Earmark requests (deferred Nov 2026: House publishes a consolidated requests .xlsx; the Senate
+  has no consolidated list and appropriations.senate.gov blocks automated downloads)
 
 ## Phase 2 — Depth
 - [ ] Vote ingest from House/Senate clerks; vote search by issue
