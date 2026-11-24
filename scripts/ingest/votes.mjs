@@ -210,7 +210,6 @@ async function main() {
         const bioguide = vote.chamber === "house" ? p.member_ref : byLis.get(p.member_ref);
         if (db && (!bioguide || !known.has(bioguide))) { unmatched++; unmatchedRefs.add(p.member_ref); continue; }
         rows.push({
-          vote_id: `${vote.chamber}-${vote.congress}-${vote.session}-${vote.roll_number}`,
           bioguide_id: bioguide ?? p.member_ref,
           position: p.position,
           position_category: category(p.position),
@@ -221,8 +220,11 @@ async function main() {
       if (dryRun) {
         if (voteCount < 2) console.log(JSON.stringify(vote), "\n  sample positions:", JSON.stringify(rows.slice(0, 2)));
       } else {
-        await upsertBatches(db, "votes", [vote], "vote_id");
-        await upsertBatches(db, "vote_positions", rows, "vote_id,bioguide_id");
+        // Positions reference the vote's integer key, assigned by the database.
+        const { data: saved, error: voteErr } = await db.from("votes")
+          .upsert(vote, { onConflict: "vote_id" }).select("vote_key").single();
+        if (voteErr) throw new Error(`upsert votes: ${String(voteErr.message).slice(0, 200)}`);
+        await upsertBatches(db, "vote_positions", rows.map((r) => ({ vote_key: saved.vote_key, ...r })), "vote_key,bioguide_id");
       }
       voteCount++;
       positionCount += rows.length;
