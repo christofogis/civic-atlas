@@ -10,7 +10,7 @@
 - [x] Schema written and tested locally: members, terms, districts, committees, bills, votes, vote_positions, finance_summaries, ingest_runs (keyed on bioguide_id)
 - [x] Apply schema to Supabase (advisors clean)
 - [x] Ingest: congress-legislators → members/terms (daily, GitHub Actions)
-- [ ] Ingest: committees and committee memberships
+- [x] Ingest: committees and committee memberships (same daily workflow)
 - [ ] Address lookup → your 2 senators + 1 representative
 - [ ] Member profile page: bio, committees, sponsored bills, recent votes, FEC totals, source links
 - [ ] Deploy publicly
