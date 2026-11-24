@@ -1,6 +1,7 @@
 name: Accuracy check
 
 # Weekly: compare random facts on the site with the original sources; results are public.
+# Also checks the database size against the free plan's 500 MB limit.
 on:
   schedule:
     - cron: "17 17 * * 1"   # Mondays, 9:17am Pacific
@@ -25,3 +26,6 @@ jobs:
           cache: npm
       - run: npm ci
       - run: node scripts/checks/accuracy.mjs
+      - name: Database size
+        if: always()
+        run: node scripts/checks/db-size.mjs
