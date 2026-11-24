@@ -7,7 +7,8 @@
 - [ ] Confirm each data source in CLAUDE.md is live and its terms allow this use
 
 ## Phase 1 — Federal MVP
-- [ ] Schema: members, terms, committees, bills, votes, vote_positions, finance_summary (keyed on bioguide_id)
+- [x] Schema written and tested locally: members, terms, districts, committees, bills, votes, vote_positions, finance_summaries, ingest_runs (keyed on bioguide_id)
+- [ ] Apply schema to Supabase
 - [ ] Ingest: congress-legislators → members/terms/committees
 - [ ] Address lookup → your 2 senators + 1 representative
 - [ ] Member profile page: bio, committees, sponsored bills, recent votes, FEC totals, source links

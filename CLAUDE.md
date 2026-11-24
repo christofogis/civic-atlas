@@ -46,8 +46,16 @@ yes-man: flag weak ideas, scope creep, and shortcuts that will cost later.
 
 ## Congress transitions
 - The 120th Congress convenes Jan 3, 2027. Several states redrew districts mid-decade
-  (incl. CA, TX, OH, NC, MO, UT). Store `congress` on every term, district, and vote; never
-  assume "current" is fixed. Geocodio's `cd` default flips to the 120th on Jan 3, 2027.
+  (incl. CA, TX, OH, NC, MO, UT). Districts, votes, bills, and committee seats carry a
+  `congress` number; terms carry dates (a Senate term spans three Congresses) and map to
+  Congresses via the `term_congresses` view. Never assume "current" is fixed. Geocodio's
+  `cd` default flips to the 120th on Jan 3, 2027.
+
+## Database
+- Schema lives in `supabase/migrations/`. Change it only by adding a new migration file.
+- Party is snapshotted on each term and each vote position, so party switches don't
+  rewrite history. Clerk wording (`position`, `question`, `result`) is stored verbatim.
+- User addresses are never stored.
 
 ## Conventions
 - Small, reviewable commits. Explain *why* in commit messages.
