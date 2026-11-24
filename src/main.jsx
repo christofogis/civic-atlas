@@ -19,6 +19,8 @@ const Committee = lazy(() => import("./pages/Committee.jsx"));
 const Week = lazy(() => import("./pages/Week.jsx"));
 const Glossary = lazy(() => import("./pages/Glossary.jsx"));
 const Quiz = lazy(() => import("./pages/Quiz.jsx"));
+const Topics = lazy(() => import("./pages/Topics.jsx"));
+const Topic = lazy(() => import("./pages/Topic.jsx"));
 const NotFound = lazy(() => import("./pages/NotFound.jsx"));
 
 createRoot(document.getElementById("root")).render(
@@ -34,6 +36,8 @@ createRoot(document.getElementById("root")).render(
         <Route path="/week" element={<Week />} />
         <Route path="/glossary" element={<Glossary />} />
         <Route path="/quiz" element={<Quiz />} />
+        <Route path="/topics" element={<Topics />} />
+        <Route path="/topic/:slug" element={<Topic />} />
         <Route path="/committees" element={<Committees />} />
         <Route path="/committee/:id" element={<Committee />} />
         <Route path="/member/:bioguide" element={<Member />} />

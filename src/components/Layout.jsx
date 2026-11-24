@@ -21,9 +21,9 @@ export default function Layout() {
           <nav>
             <NavLink to="/week">This week</NavLink>
             <NavLink to="/members">Members</NavLink>
+            <NavLink to="/topics">Topics</NavLink>
             <NavLink to="/bills">Bills</NavLink>
             <NavLink to="/committees">Committees</NavLink>
-            <NavLink to="/compare">Compare</NavLink>
           </nav>
           {location.pathname !== "/search" && (
             <form onSubmit={submit} role="search" className="site-search">
@@ -40,6 +40,8 @@ export default function Layout() {
         <div className="site-inner">
           <Link to="/methods">How this site works</Link>
           <Link to="/glossary">Glossary</Link>
+          <Link to="/compare">Compare two members</Link>
+          <Link to="/quiz">Quiz</Link>
           <ReportError />
         </div>
       </footer>

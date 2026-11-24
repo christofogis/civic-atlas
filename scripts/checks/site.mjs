@@ -17,6 +17,8 @@ const PAGES = [
   ["/search?q=padilla", ["Alex Padilla"]],
   ["/compare?a=P000145&b=S000033", ["Votes where they differed"]],
   ["/glossary", ["Cloture"]],
+  ["/topics", ["Topics", "Health"]],
+  ["/topic/health", ["Became law", "Recent roll-call votes"]],
   ["/quiz", ["Do you vote like your representatives?", "Would you have voted for it?"]],
   ["/methods", ["Votes by issue"]],
 ];

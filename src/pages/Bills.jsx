@@ -1,21 +1,10 @@
 import { useEffect, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { db } from "../lib/db.js";
+import { POLICY_AREAS } from "../lib/policyAreas.js";
 import { congressOn, congressYears } from "../../lib/congress.js";
 import { billLabel, ordinal, partyTag, date } from "../lib/format.js";
 
-// The Library of Congress's 32 policy areas.
-const POLICY_AREAS = [
-  "Agriculture and Food", "Animals", "Armed Forces and National Security", "Arts, Culture, Religion",
-  "Civil Rights and Liberties, Minority Issues", "Commerce", "Congress", "Crime and Law Enforcement",
-  "Economics and Public Finance", "Education", "Emergency Management", "Energy", "Environmental Protection",
-  "Families", "Finance and Financial Sector", "Foreign Trade and International Finance",
-  "Geographic Areas, Entities, and Committees", "Government Operations and Politics", "Health",
-  "Housing and Community Development", "Immigration", "International Affairs", "Labor and Employment", "Law",
-  "Native Americans", "Private Legislation", "Public Lands and Natural Resources",
-  "Science, Technology, Communications", "Social Sciences and History", "Social Welfare",
-  "Sports and Recreation", "Taxation", "Transportation and Public Works", "Water Resources Development",
-];
 const SORTS = {
   action: { label: "Most recent action", column: "latest_action_date" },
   introduced: { label: "Most recently introduced", column: "introduced_date" },

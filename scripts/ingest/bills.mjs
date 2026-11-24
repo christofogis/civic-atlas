@@ -204,6 +204,9 @@ async function main() {
       const { data: statRows, error: statErr } = await db.rpc("refresh_member_bill_stats");
       if (statErr) throw new Error(`refresh bill stats: ${statErr.message}`);
       console.log(`bipartisan cosponsorship stats refreshed: ${statRows} member rows`);
+      const { data: topicRows, error: topicErr } = await db.rpc("refresh_topic_stats");
+      if (topicErr) throw new Error(`refresh topic stats: ${topicErr.message}`);
+      console.log(`topic stats refreshed: ${topicRows} rows`);
     }
     return { rows_inserted: 0, rows_updated: billCount + cosponsorCount };
   };
