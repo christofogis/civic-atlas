@@ -2,31 +2,9 @@
 // Run nightly by .github/workflows/site-check.yml; a failure opens a GitHub issue.
 //   node scripts/checks/site.mjs [base-url]
 import { chromium } from "playwright";
+import { PAGES } from "./pages.mjs";
 
 const BASE = process.argv[2] ?? "https://civic-atlas-cub.pages.dev";
-const PAGES = [
-  ["/", ["Civic Atlas", "Look up"]],
-  ["/member/P000145", ["Alex Padilla", "At a glance", "Contact", "next up for election", "Overview"]],
-  ["/member/P000145#votes", ["Voting record", "Recent roll-call votes"]],
-  ["/member/P000145/votes", ["Roll-call votes", "Issue"]],
-  ["/bill/119/hr/1", ["Became law", "Cosponsors", "Roll-call votes", "Lobbying reports naming this bill"]],
-  ["/bills", ["Bills", "Latest action"]],
-  ["/members", ["Members of Congress", "California"]],
-  ["/committees", ["Committees", "Senate"]],
-  ["/committee/SSFI", ["Members", "Bills referred"]],
-  ["/week", ["This week in Congress", "Coming up", "Committee hearings and markups"]],
-  ["/search?q=padilla", ["Alex Padilla"]],
-  ["/compare?a=P000145&b=S000033", ["Votes where they differed"]],
-  ["/glossary", ["Cloture"]],
-  ["/corrections", ["What was wrong"]],
-  ["/nominations", ["Nominations", "Confirmation"]],
-  ["/story", ["Look up a news story", "Article text"]],
-  ["/topics", ["Topics", "Health"]],
-  ["/elections?state=CA", ["who has filed", "Senate"]],
-  ["/topic/health", ["Became law", "Recent roll-call votes"]],
-  ["/quiz", ["Do you vote like your representatives?", "Would you have voted for it?"]],
-  ["/methods", ["Votes by issue"]],
-];
 // Feeds fetched directly: [path, content-type fragment, text that must appear]
 const FEEDS = [
   ["/api/feed/member/P000145", "rss", "<item>"],

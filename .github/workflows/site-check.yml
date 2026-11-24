@@ -1,6 +1,7 @@
 name: Site check
 
-# Nightly: open key pages of the live site in a real browser and check their content.
+# Nightly: open key pages of the live site in a real browser and check their content and
+# accessibility.
 on:
   schedule:
     - cron: "11 15 * * *"   # daily, 7:11am Pacific, after the morning data jobs
@@ -10,6 +11,10 @@ on:
         description: "Site URL"
         type: string
         default: "https://civic-atlas-cub.pages.dev"
+      a11y_report:
+        description: "Accessibility: list every finding without failing"
+        type: boolean
+        default: false
 
 permissions:
   contents: read
@@ -27,3 +32,6 @@ jobs:
       - run: npm ci
       - run: npx playwright install --with-deps chromium
       - run: node scripts/checks/site.mjs "${{ inputs.base_url || 'https://civic-atlas-cub.pages.dev' }}"
+      - name: Accessibility (axe, WCAG 2.1 AA)
+        if: always()
+        run: node scripts/checks/a11y.mjs "${{ inputs.base_url || 'https://civic-atlas-cub.pages.dev' }}" ${{ inputs.a11y_report && '--report' || '' }}
