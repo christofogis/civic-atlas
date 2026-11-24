@@ -3,6 +3,7 @@ import { Link, useParams } from "react-router-dom";
 import { db } from "../lib/db.js";
 import { billLabel, ordinal } from "../lib/format.js";
 import { statementFor, meetingHeading } from "../../lib/meetings.js";
+import { itemsLabel } from "../lib/meetingLabels.js";
 import { meetingTime } from "../components/MeetingList.jsx";
 import { tr } from "../lib/lang.js";
 
@@ -44,7 +45,7 @@ export default function Hearing() {
   // Where a Senate committee posts its witnesses: the committee's own site (the parent's for a subcommittee).
   const site = committees.map((c) => c.url ?? c.parent?.url).find(Boolean);
   const isHearing = /hearing/i.test(m.meeting_type ?? "");
-  const { heading, agenda } = meetingHeading(m.title, m.meeting_type);
+  const { heading, agenda } = meetingHeading(m.title, m.meeting_type, itemsLabel);
 
   return (
     <main className="page">

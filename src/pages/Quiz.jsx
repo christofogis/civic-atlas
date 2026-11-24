@@ -5,6 +5,7 @@ import { billLabel, date, partyTag } from "../lib/format.js";
 import { voteKind } from "../lib/voteKind.js";
 import { myRepresentatives } from "../lib/myReps.js";
 import { congressOn } from "../../lib/congress.js";
+import { tr } from "../lib/lang.js";
 
 const QUESTIONS = 10;
 const MIN_SHARE = 0.1;   // each side needs at least 10% of the votes, so the vote was contested
@@ -50,7 +51,7 @@ async function loadPositions(voteIds) {
 function Summary({ text }) {
   const [open, setOpen] = useState(false);
   if (text.length <= 500) return <p>{text}</p>;
-  return <p>{open ? text : `${text.slice(0, 480).replace(/\s+\S*$/, "")}… `}<button className="link" onClick={() => setOpen(!open)}>{open ? "Show less" : "Read more"}</button></p>;
+  return <p>{open ? text : `${text.slice(0, 480).replace(/\s+\S*$/, "")}… `}<button className="link" onClick={() => setOpen(!open)}>{open ? tr("Show less", "Mostrar menos") : tr("Read more", "Leer más")}</button></p>;
 }
 
 export default function Quiz() {
@@ -90,39 +91,38 @@ export default function Quiz() {
     setResults({ status: "done", answered, mine: [...tally.values()].filter((t) => mine.has(t.bioguide_id)), house: ranked("house"), senate: ranked("senate") });
   }
 
-  if (state.status === "loading") return <main className="page"><h1>Do you vote like your representatives?</h1><p>Loading…</p></main>;
-  if (state.status === "error") return <main className="page"><h1>Do you vote like your representatives?</h1><p className="notice">Couldn't load the questions right now.</p></main>;
+  if (state.status === "loading") return <main className="page"><h1>{tr("Do you vote like your representatives?", "¿Vota usted como sus representantes?")}</h1><p>{tr("Loading…", "Cargando…")}</p></main>;
+  if (state.status === "error") return <main className="page"><h1>{tr("Do you vote like your representatives?", "¿Vota usted como sus representantes?")}</h1><p className="notice">{tr("Couldn't load the questions right now.", "No se pudieron cargar las preguntas en este momento.")}</p></main>;
   const qs = state.qs;
-  if (qs.length === 0) return <main className="page"><h1>Do you vote like your representatives?</h1><p>No contested final votes with summaries yet this Congress.</p></main>;
+  if (qs.length === 0) return <main className="page"><h1>{tr("Do you vote like your representatives?", "¿Vota usted como sus representantes?")}</h1><p>{tr("No contested final votes with summaries yet this Congress.", "Todavía no hay votaciones finales disputadas con resumen en este Congreso.")}</p></main>;
 
   if (results) {
-    if (results.status === "loading") return <main className="page"><h1>Your results</h1><p>Comparing…</p></main>;
+    if (results.status === "loading") return <main className="page"><h1>{tr("Your results", "Sus resultados")}</h1><p>{tr("Comparing…", "Comparando…")}</p></main>;
     const pct = (t) => `${Math.round((100 * t.same) / t.total)}%`;
-    const row = (t) => <li key={t.bioguide_id}><Link to={`/member/${t.bioguide_id}`}>{t.name}</Link> ({partyTag({ party: t.party_at_vote, state: t.state_at_vote, chamber: t.chamber })}): agreed on {t.same} of {t.total} ({pct(t)})</li>;
+    const row = (t) => <li key={t.bioguide_id}><Link to={`/member/${t.bioguide_id}`}>{t.name}</Link> ({partyTag({ party: t.party_at_vote, state: t.state_at_vote, chamber: t.chamber })}): {tr(`agreed on ${t.same} of ${t.total}`, `coincidió en ${t.same} de ${t.total}`)} ({pct(t)})</li>;
     return (
       <main className="page">
-        <h1>Your results</h1>
-        <p className="lede">You answered {results.answered} of {qs.length} questions with Yes or No.</p>
+        <h1>{tr("Your results", "Sus resultados")}</h1>
+        <p className="lede">{tr(`You answered ${results.answered} of ${qs.length} questions with Yes or No.`, `Respondió ${results.answered} de ${qs.length} preguntas con Sí o No.`)}</p>
         <section className="section">
-          <h2>Your representatives</h2>
-          {mine.size === 0 ? <p><Link to="/">Look up your address</Link>, then come back to compare with your own representatives.</p>
-            : results.mine.length === 0 ? <p>Your representatives didn't vote Yea or Nay on the questions you answered.</p>
+          <h2>{tr("Your representatives", "Sus representantes")}</h2>
+          {mine.size === 0 ? <p><Link to="/">{tr("Look up your address", "Busque su dirección")}</Link>{tr(", then come back to compare with your own representatives.", " y luego vuelva para compararse con sus representantes.")}</p>
+            : results.mine.length === 0 ? <p>{tr("Your representatives didn't vote Yea or Nay on the questions you answered.", "Sus representantes no votaron sí ni no en las preguntas que usted respondió.")}</p>
             : <ul className="plain">{results.mine.map(row)}</ul>}
         </section>
         {["senate", "house"].map((ch) => results[ch].length > 0 && (
           <section className="section" key={ch}>
-            <h2>{ch === "senate" ? "Senators" : "House members"} you agreed with most</h2>
+            <h2>{ch === "senate" ? tr("Senators you agreed with most", "Senadores con quienes más coincidió") : tr("House members you agreed with most", "Miembros de la Cámara con quienes más coincidió")}</h2>
             <ul className="plain">{results[ch].slice(0, 5).map(row)}</ul>
-            <details><summary className="fine">Everyone in the {ch === "senate" ? "Senate" : "House"} ({results[ch].length})</summary>
+            <details><summary className="fine">{ch === "senate" ? tr("Everyone in the Senate", "Todo el Senado") : tr("Everyone in the House", "Toda la Cámara")} ({results[ch].length})</summary>
               <ul className="plain">{results[ch].map(row)}</ul></details>
           </section>
         ))}
         <p className="fine">
-          This compares your answers with members' recorded votes on these {qs.length} bills only, chosen by a fixed rule:
-          the most recent contested final votes this Congress on bills with a Congressional Research Service summary.
-          It isn't a measure of overall agreement. Your answers stay in your browser and aren't saved.
+          {tr(`This compares your answers with members' recorded votes on these ${qs.length} bills only, chosen by a fixed rule: the most recent contested final votes this Congress on bills with a Congressional Research Service summary. It isn't a measure of overall agreement. Your answers stay in your browser and aren't saved.`,
+            `Esto compara sus respuestas con los votos registrados de los miembros solo en estos ${qs.length} proyectos, elegidos con una regla fija: las votaciones finales disputadas más recientes de este Congreso sobre proyectos con un resumen del Servicio de Investigación del Congreso. No mide la coincidencia en general. Sus respuestas se quedan en su navegador y no se guardan.`)}
         </p>
-        <p><button className="link" onClick={() => { setResults(null); setStep(0); setAnswers({}); }}>Start over</button></p>
+        <p><button className="link" onClick={() => { setResults(null); setStep(0); setAnswers({}); }}>{tr("Start over", "Empezar de nuevo")}</button></p>
       </main>
     );
   }
@@ -132,25 +132,25 @@ export default function Quiz() {
   const choose = (a) => { setAnswers({ ...answers, [q.key]: a }); if (step < qs.length - 1) setStep(step + 1); else setTimeout(finish, 0); };
   return (
     <main className="page">
-      <h1>Do you vote like your representatives?</h1>
-      <p className="fine">Question {step + 1} of {qs.length}. Answer the way you would have voted; party labels are shown only at the end.</p>
+      <h1>{tr("Do you vote like your representatives?", "¿Vota usted como sus representantes?")}</h1>
+      <p className="fine">{tr(`Question ${step + 1} of ${qs.length}. Answer the way you would have voted; party labels are shown only at the end.`, `Pregunta ${step + 1} de ${qs.length}. Responda como habría votado; los partidos se muestran solo al final. Los resúmenes están en inglés.`)}</p>
       <section className="quiz-card">
-        <p className="fine">{billLabel(b)}{b.law_number ? ` · became ${b.law_number}` : ""}</p>
+        <p className="fine">{billLabel(b)}{b.law_number ? tr(` · became ${b.law_number}`, ` · se convirtió en ${b.law_number}`) : ""}</p>
         <h2>{b.short_title ?? b.title}</h2>
         <Summary text={b.crs_summary} />
-        <p className="fine">Summary by the Congressional Research Service. <Link to={`/bill/${b.congress}/${b.bill_type}/${b.number}`} target="_blank">Bill page</Link></p>
-        <p>Would you have voted for it?</p>
+        <p className="fine">{tr("Summary by the Congressional Research Service.", "Resumen del Servicio de Investigación del Congreso.")} <Link to={`/bill/${b.congress}/${b.bill_type}/${b.number}`} target="_blank">{tr("Bill page", "Página del proyecto")}</Link></p>
+        <p>{tr("Would you have voted for it?", "¿Habría votado a favor?")}</p>
         <div className="quiz-buttons">
-          <button type="button" onClick={() => choose("yes")}>Yes</button>
+          <button type="button" onClick={() => choose("yes")}>{tr("Yes", "Sí")}</button>
           <button type="button" onClick={() => choose("no")}>No</button>
-          <button type="button" className="link" onClick={() => choose("skip")}>Skip</button>
+          <button type="button" className="link" onClick={() => choose("skip")}>{tr("Skip", "Omitir")}</button>
         </div>
         <p className="fine">
-          Voted on: {Object.values(q.votes).map((v) => `${v.chamber === "house" ? "House" : "Senate"} ${date(v.voted_at)}`).join(" and ")}.
-          Results are revealed at the end.
+          {tr("Voted on", "Votado en")}: {Object.values(q.votes).map((v) => `${v.chamber === "house" ? tr("House", "Cámara") : tr("Senate", "Senado")} ${date(v.voted_at)}`).join(tr(" and ", " y "))}.{" "}
+          {tr("Results are revealed at the end.", "Los resultados se muestran al final.")}
         </p>
       </section>
-      {step > 0 && <p><button className="link" onClick={() => setStep(step - 1)}>← Back</button></p>}
+      {step > 0 && <p><button className="link" onClick={() => setStep(step - 1)}>{tr("← Back", "← Atrás")}</button></p>}
     </main>
   );
 }

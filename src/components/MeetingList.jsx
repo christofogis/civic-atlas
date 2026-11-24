@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 import { date } from "../lib/format.js";
 import { tr, locale } from "../lib/lang.js";
 import { meetingHeading } from "../../lib/meetings.js";
+import { itemsLabel } from "../lib/meetingLabels.js";
 
 export const meetingTime = (m) => m.meeting_at
   ? `${date(m.meeting_at)}, ${new Date(m.meeting_at).toLocaleTimeString(locale(), { hour: "numeric", minute: "2-digit", timeZone: "America/New_York" })} ${tr("ET", "(hora del Este)")}`
@@ -16,7 +17,7 @@ export default function MeetingList({ meetings, showCommittee = false, committee
           <span className="fine">{meetingTime(m)}{m.meeting_type && <> · {m.meeting_type}</>}
             {m.status && !/^scheduled$/i.test(m.status) && <strong> · {m.status}</strong>}
             {showCommittee && m.committee_ids?.[0] && <> · {committees[m.committee_ids[0]] ?? m.committee_ids[0]}</>}</span>
-          <div><Link to={`/hearing/${m.event_id}`}>{meetingHeading(m.title, m.meeting_type).heading}</Link></div>
+          <div><Link to={`/hearing/${m.event_id}`}>{meetingHeading(m.title, m.meeting_type, itemsLabel).heading}</Link></div>
         </li>
       ))}
     </ul>

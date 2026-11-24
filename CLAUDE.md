@@ -93,5 +93,6 @@ yes-man: flag weak ideas, scope creep, and shortcuts that will cost later.
 - Ingest jobs are idempotent (safe to re-run) and log what they changed.
 - No committed build output (`dist/`), logs, zips, or progress files.
 - Interface text is bilingual: write English/Spanish pairs where used (`tr("Members", "Miembros")` from
-  `src/lib/lang.js`, or `t()` from `useLang()`). Records stay in English as published. Pages fully in
-  Spanish are listed in `Layout.jsx` (`SPANISH`); others show a Spanish note that they're in English.
+  `src/lib/lang.js`, or `t()` from `useLang()`). Records stay in English as published. Every page is
+  bilingual; a new page ships with its Spanish. Long prose pages keep a separate Spanish component
+  (`Methods.jsx` / `MethodsEs.jsx`) — change both together.

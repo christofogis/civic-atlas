@@ -2,7 +2,8 @@ import { useEffect, useMemo, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { db } from "../lib/db.js";
 import DownloadCsv from "../components/DownloadCsv.jsx";
-import { STATE_NAMES, partyTag, date } from "../lib/format.js";
+import { STATE_NAMES, stateName, partyTag, date } from "../lib/format.js";
+import { tr } from "../lib/lang.js";
 
 // Every member since 2023, by state. Defaults to those serving now.
 export default function Members() {
@@ -35,26 +36,26 @@ export default function Members() {
 
   return (
     <main className="page wide">
-      <h1>Members of Congress</h1>
+      <h1>{tr("Members of Congress", "Miembros del Congreso")}</h1>
       <div className="filters">
-        <label>State{" "}
+        <label>{tr("State", "Estado")}{" "}
           <select value={state} onChange={(e) => set("state", e.target.value)}>
-            <option value="">All</option>
-            {states.map((s) => <option key={s} value={s}>{STATE_NAMES[s] ?? s}</option>)}
+            <option value="">{tr("All", "Todos")}</option>
+            {states.map((s) => <option key={s} value={s}>{stateName(s)}</option>)}
           </select>
         </label>
-        <label>Chamber{" "}
+        <label>{tr("Chamber", "Cámara")}{" "}
           <select value={chamber} onChange={(e) => set("chamber", e.target.value)}>
-            <option value="">Both</option>
-            <option value="senate">Senate</option>
-            <option value="house">House</option>
+            <option value="">{tr("Both", "Ambas")}</option>
+            <option value="senate">{tr("Senate", "Senado")}</option>
+            <option value="house">{tr("House", "Cámara de Representantes")}</option>
           </select>
         </label>
-        <label><input type="checkbox" checked={former} onChange={(e) => set("former", e.target.checked ? "1" : "")} /> Include former members (since 2023)</label>
+        <label><input type="checkbox" checked={former} onChange={(e) => set("former", e.target.checked ? "1" : "")} /> {tr("Include former members (since 2023)", "Incluir exmiembros (desde 2023)")}</label>
       </div>
-      {error && <p className="notice">Couldn't load members right now.</p>}
-      {!rows && !error && <p>Loading…</p>}
-      {rows && <p className="fine">{count} member{count === 1 ? "" : "s"}. Source: unitedstates/congress-legislators.</p>}
+      {error && <p className="notice">{tr("Couldn't load members right now.", "No se pudieron cargar los miembros en este momento.")}</p>}
+      {!rows && !error && <p>{tr("Loading…", "Cargando…")}</p>}
+      {rows && <p className="fine">{tr(`${count} member${count === 1 ? "" : "s"}. Source: unitedstates/congress-legislators.`, `${count} miembro${count === 1 ? "" : "s"}. Fuente: unitedstates/congress-legislators.`)}</p>}
       <DownloadCsv rows={groups.flatMap(([, list]) => list)} filename="members" columns={[
         ["Name", (m) => m.name], ["Party", (m) => m.party], ["Chamber", (m) => m.chamber], ["State", (m) => m.state],
         ["District", (m) => (m.chamber === "house" ? m.district : "")], ["Serving", (m) => (m.serving ? "yes" : "no")],
@@ -62,11 +63,11 @@ export default function Members() {
       ]} />
       {groups.map(([st, list]) => (
         <section key={st} className="section">
-          <h2>{STATE_NAMES[st] ?? st}</h2>
+          <h2>{stateName(st)}</h2>
           <ul className="plain columns">
             {list.map((m) => (
               <li key={m.bioguide_id}>
-                <Link to={`/member/${m.bioguide_id}`}>{m.name}</Link> <span className="fine">({partyTag(m)}){m.chamber === "senate" ? " · Senate" : ""}{m.serving ? "" : ` · served until ${date(m.end_date)}`}</span>
+                <Link to={`/member/${m.bioguide_id}`}>{m.name}</Link> <span className="fine">({partyTag(m)}){m.chamber === "senate" ? tr(" · Senate", " · Senado") : ""}{m.serving ? "" : tr(` · served until ${date(m.end_date)}`, ` · en el cargo hasta el ${date(m.end_date)}`)}</span>
               </li>
             ))}
           </ul>

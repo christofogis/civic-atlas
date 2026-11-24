@@ -2,6 +2,7 @@ import { Fragment, useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { db } from "../lib/db.js";
 import TextVersions from "../components/TextVersions.jsx";
+import { areaName } from "../lib/policyAreas.js";
 import MeetingList from "../components/MeetingList.jsx";
 import DownloadCsv from "../components/DownloadCsv.jsx";
 import { date, billLabel, ordinal, partyTag, partyName } from "../lib/format.js";
@@ -89,7 +90,7 @@ export default function Bill() {
         {b.short_title && b.short_title !== b.title && <p className="lede">{b.title}</p>}
         {sponsor && <p>{tr("Sponsor", "Patrocinador")}: {person(sponsor)}</p>}
         <p className="fine">
-          {tr("Introduced", "Presentado el")} {date(b.introduced_date)}{b.policy_area && <> · {tr("Policy area", "Área de política")}: {b.policy_area}</>}
+          {tr("Introduced", "Presentado el")} {date(b.introduced_date)}{b.policy_area && <> · {tr("Policy area", "Área de política")}: {areaName(b.policy_area)}</>}
         </p>
         {b.latest_action_text && <p>{tr("Latest action", "Última acción")} ({date(b.latest_action_date)}): {b.latest_action_text}</p>}
         <p className="fine"><a href={b.source_url}>{tr("Full text, actions and history at Congress.gov", "Texto completo, acciones e historial en Congress.gov (en inglés)")}</a></p>

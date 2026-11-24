@@ -3,9 +3,6 @@ import { Link, NavLink, Outlet, useNavigate, useLocation } from "react-router-do
 import ReportError from "./ReportError.jsx";
 import { useLang } from "../lib/i18n.jsx";
 
-// Pages fully available in Spanish. Others show a short note in Spanish that they're in English.
-const SPANISH = [/^\/$/, /^\/member\/[A-Z]\d{6}$/, /^\/bill\//, /^\/glossary$/, /^\/week$/, /^\/hearing\//];
-
 // Site header on every page: name, main sections, and a search box for members and bills.
 export default function Layout() {
   const navigate = useNavigate();
@@ -44,9 +41,6 @@ export default function Layout() {
         </div>
       </header>
       <div id="main" tabIndex={-1}>
-        {lang === "es" && !SPANISH.some((r) => r.test(location.pathname)) && (
-          <p className="notice lang-note page">Esta página todavía está solo en inglés. Los registros oficiales se muestran tal como se publicaron.</p>
-        )}
         <Suspense fallback={<main className="page"><p>{t("Loading…", "Cargando…")}</p></main>}>
           <Outlet />
         </Suspense>

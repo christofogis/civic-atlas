@@ -2,9 +2,10 @@ import { useEffect, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { db } from "../lib/db.js";
 import { ordinal } from "../lib/format.js";
-import { topicSlug } from "../lib/policyAreas.js";
+import { topicSlug, areaName } from "../lib/policyAreas.js";
 import { congressOn, congressYears } from "../../lib/congress.js";
 import { Explain } from "../components/Explain.jsx";
+import { tr } from "../lib/lang.js";
 
 const CURRENT = congressOn();
 
@@ -20,22 +21,22 @@ export default function Topics() {
 
   return (
     <main className="page wide">
-      <h1>Topics</h1>
-      <p className="lede">What Congress has worked on, by subject. Each bill has one <Explain id="policy-area">policy area</Explain>.</p>
+      <h1>{tr("Topics", "Temas")}</h1>
+      <p className="lede">{tr("What Congress has worked on, by subject. Each bill has one ", "En qué ha trabajado el Congreso, por tema. Cada proyecto tiene un ")}<Explain id="policy-area">{tr("policy area", "área de política")}</Explain>.</p>
       <div className="filters">
-        <label>Congress{" "}
+        <label>{tr("Congress", "Congreso")}{" "}
           <select value={congress} onChange={(e) => setParams({ congress: e.target.value })}>
             {Array.from({ length: CURRENT - 117 }, (_, i) => CURRENT - i).map((c) => <option key={c} value={c}>{ordinal(c)} ({congressYears(c)})</option>)}
           </select>
         </label>
       </div>
-      {!rows ? <p>Loading…</p> : (
+      {!rows ? <p>{tr("Loading…", "Cargando…")}</p> : (
         <table>
-          <thead><tr><th>Topic</th><th>Bills introduced</th><th>Passed a chamber</th><th>Became law</th></tr></thead>
+          <thead><tr><th>{tr("Topic", "Tema")}</th><th>{tr("Bills introduced", "Proyectos presentados")}</th><th>{tr("Passed a chamber", "Aprobados por una cámara")}</th><th>{tr("Became law", "Se convirtieron en ley")}</th></tr></thead>
           <tbody>
             {rows.map((r) => (
               <tr key={r.policy_area}>
-                <td><Link to={`/topic/${topicSlug(r.policy_area)}?congress=${congress}`}>{r.policy_area}</Link></td>
+                <td><Link to={`/topic/${topicSlug(r.policy_area)}?congress=${congress}`}>{areaName(r.policy_area)}</Link></td>
                 <td>{r.bills.toLocaleString()}</td>
                 <td>{r.passed_any.toLocaleString()}</td>
                 <td>{r.laws.toLocaleString()}</td>
@@ -44,7 +45,7 @@ export default function Topics() {
           </tbody>
         </table>
       )}
-      <p className="fine">Source: GovInfo Bill Status (Library of Congress). Bills and resolutions; "passed a chamber" includes resolutions agreed to.</p>
+      <p className="fine">{tr('Source: GovInfo Bill Status (Library of Congress). Bills and resolutions; "passed a chamber" includes resolutions agreed to.', 'Fuente: GovInfo Bill Status (Biblioteca del Congreso). Proyectos y resoluciones; "aprobados por una cámara" incluye resoluciones adoptadas.')}</p>
     </main>
   );
 }

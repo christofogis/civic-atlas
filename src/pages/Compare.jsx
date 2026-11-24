@@ -4,6 +4,7 @@ import { db } from "../lib/db.js";
 import DownloadCsv from "../components/DownloadCsv.jsx";
 import { KindLabel } from "../components/Explain.jsx";
 import { billLabel, ordinal, partyTag, date } from "../lib/format.js";
+import { tr } from "../lib/lang.js";
 
 const BIOGUIDE = /^[A-Z][0-9]{6}$/;
 const pct = (n, d) => (d ? `${Math.round((1000 * n) / d) / 10}%` : "—");
@@ -18,15 +19,15 @@ function Picker({ label, value, members, onPick }) {
   return (
     <div className="picker">
       <label>{label}{" "}
-        <input type="search" value={text} placeholder={chosen ? chosen.name : "Type a name"} onChange={(e) => setText(e.target.value)} />
+        <input type="search" value={text} placeholder={chosen ? chosen.name : tr("Type a name", "Escriba un nombre")} onChange={(e) => setText(e.target.value)} />
       </label>
-      {chosen && !text && <div className="fine">{chosen.name} ({partyTag(chosen)}), {chosen.chamber === "senate" ? "Senate" : "House"}</div>}
+      {chosen && !text && <div className="fine">{chosen.name} ({partyTag(chosen)}), {chosen.chamber === "senate" ? tr("Senate", "Senado") : tr("House", "Cámara")}</div>}
       {matches.length > 0 && (
         <ul className="plain">
           {matches.map((m) => (
             <li key={m.bioguide_id}>
               <button className="link" onClick={() => { onPick(m.bioguide_id); setText(""); }}>{m.name}</button>{" "}
-              <span className="fine">({partyTag(m)}){m.chamber === "senate" ? " · Senate" : " · House"}</span>
+              <span className="fine">({partyTag(m)}){m.chamber === "senate" ? tr(" · Senate", " · Senado") : tr(" · House", " · Cámara")}</span>
             </li>
           ))}
         </ul>
@@ -63,30 +64,30 @@ export default function Compare() {
 
   return (
     <main className="page wide">
-      <h1>Compare two members' votes</h1>
-      <p className="lede">How often two members of the same chamber cast the same vote, and the roll calls where they differed.</p>
+      <h1>{tr("Compare two members' votes", "Comparar los votos de dos miembros")}</h1>
+      <p className="lede">{tr("How often two members of the same chamber cast the same vote, and the roll calls where they differed.", "Con qué frecuencia dos miembros de la misma cámara votaron igual, y las votaciones en que votaron distinto.")}</p>
       <div className="filters">
-        <Picker label="First member" value={a} members={members} onPick={(id) => pick("a", id)} />
-        <Picker label="Second member" value={b} members={members} onPick={(id) => pick("b", id)} />
+        <Picker label={tr("First member", "Primer miembro")} value={a} members={members} onPick={(id) => pick("a", id)} />
+        <Picker label={tr("Second member", "Segundo miembro")} value={b} members={members} onPick={(id) => pick("b", id)} />
       </div>
 
-      {a && b && a === b && <p className="notice">Pick two different members.</p>}
-      {result.status === "loading" && <p>Comparing…</p>}
-      {result.status === "error" && <p className="notice">Couldn't compare right now. Try again shortly.</p>}
+      {a && b && a === b && <p className="notice">{tr("Pick two different members.", "Elija dos miembros distintos.")}</p>}
+      {result.status === "loading" && <p>{tr("Comparing…", "Comparando…")}</p>}
+      {result.status === "error" && <p className="notice">{tr("Couldn't compare right now. Try again shortly.", "No se pudo comparar en este momento. Inténtelo en un momento.")}</p>}
       {result.status === "done" && (
         result.by_congress.length === 0
-          ? <p className="notice">These two members haven't voted on any of the same roll calls since 2023. Members can only be compared within the same chamber.</p>
+          ? <p className="notice">{tr("These two members haven't voted on any of the same roll calls since 2023. Members can only be compared within the same chamber.", "Estos dos miembros no han votado en las mismas votaciones desde 2023. Solo se pueden comparar miembros de la misma cámara.")}</p>
           : (
             <>
               <section className="section">
-                <h2>{ma?.name} and {mb?.name}</h2>
+                <h2>{ma?.name} {tr("and", "y")} {mb?.name}</h2>
                 <table>
-                  <thead><tr><th>Congress</th><th>Both voted Yea or Nay</th><th>Same vote</th><th>Different vote</th></tr></thead>
+                  <thead><tr><th>{tr("Congress", "Congreso")}</th><th>{tr("Both voted Yea or Nay", "Ambos votaron sí o no")}</th><th>{tr("Same vote", "Mismo voto")}</th><th>{tr("Different vote", "Voto distinto")}</th></tr></thead>
                   <tbody>
                     {result.by_congress.map((c) => (
                       <tr key={`${c.congress}-${c.chamber}`}>
-                        <td>{ordinal(c.congress)} ({c.chamber === "senate" ? "Senate" : "House"})</td>
-                        <td>{c.both_voted.toLocaleString()} of {c.shared_roll_calls.toLocaleString()} roll calls</td>
+                        <td>{ordinal(c.congress)} ({c.chamber === "senate" ? tr("Senate", "Senado") : tr("House", "Cámara")})</td>
+                        <td>{tr(`${c.both_voted.toLocaleString()} of ${c.shared_roll_calls.toLocaleString()} roll calls`, `${c.both_voted.toLocaleString()} de ${c.shared_roll_calls.toLocaleString()} votaciones`)}</td>
                         <td>{c.same.toLocaleString()} ({pct(c.same, c.both_voted)})</td>
                         <td>{c.different.toLocaleString()} ({pct(c.different, c.both_voted)})</td>
                       </tr>
@@ -94,16 +95,16 @@ export default function Compare() {
                   </tbody>
                 </table>
                 <p className="fine">
-                  Counts every roll call where both voted Yea or Nay, including procedural votes. Votes where either was
-                  absent or voted Present aren't counted. <Link to="/methods#compare">More on this comparison</Link>.
+                  {tr("Counts every roll call where both voted Yea or Nay, including procedural votes. Votes where either was absent or voted Present aren't counted.", "Cuenta cada votación en que ambos votaron sí (Yea) o no (Nay), incluidas las de procedimiento. No se cuentan las votaciones en que alguno estuvo ausente o votó Present.")}{" "}
+                  <Link to="/methods#compare">{tr("More on this comparison", "Más sobre esta comparación")}</Link>.
                 </p>
               </section>
               <section className="section">
-                <h2>Votes where they differed</h2>
-                {result.differed.length === 0 ? <p>None.</p> : (
+                <h2>{tr("Votes where they differed", "Votaciones en que votaron distinto")}</h2>
+                {result.differed.length === 0 ? <p>{tr("None.", "Ninguna.")}</p> : (
                   <>
                     <table>
-                      <thead><tr><th>Date</th><th>Question</th><th>{short(ma)}</th><th>{short(mb)}</th></tr></thead>
+                      <thead><tr><th>{tr("Date", "Fecha")}</th><th>{tr("Question", "Asunto")}</th><th>{short(ma)}</th><th>{short(mb)}</th></tr></thead>
                       <tbody>
                         {result.differed.slice(0, shown).map((v) => {
                           return (
@@ -130,9 +131,9 @@ export default function Compare() {
                       [ma?.name ?? a, (v) => v.a_position], [mb?.name ?? b, (v) => v.b_position], ["Source", (v) => v.source_url],
                     ]} />
                     {result.differed.length > shown && (
-                      <p><button className="link" onClick={() => setShown(shown + 50)}>Show more</button></p>
+                      <p><button className="link" onClick={() => setShown(shown + 50)}>{tr("Show more", "Mostrar más")}</button></p>
                     )}
-                    {result.differed.length === 500 && <p className="fine">Showing the 500 most recent.</p>}
+                    {result.differed.length === 500 && <p className="fine">{tr("Showing the 500 most recent.", "Se muestran las 500 más recientes.")}</p>}
                   </>
                 )}
               </section>

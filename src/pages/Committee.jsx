@@ -5,15 +5,16 @@ import MeetingList from "../components/MeetingList.jsx";
 import Follow from "../components/Follow.jsx";
 import { congressOn, congressYears } from "../../lib/congress.js";
 import { billLabel, ordinal, partyTag, date } from "../lib/format.js";
+import { tr } from "../lib/lang.js";
 
 const PAGE = 50;
 const CURRENT = congressOn();
 // Coverage starts with the 118th Congress.
 const CONGRESS_OPTIONS = Array.from({ length: CURRENT - 117 }, (_, i) => CURRENT - i);
 const SORTS = {
-  action: { label: "Most recent action", column: "latest_action_date" },
-  referred: { label: "Most recently referred", column: "first_activity_date" },
-  lobbying: { label: "Most organizations lobbying", column: "lobbying_clients" },
+  action: { label: "Most recent action", es: "Acción más reciente", column: "latest_action_date" },
+  referred: { label: "Most recently referred", es: "Remitidos más recientemente", column: "first_activity_date" },
+  lobbying: { label: "Most organizations lobbying", es: "Más organizaciones haciendo cabildeo", column: "lobbying_clients" },
 };
 
 export default function Committee() {
@@ -63,28 +64,28 @@ export default function Committee() {
       .then(({ data, error, count }) => setBills(error ? { status: "error", rows: [] } : { status: "done", rows: data, count }));
   }, [id, congress, sort]);
 
-  if (info.status === "missing") return <main className="page"><h1>Committee not found</h1><p><Link to="/committees">All committees</Link></p></main>;
-  if (info.status === "error") return <main className="page"><p className="notice">Couldn't load this committee right now.</p></main>;
-  if (info.status === "loading") return <main className="page"><p>Loading…</p></main>;
+  if (info.status === "missing") return <main className="page"><h1>{tr("Committee not found", "Comité no encontrado")}</h1><p><Link to="/committees">{tr("All committees", "Todos los comités")}</Link></p></main>;
+  if (info.status === "error") return <main className="page"><p className="notice">{tr("Couldn't load this committee right now.", "No se pudo cargar este comité en este momento.")}</p></main>;
+  if (info.status === "loading") return <main className="page"><p>{tr("Loading…", "Cargando…")}</p></main>;
   const { committee: c, subs, roster, rosterCongress, events, meetings } = info;
   const subNames = Object.fromEntries(subs.map((x) => [x.committee_id, x.name]));
   const sides = ["majority", "minority"].map((s) => [s, roster.filter((r) => r.side === s)]).filter(([, l]) => l.length);
-  const chamberName = { house: "House", senate: "Senate", joint: "Joint" }[c.chamber] ?? c.chamber;
+  const chamberName = { house: tr("House", "Cámara:"), senate: tr("Senate", "Senado:"), joint: tr("Joint", "Conjunto:") }[c.chamber] ?? c.chamber;
 
   return (
     <main className="page wide">
-      <p className="fine"><Link to="/committees">Committees</Link>{c.parent && <> · <Link to={`/committee/${c.parent.committee_id}`}>{c.parent.name}</Link></>}</p>
+      <p className="fine"><Link to="/committees">{tr("Committees", "Comités")}</Link>{c.parent && <> · <Link to={`/committee/${c.parent.committee_id}`}>{c.parent.name}</Link></>}</p>
       <h1>{c.chamber === "joint" ? c.name : `${chamberName} ${c.name}`}</h1>
-      {c.url && <p className="fine"><a href={c.url}>Committee website</a></p>}
+      {c.url && <p className="fine"><a href={c.url}>{tr("Committee website", "Sitio web del comité (en inglés)")}</a></p>}
       <Follow calendar={`/api/calendar/committee/${c.committee_id}`} />
 
       {events.length > 0 && (
         <section className="section">
-          <h2>Coming up</h2>
+          <h2>{tr("Coming up", "Próximamente")}</h2>
           <ul className="plain">
             {events.map((e) => (
               <li key={e.event_id}>
-                <strong>{date(e.event_date)}</strong>{e.event_time && <> {e.event_time} ET</>} · {e.kind === "markup" ? "Markup" : e.kind === "hearing" ? "Hearing" : "Meeting"}
+                <strong>{date(e.event_date)}</strong>{e.event_time && <> {e.event_time} {tr("ET", "(hora del Este)")}</>} · {e.kind === "markup" ? tr("Markup", "Sesión de enmiendas") : e.kind === "hearing" ? tr("Hearing", "Audiencia") : tr("Meeting", "Reunión")}
                 {e.committee_id !== c.committee_id && <> · {e.committee_name}</>}: <a href={e.source_url}>{e.title}</a>
                 {e.status && e.status !== "Scheduled" && <strong> ({e.status})</strong>}
               </li>
@@ -95,24 +96,24 @@ export default function Committee() {
 
       {meetings.length > 0 && (
         <section className="section">
-          <h2>Recent hearings and meetings</h2>
-          <MeetingList meetings={meetings} showCommittee committees={{ [c.committee_id]: "Full committee", ...subNames }} />
-          <p className="fine">Source: Congress.gov committee meeting records. The 25 most recent are listed; each links to video, documents and, for House hearings, witnesses.</p>
+          <h2>{tr("Recent hearings and meetings", "Audiencias y reuniones recientes")}</h2>
+          <MeetingList meetings={meetings} showCommittee committees={{ [c.committee_id]: tr("Full committee", "Comité en pleno"), ...subNames }} />
+          <p className="fine">{tr("Source: Congress.gov committee meeting records. The 25 most recent are listed; each links to video, documents and, for House hearings, witnesses.", "Fuente: registros de reuniones de comités de Congress.gov. Se listan las 25 más recientes; cada una enlaza a video, documentos y, en audiencias de la Cámara, testigos.")}</p>
         </section>
       )}
 
       {subs.length > 0 && (
         <section className="section">
-          <h2>Subcommittees</h2>
+          <h2>{tr("Subcommittees", "Subcomités")}</h2>
           <ul className="plain columns">{subs.map((s) => <li key={s.committee_id}><Link to={`/committee/${s.committee_id}`}>{s.name}</Link></li>)}</ul>
         </section>
       )}
 
       <section className="section">
-        <h2>Members{rosterCongress && ` (${ordinal(rosterCongress)} Congress)`}</h2>
-        {sides.length === 0 ? <p>No membership on record.</p> : sides.map(([side, list]) => (
+        <h2>{tr("Members", "Miembros")}{rosterCongress && tr(` (${ordinal(rosterCongress)} Congress)`, ` (${ordinal(rosterCongress)} Congreso)`)}</h2>
+        {sides.length === 0 ? <p>{tr("No membership on record.", "No hay miembros registrados.")}</p> : sides.map(([side, list]) => (
           <div key={side}>
-            <h3 className="small">{side === "majority" ? "Majority" : "Minority"}</h3>
+            <h3 className="small">{side === "majority" ? tr("Majority", "Mayoría") : tr("Minority", "Minoría")}</h3>
             <ul className="plain columns">
               {list.map((r) => (
                 <li key={r.bioguide_id}>
@@ -123,33 +124,33 @@ export default function Committee() {
             </ul>
           </div>
         ))}
-        <p className="fine">Source: unitedstates/congress-legislators. Listed in committee rank order.</p>
+        <p className="fine">{tr("Source: unitedstates/congress-legislators. Listed in committee rank order.", "Fuente: unitedstates/congress-legislators. En el orden de rango del comité.")}</p>
       </section>
 
       <section className="section">
-        <h2>Bills referred</h2>
+        <h2>{tr("Bills referred", "Proyectos remitidos")}</h2>
         <div className="filters">
-          <label>Congress{" "}
+          <label>{tr("Congress", "Congreso")}{" "}
             <select value={congress} onChange={(e) => set("congress", e.target.value)}>
               {CONGRESS_OPTIONS.map((c) => <option key={c} value={c}>{ordinal(c)} ({congressYears(c)})</option>)}
             </select>
           </label>
-          <label>Sort{" "}
+          <label>{tr("Sort", "Ordenar")}{" "}
             <select value={sort} onChange={(e) => set("sort", e.target.value)}>
-              {Object.entries(SORTS).map(([k, s]) => <option key={k} value={k}>{s.label}</option>)}
+              {Object.entries(SORTS).map(([k, s]) => <option key={k} value={k}>{tr(s.label, s.es)}</option>)}
             </select>
           </label>
         </div>
-        {bills.status === "error" && <p className="notice">Couldn't load bills.</p>}
-        {bills.status === "done" && <p>{(bills.count ?? bills.rows.length).toLocaleString()} bills referred in the {ordinal(congress)} Congress.</p>}
+        {bills.status === "error" && <p className="notice">{tr("Couldn't load bills.", "No se pudieron cargar los proyectos.")}</p>}
+        {bills.status === "done" && <p>{tr(`${(bills.count ?? bills.rows.length).toLocaleString()} bills referred in the ${ordinal(congress)} Congress.`, `${(bills.count ?? bills.rows.length).toLocaleString()} proyectos remitidos en el ${ordinal(congress)} Congreso.`)}</p>}
         {bills.rows.length > 0 && (
           <table className={bills.status === "loading" ? "dim" : ""}>
-            <thead><tr><th>Bill</th><th>Referred</th><th>Latest action</th>{sort === "lobbying" && <th>Lobbying</th>}</tr></thead>
+            <thead><tr><th>{tr("Bill", "Proyecto")}</th><th>{tr("Referred", "Remitido")}</th><th>{tr("Latest action", "Última acción")}</th>{sort === "lobbying" && <th>{tr("Lobbying", "Cabildeo")}</th>}</tr></thead>
             <tbody>
               {bills.rows.slice(0, shown).map((b) => (
                 <tr key={`${b.bill_type}-${b.number}`}>
                   <td><Link to={`/bill/${b.congress}/${b.bill_type}/${b.number}`}>{billLabel(b)}</Link> {b.short_title ?? b.title}
-                    {b.sponsor_name && <div className="fine">Sponsor: <Link to={`/member/${b.sponsor_bioguide_id}`}>{b.sponsor_name}</Link></div>}</td>
+                    {b.sponsor_name && <div className="fine">{tr("Sponsor", "Patrocinador")}: <Link to={`/member/${b.sponsor_bioguide_id}`}>{b.sponsor_name}</Link></div>}</td>
                   <td className="fine">{date(b.first_activity_date)}</td>
                   <td><span className="fine">{date(b.latest_action_date)}</span><div>{b.latest_action_text}</div></td>
                   {sort === "lobbying" && <td>{b.lobbying_clients.toLocaleString()}</td>}
@@ -158,9 +159,9 @@ export default function Committee() {
             </tbody>
           </table>
         )}
-        {bills.rows.length > shown && <p><button className="link" onClick={() => setShown(shown + PAGE)}>Show more</button></p>}
-        {bills.count > bills.rows.length && <p className="fine">Showing the first 1,000.</p>}
-        <p className="fine">Source: GovInfo Bill Status (Library of Congress). Includes bills referred to this committee or later handled by it.</p>
+        {bills.rows.length > shown && <p><button className="link" onClick={() => setShown(shown + PAGE)}>{tr("Show more", "Mostrar más")}</button></p>}
+        {bills.count > bills.rows.length && <p className="fine">{tr("Showing the first 1,000.", "Se muestran los primeros 1,000.")}</p>}
+        <p className="fine">{tr("Source: GovInfo Bill Status (Library of Congress). Includes bills referred to this committee or later handled by it.", "Fuente: GovInfo Bill Status (Biblioteca del Congreso). Incluye proyectos remitidos a este comité o que este tramitó después.")}</p>
       </section>
     </main>
   );

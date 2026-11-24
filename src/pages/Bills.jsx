@@ -2,14 +2,15 @@ import { useEffect, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { db } from "../lib/db.js";
 import DownloadCsv from "../components/DownloadCsv.jsx";
-import { POLICY_AREAS } from "../lib/policyAreas.js";
+import { POLICY_AREAS, areaName } from "../lib/policyAreas.js";
 import { congressOn, congressYears } from "../../lib/congress.js";
 import { billLabel, ordinal, partyTag, date } from "../lib/format.js";
+import { tr } from "../lib/lang.js";
 
 const SORTS = {
-  action: { label: "Most recent action", column: "latest_action_date" },
-  introduced: { label: "Most recently introduced", column: "introduced_date" },
-  lobbying: { label: "Most organizations lobbying", column: "lobbying_clients" },
+  action: { label: "Most recent action", es: "Acción más reciente", column: "latest_action_date" },
+  introduced: { label: "Most recently introduced", es: "Presentados más recientemente", column: "introduced_date" },
+  lobbying: { label: "Most organizations lobbying", es: "Más organizaciones haciendo cabildeo", column: "lobbying_clients" },
 };
 const PAGE = 50;
 const CURRENT = congressOn();
@@ -44,37 +45,37 @@ export default function Bills() {
 
   return (
     <main className="page wide">
-      <h1>Bills</h1>
+      <h1>{tr("Bills", "Proyectos de ley")}</h1>
       <div className="filters">
-        <label>Congress{" "}
+        <label>{tr("Congress", "Congreso")}{" "}
           <select value={congress} onChange={(e) => set("congress", e.target.value)}>
             {CONGRESS_OPTIONS.map((c) => <option key={c} value={c}>{ordinal(c)} ({congressYears(c)})</option>)}
           </select>
         </label>
-        <label>Issue{" "}
+        <label>{tr("Issue", "Tema")}{" "}
           <select value={issue} onChange={(e) => set("issue", e.target.value)}>
-            <option value="">All issues</option>
-            {POLICY_AREAS.map((a) => <option key={a} value={a}>{a}</option>)}
+            <option value="">{tr("All issues", "Todos los temas")}</option>
+            {POLICY_AREAS.map((a) => <option key={a} value={a}>{areaName(a)}</option>)}
           </select>
         </label>
-        <label>Sort{" "}
+        <label>{tr("Sort", "Ordenar")}{" "}
           <select value={sort} onChange={(e) => set("sort", e.target.value)}>
-            {Object.entries(SORTS).map(([k, s]) => <option key={k} value={k}>{s.label}</option>)}
+            {Object.entries(SORTS).map(([k, s]) => <option key={k} value={k}>{tr(s.label, s.es)}</option>)}
           </select>
         </label>
       </div>
-      {state.status === "error" && <p className="notice">Couldn't load bills right now.</p>}
-      {state.status === "loading" && state.rows.length === 0 && <p>Loading…</p>}
-      {state.rows.length === 0 && state.status === "done" && <p>No bills match.</p>}
+      {state.status === "error" && <p className="notice">{tr("Couldn't load bills right now.", "No se pudieron cargar los proyectos en este momento.")}</p>}
+      {state.status === "loading" && state.rows.length === 0 && <p>{tr("Loading…", "Cargando…")}</p>}
+      {state.rows.length === 0 && state.status === "done" && <p>{tr("No bills match.", "Ningún proyecto coincide.")}</p>}
       {state.rows.length > 0 && (
         <table className={state.status === "loading" ? "dim" : ""}>
-          <thead><tr><th>Bill</th><th>Sponsor</th><th>Latest action</th>{sort === "lobbying" && <th>Lobbying</th>}</tr></thead>
+          <thead><tr><th>{tr("Bill", "Proyecto")}</th><th>{tr("Sponsor", "Patrocinador")}</th><th>{tr("Latest action", "Última acción")}</th>{sort === "lobbying" && <th>{tr("Lobbying", "Cabildeo")}</th>}</tr></thead>
           <tbody>
             {state.rows.map((b) => (
               <tr key={`${b.bill_type}-${b.number}`}>
                 <td>
                   <Link to={`/bill/${b.congress}/${b.bill_type}/${b.number}`}>{billLabel(b)}</Link> {b.short_title ?? b.title}
-                  {b.policy_area && <div className="fine">{b.policy_area}</div>}
+                  {b.policy_area && <div className="fine">{areaName(b.policy_area)}</div>}
                 </td>
                 <td>{b.sponsor_bioguide_id
                   ? <><Link to={`/member/${b.sponsor_bioguide_id}`}>{b.sponsor_name}</Link>{b.sponsor_party && <> ({partyTag({ party: b.sponsor_party, chamber: b.sponsor_chamber, state: b.sponsor_state, district: b.sponsor_district })})</>}</>
@@ -87,19 +88,20 @@ export default function Bills() {
         </table>
       )}
       <DownloadCsv rows={state.rows} filename={`bills-${congress}${issue ? `-${issue.toLowerCase().replace(/[^a-z]+/g, "-")}` : ""}-p${page + 1}`}
-        note="this page of results" columns={[
+        note={tr("this page of results", "esta página de resultados")} columns={[
         ["Bill", (b) => `${b.bill_type.toUpperCase()} ${b.number}`], ["Congress", (b) => b.congress], ["Title", (b) => b.short_title ?? b.title],
         ["Issue", (b) => b.policy_area], ["Sponsor", (b) => b.sponsor_name], ["Sponsor party", (b) => b.sponsor_party], ["Sponsor state", (b) => b.sponsor_state],
         ["Introduced", (b) => b.introduced_date], ["Latest action date", (b) => b.latest_action_date], ["Latest action", (b) => b.latest_action_text],
         ["Organizations lobbying", (b) => b.lobbying_clients], ["Page", (b) => `${window.location.origin}/bill/${b.congress}/${b.bill_type}/${b.number}`],
       ]} />
       <p className="pager">
-        {page > 0 && <button className="link" onClick={() => set("page", String(page - 1))}>← Previous</button>}
-        {state.rows.length === PAGE && <button className="link" onClick={() => set("page", String(page + 1))}>Next →</button>}
+        {page > 0 && <button className="link" onClick={() => set("page", String(page - 1))}>{tr("← Previous", "← Anterior")}</button>}
+        {state.rows.length === PAGE && <button className="link" onClick={() => set("page", String(page + 1))}>{tr("Next →", "Siguiente →")}</button>}
       </p>
       <p className="fine">
-        Source: GovInfo Bill Status (Library of Congress); {ordinal(congress)} Congress. Lobbying counts are organizations
-        whose LD-2 reports name the bill (<Link to="/methods#lobbying">how they're counted</Link>).
+        {tr(`Source: GovInfo Bill Status (Library of Congress); ${ordinal(congress)} Congress. Lobbying counts are organizations whose LD-2 reports name the bill`,
+          `Fuente: GovInfo Bill Status (Biblioteca del Congreso); ${ordinal(congress)} Congreso. Los conteos de cabildeo son organizaciones cuyos informes LD-2 mencionan el proyecto`)}{" "}
+        (<Link to="/methods#lobbying">{tr("how they're counted", "cómo se cuentan")}</Link>).
       </p>
     </main>
   );

@@ -1,6 +1,8 @@
 import { useEffect } from "react";
 import AccuracyStatus from "../components/AccuracyStatus.jsx";
 import { Link, useLocation } from "react-router-dom";
+import { getLang } from "../lib/lang.js";
+import MethodsEs from "./MethodsEs.jsx";
 
 // How every number on the site is produced. Keep this in step with the code:
 // supabase/migrations/*_member_vote_stats.sql and scripts/ingest/*.
@@ -9,6 +11,7 @@ export default function Methods() {
   useEffect(() => {
     if (hash) document.getElementById(hash.slice(1))?.scrollIntoView();
   }, [hash]);
+  if (getLang() === "es") return <MethodsEs />;
   return (
     <main className="page prose">
       <h1>How this site works</h1>
@@ -221,8 +224,8 @@ export default function Methods() {
 
       <h2>Corrections</h2>
       <p>
-        If something here is wrong, it will be corrected and the correction noted. A public corrections
-        log is coming soon.
+        If something here is wrong, it will be corrected and the correction noted in the
+        public <Link to="/corrections">corrections log</Link>.
       </p>
     </main>
   );
