@@ -17,10 +17,20 @@ const money = (v) => (v == null || v === "" ? null : Number(v));
 // Entries donors write in the employer field that don't name an employer. Listed on /methods.
 const NOT_AN_EMPLOYER = /^(|N\/?A|NULL|NONE|RETIRED|SELF|SELF[- ]?EMPLOYED|NOT EMPLOYED|UNEMPLOYED|HOMEMAKER|STUDENT|INFORMATION REQUESTED.*|REQUESTED|ENTREPRENEUR)$/i;
 
+// Shared pacer: request *starts* are spaced PAUSE_MS apart across all workers, so slow FEC
+// responses overlap without exceeding the hourly limit.
+let nextStart = 0;
+async function pace() {
+  const now = Date.now();
+  const at = Math.max(now, nextStart);
+  nextStart = at + PAUSE_MS;
+  if (at > now) await sleep(at - now);
+}
+
 async function getJson(path, params, key) {
   const url = `${API}${path}?${new URLSearchParams(params)}`;
   for (let attempt = 0; attempt < 3; attempt++) {
-    await sleep(PAUSE_MS);
+    await pace();
     const res = await fetch(url, { headers: { "X-Api-Key": key, Accept: "application/json" } });
     if (res.status === 429) { await sleep(120_000); continue; }
     if (res.status === 404) return null;
@@ -118,10 +128,16 @@ async function main() {
     return;
   }
 
+  // Members with no detail yet go first; the rest in random order, so a run that hits the
+  // time limit doesn't always leave the same members out.
+  const have = new Set((await fetchAll(db, "finance_top_employers", "fec_candidate_id")).map((r) => r.fec_candidate_id));
+  const shuffled = work.map((w) => [Math.random(), w]).sort((a, b) => a[0] - b[0]).map(([, w]) => w);
+  work = [...shuffled.filter((w) => !have.has(w.fec_candidate_id)), ...shuffled.filter((w) => have.has(w.fec_candidate_id))];
+
   await withRun(db, "fec-detail", async () => {
-    console.log(`candidate IDs: ${work.length}`);
-    let n = 0, rows = 0;
-    for (const w of work) {
+    console.log(`candidate IDs: ${work.length} (${work.filter((w) => !have.has(w.fec_candidate_id)).length} without detail yet)`);
+    let n = 0, rows = 0, i = 0;
+    const one = async (w) => {
       const d = await detail(w.fec_candidate_id, w.cycle, w.bioguide_id, key, false);
       // Replace this candidate-cycle's rows: rankings change from week to week.
       for (const t of ["finance_by_size", "finance_top_employers", "finance_committee_contributions", "outside_spending"]) {
@@ -134,7 +150,8 @@ async function main() {
       await upsertBatches(db, "outside_spending", d.outside, "fec_candidate_id,cycle,committee_id,support_oppose");
       rows += d.bySize.length + d.employers.length + d.committeesIn.length + d.outside.length;
       if (++n % 50 === 0) console.log(`  ${n}/${work.length}`);
-    }
+    };
+    await Promise.all(Array.from({ length: 3 }, async () => { while (i < work.length) await one(work[i++]); }));
     console.log(`done: ${n} candidates, ${rows} rows`);
     return { rows_inserted: rows, rows_updated: 0 };
   });
