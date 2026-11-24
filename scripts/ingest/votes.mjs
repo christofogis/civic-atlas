@@ -61,8 +61,12 @@ const MONTHS = { jan: 1, feb: 2, mar: 3, apr: 4, may: 5, jun: 6, jul: 7, aug: 8,
 
 export const yearFor = (congress, session) => 1789 + 2 * (congress - 1) + (session - 1);
 
+// The clerks answer some missing votes with an ordinary page instead of a 404;
+// anything that isn't a roll-call document returns null.
 export function parseHouse(xml, url) {
-  const meta = parser.parse(xml)["rollcall-vote"]["vote-metadata"];
+  const doc = parser.parse(xml)["rollcall-vote"];
+  if (!doc?.["vote-metadata"]) return null;
+  const meta = doc["vote-metadata"];
   const [d, mon, y] = text(meta["action-date"]).split("-");
   const [h, mi] = (meta["action-time"]?.["@time-etz"] ?? "12:00").split(":").map(Number);
   const totals = meta["vote-totals"]?.["totals-by-vote"] ?? {};
@@ -91,7 +95,7 @@ export function parseHouse(xml, url) {
     not_voting_total: int(totals["not-voting-total"]),
     source_url: url,
   };
-  const recorded = list(parser.parse(xml)["rollcall-vote"]["vote-data"]?.["recorded-vote"]);
+  const recorded = list(doc["vote-data"]?.["recorded-vote"]);
   const positions = recorded.map((rv) => ({
     member_ref: rv.legislator["@name-id"],
     position: text(rv.vote),
@@ -103,6 +107,7 @@ export function parseHouse(xml, url) {
 
 export function parseSenate(xml, url) {
   const v = parser.parse(xml).roll_call_vote;
+  if (!v?.vote_number) return null;
   // "January 9, 2025,  02:54 PM"
   const m = text(v.vote_date).match(/^(\w+)\s+(\d+),\s*(\d{4}),\s+(\d+):(\d+)\s*(AM|PM)$/i);
   if (!m) throw new Error(`unparsed Senate date "${text(v.vote_date)}"`);
@@ -228,8 +233,9 @@ async function main() {
         const url = houseUrl(year, n);
         const xml = await get(url);
         fetched++;
-        if (!xml) break;
-        await save(parseHouse(xml, url));
+        const parsed = xml && parseHouse(xml, url);
+        if (!parsed) break; // past the last roll call of the session
+        await save(parsed);
       }
       // Senate: the session menu says how many votes exist.
       const total = await senateCount(congress, s);
@@ -238,8 +244,9 @@ async function main() {
         const url = senateUrl(congress, s, n);
         const xml = await get(url);
         fetched++;
-        if (!xml) continue;
-        await save(parseSenate(xml, url));
+        const parsed = xml && parseSenate(xml, url);
+        if (!parsed) { console.log(`skipped ${url}: not a roll-call document`); continue; }
+        await save(parsed);
       }
     }
     console.log(`Congress ${congress}: ${voteCount} votes, ${positionCount} positions, ${fetched} fetches`);
