@@ -95,10 +95,16 @@ async function apply(db, parsed, counts) {
   }
   if (!latest.size) return;
   const ids = (f) => [...new Set([...latest.values()].map((p) => p.filing[f]))];
-  const { data: existing, error } = await db.from("lobbying_filings")
-    .select("filing_uuid, registrant_id, client_id, filing_year, filing_period, dt_posted")
-    .in("registrant_id", ids("registrant_id")).in("client_id", ids("client_id")).range(0, 9999);
-  if (error) throw new Error(`read lobbying_filings: ${error.message}`);
+  let existing;
+  for (let attempt = 1; ; attempt++) {
+    const { data, error } = await db.from("lobbying_filings")
+      .select("filing_uuid, registrant_id, client_id, filing_year, filing_period, dt_posted")
+      .in("registrant_id", ids("registrant_id")).in("client_id", ids("client_id")).range(0, 9999);
+    if (!error) { existing = data; break; }
+    // Occasional gateway errors come back as an HTML page; retry those briefly.
+    if (attempt >= 4) throw new Error(`read lobbying_filings: ${String(error.message).slice(0, 120)}`);
+    await sleep(5000 * attempt);
+  }
 
   const remove = [];
   const insert = [];
