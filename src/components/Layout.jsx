@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { Suspense, useState } from "react";
 import { Link, NavLink, Outlet, useNavigate, useLocation } from "react-router-dom";
 import ReportError from "./ReportError.jsx";
 
@@ -33,7 +33,9 @@ export default function Layout() {
           )}
         </div>
       </header>
-      <Outlet />
+      <Suspense fallback={<main className="page"><p>Loading…</p></main>}>
+        <Outlet />
+      </Suspense>
       <footer className="site-footer">
         <div className="site-inner">
           <Link to="/methods">How this site works</Link>

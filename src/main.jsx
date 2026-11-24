@@ -1,22 +1,24 @@
-import { StrictMode } from "react";
+import { StrictMode, lazy } from "react";
 import { createRoot } from "react-dom/client";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Home from "./pages/Home.jsx";
-import Member from "./pages/Member.jsx";
-import Bill from "./pages/Bill.jsx";
-import MemberVotes from "./pages/MemberVotes.jsx";
-import Methods from "./pages/Methods.jsx";
-import Search from "./pages/Search.jsx";
-import Members from "./pages/Members.jsx";
-import Bills from "./pages/Bills.jsx";
-import Compare from "./pages/Compare.jsx";
-import Committees from "./pages/Committees.jsx";
-import Committee from "./pages/Committee.jsx";
 import Layout from "./components/Layout.jsx";
-import Week from "./pages/Week.jsx";
-import Glossary from "./pages/Glossary.jsx";
-import NotFound from "./pages/NotFound.jsx";
 import "./styles.css";
+
+// Each page loads its own code when first visited, so phones download less up front.
+const Member = lazy(() => import("./pages/Member.jsx"));
+const Bill = lazy(() => import("./pages/Bill.jsx"));
+const MemberVotes = lazy(() => import("./pages/MemberVotes.jsx"));
+const Methods = lazy(() => import("./pages/Methods.jsx"));
+const Search = lazy(() => import("./pages/Search.jsx"));
+const Members = lazy(() => import("./pages/Members.jsx"));
+const Bills = lazy(() => import("./pages/Bills.jsx"));
+const Compare = lazy(() => import("./pages/Compare.jsx"));
+const Committees = lazy(() => import("./pages/Committees.jsx"));
+const Committee = lazy(() => import("./pages/Committee.jsx"));
+const Week = lazy(() => import("./pages/Week.jsx"));
+const Glossary = lazy(() => import("./pages/Glossary.jsx"));
+const NotFound = lazy(() => import("./pages/NotFound.jsx"));
 
 createRoot(document.getElementById("root")).render(
   <StrictMode>

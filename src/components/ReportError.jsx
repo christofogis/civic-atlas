@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { useLocation } from "react-router-dom";
-import { db } from "../lib/db.js";
 
 // "Report an error" link at the foot of every page. Sends the page address and the message
 // only; no names or contact details.
@@ -14,6 +13,7 @@ export default function ReportError() {
     e.preventDefault();
     if (text.trim().length < 5) return;
     setStatus("sending");
+    const { db } = await import("../lib/db.js"); // loaded only when someone sends a report
     const { error } = await db.rpc("submit_error_report", { page: `${pathname}${search}`, message: text.trim() });
     setStatus(error ? "error" : "sent");
     if (!error) setText("");
