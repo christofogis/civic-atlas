@@ -1,12 +1,28 @@
 import { useState } from "react";
+import OfficialCard from "../components/OfficialCard.jsx";
+import { STATE_NAMES } from "../lib/format.js";
 
 export default function Home() {
   const [address, setAddress] = useState("");
-  const [submitted, setSubmitted] = useState(false);
+  const [status, setStatus] = useState("idle"); // idle | loading | done | error
+  const [result, setResult] = useState(null);
+  const [error, setError] = useState("");
 
-  function handleSubmit(e) {
+  async function handleSubmit(e) {
     e.preventDefault();
-    if (address.trim()) setSubmitted(true);
+    if (!address.trim()) return;
+    setStatus("loading");
+    setError("");
+    try {
+      const res = await fetch(`/api/lookup?address=${encodeURIComponent(address.trim())}`);
+      const body = await res.json();
+      if (!res.ok) throw new Error(body.error ?? "Lookup failed.");
+      setResult(body);
+      setStatus("done");
+    } catch (err) {
+      setError(err.message);
+      setStatus("error");
+    }
   }
 
   return (
@@ -28,22 +44,37 @@ export default function Home() {
             autoComplete="street-address"
             placeholder="123 Main St, City, State"
             value={address}
-            onChange={(e) => {
-              setAddress(e.target.value);
-              setSubmitted(false);
-            }}
+            onChange={(e) => setAddress(e.target.value)}
           />
-          <button type="submit">Look up</button>
+          <button type="submit" disabled={status === "loading"}>
+            {status === "loading" ? "Looking up…" : "Look up"}
+          </button>
         </div>
+        <p className="fine">Your address is used only to find your district. It isn't stored.</p>
       </form>
 
-      {submitted && (
-        <p className="notice">Address lookup is not connected yet.</p>
+      {status === "error" && <p className="notice">{error}</p>}
+
+      {status === "done" && result && (
+        <section className="results">
+          <h2>
+            Representing {STATE_NAMES[result.state] ?? result.state}
+            {result.districts.length === 1 && result.officials.some((o) => o.chamber === "house" && o.district !== 0)
+              ? `, District ${result.districts[0]}` : ""}
+          </h2>
+          {result.approximate && (
+            <p className="notice">
+              This location may fall in more than one district. A full street address gives an exact match.
+            </p>
+          )}
+          <ul className="cards">
+            {result.officials.map((o) => <OfficialCard key={`${o.chamber}-${o.bioguide_id}`} official={o} />)}
+          </ul>
+          <p className="fine">District: {result.sources.district}. Officials: {result.sources.officials}.</p>
+        </section>
       )}
 
-      <footer>
-        Data sources: Congress.gov, House Clerk, Senate.gov, FEC.
-      </footer>
+      <footer>Data sources: Congress.gov, GovInfo, House Clerk, Senate.gov, FEC.</footer>
     </main>
   );
 }

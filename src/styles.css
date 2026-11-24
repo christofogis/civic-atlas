@@ -26,3 +26,21 @@ h1 { font-size: 2rem; margin: 0 0 8px; }
 }
 .notice { margin-top: 16px; color: var(--muted); }
 footer { margin-top: 64px; font-size: 0.875rem; color: var(--muted); }
+.fine { font-size: 0.85rem; color: var(--muted); margin: 6px 0 0; }
+.results { margin-top: 32px; }
+.results h2 { font-size: 1.25rem; }
+.cards { list-style: none; padding: 0; display: grid; gap: 12px; }
+.card { border: 1px solid var(--border); border-radius: 8px; padding: 14px 16px; }
+.card h3 { margin: 4px 0; font-size: 1.15rem; }
+.card .seat, .card .meta { margin: 0; color: var(--muted); font-size: 0.9rem; }
+.card.pending { background: #f7f7f7; }
+a { color: var(--accent); }
+.section { margin-top: 36px; }
+.section h2 { font-size: 1.15rem; border-bottom: 1px solid var(--border); padding-bottom: 6px; }
+ul.plain { padding-left: 18px; }
+ul.plain li { margin: 6px 0; }
+table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+th, td { text-align: left; padding: 6px 8px; border-bottom: 1px solid var(--border); vertical-align: top; }
+th { color: var(--muted); font-weight: 600; }
+button:disabled { opacity: 0.7; cursor: default; }
+@media (max-width: 600px) { .row { flex-direction: column; } table { font-size: 0.8rem; } }

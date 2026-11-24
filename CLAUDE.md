@@ -19,8 +19,11 @@ yes-man: flag weak ideas, scope creep, and shortcuts that will cost later.
 - State and local officials come later. Do not build for them yet.
 
 ## Stack
-- Frontend: React + Vite, deployed on Vercel.
-- Backend: Vercel serverless functions in `/api`. All third-party API calls happen here.
+- Frontend: React + Vite, hosted on Cloudflare Pages (free plan; static assets unlimited).
+- Backend: Cloudflare Pages Functions in `/functions` (e.g. `functions/api/lookup.js` →
+  `/api/lookup`). Keyed third-party calls (Geocodio) happen here; keys live in the Pages
+  project's environment variables, never in GitHub. Free plan: 100k requests/day, 10 ms CPU.
+- Ingest jobs run in GitHub Actions, not on the host (see below).
 - Database: Supabase (Postgres). Scheduled ingest jobs write to it; the site reads from it.
   The site should not call upstream APIs on every page view.
 
@@ -30,7 +33,8 @@ yes-man: flag weak ideas, scope creep, and shortcuts that will cost later.
 - No API calls to OpenAI or other keyed services from the browser.
 - Google Maps/Places browser keys must be restricted by HTTP referrer in Google Cloud.
 - Supabase: Row Level Security on every table; the browser gets read-only access via the
-  publishable key. The service-role key is used only in server functions and ingest jobs.
+  publishable key, which is committed in `src/lib/config.js` by design. The service-role
+  key is used only in ingest jobs (GitHub secret).
 
 ## Data sources (checked Nov 2026)
 - Members, terms, IDs: unitedstates/congress-legislators (public domain; crosswalk of
