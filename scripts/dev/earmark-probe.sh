@@ -1,26 +1,23 @@
 #!/usr/bin/env bash
 # Developer probe: what format are the enacted earmark tables in? Writes nothing to the database.
 set -u
-UA="Mozilla/5.0 (civic-atlas data probe; github.com/christofogis/civic-atlas)"
+UA="civic-atlas data probe (github.com/christofogis/civic-atlas)"
 mkdir -p /tmp/ep && cd /tmp/ep
-for y in 2024 2026; do
-  page="https://www.appropriations.senate.gov/fy-${y}-congressionally-directed-spending"
-  curl -sL -A "$UA" "$page" -o page$y.html
-  echo "== FY$y page $(wc -c < page$y.html) bytes"
-  grep -oE 'href="[^"]*(download/[^"]*|\.pdf|\.xlsx)"' page$y.html | sed 's/href="//;s/"$//' | sort -u | tee links$y.txt
-done
-n=0
-for url in $(grep -hE 'public-law|_pl|enacted' links2024.txt links2026.txt | sed 's#^/#https://www.appropriations.senate.gov/#' | head -4) \
-           https://www.appropriations.senate.gov/download/fy26-thud-cds-public-law \
-           https://appropriations.house.gov/sites/evo-subsites/republicans-appropriations.house.gov/files/evo-media-document/fy26-house-cpf-consolidated.xlsx; do
-  n=$((n+1)); curl -sL -A "$UA" "$url" -o f$n -D h$n
-  echo; echo "== $url"; grep -i '^content-type\|^content-disposition' h$n; file f$n; ls -l f$n | awk '{print $5" bytes"}'
-  case "$(file -b f$n)" in
-    PDF*) pdftotext -layout f$n - | head -45 ;;
-    *Excel*|*Zip*|*OOXML*) python3 -c "
-import openpyxl,sys; wb=openpyxl.load_workbook('f$n',read_only=True)
+show() {  # url name
+  curl -sL -A "$UA" "$1" -o "$2" -D "$2.h"
+  echo; echo "== $1"; grep -i '^content-type\|^content-disposition\|^location' "$2.h"; file "$2"; ls -l "$2" | awk '{print $5" bytes"}'
+  case "$(file -b "$2")" in
+    PDF*) pdfinfo "$2" | grep -i 'pages\|title'; pdftotext -layout -f 1 -l 2 "$2" - | head -60 ;;
+    *Excel*|*Zip*|*OOXML*) cp "$2" "$2.xlsx"; python3 -c "
+import openpyxl; wb=openpyxl.load_workbook('$2.xlsx',read_only=True)
 for ws in wb.worksheets[:3]:
   print('# sheet',ws.title,ws.max_row,'rows')
-  for r in list(ws.iter_rows(values_only=True))[:8]: print(r)" ;;
+  for r in list(ws.iter_rows(values_only=True))[:6]: print(r)" ;;
+    HTML*) grep -oiE '<title>[^<]*|http-equiv="refresh"[^>]*|href="[^"]*\.(pdf|xlsx)"' "$2" | head -8 ;;
   esac
-done
+}
+show https://www.appropriations.senate.gov/download/fy26-thud-cds-public-law a
+show https://www.appropriations.senate.gov/imo/media/doc/fy24_thud_cds_table_updated.pdf b
+show https://www.appropriations.senate.gov/imo/media/doc/fy24_lhhs_cds_table.pdf c
+show https://appropriations.house.gov/sites/evo-subsites/republicans-appropriations.house.gov/files/evo-media-document/fy26-house-cpf-consolidated.xlsx d
+curl -sL -A "$UA" https://www.appropriations.senate.gov/fy-2024-congressionally-directed-spending | sed 's/<[^>]*>/ /g' | grep -iE 'public law|P\.L\.|enacted|funded|included in' | sed 's/  */ /g' | head -20
