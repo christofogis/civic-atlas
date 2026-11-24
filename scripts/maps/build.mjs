@@ -38,7 +38,7 @@ async function districts(n, inputs, clip) {
   const field = `CD${n}FP`;
   const src = `-i ${inputs.map((f) => `"${f}"`).join(" ")} combine-files -merge-layers force -proj wgs84 ${normalize(field)}${clip ? ` -clip "${clip}" remove-slivers` : ""} -dissolve2 st,cd copy-fields=st,cd`;
   await run(`${src} -simplify interval=${NATIONAL_M} keep-shapes -clean -o "${join(dir, "us.json")}" format=topojson quantization=100000`);
-  await run(`${src} -simplify interval=${STATE_M} keep-shapes -clean -split st -o "${dir}/" format=topojson quantization=100000`);
+  await run(`${src} -simplify interval=${STATE_M} keep-shapes -clean -split st -o "${dir}/" format=topojson singles quantization=100000`);
   // -split writes one file per state named after the layer (the st value).
   for (const f of readdirSync(dir)) if (!/^([A-Z]{2}|us)\.json$/.test(f)) rmSync(join(dir, f));
 }
