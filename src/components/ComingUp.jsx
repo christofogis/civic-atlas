@@ -17,7 +17,8 @@ const billPath = (ref) => { const [c, t, n] = ref.split("-"); return `/bill/${c}
 
 // What Congress has scheduled: House floor items, when the Senate meets, and committee
 // hearings and markups. Committees the visitor's representatives sit on are marked.
-export default function ComingUp({ myCommittees = new Set() }) {
+// committees=false leaves out the committee list (the Week page shows it as a calendar instead).
+export default function ComingUp({ myCommittees = new Set(), floor: showFloor = true, committees: showCommittees = true }) {
   const [state, setState] = useState({ status: "loading" });
 
   useEffect(() => {
@@ -51,6 +52,7 @@ export default function ComingUp({ myCommittees = new Set() }) {
 
   return (
     <>
+      {showFloor && <>
       <h3 className="small">{tr("House floor", "Pleno de la Cámara")}</h3>
       {weeks.length === 0
         ? <p>{tr("The House hasn't published a floor schedule for this week or next. It usually comes out the Friday before.", "La Cámara no ha publicado la agenda del pleno para esta semana ni la próxima. Suele publicarse el viernes anterior.")}</p>
@@ -78,6 +80,8 @@ export default function ComingUp({ myCommittees = new Set() }) {
       <p>{convene ? <>{tr("The Senate next meets", "El Senado se reúne de nuevo el")} {date(convene.event_date)} {tr("at", "a las")} {convene.event_time}.</> : tr("The Senate hasn't announced when it next meets.", "El Senado no ha anunciado cuándo se reúne de nuevo.")}</p>
       <p className="fine">{tr("Source", "Fuente")}: <a href="https://www.senate.gov/legislative/schedule/floor_schedule.htm">{tr("Senate floor schedule", "agenda del pleno del Senado")}</a>.</p>
 
+      </>}
+      {showCommittees && <>
       <h3 className="small">{tr("Committee hearings and markups", "Audiencias y sesiones de comités")}</h3>
       {byDay.size === 0 ? <p>{tr("None scheduled yet.", "Nada programado todavía.")}</p> : [...byDay].map(([day, list]) => (
         <div key={day}>
@@ -101,6 +105,7 @@ export default function ComingUp({ myCommittees = new Set() }) {
         </div>
       ))}
       <p className="fine">{tr("Sources: senate.gov hearings schedule; House committee meeting notices (docs.house.gov). Times are Eastern.", "Fuentes: agenda de audiencias de senate.gov; avisos de reuniones de comités de la Cámara (docs.house.gov). Horas en la zona del Este.")}</p>
+      </>}
     </>
   );
 }

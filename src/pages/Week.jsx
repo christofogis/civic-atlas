@@ -6,6 +6,7 @@ import { isFinal } from "../lib/voteKind.js";
 import { KindLabel } from "../components/Explain.jsx";
 import { myRepresentatives } from "../lib/myReps.js";
 import ComingUp from "../components/ComingUp.jsx";
+import CommitteeCalendar from "../components/CommitteeCalendar.jsx";
 import { tr } from "../lib/lang.js";
 import Clamp from "../components/Clamp.jsx";
 
@@ -65,7 +66,12 @@ export default function Week() {
       <h1>{tr("This week in Congress", "Esta semana en el Congreso")}</h1>
       <section className="section">
         <h2>{tr("Coming up", "Próximamente")}</h2>
-        <ComingUp myCommittees={myCommittees} />
+        <ComingUp myCommittees={myCommittees} committees={false} />
+      </section>
+
+      <section className="section">
+        <h2>{tr("Committee hearings and markups", "Audiencias y sesiones de comités")}</h2>
+        <CommitteeCalendar mine={myCommittees} />
       </section>
 
       {votes.length === 0 ? <p>{tr("No votes on record yet.", "Todavía no hay votos registrados.")}</p> : (
