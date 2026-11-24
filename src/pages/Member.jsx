@@ -250,6 +250,7 @@ export default function Member() {
             </tbody>
           </table>
           {finalOnly && votes.filter(isFinal).length === 0 && <p className="fine">No final votes among the most recent 120 roll calls.</p>}
+          <p><Link to={`/member/${m.bioguide_id}/votes`}>All votes, searchable by issue →</Link></p>
           </>
         )}
       </Section>

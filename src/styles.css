@@ -64,3 +64,8 @@ ul.columns { columns: 2; column-gap: 24px; }
 ul.columns li { break-inside: avoid; }
 @media (max-width: 600px) { ul.columns { columns: 1; } }
 button.link { background: none; border: 0; padding: 0; color: var(--accent); text-decoration: underline; cursor: pointer; font-size: inherit; }
+.page.wide { max-width: 900px; }
+.filters { display: flex; flex-wrap: wrap; gap: 10px 16px; align-items: center; margin: 16px 0; }
+.filters label { font-size: 0.9rem; color: var(--muted); }
+.filters select, .filters input { font-size: 0.95rem; padding: 6px 8px; border: 1px solid var(--border); border-radius: 6px; max-width: 280px; }
+.filters .toggle { margin-bottom: 0; }

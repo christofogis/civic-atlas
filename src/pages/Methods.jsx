@@ -85,6 +85,20 @@ export default function Methods() {
       </ul>
       <p>"Final votes only" on a member page shows final passage, veto overrides and confirmations.</p>
 
+      <h2 id="vote-issues">Votes by issue</h2>
+      <p>
+        Each bill gets one policy area from the Library of Congress (for example "Health" or "Immigration"),
+        chosen by its legislative analysts. A vote takes the policy area of the bill it was on, including
+        votes on amendments, procedural motions and rules for that bill, so the vote-type label matters when
+        reading them. A broad bill, such as a budget or a large package, still gets one policy area, so its
+        votes appear under that one issue only. A House "rule" that sets the terms of debate for a bill
+        is a separate resolution with its own policy area, usually "Congress".
+      </p>
+      <p>
+        Votes on nominations are grouped as "Nominations". Votes with no bill or nominee, such as electing
+        the Speaker or motions about chamber procedure, are grouped as "Other votes".
+      </p>
+
       <h2 id="money">Campaign finance</h2>
       <p>
         Totals come from each campaign's reports to the Federal Election Commission, by two-year cycle.
