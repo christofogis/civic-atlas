@@ -20,6 +20,13 @@ const PAGES = [
   ["/quiz", ["Do you vote like your representatives?", "Would you have voted for it?"]],
   ["/methods", ["Votes by issue"]],
 ];
+// Feeds fetched directly: [path, content-type fragment, text that must appear]
+const FEEDS = [
+  ["/api/feed/member/P000145", "rss", "<item>"],
+  ["/api/feed/bill/119/hr/1", "rss", "Became law"],
+  ["/api/calendar/committee/SSFI", "calendar", "BEGIN:VCALENDAR"],
+  ["/api/calendar/member/P000145", "calendar", "END:VCALENDAR"],
+];
 const FAILURE_TEXT = /Couldn't load|isn't working right now|not found/i;
 
 const browser = await chromium.launch();
@@ -52,6 +59,17 @@ for (const [path, expected] of PAGES) {
   await page.close();
 }
 await browser.close();
+for (const [path, type, must] of FEEDS) {
+  try {
+    const res = await fetch(BASE + path);
+    const body = await res.text();
+    const ok = res.ok && (res.headers.get("content-type") ?? "").includes(type) && body.includes(must);
+    if (!ok) failures.push(`${path}: HTTP ${res.status}, ${res.headers.get("content-type")}, ${body.slice(0, 120)}`);
+    console.log(`${ok ? "ok  " : "FAIL"} ${path}`);
+  } catch (err) {
+    failures.push(`${path}: ${err.message}`);
+  }
+}
 if (failures.length) {
   console.log(`\n${failures.length} problem(s):\n- ${failures.join("\n- ")}`);
   process.exit(1);

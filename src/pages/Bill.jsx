@@ -4,6 +4,7 @@ import { db } from "../lib/db.js";
 import { date, billLabel, ordinal, partyTag } from "../lib/format.js";
 import VoteBreakdown from "../components/VoteBreakdown.jsx";
 import StatusBar from "../components/StatusBar.jsx";
+import Follow from "../components/Follow.jsx";
 import { Explain } from "../components/Explain.jsx";
 
 const TYPES = new Set(["hr", "s", "hres", "sres", "hjres", "sjres", "hconres", "sconres"]);
@@ -85,6 +86,7 @@ export default function Bill() {
         </p>
         {b.latest_action_text && <p>Latest action ({date(b.latest_action_date)}): {b.latest_action_text}</p>}
         <p className="fine"><a href={b.source_url}>Full text, actions and history at Congress.gov</a></p>
+        <Follow feed={`/api/feed/bill/${b.congress}/${b.bill_type}/${b.number}`} />
       </header>
 
       <StatusBar bill={b} />

@@ -3,6 +3,7 @@ import { voteKind, isFinal } from "../lib/voteKind.js";
 import { Link, useParams } from "react-router-dom";
 import { db } from "../lib/db.js";
 import AtAGlance from "../components/AtAGlance.jsx";
+import Follow from "../components/Follow.jsx";
 import { KindLabel } from "../components/Explain.jsx";
 import { seatLabel, date, money, billLabel, ordinal } from "../lib/format.js";
 
@@ -208,6 +209,8 @@ export default function Member() {
         ) : (
           <p className="lede">Not currently serving. Most recent: {seatLabel(latest)}, {date(latest.start_date)} – {date(latest.end_date)} ({latest.party})</p>
         )}
+        <Follow feed={`/api/feed/member/${m.bioguide_id}`} calendar={`/api/calendar/member/${m.bioguide_id}`}
+          calendarLabel="Add their committees' hearings to your calendar" />
         <p className="fine">
           <a href={m.source_url}>Biographical Directory of the U.S. Congress</a>
           {seat?.url && <> · <a href={seat.url}>Official website</a></>}

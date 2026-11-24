@@ -5,18 +5,11 @@
 import { congressOn } from "../../lib/congress.js";
 import { districtsFromGeocodio } from "../../lib/geocodio.js";
 import { verifyTurnstile } from "../../lib/turnstile.js";
-import { SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY } from "../../src/lib/config.js";
+import { rest } from "../../lib/rest.js";
 
 const json = (body, status = 200) =>
   Response.json(body, { status, headers: { "Cache-Control": "no-store" } });
 
-async function rest(path) {
-  const res = await fetch(`${SUPABASE_URL}/rest/v1/${path}`, {
-    headers: { apikey: SUPABASE_PUBLISHABLE_KEY, Authorization: `Bearer ${SUPABASE_PUBLISHABLE_KEY}` },
-  });
-  if (!res.ok) throw new Error(`database ${res.status}`);
-  return res.json();
-}
 
 export async function onRequestGet({ request, env }) {
   const address = new URL(request.url).searchParams.get("address")?.trim() ?? "";

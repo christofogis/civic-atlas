@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link, useParams, useSearchParams } from "react-router-dom";
 import { db } from "../lib/db.js";
+import Follow from "../components/Follow.jsx";
 import { congressOn, congressYears } from "../../lib/congress.js";
 import { billLabel, ordinal, partyTag, date } from "../lib/format.js";
 
@@ -68,6 +69,7 @@ export default function Committee() {
       <p className="fine"><Link to="/committees">Committees</Link>{c.parent && <> · <Link to={`/committee/${c.parent.committee_id}`}>{c.parent.name}</Link></>}</p>
       <h1>{c.chamber === "joint" ? c.name : `${chamberName} ${c.name}`}</h1>
       {c.url && <p className="fine"><a href={c.url}>Committee website</a></p>}
+      <Follow calendar={`/api/calendar/committee/${c.committee_id}`} />
 
       {events.length > 0 && (
         <section className="section">
