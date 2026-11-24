@@ -18,9 +18,12 @@ async function searchBills(q) {
     }));
     return { byNumber: true, bills: found.flat() };
   }
-  if (q.trim().length < 3) return { byNumber: false, bills: [] };
+  // "Bill", "act" and "resolution" rarely help ("farm bill" should find the Farm, Food, and
+  // National Security Act), and official House titles don't contain them.
+  const words = q.replace(/\b(bills?|acts?|resolutions?)\b/gi, " ").trim();
+  if (words.length < 3) return { byNumber: false, bills: [] };
   const { data, error } = await db.from("bill_list").select(BILL_COLUMNS)
-    .textSearch("search", q, { type: "websearch", config: "english" })
+    .textSearch("search", words, { type: "websearch", config: "english" })
     .order("latest_action_date", { ascending: false, nullsFirst: false }).limit(30);
   if (error) throw error;
   return { byNumber: false, bills: data };
