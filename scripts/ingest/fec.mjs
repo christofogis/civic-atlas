@@ -63,8 +63,16 @@ async function main() {
       .slice(0, limit);
     console.log(`candidate IDs to refresh: ${pairs.length}`);
 
-    const rows = [];
-    let n = 0;
+    // Saved every 50 candidates, so a failure late in the hour-long run keeps earlier work.
+    let rows = [];
+    let n = 0, written = 0;
+    const flush = async () => {
+      if (!rows.length) return;
+      const batch = rows;
+      rows = [];
+      if (!dryRun) await upsertBatches(db, "finance_summaries", batch, "fec_candidate_id,cycle");
+      written += batch.length;
+    };
     for (const [id, bioguide] of pairs) {
       // election_full=false: one row per two-year cycle rather than per full Senate term.
       const data = await getJson(`${API}/candidate/${id}/totals/?per_page=100&election_full=false&sort=-cycle`, key);
@@ -76,17 +84,18 @@ async function main() {
         const missing = expected.filter((f) => !(f in results[0]));
         console.log(missing.length ? `MISSING expected fields: ${missing.join(", ")}` : "all expected fields present");
       }
-      rows.push(...results.map((r) => mapTotals(r, bioguide)));
-      if (++n % 100 === 0) console.log(`  ${n}/${pairs.length}`);
+      const mapped = results.map((r) => mapTotals(r, bioguide));
+      if (dryRun && n === 0) console.log("sample:", JSON.stringify(mapped[0] ?? null));
+      rows.push(...mapped);
+      if (++n % 50 === 0) { await flush(); console.log(`  ${n}/${pairs.length}`); }
     }
-    console.log(`totals rows: ${rows.length}`);
+    await flush();
+    console.log(`totals rows: ${written}`);
     if (dryRun) {
-      console.log("sample:", JSON.stringify(rows[0] ?? null));
       console.log("dry run: nothing written");
       return { rows_inserted: 0, rows_updated: 0 };
     }
-    await upsertBatches(db, "finance_summaries", rows, "fec_candidate_id,cycle");
-    return { rows_inserted: 0, rows_updated: rows.length };
+    return { rows_inserted: 0, rows_updated: written };
   };
 
   if (dryRun) await run();
