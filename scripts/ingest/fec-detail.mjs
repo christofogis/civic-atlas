@@ -14,6 +14,8 @@ const API = "https://api.open.fec.gov/v1";
 const PAUSE_MS = 3800;
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 const money = (v) => (v == null || v === "" ? null : Number(v));
+// Entries donors write in the employer field that don't name an employer. Listed on /methods.
+const NOT_AN_EMPLOYER = /^(|N\/?A|NONE|RETIRED|SELF|SELF[- ]?EMPLOYED|NOT EMPLOYED|UNEMPLOYED|HOMEMAKER|STUDENT|INFORMATION REQUESTED.*|REQUESTED|ENTREPRENEUR)$/i;
 
 async function getJson(path, params, key) {
   const url = `${API}${path}?${new URLSearchParams(params)}`;
@@ -46,19 +48,22 @@ async function detail(candId, cycle, bioguide, key, probe) {
 
   let employers = [], committeesIn = [];
   if (committee) {
-    const emp = await getJson("/schedules/schedule_a/by_employer/", { committee_id: committee, cycle, sort: "-total", per_page: 15 }, key);
+    const emp = await getJson("/schedules/schedule_a/by_employer/", { committee_id: committee, cycle, sort: "-total", per_page: 40 }, key);
     show("by employer", emp);
-    employers = (emp?.results ?? []).map((r, i) => ({
+    employers = (emp?.results ?? []).filter((r) => !NOT_AN_EMPLOYER.test(String(r.employer ?? "").trim())).slice(0, 15).map((r, i) => ({
       fec_candidate_id: candId, cycle, bioguide_id: bioguide, rank: i + 1,
       employer: String(r.employer ?? "").trim() || "(blank)", total: money(r.total), contributions: r.count ?? null,
     }));
 
+    // Form 3 line 11C: contributions from other political committees (PACs). This leaves out
+    // transfers from the member's own fundraising committees (line 12), loans and party money.
     const pac = await getJson("/schedules/schedule_a/", {
-      committee_id: committee, two_year_transaction_period: cycle, is_individual: "false",
+      committee_id: committee, two_year_transaction_period: cycle, line_number: "F3-11C",
       sort: "-contribution_receipt_amount", per_page: 100,
     }, key);
     show("committee contributions", pac);
     const sums = new Map();
+    if (probe) console.log("line numbers seen:", [...new Set((pac?.results ?? []).map((r) => r.line_number))].join(","));
     for (const r of pac?.results ?? []) {
       const id = r.contributor_committee_id ?? r.contributor_id ?? r.contributor_name;
       if (!id) continue;
