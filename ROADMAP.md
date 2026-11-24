@@ -3,7 +3,7 @@
 ## Phase 0 — Clean foundation
 - [ ] Rotate every key that was in the old repo (Supabase, OpenAI, FEC, Geocodio, Google x2, OpenStates)
 - [x] New repo, Vite + React scaffold
-- [ ] Cloudflare Pages project connected to the repo
+- [x] Cloudflare Pages project connected to the repo
 - [x] New Supabase project (old one was past restore window); RLS on all tables
 - [ ] Confirm each data source in CLAUDE.md is live and its terms allow this use
 
@@ -34,10 +34,10 @@
   has no consolidated list and appropriations.senate.gov blocks automated downloads)
 
 ## Phase 2 — Depth
-- [ ] Vote ingest from House/Senate clerks; vote search by issue
-- [ ] Bill pages with CRS summaries (AI summary only as labeled fallback)
-- [ ] FEC detail: top contributors by industry/committee
-- [ ] Scheduled refresh jobs + data-freshness indicator on each page
+- [ ] Vote search by issue (vote ingest from House/Senate clerks is done)
+- [x] Bill pages with CRS summaries (AI summary only as labeled fallback; none generated yet)
+- [x] FEC detail: donation sizes, donors' employers, PACs, outside spending (no industry codes: the FEC has none)
+- [x] Scheduled refresh jobs + data-freshness indicator on each page
 
 ## Later
 - State legislators (OpenStates), governors, then local
