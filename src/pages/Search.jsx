@@ -6,6 +6,7 @@ import { billLabel, ordinal, partyTag, date } from "../lib/format.js";
 import { extractBillRefs } from "../../lib/billrefs.js";
 import { tr } from "../lib/lang.js";
 import { PartyTag } from "../components/PartyTag.jsx";
+import Clamp from "../components/Clamp.jsx";
 
 const BILL_COLUMNS = "congress,bill_type,number,title,short_title,latest_action_date,policy_area,sponsor_name";
 
@@ -81,7 +82,7 @@ export default function Search() {
                 {state.bills.map((b) => (
                   <li key={`${b.congress}-${b.bill_type}-${b.number}`}>
                     <Link to={`/bill/${b.congress}/${b.bill_type}/${b.number}`}>{billLabel(b)}</Link>{" "}
-                    <span className="fine">({ordinal(b.congress)})</span> {b.short_title ?? b.title}
+                    <span className="fine">({ordinal(b.congress)})</span> <Clamp lines={2}>{b.short_title ?? b.title}</Clamp>
                     <div className="fine">{[b.sponsor_name && `${tr("Sponsor", "Patrocinador")}: ${b.sponsor_name}`, b.policy_area, b.latest_action_date && `${tr("Latest action", "Última acción")} ${date(b.latest_action_date)}`].filter(Boolean).join(" · ")}</div>
                   </li>
                 ))}

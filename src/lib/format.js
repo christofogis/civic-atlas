@@ -58,3 +58,7 @@ export function partyTag(p) {
   const district = p.chamber === "house" && p.district > 0 && !TERRITORIES.has(p.state) ? `-${p.district}` : "";
   return `${party}-${p.state}${district}`;
 }
+
+// "Committee on Commerce, Science, and Transportation" -> "Commerce, Science, and Transportation"
+// for tight lists; the full official name stays on the committee's own page.
+export const shortCommittee = (name) => String(name ?? "").replace(/^(House |Senate |Joint )?(Select |Special |Permanent Select )?Committee on (the )?/i, "").replace(/^(House|Senate) /, "");

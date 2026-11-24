@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { db } from "../lib/db.js";
-import { date } from "../lib/format.js";
+import { date, shortCommittee } from "../lib/format.js";
+import Clamp from "./Clamp.jsx";
 import { Explain } from "./Explain.jsx";
 import { tr, locale } from "../lib/lang.js";
 
@@ -77,13 +78,19 @@ export default function ComingUp({ myCommittees = new Set() }) {
       {byDay.size === 0 ? <p>{tr("None scheduled yet.", "Nada programado todavía.")}</p> : [...byDay].map(([day, list]) => (
         <div key={day}>
           <p><strong>{new Date(`${day}T12:00:00Z`).toLocaleDateString(locale(), { weekday: "long", month: "short", day: "numeric", timeZone: "UTC" })}</strong></p>
-          <ul className="plain">
+          <ul className="bare events">
             {list.map((e) => (
-              <li key={e.event_id} className={myCommittees.has(e.committee_id) || myCommittees.has(e.committee_id?.slice(0, 4)) ? "mine-row" : ""}>
-                <span className="fine">{e.event_time ?? ""} · {e.chamber === "house" ? tr("House", "Cámara") : tr("Senate", "Senado")} · {KIND()[e.kind]}</span><br />
-                {e.committee_id ? <Link to={`/committee/${e.committee_id}`}>{e.committee_name}</Link> : e.committee_name}: <a href={e.source_url}>{e.title}</a>
-                {e.status && e.status !== "Scheduled" && <strong> ({e.status})</strong>}
-                {(myCommittees.has(e.committee_id) || myCommittees.has(e.committee_id?.slice(0, 4))) && <span className="fine"> · {tr("one of your representatives sits on this committee", "uno de sus representantes forma parte de este comité")}</span>}
+              <li key={e.event_id} className={`event-row${myCommittees.has(e.committee_id) || myCommittees.has(e.committee_id?.slice(0, 4)) ? " mine-row" : ""}`}>
+                <span className="event-time">{e.event_time ?? ""}</span>
+                <span className="event-body">
+                  <span className="event-meta">
+                    {e.committee_id ? <Link to={`/committee/${e.committee_id}`}>{shortCommittee(e.committee_name)}</Link> : shortCommittee(e.committee_name)}
+                    <span className="fine"> · {e.chamber === "house" ? tr("House", "Cámara") : tr("Senate", "Senado")} · {KIND()[e.kind]}</span>
+                    {e.status && e.status !== "Scheduled" && <strong className="fine"> · {e.status}</strong>}
+                    {(myCommittees.has(e.committee_id) || myCommittees.has(e.committee_id?.slice(0, 4))) && <span className="fine"> · {tr("your representative's committee", "comité de su representante")}</span>}
+                  </span>
+                  <Clamp lines={1}><a href={e.source_url}>{e.title}</a></Clamp>
+                </span>
               </li>
             ))}
           </ul>

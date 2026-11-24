@@ -252,3 +252,13 @@ header.site nav { flex-wrap: wrap; row-gap: 4px; }
 .member-photo { float: left; margin: 4px 14px 6px 0; border-radius: 6px; object-fit: cover; }
 .member-photo.small { margin-right: 10px; }
 .tabs { clear: both; }   /* start below the member photo */
+
+/* Long titles: cut to a few lines, with "more" (Clamp.jsx) */
+.clamp { display: -webkit-box; -webkit-box-orient: vertical; overflow: hidden; }
+.clamp-wrap { display: block; }
+.clamp-more { margin-left: 2px; }
+/* Schedule rows: time in its own column, then committee, then the title on one line */
+.events li.event-row { display: grid; grid-template-columns: 5.5rem 1fr; gap: 12px; padding: 8px 0; border-bottom: 1px solid var(--border); }
+.event-time { font-variant-numeric: tabular-nums; color: var(--muted); font-size: 0.9rem; padding-top: 1px; }
+.event-meta { display: block; font-size: 0.92rem; }
+.event-meta a { font-weight: 600; text-decoration: none; }

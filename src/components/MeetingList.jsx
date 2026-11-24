@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import { date } from "../lib/format.js";
+import Clamp from "./Clamp.jsx";
 import { tr, locale } from "../lib/lang.js";
 import { meetingHeading } from "../../lib/meetings.js";
 import { itemsLabel } from "../lib/meetingLabels.js";
@@ -17,7 +18,7 @@ export default function MeetingList({ meetings, showCommittee = false, committee
           <span className="fine">{meetingTime(m)}{m.meeting_type && <> · {m.meeting_type}</>}
             {m.status && !/^scheduled$/i.test(m.status) && <strong> · {m.status}</strong>}
             {showCommittee && m.committee_ids?.[0] && <> · {committees[m.committee_ids[0]] ?? m.committee_ids[0]}</>}</span>
-          <div><Link to={`/hearing/${m.event_id}`}>{meetingHeading(m.title, m.meeting_type, itemsLabel).heading}</Link></div>
+          <div><Clamp lines={2}><Link to={`/hearing/${m.event_id}`}>{meetingHeading(m.title, m.meeting_type, itemsLabel).heading}</Link></Clamp></div>
         </li>
       ))}
     </ul>

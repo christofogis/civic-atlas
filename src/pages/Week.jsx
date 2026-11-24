@@ -7,6 +7,7 @@ import { KindLabel } from "../components/Explain.jsx";
 import { myRepresentatives } from "../lib/myReps.js";
 import ComingUp from "../components/ComingUp.jsx";
 import { tr } from "../lib/lang.js";
+import Clamp from "../components/Clamp.jsx";
 
 const DAY = 86400000;
 const iso = (d) => d.toISOString().slice(0, 10);
@@ -74,15 +75,15 @@ export default function Week() {
           <section className="section">
             <h2>{tr("Became law", "Se convirtieron en ley")}</h2>
             {laws.length === 0 ? <p>{tr("None this week.", "Ninguno esta semana.")}</p> : (
-              <ul className="plain">{laws.map((b) => <li key={`${b.bill_type}${b.number}`}>{billLink(b)} {b.short_title ?? b.title} · {b.law_number} · {tr("signed", "firmado el")} {date(b.became_law_date)}</li>)}</ul>
+              <ul className="plain">{laws.map((b) => <li key={`${b.bill_type}${b.number}`}>{billLink(b)} <Clamp lines={2}>{b.short_title ?? b.title}</Clamp> · {b.law_number} · {tr("signed", "firmado el")} {date(b.became_law_date)}</li>)}</ul>
             )}
-            {vetoed.length > 0 && <p>{tr("Vetoed", "Vetados")}: {vetoed.map((b, i) => <span key={b.number}>{i ? "; " : ""}{billLink(b)} {b.short_title ?? b.title} ({date(b.vetoed_date)})</span>)}</p>}
+            {vetoed.length > 0 && <p>{tr("Vetoed", "Vetados")}: {vetoed.map((b, i) => <span key={b.number}>{i ? "; " : ""}{billLink(b)} <Clamp lines={2}>{b.short_title ?? b.title}</Clamp> ({date(b.vetoed_date)})</span>)}</p>}
           </section>
 
           <section className="section">
             <h2>{tr("Passed a chamber", "Aprobados por una cámara")}</h2>
             {passed.length === 0 ? <p>{tr("None this week.", "Ninguno esta semana.")}</p> : (
-              <ul className="plain">{passed.map((b) => <li key={`${b.bill_type}${b.number}`}>{billLink(b)} {b.short_title ?? b.title} <span className="fine">· {tr("passed the", "aprobado por:")} {passedWhere(b)}</span></li>)}</ul>
+              <ul className="plain">{passed.map((b) => <li key={`${b.bill_type}${b.number}`}>{billLink(b)} <Clamp lines={2}>{b.short_title ?? b.title}</Clamp> <span className="fine">· {tr("passed the", "aprobado por:")} {passedWhere(b)}</span></li>)}</ul>
             )}
             <p className="fine">{tr("Includes bills and resolutions passed by voice vote, which have no roll call.", "Incluye proyectos y resoluciones aprobados a viva voz, que no tienen votación nominal.")}</p>
           </section>

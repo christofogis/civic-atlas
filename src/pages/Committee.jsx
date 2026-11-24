@@ -7,6 +7,7 @@ import { congressOn, congressYears } from "../../lib/congress.js";
 import { billLabel, ordinal, partyTag, date } from "../lib/format.js";
 import { tr } from "../lib/lang.js";
 import { PartyTag } from "../components/PartyTag.jsx";
+import Clamp from "../components/Clamp.jsx";
 
 const PAGE = 50;
 const CURRENT = congressOn();
@@ -150,7 +151,7 @@ export default function Committee() {
             <tbody>
               {bills.rows.slice(0, shown).map((b) => (
                 <tr key={`${b.bill_type}-${b.number}`}>
-                  <td><Link to={`/bill/${b.congress}/${b.bill_type}/${b.number}`}>{billLabel(b)}</Link> {b.short_title ?? b.title}
+                  <td><Link to={`/bill/${b.congress}/${b.bill_type}/${b.number}`}>{billLabel(b)}</Link> <Clamp lines={2}>{b.short_title ?? b.title}</Clamp>
                     {b.sponsor_name && <div className="fine">{tr("Sponsor", "Patrocinador")}: <Link to={`/member/${b.sponsor_bioguide_id}`}>{b.sponsor_name}</Link></div>}</td>
                   <td className="fine">{date(b.first_activity_date)}</td>
                   <td><span className="fine">{date(b.latest_action_date)}</span><div>{b.latest_action_text}</div></td>

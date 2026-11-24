@@ -7,6 +7,7 @@ import { congressOn, congressYears } from "../../lib/congress.js";
 import { billLabel, ordinal, partyTag, date } from "../lib/format.js";
 import { tr } from "../lib/lang.js";
 import { PartyTag } from "../components/PartyTag.jsx";
+import Clamp from "../components/Clamp.jsx";
 
 const SORTS = {
   action: { label: "Most recent action", es: "Acción más reciente", column: "latest_action_date" },
@@ -75,7 +76,7 @@ export default function Bills() {
             {state.rows.map((b) => (
               <tr key={`${b.bill_type}-${b.number}`}>
                 <td>
-                  <Link to={`/bill/${b.congress}/${b.bill_type}/${b.number}`}>{billLabel(b)}</Link> {b.short_title ?? b.title}
+                  <Link to={`/bill/${b.congress}/${b.bill_type}/${b.number}`}>{billLabel(b)}</Link> <Clamp lines={2}>{b.short_title ?? b.title}</Clamp>
                   {b.policy_area && <div className="fine">{areaName(b.policy_area)}</div>}
                 </td>
                 <td>{b.sponsor_bioguide_id
