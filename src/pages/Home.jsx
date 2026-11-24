@@ -56,7 +56,9 @@ export default function Home() {
   }
 
   return (
-    <main className="page">
+    <main className="page full home">
+      <div className="home-grid">
+      <div className="home-main">
       <header>
         <div className="home-title">
           <h1>Civic Atlas</h1>
@@ -70,8 +72,6 @@ export default function Home() {
             "Escriba una dirección para ver quién le representa en el Congreso, con sus votos, proyectos de ley, comités y finanzas de campaña, según fuentes oficiales.")}
         </p>
       </header>
-
-      {mine.size > 0 && status !== "done" && <MyReps ids={mine} onForget={() => setMine(new Set())} />}
 
       <form onSubmit={handleSubmit} className="lookup">
         <label htmlFor="address">{mine.size > 0 ? t("Look up another address", "Buscar otra dirección") : t("Address", "Dirección")}</label>
@@ -109,12 +109,16 @@ export default function Home() {
         </section>
       )}
 
+      </div>
+      <div className="home-side">
+      {mine.size > 0 && status !== "done" && <MyReps ids={mine} onForget={() => setMine(new Set())} />}
       <section className="home-links">
         <Link to="/quiz" className="home-card"><strong>{t("Do you vote like your representatives?", "¿Vota usted como sus representantes?")}</strong><span>{t("Answer 10 real bills Congress voted on and see who agrees with you.", "Responda sobre 10 proyectos reales que el Congreso votó y vea quién coincide con usted.")}</span></Link>
         <Link to="/map" className="home-card"><strong>{t("Explore the map", "Explore el mapa")}</strong><span>{t("States and congressional districts, down to your street. Tap one to see who represents it.", "Estados y distritos del Congreso, hasta su calle. Toque uno para ver quién lo representa.")}</span></Link>
         <Link to="/week" className="home-card"><strong>{t("This week in Congress", "Esta semana en el Congreso")}</strong><span>{t("What's scheduled, and what passed, failed or became law.", "Lo programado y lo que se aprobó, fracasó o se convirtió en ley.")}</span></Link>
       </section>
-
+      </div>
+      </div>
     </main>
   );
 }

@@ -5,6 +5,7 @@ import Home from "./pages/Home.jsx";
 import Layout from "./components/Layout.jsx";
 import { LangProvider } from "./lib/i18n.jsx";
 import "@fontsource/public-sans/400.css";
+import "@fontsource/public-sans/500.css";
 import "@fontsource/public-sans/600.css";
 import "@fontsource/public-sans/700.css";
 import "./styles.css";

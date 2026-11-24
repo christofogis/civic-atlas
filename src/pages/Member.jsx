@@ -233,8 +233,8 @@ export default function Member() {
   const voteJob = Object.keys(fresh).find((j) => j.startsWith("votes-"));
 
   return (
-    <main className="page">
-      <header>
+    <main className="page full">
+      <header className="page-head member-head">
         <img className="member-photo" src={`https://unitedstates.github.io/images/congress/225x275/${m.bioguide_id}.jpg`} alt={name} width="90" height="110" loading="lazy" onError={(e) => { e.currentTarget.style.display = "none"; }} />
         <h1>{name}</h1>
         {seat?.seat_status === "serving" ? (
@@ -256,14 +256,17 @@ export default function Member() {
       </nav>
 
       <div role="tabpanel" id={`panel-${tab}`} aria-labelledby={`tab-${tab}`}>
-      {tab === "overview" && <>
+      {tab === "overview" && <div className="split">
+      <aside className="split-aside">
+      {seat?.seat_status === "serving" && <Contact term={terms[0]} member={m} />}
       <Follow feed={`/api/feed/member/${m.bioguide_id}`} calendar={`/api/calendar/member/${m.bioguide_id}`}
         calendarLabel={tr("Add their committees' hearings to your calendar", "Agregar a su calendario las audiencias de sus comités")} />
-      {seat?.seat_status === "serving" && <Contact term={terms[0]} member={m} />}
+      <EmbedCode path={`/embed/member/${m.bioguide_id}`} title={`${name} · Civic Atlas`} />
 
+      </aside>
+      <div className="split-main">
       <AtAGlance terms={terms} voteStats={voteStats} medians={medians} billStats={billStats} laws={laws}
         finance={finance} bySize={bySize} tradeSummary={ts} delegate={delegate(latest)} />
-      <EmbedCode path={`/embed/member/${m.bioguide_id}`} title={`${name} · Civic Atlas`} />
 
       <Section title={tr("Service in Congress", "Servicio en el Congreso")} source={<>unitedstates/congress-legislators.{updated("members")} {tr("Biography", "Biografía")}: <a href={m.source_url}>Biographical Directory of the U.S. Congress</a>.</>}>
         {seat?.seat_status === "serving" && (() => {
@@ -304,7 +307,8 @@ export default function Member() {
         )}
       </Section>
 
-      </>}
+      </div>
+      </div>}
 
       {tab === "votes" && <>
       <Section title={tr("Voting record", "Historial de votos")} source={<>{tr("Calculated from House Clerk and Senate.gov roll-call records.", "Calculado a partir de los registros de votaciones nominales del Secretario de la Cámara y de Senate.gov.")} <Link to="/methods">{tr("How these are calculated", "Cómo se calculan")}</Link>.</>}>

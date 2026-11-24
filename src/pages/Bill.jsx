@@ -2,6 +2,7 @@ import { Fragment, useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { db } from "../lib/db.js";
 import TextVersions from "../components/TextVersions.jsx";
+import Clamp from "../components/Clamp.jsx";
 import { areaName } from "../lib/policyAreas.js";
 import MeetingList from "../components/MeetingList.jsx";
 import DownloadCsv from "../components/DownloadCsv.jsx";
@@ -84,21 +85,23 @@ export default function Bill() {
   );
 
   return (
-    <main className="page">
-      <header>
+    <main className="page full">
+      <header className="page-head">
         <p className="fine">{billLabel(b)} · {ordinal(b.congress)} {tr("Congress", "Congreso")} · <Explain id="bill-types">{tr(`What's an ${billLabel(b).replace(/\s*\d+$/, "")}?`, `¿Qué es un ${billLabel(b).replace(/\s*\d+$/, "")}?`)}</Explain></p>
         <h1 className="bill-title">{b.short_title ?? b.title}</h1>
-        {b.short_title && b.short_title !== b.title && <p className="lede">{b.title}</p>}
-        {sponsor && <p>{tr("Sponsor", "Patrocinador")}: {person(sponsor)}</p>}
-        <p className="fine">
-          {tr("Introduced", "Presentado el")} {date(b.introduced_date)}{b.policy_area && <> · {tr("Policy area", "Área de política")}: {areaName(b.policy_area)}</>}
-        </p>
-        {b.latest_action_text && <p>{tr("Latest action", "Última acción")} ({date(b.latest_action_date)}): {b.latest_action_text}</p>}
-        <p className="fine"><a href={b.source_url}>{tr("Full text, actions and history at Congress.gov", "Texto completo, acciones e historial en Congress.gov (en inglés)")}</a></p>
-        <Follow feed={`/api/feed/bill/${b.congress}/${b.bill_type}/${b.number}`} />
+        {b.short_title && b.short_title !== b.title && <p className="lede"><Clamp lines={3}>{b.title}</Clamp></p>}
       </header>
 
-      <StatusBar bill={b} />
+      <div className="split">
+      <aside className="split-aside">
+        <dl className="facts">
+          {sponsor && <><dt>{tr("Sponsor", "Patrocinador")}</dt><dd>{person(sponsor)}</dd></>}
+          <dt>{tr("Introduced", "Presentado")}</dt><dd>{date(b.introduced_date)}</dd>
+          {b.policy_area && <><dt>{tr("Policy area", "Área de política")}</dt><dd>{areaName(b.policy_area)}</dd></>}
+          {b.latest_action_text && <><dt>{tr("Latest action", "Última acción")}</dt><dd>{date(b.latest_action_date)}<div className="fine-plain">{b.latest_action_text}</div></dd></>}
+        </dl>
+        <p className="fine"><a href={b.source_url}>{tr("Full text, actions and history at Congress.gov", "Texto completo, acciones e historial en Congress.gov (en inglés)")}</a></p>
+        <Follow feed={`/api/feed/bill/${b.congress}/${b.bill_type}/${b.number}`} />
       {scheduled.length > 0 && (
         <div className="notice-box">
           <strong>{tr("Scheduled", "Programado")}</strong>
@@ -114,6 +117,11 @@ export default function Bill() {
           </ul>
         </div>
       )}
+
+      </aside>
+
+      <div className="split-main">
+      <StatusBar bill={b} />
 
       <Section title={tr("Summary", "Resumen")} source={<>{tr("Congressional Research Service, via GovInfo Bill Status.", "Servicio de Investigación del Congreso, vía GovInfo Bill Status. Los resúmenes se publican solo en inglés.")} <Explain id="crs-summary">{tr("About these summaries", "Sobre estos resúmenes")}</Explain></>}>
         {b.crs_summary
@@ -214,6 +222,8 @@ export default function Bill() {
           </>
         )}
       </Section>
+      </div>
+      </div>
     </main>
   );
 }
