@@ -38,6 +38,7 @@ const Nominations = lazy(() => import("./pages/Nominations.jsx"));
 const ExplainStory = lazy(() => import("./pages/ExplainStory.jsx"));
 const Hearing = lazy(() => import("./pages/Hearing.jsx"));
 const EmbedMember = lazy(() => import("./pages/EmbedMember.jsx"));
+const MapPage = lazy(() => import("./pages/MapPage.jsx"));
 const NotFound = lazy(() => import("./pages/NotFound.jsx"));
 
 createRoot(document.getElementById("root")).render(
@@ -63,6 +64,7 @@ createRoot(document.getElementById("root")).render(
         <Route path="/nominations" element={<Nominations />} />
         <Route path="/story" element={<ExplainStory />} />
         <Route path="/hearing/:id" element={<Hearing />} />
+        <Route path="/map" element={<MapPage />} />
         <Route path="/committees" element={<Committees />} />
         <Route path="/committee/:id" element={<Committee />} />
         <Route path="/member/:bioguide" element={<Member />} />

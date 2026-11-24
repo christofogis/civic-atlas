@@ -23,6 +23,7 @@ export default function Layout() {
           <Link to="/" className="brand">Civic Atlas</Link>
           <nav>
             <NavLink to="/week">{t("This week", "Esta semana")}</NavLink>
+            <NavLink to="/map">{t("Map", "Mapa")}</NavLink>
             <NavLink to="/members">{t("Members", "Miembros")}</NavLink>
             <NavLink to="/topics">{t("Topics", "Temas")}</NavLink>
             <NavLink to="/bills">{t("Bills", "Proyectos de ley")}</NavLink>

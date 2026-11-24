@@ -23,6 +23,7 @@ export const PAGES = [
   ["/member/P000145?lang=es", ["En resumen", "Contacto", "Senado de EE. UU."]],
   ["/bills?lang=es", ["Proyectos de ley", "Última acción"]],
   ["/methods?lang=es", ["Cómo funciona este sitio", "Tasa de voto con el partido"]],
+  ["/map?state=CA", ["Map", "Senators (whole state)", "Alex Padilla", "District 12"]],
   ["/story", ["Look up a news story", "Article text"]],
   ["/topics", ["Topics", "Health"]],
   ["/elections?state=CA", ["who has filed", "Senate"]],

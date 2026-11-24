@@ -239,3 +239,11 @@ header.site nav { flex-wrap: wrap; row-gap: 4px; }
 .party-d { background: #1f4e9c; }
 .party-r { background: #b42318; }
 .party-other { background: #5b6470; }
+
+/* Map page */
+.map-wrap { position: relative; }
+.map-canvas { width: 100%; height: min(70vh, 620px); border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
+.map-failed { position: absolute; top: 12px; left: 12px; right: 12px; }
+.map-panel .map-current { font-weight: 600; background: var(--accent-soft); }
+.swatch-mine { display: inline-block; width: 14px; height: 10px; border: 3px solid var(--mark); vertical-align: middle; }
+@media (max-width: 600px) { .map-canvas { height: 60vh; } }
