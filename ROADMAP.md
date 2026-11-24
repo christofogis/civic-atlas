@@ -29,7 +29,7 @@
 - [x] Stock trades (STOCK Act PTRs, House + Senate, 2025 on) with 45-day timing
 - [x] Donors: contributions by size, donors' employers, top PACs (FEC has no industry codes)
 - [x] Outside spending for / against
-- [ ] Lobbying on bills
+- [x] Lobbying on bills (LDA.gov LD-2 reports naming a bill; bill pages)
 - [ ] Earmark requests
 
 ## Phase 2 — Depth

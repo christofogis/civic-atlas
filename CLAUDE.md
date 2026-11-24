@@ -53,6 +53,10 @@ yes-man: flag weak ideas, scope creep, and shortcuts that will cost later.
   Senate eFD (public-use agreement accepted automatically, authorized by Chris for free,
   non-commercial use). 5 U.S.C. § 13107 bars commercial use of this data other than news
   media dissemination — no paid tiers or paid APIs built on it. Scanned filings: link only.
+- Lobbying: LDA.gov REST API (lda.senate.gov retired mid-2026). 25 filings/page; 15 requests/min
+  anonymous, 120/min with `LDA_API_KEY`. Bills are read from LD-2 issue text by number only.
+  No per-bill dollar amounts (a report's income covers all its issues). Pages must say the Senate
+  Office of Public Records can't vouch for data or analyses derived after retrieval.
 - Address → district: Geocodio `cd` field (free tier 2,500 lookups/day). Results may be stored.
 - Do not use: ProPublica Congress API (no new keys issued). Prefer the official sources above
   over third-party aggregators.
@@ -74,7 +78,8 @@ yes-man: flag weak ideas, scope creep, and shortcuts that will cost later.
   redistricting the previous holder may have represented a different area.
 
 ## Ingest jobs (GitHub Actions, `scripts/ingest/`)
-- Daily: members + committees 4:17am PT, votes 4:47am, bills 5:23am, trades 5:53am.
+- Daily: members + committees 4:17am PT, votes 4:47am, bills 5:23am, trades 5:53am,
+  lobbying 6:23am.
   FEC totals weekly Tue evening, FEC detail (sizes, employers, PACs, outside spending) Wed
   evening (~3 hours, paced under the API limit). Vote and bill stats are recomputed in the database after their jobs.
 - Coverage starts with the 118th Congress (2023). Members include anyone who served since then.
