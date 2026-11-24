@@ -5,6 +5,10 @@ on:
     - cron: "41 2 * * 3"    # weekly, Tuesday evenings Pacific (away from the bills runs; same API key)
   workflow_dispatch:
     inputs:
+      only_candidates:
+        description: "Skip the totals; refresh the candidate list only"
+        type: boolean
+        default: false
       dry_run:
         description: "Fetch two candidates only; write nothing"
         type: boolean
@@ -33,6 +37,7 @@ jobs:
           cache: npm
       - run: npm ci
       - name: FEC totals
+        if: ${{ !inputs.only_candidates }}
         env:
           DRY_RUN: ${{ inputs.dry_run }}
         run: |
