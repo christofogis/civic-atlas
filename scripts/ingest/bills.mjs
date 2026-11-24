@@ -58,7 +58,8 @@ export function parseBillStatus(xml) {
       policy_area: str(b.policyArea?.name),
       latest_action_date: str(b.latestAction?.actionDate),
       latest_action_text: str(b.latestAction?.text),
-      crs_summary: plain(summaries[0]?.text),
+      // Text sits at summary > text in some files and summary > cdata > text in others.
+      crs_summary: plain(summaries[0]?.text ?? summaries[0]?.cdata?.text),
       source_url: billPage(congress, bill_type, number),
     },
     // One row per person: if someone withdrew and later re-joined, the active entry wins.
