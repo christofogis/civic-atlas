@@ -1,0 +1,51 @@
+name: Ingest lobbying reports
+
+# LD-2 lobbying reports from LDA.gov that name a tracked bill. Daily run reads reports posted
+# since the last success; the quarters input backfills whole quarters (about 75 minutes each
+# without an LDA_API_KEY secret, about 10 with one).
+on:
+  schedule:
+    - cron: "23 14 * * *"   # daily, 6:23am Pacific
+  workflow_dispatch:
+    inputs:
+      quarters:
+        description: "Backfill quarters, e.g. 2025-1,2025-2 (blank = reports posted since last run)"
+        type: string
+        default: ""
+      dry_run:
+        description: "Read a few pages; write nothing"
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ingest-lobbying-${{ inputs.quarters || 'daily' }}
+  cancel-in-progress: false
+
+jobs:
+  ingest:
+    runs-on: ubuntu-latest
+    timeout-minutes: 330
+    env:
+      SUPABASE_URL: https://fkbzxaoeyrtzviyfzulq.supabase.co
+      SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+      LDA_API_KEY: ${{ secrets.LDA_API_KEY }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: node --test
+      - name: Lobbying
+        env:
+          QUARTERS: ${{ inputs.quarters }}
+          DRY_RUN: ${{ inputs.dry_run }}
+        run: |
+          set -- 
+          if [ -n "$QUARTERS" ]; then set -- --quarters "$QUARTERS"; fi
+          if [ "$DRY_RUN" = "true" ]; then set -- "$@" --dry-run --pages 8; fi
+          node scripts/ingest/lobbying.mjs "$@"

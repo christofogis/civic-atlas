@@ -1,0 +1,32 @@
+name: Backfill lobbying reports (one-time)
+
+# Loads every quarter from 2023 on, two quarters per job, one job at a time so the
+# anonymous LDA.gov rate limit is respected. About 19 hours without an API key.
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  backfill:
+    runs-on: ubuntu-latest
+    timeout-minutes: 340
+    strategy:
+      max-parallel: 1
+      fail-fast: false
+      matrix:
+        quarters: ["2023-1,2023-2", "2023-3,2023-4", "2024-1,2024-2", "2024-3,2024-4",
+                   "2025-1,2025-2", "2025-3,2025-4", "2026-1,2026-2", "2026-3"]
+    env:
+      SUPABASE_URL: https://fkbzxaoeyrtzviyfzulq.supabase.co
+      SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+      LDA_API_KEY: ${{ secrets.LDA_API_KEY }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: node scripts/ingest/lobbying.mjs --quarters "${{ matrix.quarters }}"
