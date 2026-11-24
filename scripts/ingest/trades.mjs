@@ -27,7 +27,17 @@ const UA = "civic-atlas (github.com/christofogis/civic-atlas)";
 const HOUSE = "https://disclosures-clerk.house.gov/public_disc";
 const SENATE = "https://efdsearch.senate.gov";
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
-const norm = (s) => String(s ?? "").normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase().replace(/[^a-z]/g, "");
+const norm = (s) => String(s ?? "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/[^a-z]/g, "");
+// Surname for matching: drop generational suffixes ("King, Jr.", "Justice II", "Hagerty IV").
+const SUFFIX = /[,\s]+(jr|sr|ii|iii|iv|v)\.?$/i;
+const surname = (s) => norm(String(s ?? "").replace(SUFFIX, ""));
+const lastWord = (s) => norm(String(s ?? "").replace(SUFFIX, "").trim().split(/[\s-]+/).pop());
+// "Delaney" matches "McClain Delaney"; "Lujan" matches "Luján".
+const sameSurname = (filed, member) => {
+  const a = surname(filed), b = surname(member);
+  if (!a || !b) return false;
+  return a === b || lastWord(filed) === b || a === lastWord(member) || lastWord(filed) === lastWord(member);
+};
 
 async function get(url, opts = {}) {
   for (let attempt = 0; attempt < 3; attempt++) {
@@ -43,27 +53,30 @@ async function get(url, opts = {}) {
 
 // ---------- matching filers to members ----------
 
+const addDays = (iso, n) => new Date(new Date(`${iso}T12:00:00Z`).getTime() + n * 86_400_000).toISOString().slice(0, 10);
+
 function memberMatcher(members, terms) {
   const byId = new Map(members.map((m) => [m.bioguide_id, m]));
-  const covering = (t, day) => day >= t.start_date && day <= t.end_date;
+  // A term covers a filing if it was in force on the filing date, or ended within the year
+  // before it: members who leave still file reports for trades made while serving.
+  const covering = (t, day) => day >= t.start_date && day <= addDays(t.end_date, 365);
   return {
     house(last, stateDst, day) {
       const state = stateDst.slice(0, 2);
       const district = parseInt(stateDst.slice(2), 10);
       const inState = terms.filter((t) => t.chamber === "house" && t.state === state && covering(t, day));
-      const lastN = norm(last);
-      const named = inState.filter((t) => norm(byId.get(t.bioguide_id)?.last_name) === lastN);
+      const named = inState.filter((t) => sameSurname(last, byId.get(t.bioguide_id)?.last_name));
       const exact = named.find((t) => t.district === district || inState.length === 1);
-      return (exact ?? (named.length === 1 ? named[0] : null))?.bioguide_id ?? null;
+      const ids = [...new Set(named.map((t) => t.bioguide_id))];
+      return exact?.bioguide_id ?? (ids.length === 1 ? ids[0] : null);
     },
     senate(first, last, day) {
-      const lastN = norm(last);
       const firstN = norm(first).slice(0, 3);
       const named = terms.filter((t) => t.chamber === "senate" && covering(t, day)
-        && norm(byId.get(t.bioguide_id)?.last_name) === lastN);
+        && sameSurname(last, byId.get(t.bioguide_id)?.last_name));
       const ids = [...new Set(named.map((t) => t.bioguide_id))];
       if (ids.length <= 1) return ids[0] ?? null;
-      const m = ids.filter((id) => [byId.get(id).first_name, byId.get(id).nickname].some((n) => norm(n).startsWith(firstN)));
+      const m = ids.filter((id) => [byId.get(id).first_name, byId.get(id).middle_name, byId.get(id).nickname].some((n) => n && norm(n).startsWith(firstN)));
       return m.length === 1 ? m[0] : null;
     },
   };
@@ -197,7 +210,7 @@ async function main() {
   const run = async () => {
     const seen = dryRun ? new Set() : new Set((await fetchAll(db, "ptr_filings", "filing_id")).map((f) => f.filing_id));
     const match = memberMatcher(
-      await fetchAll(db, "members", "bioguide_id,first_name,last_name,nickname"),
+      await fetchAll(db, "members", "bioguide_id,first_name,middle_name,last_name,nickname"),
       await fetchAll(db, "terms", "bioguide_id,chamber,state,district,start_date,end_date"));
     const thisYear = new Date().getUTCFullYear();
     let filings = 0, trades = 0, scanned = 0, unmatched = [];
@@ -255,6 +268,8 @@ async function main() {
   if (dryRun) await run();
   else await withRun(db, "trades", run);
 }
+
+export { memberMatcher, sameSurname };
 
 if (import.meta.url === `file://${process.argv[1]}`) {
   main().catch((err) => {
