@@ -59,3 +59,10 @@
 - [x] Report an error on every page (error_reports, read in the Supabase dashboard)
 - [ ] AI bill summaries: cheapest model, labeled, from official text only. Needs Chris to pick
       a provider, add the API key as a GitHub secret, and set a monthly spending cap
+- [x] Contact box and official account links on member pages
+- [x] Nightly browser check of key pages; failures and job failures open a GitHub issue
+- [x] Coming up: House floor schedule, Senate convening, committee hearings/markups
+- [x] Quiz: do you vote like your representatives? (fixed-rule bill selection)
+- [ ] Follow a member or bill: RSS feed and calendar (.ics) links, no account
+- [ ] Topic pages (e.g. Immigration in the 119th); 2028 challengers from FEC filings
+- [ ] Installable app with notifications; Spanish
