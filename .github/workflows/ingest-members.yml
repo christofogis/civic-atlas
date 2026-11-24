@@ -1,0 +1,29 @@
+name: Ingest members
+
+on:
+  schedule:
+    - cron: "17 12 * * *"   # daily, 4:17am Pacific (UTC cron)
+  workflow_dispatch:        # "Run workflow" button in the Actions tab
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ingest-members
+  cancel-in-progress: false
+
+jobs:
+  ingest:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: node scripts/ingest/members.mjs
+        env:
+          SUPABASE_URL: https://fkbzxaoeyrtzviyfzulq.supabase.co
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}

@@ -9,7 +9,8 @@
 ## Phase 1 — Federal MVP
 - [x] Schema written and tested locally: members, terms, districts, committees, bills, votes, vote_positions, finance_summaries, ingest_runs (keyed on bioguide_id)
 - [x] Apply schema to Supabase (advisors clean)
-- [ ] Ingest: congress-legislators → members/terms/committees
+- [x] Ingest: congress-legislators → members/terms (daily, GitHub Actions)
+- [ ] Ingest: committees and committee memberships
 - [ ] Address lookup → your 2 senators + 1 representative
 - [ ] Member profile page: bio, committees, sponsored bills, recent votes, FEC totals, source links
 - [ ] Deploy publicly
