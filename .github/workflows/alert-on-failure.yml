@@ -14,6 +14,7 @@ on:
       - Ingest FEC detail
       - Ingest schedule
       - Site check
+      - Accuracy check
     types: [completed]
 
 permissions:
