@@ -49,6 +49,10 @@ yes-man: flag weak ideas, scope creep, and shortcuts that will cost later.
   page, not a 404, past the last roll number. Speaker elections record candidate names.
 - Campaign finance: OpenFEC API (~1,000 calls/hour with the `DATA_GOV_API_KEY`; runs weekly). FEC rules bar using
   individual contributor names for solicitation or commercial purposes — display is fine.
+- Stock trades: House Clerk FD index ({year}FD.zip) + PTR PDFs (pdftotext -layout), and
+  Senate eFD (public-use agreement accepted automatically, authorized by Chris for free,
+  non-commercial use). 5 U.S.C. § 13107 bars commercial use of this data other than news
+  media dissemination — no paid tiers or paid APIs built on it. Scanned filings: link only.
 - Address → district: Geocodio `cd` field (free tier 2,500 lookups/day). Results may be stored.
 - Do not use: ProPublica Congress API (no new keys issued). Prefer the official sources above
   over third-party aggregators.
@@ -70,7 +74,8 @@ yes-man: flag weak ideas, scope creep, and shortcuts that will cost later.
   redistricting the previous holder may have represented a different area.
 
 ## Ingest jobs (GitHub Actions, `scripts/ingest/`)
-- Daily: members + committees 4:17am PT, votes 4:47am, bills 5:23am. FEC weekly, Tue evening.
+- Daily: members + committees 4:17am PT, votes 4:47am, bills 5:23am, trades 5:53am.
+  FEC weekly, Tue evening. Vote and bill stats are recomputed in the database after their jobs.
 - Coverage starts with the 118th Congress (2023). Members include anyone who served since then.
 - Every run is logged in `ingest_runs` (public); never put secrets in error text.
 

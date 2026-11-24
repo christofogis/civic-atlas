@@ -85,11 +85,32 @@ export default function Methods() {
       </ul>
       <p>"Final votes only" on a member page shows final passage, veto overrides and confirmations.</p>
 
+      <h2 id="trades">Stock trades</h2>
+      <p>
+        Under the STOCK Act, members of Congress must report each purchase, sale or exchange of stocks,
+        bonds and similar assets over $1,000 by themselves, their spouse or dependent children, within
+        30 days of learning of it and no later than 45 days after the transaction. These reports are
+        called Periodic Transaction Reports.
+      </p>
+      <p>
+        Trades are shown as filed: the asset's name, the amount as the range the law requires (exact
+        figures are not disclosed), and who owned it. "Days to report" counts from the transaction date to
+        the date the report was filed; more than 45 is noted, since that is the law's outer limit. The
+        records don't show whether a late fee was paid or waived. Reports filed on paper are linked but not
+        itemized. Coverage starts January 2025.
+      </p>
+      <p>
+        By law (5 U.S.C. § 13107), these reports may not be used for any commercial purpose other than by
+        news media for dissemination to the public, for determining anyone's credit rating, or for
+        soliciting money.
+      </p>
+
       <h2>Where the data comes from</h2>
       <ul className="plain">
         <li><strong>Members, terms, committees:</strong> the public-domain congress-legislators dataset.</li>
         <li><strong>Roll-call votes:</strong> the Clerk of the House and Senate.gov, recorded exactly as published.</li>
         <li><strong>Bills, cosponsors, summaries:</strong> GovInfo Bill Status records from the Library of Congress. Summaries are written by the nonpartisan Congressional Research Service.</li>
+        <li><strong>Stock trades:</strong> Periodic Transaction Reports from the Clerk of the House and the Senate's electronic financial disclosure system.</li>
         <li><strong>Campaign finance:</strong> the Federal Election Commission, totals by two-year cycle.</li>
         <li><strong>Your district:</strong> Geocodio, using Census Bureau district boundaries. Your address is used only for the lookup and is never stored.</li>
       </ul>

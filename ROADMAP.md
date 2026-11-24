@@ -25,6 +25,13 @@
 - [x] Bipartisan cosponsorship: cross-party cosponsorship and cross-party support rates
 - [ ] Members' statements beside their votes
 
+## Phase 1c — Money & conflicts
+- [x] Stock trades (STOCK Act PTRs, House + Senate, 2025 on) with 45-day timing
+- [ ] Donors by industry and PAC
+- [ ] Outside spending for / against
+- [ ] Lobbying on bills
+- [ ] Earmark requests
+
 ## Phase 2 — Depth
 - [ ] Vote ingest from House/Senate clerks; vote search by issue
 - [ ] Bill pages with CRS summaries (AI summary only as labeled fallback)
