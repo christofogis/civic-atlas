@@ -1,0 +1,29 @@
+name: Smoke test
+
+# Manual check of the live site's API with public addresses (government buildings only).
+on:
+  workflow_dispatch:
+    inputs:
+      base_url:
+        description: "Site URL"
+        type: string
+        default: "https://civic-atlas-cub.pages.dev"
+
+permissions:
+  contents: read
+
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Lookups
+        env:
+          BASE: ${{ inputs.base_url }}
+        run: |
+          for a in "200 N Spring St, Los Angeles, CA 90012" "200 W 24th St, Cheyenne, WY 82002" \
+                   "1600 Pennsylvania Ave NW, Washington, DC 20500" "90210"; do
+            echo "=== $a"
+            curl -sS -w "\nHTTP %{http_code}\n" --get --data-urlencode "address=$a" "$BASE/api/lookup" | head -c 3000
+            echo
+          done
