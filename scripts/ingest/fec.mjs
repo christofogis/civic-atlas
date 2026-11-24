@@ -69,7 +69,13 @@ async function main() {
       // election_full=false: one row per two-year cycle rather than per full Senate term.
       const data = await getJson(`${API}/candidate/${id}/totals/?per_page=100&election_full=false&sort=-cycle`, key);
       const results = (data?.results ?? []).filter((r) => r.cycle >= FROM_CYCLE);
-      if (dryRun && n === 0 && results[0]) console.log("raw fields:", Object.keys(results[0]).join(", "));
+      if (dryRun && n === 0 && results[0]) {
+        const expected = ["receipts", "disbursements", "last_cash_on_hand_end_period", "last_debts_owed_by_committee",
+          "individual_contributions", "other_political_committee_contributions",
+          "political_party_committee_contributions", "candidate_contribution", "coverage_end_date"];
+        const missing = expected.filter((f) => !(f in results[0]));
+        console.log(missing.length ? `MISSING expected fields: ${missing.join(", ")}` : "all expected fields present");
+      }
       rows.push(...results.map((r) => mapTotals(r, bioguide)));
       if (++n % 100 === 0) console.log(`  ${n}/${pairs.length}`);
     }
