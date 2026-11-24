@@ -20,6 +20,7 @@ const PAGES = [
   ["/glossary", ["Cloture"]],
   ["/corrections", ["What was wrong"]],
   ["/nominations", ["Nominations", "Confirmation"]],
+  ["/story", ["Look up a news story", "Article text"]],
   ["/topics", ["Topics", "Health"]],
   ["/elections?state=CA", ["who has filed", "Senate"]],
   ["/topic/health", ["Became law", "Recent roll-call votes"]],
