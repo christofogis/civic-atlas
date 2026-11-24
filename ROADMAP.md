@@ -54,6 +54,8 @@
 - [x] Nominations page (Senate cloture and confirmation votes)
 - [x] Spreadsheet (CSV) downloads on vote, member, bill, lobbying and comparison lists
 - [x] Look up a news story (paste text; members and bill numbers matched in the browser)
+- [x] Bill text versions + what changed between them (section-level, computed; see /methods#text-versions)
+- [x] Nightly accessibility check (axe, WCAG 2.1 AA) + keyboard/screen-reader fixes
 - [ ] Story lookup by link (needs a server fetch; weigh paywalls and the 10 ms CPU limit first)
 - [ ] Email alerts (needs a decision on accounts and an email provider)
 - [x] Bill status bar from Library of Congress milestone codes

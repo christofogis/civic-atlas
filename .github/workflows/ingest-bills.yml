@@ -10,7 +10,7 @@ on:
         type: boolean
         default: false
       full:
-        description: "Re-read every bill (first load or repair)"
+        description: "Re-read every bill (first load or repair). Leaves ~50 MB of dead rows: run VACUUM FULL on bills, bill_cosponsors, bill_committees after"
         type: boolean
         default: false
       text_recompute:
