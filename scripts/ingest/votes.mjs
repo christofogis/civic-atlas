@@ -228,6 +228,22 @@ async function main() {
       positionCount += rows.length;
     };
 
+    // --relink: re-read Senate votes about an amendment that have no bill yet (stored before
+    // the parser read amendment_to_document_number). Upserts make this safe to repeat.
+    if (args.includes("--relink") && db) {
+      const { data: stale, error: staleErr } = await db.from("votes").select("session,roll_number")
+        .eq("chamber", "senate").eq("congress", congress).is("bill_type", null).like("question", "%Amdt%");
+      if (staleErr) throw new Error(`read unlinked votes: ${staleErr.message}`);
+      for (const v of stale) {
+        const url = senateUrl(congress, v.session, v.roll_number);
+        const xml = await get(url);
+        fetched++;
+        const parsed = xml && parseSenate(xml, url);
+        if (parsed) await save(parsed);
+      }
+      console.log(`relinked: re-read ${stale.length} Senate amendment votes`);
+    }
+
     for (const s of sessions) {
       // House: walk roll numbers until the clerk returns 404.
       const year = yearFor(congress, s);

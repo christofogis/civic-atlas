@@ -13,6 +13,10 @@ on:
         description: "Congress to ingest (blank = current)"
         type: string
         default: ""
+      relink:
+        description: "Re-read Senate amendment votes that have no bill"
+        type: boolean
+        default: false
 
 permissions:
   contents: read
@@ -39,8 +43,10 @@ jobs:
         env:
           DRY_RUN: ${{ inputs.dry_run }}
           CONGRESS: ${{ inputs.congress }}
+          RELINK: ${{ inputs.relink }}
         run: |
           ARGS=()
           if [ "$DRY_RUN" = "true" ]; then ARGS+=(--dry-run --limit 3); fi
           if [[ "$CONGRESS" =~ ^[0-9]+$ ]]; then ARGS+=(--congress "$CONGRESS"); fi
+          if [ "$RELINK" = "true" ]; then ARGS+=(--relink); fi
           node scripts/ingest/votes.mjs "${ARGS[@]}"
