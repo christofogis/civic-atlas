@@ -32,6 +32,7 @@ const Quiz = lazy(() => import("./pages/Quiz.jsx"));
 const Topics = lazy(() => import("./pages/Topics.jsx"));
 const Topic = lazy(() => import("./pages/Topic.jsx"));
 const Elections = lazy(() => import("./pages/Elections.jsx"));
+const Corrections = lazy(() => import("./pages/Corrections.jsx"));
 const NotFound = lazy(() => import("./pages/NotFound.jsx"));
 
 createRoot(document.getElementById("root")).render(
@@ -50,6 +51,7 @@ createRoot(document.getElementById("root")).render(
         <Route path="/topics" element={<Topics />} />
         <Route path="/topic/:slug" element={<Topic />} />
         <Route path="/elections" element={<Elections />} />
+        <Route path="/corrections" element={<Corrections />} />
         <Route path="/committees" element={<Committees />} />
         <Route path="/committee/:id" element={<Committee />} />
         <Route path="/member/:bioguide" element={<Member />} />

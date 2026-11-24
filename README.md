@@ -23,6 +23,9 @@ in `ROADMAP.md`.
   any shows an error or is missing content.
 - **Error reports from visitors**: Supabase → Table editor → `error_reports`. Set `status` to
   `fixed`, `not_an_error` or `duplicate` when handled.
+- **Publishing a correction**: when a report turns out to be a real error in the data, fix it,
+  then add a row to `corrections` (Supabase → Table editor) saying what was wrong and what
+  changed. It appears on /corrections.
 - **Secrets**: GitHub → Settings → Secrets → Actions (`SUPABASE_SERVICE_ROLE_KEY`,
   `DATA_GOV_API_KEY`, `LDA_API_KEY`). Cloudflare Pages → Settings → Variables
   (`GEOCODIO_API_KEY`, `TURNSTILE_SECRET_KEY`). After changing a Cloudflare variable, redeploy.

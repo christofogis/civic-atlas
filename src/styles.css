@@ -198,3 +198,5 @@ td { border-bottom: 1px solid var(--border); padding: 8px 8px 8px 0; vertical-al
 header.site nav a { white-space: nowrap; }
 ul.bare { list-style: none; padding: 0; margin: 0; }
 .follow { margin: 14px 0 4px; }
+.corrections li { padding: 14px 0; border-bottom: 1px solid var(--border); }
+.corrections p { margin: 4px 0; }
