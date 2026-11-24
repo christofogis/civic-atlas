@@ -41,3 +41,14 @@
 
 ## Later
 - State legislators (OpenStates), governors, then local
+
+## Added Nov 24, 2026
+- [x] Site header with search (members by name, bills by number or title)
+- [x] Browse: /members by state, /bills by Congress and issue (sortable by lobbying)
+- [x] /compare: how often two members cast the same vote, and where they differed
+- [x] Bill pages: how every member voted on each roll call, counts by party
+- [x] Committee pages with members and bills referred
+- [x] 120th Congress transition prep (docs/transition-120th.md)
+- [x] vote_positions stored against integer vote keys (153 MB -> 99 MB)
+- [ ] Finance cycle picker (early 2027 pages will show the new 2028 cycle)
+- [ ] Email alerts (needs a decision on accounts and an email provider)
