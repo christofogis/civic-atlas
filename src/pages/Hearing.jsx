@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { db } from "../lib/db.js";
 import { billLabel, ordinal } from "../lib/format.js";
-import { statementFor } from "../../lib/meetings.js";
+import { statementFor, meetingHeading } from "../../lib/meetings.js";
 import { meetingTime } from "../components/MeetingList.jsx";
 
 const videoLabel = (url) => /youtube\.com|youtu\.be/.test(url) ? "Video (YouTube)"
@@ -40,13 +40,15 @@ export default function Hearing() {
   // Where a Senate committee posts its witnesses: the committee's own site (the parent's for a subcommittee).
   const site = committees.map((c) => c.url ?? c.parent?.url).find(Boolean);
   const isHearing = /hearing/i.test(m.meeting_type ?? "");
+  const { heading, agenda } = meetingHeading(m.title, m.meeting_type);
 
   return (
     <main className="page">
       <p className="fine">
         {chamberName} committee {(m.meeting_type ?? "meeting").toLowerCase()} · {ordinal(m.congress)} Congress
       </p>
-      <h1>{m.title}</h1>
+      <h1>{heading}</h1>
+      {agenda && <ul className="plain agenda">{agenda.map((l, i) => <li key={i}>{l}</li>)}</ul>}
       <p>
         {meetingTime(m)}{m.location && <> · {m.location}</>}
         {m.status && !/^scheduled$/i.test(m.status) && <> · <strong>{m.status}</strong></>}

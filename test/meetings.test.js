@@ -49,3 +49,12 @@ test("statement matching by last name", () => {
   assert.match(statementFor(m.witnesses[1], m.statements), /CruzA/);
   assert.equal(statementFor({ name: "Ms. Jane Doe" }, m.statements), null);
 });
+
+test("agenda-style titles", async () => {
+  const { meetingHeading } = await import("../lib/meetings.js");
+  assert.deepEqual(meetingHeading(": •\tH.R. 1031 (Rep. Tenney), “A Act”\r\n•\tH.R. 2323 (Rep. Gonzales), “B Act”", "Markup"),
+    { heading: "Markup on 2 items", agenda: ["H.R. 1031 (Rep. Tenney), “A Act”", "H.R. 2323 (Rep. Gonzales), “B Act”"] });
+  assert.deepEqual(meetingHeading("Legislative Hearing on 2 bills: \r\nH.R. 1 (Rep. A), “X”;\r\nS. 2 (Sen. B), “Y”", "Hearing"),
+    { heading: "Legislative Hearing on 2 bills", agenda: ["H.R. 1 (Rep. A), “X”", "S. 2 (Sen. B), “Y”"] });
+  assert.equal(meetingHeading("Oversight of X", "Hearing").heading, "Oversight of X");
+});
