@@ -54,12 +54,13 @@ const run = async () => {
       console.log(`${c} ${chamber}: ${listed} meetings listed`);
     }
   }
-  const work = todo.slice(0, LIMIT);
+  // A meeting can be listed twice (a joint meeting appears under both chambers); read it once.
+  const work = [...new Set(todo)].slice(0, LIMIT);
   console.log(`${todo.length} new or updated; reading ${work.length}`);
 
   let rows = [], written = 0, skipped = 0;
   const flush = async () => {
-    const r = rows; rows = [];
+    const r = [...new Map(rows.map((x) => [x.event_id, x])).values()]; rows = [];
     if (!DRY && r.length) await upsertBatches(db, "committee_meetings", r, "event_id", 200);
     written += r.length;
   };
