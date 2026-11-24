@@ -1,4 +1,5 @@
 import { useEffect } from "react";
+import AccuracyStatus from "../components/AccuracyStatus.jsx";
 import { Link, useLocation } from "react-router-dom";
 
 // How every number on the site is produced. Keep this in step with the code:
@@ -97,6 +98,15 @@ export default function Methods() {
         Votes on nominations are grouped as "Nominations". Votes with no bill or nominee, such as electing
         the Speaker or motions about chamber procedure, are grouped as "Other votes".
       </p>
+
+      <h2 id="accuracy">Checking our accuracy</h2>
+      <p>
+        Every week, a program picks random facts from this site (how members voted, who sponsored and cosponsored
+        bills, law numbers, campaign receipts) and compares each with the original record at the House Clerk,
+        the Senate, GovInfo and the FEC. Any difference is investigated, and errors we find are listed on the
+        corrections page.
+      </p>
+      <AccuracyStatus />
 
       <h2 id="compare">Comparing two members</h2>
       <p>

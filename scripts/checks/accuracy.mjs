@@ -19,10 +19,14 @@ const record = (area, fact, ours, source, url) =>
 
 // Roll-call positions.
 for (const chamber of ["house", "senate"]) {
-  const { data: rows, error } = await db.from("vote_position_details").select("vote_id,bioguide_id,position")
-    .like("vote_id", `${chamber}-%`).limit(2000);
+  // Random votes across the whole record, then a random member's position on each.
+  const { data: votes, error } = await db.from("votes").select("vote_id").eq("chamber", chamber).limit(5000);
   if (error) throw error;
-  const picks = rows.sort(() => Math.random() - 0.5).slice(0, N);
+  const picks = [];
+  for (const v of votes.sort(() => Math.random() - 0.5).slice(0, N)) {
+    const { data: ps } = await db.from("vote_position_details").select("vote_id,bioguide_id,position").eq("vote_id", v.vote_id);
+    picks.push(ps[Math.floor(Math.random() * ps.length)]);
+  }
   for (const p of picks) {
     const { data: v } = await db.from("votes").select("source_url").eq("vote_id", p.vote_id).single();
     const doc = parser.parse(await (await fetch(v.source_url, UA)).text());
@@ -41,9 +45,16 @@ for (const chamber of ["house", "senate"]) {
 
 // Bills: sponsor, introduced date, active cosponsors, law number.
 {
-  const { data: rows } = await db.from("bills").select("congress,bill_type,number,sponsor_bioguide_id,introduced_date,law_number")
-    .gte("congress", 118).limit(3000);
-  for (const b of rows.sort(() => Math.random() - 0.5).slice(0, N)) {
+  // Half random bills, half bills that became law (so law numbers get checked too).
+  const total = (await db.from("bills").select("*", { count: "exact", head: true })).count;
+  const rows = [];
+  for (let i = 0; i < N; i++) {
+    const q = db.from("bills").select("congress,bill_type,number,sponsor_bioguide_id,introduced_date,law_number");
+    const { data } = i % 2 ? await q.not("law_number", "is", null).range(Math.floor(Math.random() * 300), Math.floor(Math.random() * 300))
+      : await q.range(Math.floor(Math.random() * total), Math.floor(Math.random() * total));
+    if (data?.[0]) rows.push(data[0]);
+  }
+  for (const b of rows) {
     const url = `https://www.govinfo.gov/bulkdata/BILLSTATUS/${b.congress}/${b.bill_type}/BILLSTATUS-${b.congress}${b.bill_type}${b.number}.xml`;
     const s = parser.parse(await (await fetch(url, UA)).text())?.billStatus?.bill ?? {};
     const { count } = await db.from("bill_cosponsors").select("*", { count: "exact", head: true })
