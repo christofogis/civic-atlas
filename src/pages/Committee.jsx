@@ -27,11 +27,13 @@ export default function Committee() {
   useEffect(() => {
     if (!/^[A-Z]{4}\d{0,2}$/.test(id ?? "")) { setInfo({ status: "missing" }); return; }
     (async () => {
-      const [c, subs, mem] = await Promise.all([
+      const [c, subs, mem, events] = await Promise.all([
         db.from("committees").select("committee_id,name,chamber,url,parent:parent_id(committee_id,name)").eq("committee_id", id).maybeSingle(),
         db.from("committees").select("committee_id,name").eq("parent_id", id).order("name"),
         db.from("committee_memberships").select("bioguide_id,side,rank,title,congress").eq("committee_id", id)
           .order("congress", { ascending: false }).order("side").order("rank"),
+        db.from("upcoming_events").select("event_id,kind,event_date,event_time,committee_id,committee_name,title,status,source_url")
+          .like("committee_id", `${id}%`).gte("event_date", new Date().toISOString().slice(0, 10)).order("event_date").limit(50),
       ]);
       if (c.error || !c.data) { setInfo({ status: c.error ? "error" : "missing" }); return; }
       const latest = mem.data?.[0]?.congress;
@@ -40,7 +42,7 @@ export default function Committee() {
         ? await db.from("member_directory").select("bioguide_id,name,party,chamber,state,district").in("bioguide_id", roster.map((r) => r.bioguide_id))
         : { data: [] };
       const byId = new Map((people ?? []).map((p) => [p.bioguide_id, p]));
-      setInfo({ status: "done", committee: c.data, subs: subs.data ?? [], rosterCongress: latest,
+      setInfo({ status: "done", committee: c.data, subs: subs.data ?? [], rosterCongress: latest, events: events.data ?? [],
         roster: roster.map((r) => ({ ...r, person: byId.get(r.bioguide_id) })) });
     })().catch(() => setInfo({ status: "error" }));
   }, [id]);
@@ -57,7 +59,7 @@ export default function Committee() {
   if (info.status === "missing") return <main className="page"><h1>Committee not found</h1><p><Link to="/committees">All committees</Link></p></main>;
   if (info.status === "error") return <main className="page"><p className="notice">Couldn't load this committee right now.</p></main>;
   if (info.status === "loading") return <main className="page"><p>Loading…</p></main>;
-  const { committee: c, subs, roster, rosterCongress } = info;
+  const { committee: c, subs, roster, rosterCongress, events } = info;
   const sides = ["majority", "minority"].map((s) => [s, roster.filter((r) => r.side === s)]).filter(([, l]) => l.length);
   const chamberName = { house: "House", senate: "Senate", joint: "Joint" }[c.chamber] ?? c.chamber;
 
@@ -66,6 +68,21 @@ export default function Committee() {
       <p className="fine"><Link to="/committees">Committees</Link>{c.parent && <> · <Link to={`/committee/${c.parent.committee_id}`}>{c.parent.name}</Link></>}</p>
       <h1>{c.chamber === "joint" ? c.name : `${chamberName} ${c.name}`}</h1>
       {c.url && <p className="fine"><a href={c.url}>Committee website</a></p>}
+
+      {events.length > 0 && (
+        <section className="section">
+          <h2>Coming up</h2>
+          <ul className="plain">
+            {events.map((e) => (
+              <li key={e.event_id}>
+                <strong>{date(e.event_date)}</strong>{e.event_time && <> {e.event_time} ET</>} · {e.kind === "markup" ? "Markup" : e.kind === "hearing" ? "Hearing" : "Meeting"}
+                {e.committee_id !== c.committee_id && <> · {e.committee_name}</>}: <a href={e.source_url}>{e.title}</a>
+                {e.status && e.status !== "Scheduled" && <strong> ({e.status})</strong>}
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
 
       {subs.length > 0 && (
         <section className="section">

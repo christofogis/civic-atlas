@@ -13,7 +13,7 @@ const PAGES = [
   ["/members", ["Members of Congress", "California"]],
   ["/committees", ["Committees", "Senate"]],
   ["/committee/SSFI", ["Members", "Bills referred"]],
-  ["/week", ["This week in Congress", "Roll-call votes"]],
+  ["/week", ["This week in Congress", "Coming up", "Committee hearings and markups"]],
   ["/search?q=padilla", ["Alex Padilla"]],
   ["/compare?a=P000145&b=S000033", ["Votes where they differed"]],
   ["/glossary", ["Cloture"]],

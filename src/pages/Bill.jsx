@@ -14,7 +14,8 @@ const filingUrl = (uuid) => `https://lda.gov/filings/public/filing/${uuid}/print
 async function loadBill(congress, type, number) {
   const one = (q) => q.then(({ data, error }) => { if (error) throw error; return data; });
   const key = (q) => q.eq("congress", congress).eq("bill_type", type).eq("number", number);
-  const [bill, sponsor, cosponsors, votes, lobbying, lobbyCount, freshness] = await Promise.all([
+  const weekAgo = new Date(Date.now() - 7 * 864e5).toISOString().slice(0, 10);
+  const [bill, sponsor, cosponsors, votes, lobbying, lobbyCount, freshness, scheduled] = await Promise.all([
     one(key(db.from("bills").select("*")).maybeSingle()),
     one(key(db.from("bill_sponsor_details").select("*")).maybeSingle()),
     one(key(db.from("bill_cosponsor_details").select("*")).order("sponsored_date").order("last_name")),
@@ -23,8 +24,10 @@ async function loadBill(congress, type, number) {
     one(key(db.from("bill_lobbying").select("*")).order("quarters", { ascending: false }).order("client_name").limit(1000)),
     one(key(db.from("bill_lobbying_counts").select("clients")).maybeSingle()),
     one(db.from("data_freshness").select("*")),
+    one(db.from("upcoming_events").select("event_id,chamber,kind,event_date,event_time,week_of,category,committee_id,committee_name,title,source_url")
+      .contains("bill_refs", [`${congress}-${type}-${number}`]).gte("event_date", weekAgo).order("event_date")),
   ]);
-  return { bill, sponsor, cosponsors, votes, lobbying, lobbyTotal: lobbyCount?.clients ?? lobbying.length, freshness };
+  return { bill, sponsor, cosponsors, votes, lobbying, lobbyTotal: lobbyCount?.clients ?? lobbying.length, freshness, scheduled };
 }
 
 function Section({ title, source, children }) {
@@ -58,7 +61,7 @@ export default function Bill() {
   if (state.status === "missing") return <main className="page"><h1>Bill not found</h1><p>Bills from the 118th Congress (2023) on are covered. <Link to="/">Back to search</Link></p></main>;
   if (state.status === "error") return <main className="page"><p className="notice">Couldn't load this page right now. Try again shortly.</p></main>;
 
-  const { bill: b, sponsor, cosponsors, votes, lobbying, lobbyTotal, freshness } = state.data;
+  const { bill: b, sponsor, cosponsors, votes, lobbying, lobbyTotal, freshness, scheduled } = state.data;
   const fresh = Object.fromEntries(freshness.map((f) => [f.job, f.last_success_at]));
   const updated = (job) => (fresh[job] ? ` Updated ${date(fresh[job])}.` : "");
   const current = cosponsors.filter((x) => !x.withdrawn_date);
@@ -85,6 +88,21 @@ export default function Bill() {
       </header>
 
       <StatusBar bill={b} />
+      {scheduled.length > 0 && (
+        <div className="notice-box">
+          <strong>Scheduled</strong>
+          <ul className="plain">
+            {scheduled.map((e) => (
+              <li key={e.event_id}>
+                {e.kind === "floor"
+                  ? <>On the House floor schedule for the week of {date(e.event_date)}{e.category === "suspension" ? " as a fast-track vote (needs two-thirds)" : e.category === "rule" ? " under a rule" : ""}.</>
+                  : <>{e.chamber === "house" ? "House" : "Senate"} {e.committee_id ? <Link to={`/committee/${e.committee_id}`}>{e.committee_name}</Link> : e.committee_name} {e.kind}, {date(e.event_date)}{e.event_time ? ` at ${e.event_time} ET` : ""}.</>}
+                {" "}<a href={e.source_url} className="fine">Schedule</a>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
 
       <Section title="Summary" source={<>Congressional Research Service, via GovInfo Bill Status. <Explain id="crs-summary">About these summaries</Explain></>}>
         {b.crs_summary

@@ -5,6 +5,7 @@ import { billLabel, date } from "../lib/format.js";
 import { isFinal } from "../lib/voteKind.js";
 import { KindLabel } from "../components/Explain.jsx";
 import { myRepresentatives } from "../lib/myReps.js";
+import ComingUp from "../components/ComingUp.jsx";
 
 const DAY = 86400000;
 const iso = (d) => d.toISOString().slice(0, 10);
@@ -20,7 +21,7 @@ export default function Week() {
     (async () => {
       const { data: last, error: e1 } = await db.from("votes").select("voted_at").order("voted_at", { ascending: false }).limit(1);
       if (e1) throw e1;
-      if (!last.length) { setState({ status: "done", votes: [] }); return; }
+      if (!last.length) { setState({ status: "done", votes: [], myCommittees: new Set() }); return; }
       const end = new Date(last[0].voted_at);
       const start = new Date(end.getTime() - 6 * DAY);
       const from = iso(start), to = iso(end);
@@ -34,18 +35,24 @@ export default function Week() {
       ]);
       for (const r of [votes, laws, passed, vetoed]) if (r.error) throw r.error;
       let positions = [];
+      let myCommittees = new Set();
+      if (mine.size) {
+        const { data: cm } = await db.from("committee_memberships").select("committee_id,congress").in("bioguide_id", [...mine]);
+        const latest = Math.max(0, ...(cm ?? []).map((r) => r.congress));
+        myCommittees = new Set((cm ?? []).filter((r) => r.congress === latest).map((r) => r.committee_id));
+      }
       if (mine.size && votes.data.length) {
         const { data } = await db.from("vote_position_details").select("vote_id,bioguide_id,name,position")
           .in("vote_id", votes.data.map((v) => v.vote_id)).in("bioguide_id", [...mine]);
         positions = data ?? [];
       }
-      setState({ status: "done", from, to, votes: votes.data, laws: laws.data, passed: passed.data, vetoed: vetoed.data, positions });
+      setState({ status: "done", from, to, votes: votes.data, laws: laws.data, passed: passed.data, vetoed: vetoed.data, positions, myCommittees });
     })().catch(() => setState({ status: "error" }));
   }, [mine]);
 
   if (state.status === "loading") return <main className="page"><h1>This week in Congress</h1><p>Loading…</p></main>;
   if (state.status === "error") return <main className="page"><h1>This week in Congress</h1><p className="notice">Couldn't load this right now.</p></main>;
-  const { votes, laws = [], passed = [], vetoed = [], positions = [] } = state;
+  const { votes, laws = [], passed = [], vetoed = [], positions = [], myCommittees } = state;
   const shown = votes.filter((v) => allVotes || isFinal(v));
   const billLink = (b) => <Link to={`/bill/${b.congress}/${b.bill_type}/${b.number}`}>{billLabel(b)}</Link>;
   const passedWhere = (b) => [b.passed_house_date >= state.from && b.passed_house_date <= state.to && `House (${date(b.passed_house_date)})`,
@@ -54,9 +61,14 @@ export default function Week() {
   return (
     <main className="page wide">
       <h1>This week in Congress</h1>
+      <section className="section">
+        <h2>Coming up</h2>
+        <ComingUp myCommittees={myCommittees} />
+      </section>
+
       {votes.length === 0 ? <p>No votes on record yet.</p> : (
         <>
-          <p className="lede">The most recent week with recorded votes: {date(state.from)} to {date(state.to)}.</p>
+          <h2 className="week-head">Last week with votes: {date(state.from)} to {date(state.to)}</h2>
 
           <section className="section">
             <h2>Became law</h2>
