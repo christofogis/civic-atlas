@@ -8,6 +8,7 @@
 //   node scripts/ingest/bills.mjs --dry-run --limit 3   # list + parse a few, write nothing
 //
 // Covers the 118th Congress on, the same window as votes.
+import { textVersions } from "../../lib/billtext.js";
 import { XMLParser } from "fast-xml-parser";
 import { getClient, fetchAll, upsertBatches, withRun } from "./lib.mjs";
 import { billProgress } from "../../lib/billprogress.js";
@@ -74,7 +75,9 @@ export function parseBillStatus(xml) {
   const shortTitle = ["as Enacted", "as Passed", "as Reported", "as Introduced", ""]
     .map((stage) => titles.find((t) => String(t.titleType ?? "").startsWith("Short Title") && !/portions/i.test(t.titleType) && String(t.titleType).includes(stage)))
     .find(Boolean);
+  const progress = billProgress(list(b.actions?.item), b.laws?.item);
   return {
+    versions: textVersions(b.textVersions?.item, { congress, bill_type, number, presented_date: progress.presented_date }),
     bill: {
       congress, bill_type, number,
       title: str(b.title) ?? "(untitled)",
@@ -87,7 +90,7 @@ export function parseBillStatus(xml) {
       // Text sits at summary > text in some files and summary > cdata > text in others.
       crs_summary: plain(summaries[0]?.text ?? summaries[0]?.cdata?.text),
       source_url: billPage(congress, bill_type, number),
-      ...billProgress(list(b.actions?.item), b.laws?.item),
+      ...progress,
     },
     committees: [...committees.values()],
     // One row per person: if someone withdrew and later re-joined, the active entry wins.
@@ -165,16 +168,18 @@ async function main() {
     const known = new Set((await fetchAll(db, "members", "bioguide_id")).map((m) => m.bioguide_id));
     const knownCommittees = new Set((await fetchAll(db, "committees", "committee_id")).map((c) => c.committee_id));
     const unknownCommittees = new Set();
-    let referrals = [];
+    let referrals = [], versions = [];
     let bills = [], cosponsors = [], billCount = 0, cosponsorCount = 0, unknownPeople = 0, unparsed = 0;
     const flush = async () => {
       if (!bills.length) return;
-      const b = bills, c = cosponsors, r = referrals;
-      bills = []; cosponsors = []; referrals = [];
+      const b = bills, c = cosponsors, r = referrals, v = versions;
+      bills = []; cosponsors = []; referrals = []; versions = [];
       if (dryRun) return;
       await upsertBatches(db, "bills", b, "congress,bill_type,number");
       await upsertBatches(db, "bill_cosponsors", c, "congress,bill_type,number,bioguide_id");
       await upsertBatches(db, "bill_committees", r, "congress,bill_type,number,committee_id");
+      // full_text is left out so a re-read doesn't reset what bill-text.mjs found.
+      await upsertBatches(db, "bill_text_versions", v, "congress,bill_type,number,version_code");
     };
 
     await mapLimit(work, CONCURRENCY, async (f) => {
@@ -186,6 +191,7 @@ async function main() {
       const cos = parsed.cosponsors.filter((c) => known.has(c.bioguide_id) || (unknownPeople++, false));
       if (dryRun && billCount < 2) console.log("sample:", JSON.stringify({ ...bill, crs_summary: bill.crs_summary?.slice(0, 120) }), `cosponsors=${cos.length}`, "committees:", JSON.stringify(parsed.committees));
       bills.push(bill);
+      versions.push(...parsed.versions);
       cosponsors.push(...cos);
       referrals.push(...parsed.committees.filter((x) => knownCommittees.has(x.committee_id) || (unknownCommittees.add(x.committee_id), false)));
       billCount++;
