@@ -19,6 +19,7 @@ const PAGES = [
   ["/compare?a=P000145&b=S000033", ["Votes where they differed"]],
   ["/glossary", ["Cloture"]],
   ["/corrections", ["What was wrong"]],
+  ["/nominations", ["Nominations", "Confirmation"]],
   ["/topics", ["Topics", "Health"]],
   ["/elections?state=CA", ["who has filed", "Senate"]],
   ["/topic/health", ["Became law", "Recent roll-call votes"]],

@@ -47,6 +47,7 @@ export default function Layout() {
           <Link to="/compare">Compare two members</Link>
           <Link to="/quiz">Quiz</Link>
           <Link to="/elections">2028 candidates</Link>
+          <Link to="/nominations">Nominations</Link>
           <ReportError />
         </div>
       </footer>

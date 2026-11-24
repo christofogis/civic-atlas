@@ -1,13 +1,14 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link, useParams, useSearchParams } from "react-router-dom";
 import { db } from "../lib/db.js";
+import DownloadCsv from "../components/DownloadCsv.jsx";
 import { KindLabel } from "../components/Explain.jsx";
 import { date, billLabel, ordinal } from "../lib/format.js";
 import { voteKind, isFinal } from "../lib/voteKind.js";
 
 const BIOGUIDE = /^[A-Z][0-9]{6}$/;
 const PAGE = 50;
-const NOMINATIONS = "Nominations";
+const NOMINATIONS = "Nominations";  // also browsable at /nominations
 const NO_BILL = "Other votes (no bill or nominee)";
 const COLUMNS = "vote_id,chamber,congress,voted_at,question,description,document_name,result,source_url,position,bill_congress,bill_type,bill_number,policy_area,bill_title";
 
@@ -153,6 +154,11 @@ export default function MemberVotes() {
               </tbody>
             </table>
           )}
+          <DownloadCsv rows={filtered} filename={`votes-${bioguide}-${congress}`} columns={[
+            ["Date", (v) => v.voted_at?.slice(0, 10)], ["Chamber", (v) => v.chamber], ["Question", (v) => v.question],
+            ["Bill", (v) => (v.bill_type ? `${v.bill_type.toUpperCase()} ${v.bill_number}` : "")], ["Bill title", (v) => v.bill_title],
+            ["Issue", (v) => v.policy_area], ["Vote", (v) => v.position], ["Result", (v) => v.result], ["Source", (v) => v.source_url],
+          ]} />
           {filtered.length > shown && (
             <p><button className="link" onClick={() => setShown(shown + PAGE)}>Show {Math.min(PAGE, filtered.length - shown)} more</button></p>
           )}

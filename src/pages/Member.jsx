@@ -185,6 +185,7 @@ export default function Member() {
   const { bioguide } = useParams();
   const [state, setState] = useState({ status: "loading" });
   const [finalOnly, setFinalOnly] = useState(false);
+  const [pickedCycle, setPickedCycle] = useState(null);
   const { hash } = useLocation();
   const navigate = useNavigate();
   const tab = TABS.some(([id]) => `#${id}` === hash) ? hash.slice(1) : "overview";
@@ -203,7 +204,9 @@ export default function Member() {
 
   const { member: m, terms, seat, memberships, votes, bills, sponsoredCount, cosponsoredCount, finance, freshness, voteStats, medians, billStats, billMedians, trades, filings: scannedFilings, tradeSummary: ts, bySize, employers, pacs, outside, laws, candidacies } = state.data;
   // Finance detail is shown for the most recent cycle with detail on file.
-  const detailCycle = Math.max(0, ...[...bySize, ...employers, ...pacs, ...outside].map((r) => r.cycle));
+  // Cycles with detail on file, newest first; the visitor can switch between them.
+  const detailCycles = [...new Set([...bySize, ...employers, ...pacs, ...outside].map((r) => r.cycle))].sort((a, z) => z - a);
+  const detailCycle = detailCycles.includes(pickedCycle) ? pickedCycle : (detailCycles[0] ?? 0);
   const inCycle = (rows) => rows.filter((r) => r.cycle === detailCycle);
   const delegate = latest => latest?.chamber === "house" && TERRITORIES.has(latest.state);
   const name = m.official_full_name ?? `${m.first_name} ${m.last_name}`;
@@ -440,6 +443,11 @@ export default function Member() {
               ))}
             </tbody>
           </table>
+        )}
+        {detailCycles.length > 1 && (
+          <div className="toggle" role="group" aria-label="Election cycle to show in detail">
+            {detailCycles.map((c) => <button key={c} type="button" className={c === detailCycle ? "on" : ""} onClick={() => setPickedCycle(c)}>{c} cycle</button>)}
+          </div>
         )}
         {detailCycle > 0 && <FinanceDetail cycle={detailCycle} bySize={inCycle(bySize)} employers={inCycle(employers)} pacs={inCycle(pacs)} outside={inCycle(outside)} fecId={finance.find((f) => f.cycle === detailCycle)?.fec_candidate_id} />}
       </Section>

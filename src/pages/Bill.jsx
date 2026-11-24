@@ -1,6 +1,7 @@
 import { Fragment, useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { db } from "../lib/db.js";
+import DownloadCsv from "../components/DownloadCsv.jsx";
 import { date, billLabel, ordinal, partyTag } from "../lib/format.js";
 import VoteBreakdown from "../components/VoteBreakdown.jsx";
 import StatusBar from "../components/StatusBar.jsx";
@@ -180,6 +181,11 @@ export default function Bill() {
                 })}
               </tbody>
             </table>
+            <DownloadCsv rows={lobbying} filename={`lobbying-${congress}-${type}${number}`} columns={[
+              ["Client", (l) => l.client_name], ["Lobbying done by", (l) => l.registrants.join("; ")], ["Quarters", (l) => l.quarters],
+              ["First quarter", (l) => quarter(l.first_quarter_key)], ["Last quarter", (l) => quarter(l.last_quarter_key)],
+              ["Latest report", (l) => filingUrl(l.latest_filing_uuid)],
+            ]} />
             {lobbying.length > LOBBY_PREVIEW && !allLobbying && (
               <p><button className="link" onClick={() => setAllLobbying(true)}>
                 {lobbying.length < lobbyTotal ? `Show ${lobbying.length.toLocaleString()} with the most quarters` : `Show all ${lobbying.length.toLocaleString()}`}

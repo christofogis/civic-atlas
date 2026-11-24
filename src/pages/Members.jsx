@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { db } from "../lib/db.js";
+import DownloadCsv from "../components/DownloadCsv.jsx";
 import { STATE_NAMES, partyTag, date } from "../lib/format.js";
 
 // Every member since 2023, by state. Defaults to those serving now.
@@ -54,6 +55,11 @@ export default function Members() {
       {error && <p className="notice">Couldn't load members right now.</p>}
       {!rows && !error && <p>Loading…</p>}
       {rows && <p className="fine">{count} member{count === 1 ? "" : "s"}. Source: unitedstates/congress-legislators.</p>}
+      <DownloadCsv rows={groups.flatMap(([, list]) => list)} filename="members" columns={[
+        ["Name", (m) => m.name], ["Party", (m) => m.party], ["Chamber", (m) => m.chamber], ["State", (m) => m.state],
+        ["District", (m) => (m.chamber === "house" ? m.district : "")], ["Serving", (m) => (m.serving ? "yes" : "no")],
+        ["Bioguide ID", (m) => m.bioguide_id], ["Page", (m) => `${window.location.origin}/member/${m.bioguide_id}`],
+      ]} />
       {groups.map(([st, list]) => (
         <section key={st} className="section">
           <h2>{STATE_NAMES[st] ?? st}</h2>

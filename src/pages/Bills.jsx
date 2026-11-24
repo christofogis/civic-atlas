@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { db } from "../lib/db.js";
+import DownloadCsv from "../components/DownloadCsv.jsx";
 import { POLICY_AREAS } from "../lib/policyAreas.js";
 import { congressOn, congressYears } from "../../lib/congress.js";
 import { billLabel, ordinal, partyTag, date } from "../lib/format.js";
@@ -85,6 +86,13 @@ export default function Bills() {
           </tbody>
         </table>
       )}
+      <DownloadCsv rows={state.rows} filename={`bills-${congress}${issue ? `-${issue.toLowerCase().replace(/[^a-z]+/g, "-")}` : ""}-p${page + 1}`}
+        note="this page of results" columns={[
+        ["Bill", (b) => `${b.bill_type.toUpperCase()} ${b.number}`], ["Congress", (b) => b.congress], ["Title", (b) => b.short_title ?? b.title],
+        ["Issue", (b) => b.policy_area], ["Sponsor", (b) => b.sponsor_name], ["Sponsor party", (b) => b.sponsor_party], ["Sponsor state", (b) => b.sponsor_state],
+        ["Introduced", (b) => b.introduced_date], ["Latest action date", (b) => b.latest_action_date], ["Latest action", (b) => b.latest_action_text],
+        ["Organizations lobbying", (b) => b.lobbying_clients], ["Page", (b) => `${window.location.origin}/bill/${b.congress}/${b.bill_type}/${b.number}`],
+      ]} />
       <p className="pager">
         {page > 0 && <button className="link" onClick={() => set("page", String(page - 1))}>← Previous</button>}
         {state.rows.length === PAGE && <button className="link" onClick={() => set("page", String(page + 1))}>Next →</button>}
