@@ -66,7 +66,7 @@ export default function Topic() {
           <section className="section">
             <h2>{tr("Became law", "Se convirtieron en ley")}</h2>
             {state.laws.length === 0 ? <p>{tr("None yet.", "Ninguno todavía.")}</p> : (
-              <ul className="plain">{state.laws.map((b) => <li key={b.number + b.bill_type}>{link(b)} <Clamp lines={2}>{b.short_title ?? b.title}</Clamp> <span className="fine">· {b.law_number}, {date(b.became_law_date)}</span></li>)}</ul>
+              <ul className="bare items">{state.laws.map((b) => <li key={b.number + b.bill_type} className="item"><span className="item-head">{link(b)} <span className="fine">· {b.law_number}, {date(b.became_law_date)}</span></span><Clamp lines={2}>{b.short_title ?? b.title}</Clamp></li>)}</ul>
             )}
           </section>
 
@@ -74,7 +74,7 @@ export default function Topic() {
             <h2>{tr("Passed one chamber or more, not yet law", "Aprobados por una o más cámaras, todavía no son ley")}</h2>
             {state.passed.length === 0 ? <p>{tr("None.", "Ninguno.")}</p> : (
               <ul className="plain">{state.passed.map((b) => (
-                <li key={b.number + b.bill_type}>{link(b)} <Clamp lines={2}>{b.short_title ?? b.title}</Clamp>
+                <li key={b.number + b.bill_type} className="item">{link(b)} <Clamp lines={2}>{b.short_title ?? b.title}</Clamp>
                   <div className="fine">{[b.passed_house_date && tr(`Passed House ${date(b.passed_house_date)}`, `Aprobado por la Cámara el ${date(b.passed_house_date)}`), b.passed_senate_date && tr(`Passed Senate ${date(b.passed_senate_date)}`, `Aprobado por el Senado el ${date(b.passed_senate_date)}`)].filter(Boolean).join(" · ")}</div></li>
               ))}</ul>
             )}
@@ -84,7 +84,7 @@ export default function Topic() {
           <section className="section">
             <h2>{tr("Bills the most organizations lobbied on", "Proyectos con más organizaciones haciendo cabildeo")}</h2>
             {state.lobbied.length === 0 ? <p>{tr("No lobbying reports name bills on this topic yet.", "Ningún informe de cabildeo menciona todavía proyectos sobre este tema.")}</p> : (
-              <ul className="plain">{state.lobbied.map((b) => <li key={b.number + b.bill_type}>{link(b)} <Clamp lines={2}>{b.short_title ?? b.title}</Clamp> <span className="fine">· {b.lobbying_clients.toLocaleString()} {tr("organizations", "organizaciones")}</span></li>)}</ul>
+              <ul className="bare items">{state.lobbied.map((b) => <li key={b.number + b.bill_type} className="item"><span className="item-head">{link(b)} <span className="fine">· {b.lobbying_clients.toLocaleString()} {tr("organizations", "organizaciones")}</span></span><Clamp lines={2}>{b.short_title ?? b.title}</Clamp></li>)}</ul>
             )}
             <p className="fine">{tr("From LD-2 lobbying reports that name the bill. A listing doesn't say whether the organization supported or opposed it.", "De informes de cabildeo LD-2 que mencionan el proyecto. La mención no dice si la organización lo apoyaba o se oponía.")}</p>
           </section>

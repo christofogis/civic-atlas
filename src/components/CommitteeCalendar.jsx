@@ -11,7 +11,7 @@ import ComingUp from "./ComingUp.jsx";
 // month with each day's meetings, or the list. All times are Eastern, as Congress publishes them.
 // Past weeks and months show what happened, each meeting linking to its video and documents.
 const TZ = "America/New_York";
-const HOUR_PX = 52;
+const HOUR_PX = 66;
 const BLOCK_MIN = 60;    // meetings have a start time only; each is drawn as an hour
 const etFmt = new Intl.DateTimeFormat("en-CA", { timeZone: TZ, year: "numeric", month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit", hour12: false });
 const et = (iso) => {
@@ -77,6 +77,7 @@ function WeekGrid({ start, mine }) {
   };
   return (
     <>
+      <p className="fine cal-key"><span className="cal-swatch house" /> {tr("House", "Cámara")} <span className="cal-swatch senate" /> {tr("Senate", "Senado")}{mine.size > 0 && <> <span className="cal-swatch mine" /> {tr("your representatives' committees", "comités de sus representantes")}</>}</p>
       {rows.length === 0 && <p className="fine">{tr("No committee meetings on record for this week.", "No hay reuniones de comités registradas para esta semana.")}</p>}
       <div className="cal-week" style={{ "--days": days.length }}>
         <div className="cal-corner" />
@@ -92,12 +93,11 @@ function WeekGrid({ start, mine }) {
           <div key={d} className={`cal-day${d === today ? " today" : ""}`} style={{ height: hours.length * HOUR_PX }}>
             {hours.map((h) => <div key={h} className="cal-line" style={{ top: (h - startHour) * HOUR_PX }} />)}
             {placed(d).map((m) => (
-              <Link key={m.event_id} to={`/hearing/${m.event_id}`} title={m.title}
+              <Link key={m.event_id} to={`/hearing/${m.event_id}`} title={`${timeLabel(m.min)} · ${m.chamber === "house" ? tr("House", "Cámara") : tr("Senate", "Senado")} · ${committeeOf(m, names)}\n${m.title}`}
                 className={`cal-event ${m.chamber}${isMine(m, mine) ? " mine" : ""}${/postpon|cancel/i.test(m.status ?? "") ? " off" : ""}`}
                 style={{ top: ((m.min - startHour * 60) / 60) * HOUR_PX + 1, height: (BLOCK_MIN / 60) * HOUR_PX - 3,
                   left: `calc(${(100 / m.lanes) * m.lane}% + 2px)`, width: `calc(${100 / m.lanes}% - 4px)` }}>
-                <span className="cal-event-time">{timeLabel(m.min)} · {m.chamber === "house" ? tr("House", "Cámara") : tr("Senate", "Senado")}</span>
-                <span className="cal-event-committee">{committeeOf(m, names)}</span>
+                <span className="cal-event-committee">{committeeOf(m, names) || (m.chamber === "house" ? tr("House", "Cámara") : tr("Senate", "Senado"))}</span>
                 <span className="cal-event-title">{heading(m)}</span>
               </Link>
             ))}
