@@ -12,6 +12,10 @@ on:
         description: "Parse a few filings per chamber; write nothing"
         type: boolean
         default: false
+      full:
+        description: "Search the Senate from 2025, not just the last week"
+        type: boolean
+        default: false
 
 permissions:
   contents: read
@@ -38,6 +42,8 @@ jobs:
       - name: Trades
         env:
           DRY_RUN: ${{ inputs.dry_run }}
+          FULL: ${{ inputs.full }}
         run: |
           if [ "$DRY_RUN" = "true" ]; then node scripts/ingest/trades.mjs --dry-run --limit 6
+          elif [ "$FULL" = "true" ]; then node scripts/ingest/trades.mjs --full
           else node scripts/ingest/trades.mjs; fi

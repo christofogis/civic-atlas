@@ -11,6 +11,7 @@
 //   node scripts/ingest/trades.mjs                     # new filings since the last run
 //   node scripts/ingest/trades.mjs --dry-run --limit 5 # parse a few per chamber, write nothing
 //   node scripts/ingest/trades.mjs --chamber house     # one chamber only
+//   node scripts/ingest/trades.mjs --full              # Senate search from 2025 (repair/backfill)
 //
 // Filings are immutable (amendments arrive as new filings), so only unseen filing IDs are read.
 import { execFileSync } from "node:child_process";
@@ -243,7 +244,7 @@ async function main() {
       }
     }
     if (chambers.includes("senate")) {
-      const { data } = dryRun ? { data: null } : await db.from("ingest_runs").select("started_at").eq("job", "trades")
+      const { data } = dryRun || args.includes("--full") ? { data: null } : await db.from("ingest_runs").select("started_at").eq("job", "trades")
         .eq("status", "succeeded").order("started_at", { ascending: false }).limit(1);
       const sinceDate = data?.[0] ? new Date(new Date(data[0].started_at).getTime() - 7 * 86_400_000) : new Date(`${FROM_YEAR}-01-01`);
       const since = `${String(sinceDate.getUTCMonth() + 1).padStart(2, "0")}/${String(sinceDate.getUTCDate()).padStart(2, "0")}/${sinceDate.getUTCFullYear()} 00:00:00`;
