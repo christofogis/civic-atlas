@@ -8,6 +8,8 @@ const PATHS = (process.argv[3] ?? "/member/P000145").split(",");
 const WIDTH = Number(process.argv[4] ?? 390);
 const browser = await chromium.launch();
 const page = await browser.newPage({ viewport: { width: WIDTH, height: 844 }, deviceScaleFactor: 1 });
+page.on("response", async (r) => { if (r.status() >= 400 && !r.url().includes("challenges.cloudflare.com")) console.log(`BAD ${r.status()} ${decodeURIComponent(r.url()).slice(0, 300)} ${(await r.text().catch(() => "")).slice(0, 300)}`); });
+page.on("pageerror", (e) => console.log(`PAGEERROR ${e.message}`));
 // A returning visitor: representatives remembered from an earlier lookup (California).
 await page.goto(BASE);
 await page.evaluate(() => localStorage.setItem("civic-atlas:my-reps", JSON.stringify(["P000145", "S001150"])));
