@@ -59,3 +59,8 @@ button:disabled { opacity: 0.7; cursor: default; }
 .finance-detail { margin-top: 18px; }
 .finance-detail h3 { font-size: 1rem; margin: 16px 0 6px; }
 .finance-detail h4 { font-size: 0.9rem; margin: 14px 0 4px; color: var(--muted); font-weight: 600; }
+.bill-title { font-size: 1.6rem; }
+ul.columns { columns: 2; column-gap: 24px; }
+ul.columns li { break-inside: avoid; }
+@media (max-width: 600px) { ul.columns { columns: 1; } }
+button.link { background: none; border: 0; padding: 0; color: var(--accent); text-decoration: underline; cursor: pointer; font-size: inherit; }

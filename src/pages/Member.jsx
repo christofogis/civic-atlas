@@ -283,7 +283,7 @@ export default function Member() {
           <ul className="plain">
             {bills.map((b) => (
               <li key={`${b.congress}-${b.bill_type}-${b.number}`}>
-                <a href={b.source_url}>{billLabel(b)}</a> ({ordinal(b.congress)}) · {b.title}
+                <Link to={`/bill/${b.congress}/${b.bill_type}/${b.number}`}>{billLabel(b)}</Link> ({ordinal(b.congress)}) · {b.title}
                 <div className="fine">Introduced {date(b.introduced_date)}{b.latest_action_text && <> · Latest action {date(b.latest_action_date)}: {b.latest_action_text}</>}</div>
               </li>
             ))}

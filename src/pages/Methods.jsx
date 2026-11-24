@@ -98,6 +98,29 @@ export default function Methods() {
       </ul>
       <p>No individual donor is named here, and FEC rules bar using donor names for soliciting contributions or commercial purposes.</p>
 
+      <h2 id="lobbying">Lobbying on bills</h2>
+      <p>
+        Under the Lobbying Disclosure Act, lobbying firms and organizations that lobby for themselves file a
+        report each quarter for each client. The report lists the issues they lobbied on, often naming bills
+        by number. Bill pages list the clients whose reports name that bill, the firms that did the lobbying,
+        and the quarters it was reported.
+      </p>
+      <p>
+        Bill numbers are read from the report's text (for example "H.R. 4791" or "S.1462"). A number is matched
+        to the Congress in session in the report's year, and only bills this site tracks are kept. A report
+        that names a bill by title alone, without its number, isn't counted. When a report is amended, only the
+        latest version is used.
+      </p>
+      <p>
+        A report lists the bill; it doesn't say whether the client supported or opposed it, or what was
+        asked for. Reports state income or expenses for the whole report, covering every issue on it, so this
+        site doesn't attribute dollar amounts to individual bills. Each listing links to the report itself.
+      </p>
+      <p>
+        Source: LDA.gov, run by the Secretary of the Senate and the Clerk of the House. The Senate Office of
+        Public Records can't vouch for data or analyses derived from these reports after they're retrieved.
+      </p>
+
       <h2 id="trades">Stock trades</h2>
       <p>
         Under the STOCK Act, members of Congress must report each purchase, sale or exchange of stocks,

@@ -37,3 +37,11 @@ export function ordinal(n) {
   const s = ["th", "st", "nd", "rd"], v = n % 100;
   return n + (s[(v - 20) % 10] || s[v] || s[0]);
 }
+
+// "R-TX-19", "D-CA", "I-VT": party initial, state, and House district (none for senators,
+// delegates or at-large seats). Same form for everyone.
+export function partyTag(p) {
+  const party = { Democrat: "D", Republican: "R", Independent: "I", Libertarian: "L" }[p.party] ?? p.party?.[0] ?? "?";
+  const district = p.chamber === "house" && p.district > 0 && !TERRITORIES.has(p.state) ? `-${p.district}` : "";
+  return `${party}-${p.state}${district}`;
+}
