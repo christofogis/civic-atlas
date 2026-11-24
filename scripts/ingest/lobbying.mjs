@@ -144,7 +144,11 @@ async function run(db, counts) {
   if (quarters) {
     for (const q of quarters.split(",")) {
       const [y, n] = q.trim().split("-").map(Number);
-      queries.push({ filing_year: String(y), filing_period: PERIODS[n - 1] });
+      // Reports, terminations, then amendments (incl. "no activity" ones, which can remove
+      // bills an earlier version listed). Skips registrations, which have no quarterly activity.
+      for (const t of [`Q${n}`, `${n}T`, `${n}A`, `${n}@`, `${n}AY`, `${n}@Y`]) {
+        queries.push({ filing_year: String(y), filing_type: t });
+      }
     }
   } else {
     const { data: prev } = await db.from("ingest_runs").select("started_at")
