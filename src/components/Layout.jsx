@@ -20,6 +20,7 @@ export default function Layout() {
           <nav>
             <NavLink to="/members">Members</NavLink>
             <NavLink to="/bills">Bills</NavLink>
+            <NavLink to="/committees">Committees</NavLink>
             <NavLink to="/compare">Compare</NavLink>
             <NavLink to="/methods">Methods</NavLink>
           </nav>

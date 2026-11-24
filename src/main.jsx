@@ -10,6 +10,8 @@ import Search from "./pages/Search.jsx";
 import Members from "./pages/Members.jsx";
 import Bills from "./pages/Bills.jsx";
 import Compare from "./pages/Compare.jsx";
+import Committees from "./pages/Committees.jsx";
+import Committee from "./pages/Committee.jsx";
 import Layout from "./components/Layout.jsx";
 import NotFound from "./pages/NotFound.jsx";
 import "./styles.css";
@@ -24,6 +26,8 @@ createRoot(document.getElementById("root")).render(
         <Route path="/members" element={<Members />} />
         <Route path="/bills" element={<Bills />} />
         <Route path="/compare" element={<Compare />} />
+        <Route path="/committees" element={<Committees />} />
+        <Route path="/committee/:id" element={<Committee />} />
         <Route path="/member/:bioguide" element={<Member />} />
         <Route path="/member/:bioguide/votes" element={<MemberVotes />} />
         <Route path="/bill/:congress/:type/:number" element={<Bill />} />
