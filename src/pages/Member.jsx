@@ -225,12 +225,6 @@ export default function Member() {
         ) : (
           <p className="lede">Not currently serving. Most recent: {seatLabel(latest)}, {date(latest.start_date)} – {date(latest.end_date)} ({latest.party})</p>
         )}
-        <Follow feed={`/api/feed/member/${m.bioguide_id}`} calendar={`/api/calendar/member/${m.bioguide_id}`}
-          calendarLabel="Add their committees' hearings to your calendar" />
-        <p className="fine">
-          <a href={m.source_url}>Biographical Directory of the U.S. Congress</a>
-          {seat?.url && <> · <a href={seat.url}>Official website</a></>}
-        </p>
       </header>
 
       <nav className="tabs" role="tablist" aria-label="Sections of this page">
@@ -244,12 +238,14 @@ export default function Member() {
 
       <div role="tabpanel" id={`panel-${tab}`} aria-labelledby={`tab-${tab}`}>
       {tab === "overview" && <>
+      <Follow feed={`/api/feed/member/${m.bioguide_id}`} calendar={`/api/calendar/member/${m.bioguide_id}`}
+        calendarLabel="Add their committees' hearings to your calendar" />
       {seat?.seat_status === "serving" && <Contact term={terms[0]} member={m} />}
 
       <AtAGlance terms={terms} voteStats={voteStats} medians={medians} billStats={billStats} laws={laws}
         finance={finance} bySize={bySize} tradeSummary={ts} delegate={delegate(latest)} />
 
-      <Section title="Service in Congress" source={`unitedstates/congress-legislators.${updated("members")}`}>
+      <Section title="Service in Congress" source={<>unitedstates/congress-legislators.{updated("members")} Biography: <a href={m.source_url}>Biographical Directory of the U.S. Congress</a>.</>}>
         {seat?.seat_status === "serving" && (() => {
           const upIn = seatNextUp(seat.chamber, seat.senate_class);
           const filed = candidacies.find((c) => c.election_year === upIn);

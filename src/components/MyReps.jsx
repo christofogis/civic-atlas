@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { db } from "../lib/db.js";
 import { partyTag, date } from "../lib/format.js";
 import { forgetRepresentatives } from "../lib/myReps.js";
+import { KindLabel } from "./Explain.jsx";
 
 // The home page for a returning visitor: their representatives, the latest vote each cast,
 // and how many hearings their committees have coming up.
@@ -14,7 +15,7 @@ export default function MyReps({ ids, onForget }) {
     const today = new Date().toISOString().slice(0, 10);
     Promise.all([
       db.from("member_directory").select("bioguide_id,name,chamber,state,district,party,serving").in("bioguide_id", list),
-      ...list.map((id) => db.from("member_votes").select("bioguide_id,position,question,voted_at,bill_congress,bill_type,bill_number,bill_title")
+      ...list.map((id) => db.from("member_votes").select("bioguide_id,chamber,position,question,description,document_name,voted_at,bill_congress,bill_type,bill_number,bill_title")
         .eq("bioguide_id", id).order("voted_at", { ascending: false }).limit(1)),
       db.from("committee_memberships").select("bioguide_id,committee_id,congress").in("bioguide_id", list),
     ]).then(async (res) => {
@@ -36,7 +37,7 @@ export default function MyReps({ ids, onForget }) {
   return (
     <section className="my-reps">
       <h2>Your representatives</h2>
-      <ul className="plain">
+      <ul className="bare">
         {rows.people.map((p) => {
           const v = rows.latest[p.bioguide_id];
           return (
@@ -44,9 +45,10 @@ export default function MyReps({ ids, onForget }) {
               <Link to={`/member/${p.bioguide_id}`} className="my-rep-name">{p.name}</Link> <span className="fine">{p.chamber === "senate" ? "Senator" : p.district > 0 || p.district === 0 ? "Representative" : ""} ({partyTag(p)})</span>
               {v && (
                 <div className="fine">
-                  Latest vote, {date(v.voted_at)}: <strong>{v.position}</strong> on {v.bill_type
+                  Latest vote, {date(v.voted_at)}: <strong>{v.position}</strong> · <KindLabel v={v} />{" "}
+                  {v.bill_type
                     ? <Link to={`/bill/${v.bill_congress}/${v.bill_type}/${v.bill_number}`}>{v.bill_title ?? v.question}</Link>
-                    : v.question}
+                    : v.description ?? v.question}
                 </div>
               )}
             </li>
