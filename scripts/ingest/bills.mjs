@@ -49,10 +49,35 @@ export function parseBillStatus(xml) {
   const summaries = list(b.summaries?.summary ?? b.summaries?.billSummaries?.item)
     .sort((a, z) => String(z.updateDate ?? z.actionDate ?? "").localeCompare(String(a.updateDate ?? a.actionDate ?? "")));
   const sponsor = list(b.sponsors?.item)[0];
+  // Committees the bill was referred to (and their subcommittees). systemCode "hsag00" is the
+  // full committee HSAG; "hsag15" is its subcommittee HSAG15, matching committees.committee_id.
+  const committees = new Map();
+  const addCommittee = (c) => {
+    const code = String(c?.systemCode ?? "").toUpperCase();
+    if (!/^[HSJ][A-Z]{3}\d{2}$/.test(code)) return;
+    const id = code.endsWith("00") ? code.slice(0, 4) : code;
+    const acts = list(c.activities?.item);
+    const dates = acts.map((a) => str(a.date)?.slice(0, 10)).filter(Boolean).sort();
+    committees.set(id, {
+      congress, bill_type, number, committee_id: id,
+      first_activity_date: dates[0] ?? null,
+      activities: [...new Set(acts.map((a) => str(a.name)).filter(Boolean))],
+    });
+  };
+  for (const c of list(b.committees?.item ?? b.committees?.billCommittees?.item)) {
+    addCommittee(c);
+    for (const sc of list(c.subcommittees?.item)) addCommittee(sc);
+  }
+  // Prefer a short title from the latest stage (enacted, then passed, then introduced).
+  const titles = list(b.titles?.item);
+  const shortTitle = ["as Enacted", "as Passed", "as Reported", "as Introduced", ""]
+    .map((stage) => titles.find((t) => String(t.titleType ?? "").startsWith("Short Title") && !/portions/i.test(t.titleType) && String(t.titleType).includes(stage)))
+    .find(Boolean);
   return {
     bill: {
       congress, bill_type, number,
       title: str(b.title) ?? "(untitled)",
+      short_title: str(shortTitle?.title),
       introduced_date: str(b.introducedDate),
       sponsor_bioguide_id: str(sponsor?.bioguideId),
       policy_area: str(b.policyArea?.name),
@@ -62,6 +87,7 @@ export function parseBillStatus(xml) {
       crs_summary: plain(summaries[0]?.text ?? summaries[0]?.cdata?.text),
       source_url: billPage(congress, bill_type, number),
     },
+    committees: [...committees.values()],
     // One row per person: if someone withdrew and later re-joined, the active entry wins.
     cosponsors: [...list(b.cosponsors?.item).filter((c) => c.bioguideId).reduce((m, c) => {
       const row = {
@@ -135,14 +161,18 @@ async function main() {
     console.log(`congresses ${congresses.join(", ")}: ${work.length} bill files to read (since ${since.toISOString().slice(0, 10)})`);
 
     const known = new Set((await fetchAll(db, "members", "bioguide_id")).map((m) => m.bioguide_id));
+    const knownCommittees = new Set((await fetchAll(db, "committees", "committee_id")).map((c) => c.committee_id));
+    const unknownCommittees = new Set();
+    let referrals = [];
     let bills = [], cosponsors = [], billCount = 0, cosponsorCount = 0, unknownPeople = 0, unparsed = 0;
     const flush = async () => {
       if (!bills.length) return;
-      const b = bills, c = cosponsors;
-      bills = []; cosponsors = [];
+      const b = bills, c = cosponsors, r = referrals;
+      bills = []; cosponsors = []; referrals = [];
       if (dryRun) return;
       await upsertBatches(db, "bills", b, "congress,bill_type,number");
       await upsertBatches(db, "bill_cosponsors", c, "congress,bill_type,number,bioguide_id");
+      await upsertBatches(db, "bill_committees", r, "congress,bill_type,number,committee_id");
     };
 
     await mapLimit(work, CONCURRENCY, async (f) => {
@@ -152,9 +182,10 @@ async function main() {
       const { bill } = parsed;
       if (bill.sponsor_bioguide_id && !known.has(bill.sponsor_bioguide_id)) { unknownPeople++; bill.sponsor_bioguide_id = null; }
       const cos = parsed.cosponsors.filter((c) => known.has(c.bioguide_id) || (unknownPeople++, false));
-      if (dryRun && billCount < 2) console.log("sample:", JSON.stringify({ ...bill, crs_summary: bill.crs_summary?.slice(0, 120) }), `cosponsors=${cos.length}`);
+      if (dryRun && billCount < 2) console.log("sample:", JSON.stringify({ ...bill, crs_summary: bill.crs_summary?.slice(0, 120) }), `cosponsors=${cos.length}`, "committees:", JSON.stringify(parsed.committees));
       bills.push(bill);
       cosponsors.push(...cos);
+      referrals.push(...parsed.committees.filter((x) => knownCommittees.has(x.committee_id) || (unknownCommittees.add(x.committee_id), false)));
       billCount++;
       cosponsorCount += cos.length;
       if (bills.length >= BATCH) await flush();
@@ -165,6 +196,7 @@ async function main() {
     console.log(`bills: ${billCount}, cosponsorships: ${cosponsorCount}`);
     if (unknownPeople) console.log(`note: ${unknownPeople} sponsor/cosponsor entries not in members (left before 2023?)`);
     if (unparsed) console.log(`warning: ${unparsed} files could not be parsed`);
+    if (unknownCommittees.size) console.log(`note: referrals to committees not in the current committee list (renamed or disbanded): ${[...unknownCommittees].slice(0, 20).join(", ")}`);
     if (dryRun) console.log("dry run: nothing written");
     else {
       const { data: statRows, error: statErr } = await db.rpc("refresh_member_bill_stats");
