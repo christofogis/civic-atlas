@@ -38,3 +38,10 @@ jobs:
         run: |
           if [ "$DRY_RUN" = "true" ]; then node scripts/ingest/fec.mjs --dry-run --limit 2
           else node scripts/ingest/fec.mjs; fi
+      - name: Candidates for the next election
+        if: ${{ !cancelled() }}
+        env:
+          DRY_RUN: ${{ inputs.dry_run }}
+        run: |
+          if [ "$DRY_RUN" = "true" ]; then node scripts/ingest/fec-candidates.mjs --dry-run
+          else node scripts/ingest/fec-candidates.mjs; fi
