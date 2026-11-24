@@ -63,6 +63,10 @@ async function memberList(bioguide, kind, key) {
     const data = await getJson(`${API}/member/${bioguide}/${kind}-legislation?format=json&limit=${PAGE}&offset=${offset}`, key);
     const page = data?.[listKey] ?? [];
     items.push(...page);
+    if (process.env.DEBUG_PAGES) {
+      const cs = page.map((i) => parseInt(i.congress, 10)).filter(Boolean);
+      console.log(`  ${bioguide} ${kind} offset=${offset} items=${page.length} congress ${Math.max(...cs)}..${Math.min(...cs)} first=${page[0]?.introducedDate} last=${page.at(-1)?.introducedDate} total=${data?.pagination?.count}`);
+    }
     const reachedOld = page.some((i) => parseInt(i.congress, 10) < FROM_CONGRESS);
     if (page.length < PAGE || reachedOld || !data?.pagination?.next) break;
   }
@@ -83,7 +87,8 @@ async function main() {
     const members = (await fetchAll(db, "members", "bioguide_id")).map((r) => r.bioguide_id);
     const withBills = new Set((await fetchAll(db, "bills", "sponsor_bioguide_id")).map((r) => r.sponsor_bioguide_id));
     // Former members' records don't change, so load them once.
-    const todo = members.filter((b) => serving.has(b) || !withBills.has(b)).slice(0, limit);
+    const only = arg("--member");
+    const todo = only ? [only] : members.filter((b) => serving.has(b) || !withBills.has(b)).slice(0, limit);
     console.log(`members to refresh: ${todo.length} (${serving.size} serving)`);
 
     // Saved member by member, so a failure late in the run keeps what was already done.

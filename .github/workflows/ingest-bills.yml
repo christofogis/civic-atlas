@@ -9,6 +9,10 @@ on:
         description: "Fetch two members only; write nothing"
         type: boolean
         default: false
+      member:
+        description: "Dry run one member by bioguide ID and print paging details"
+        type: string
+        default: ""
 
 permissions:
   contents: read
@@ -35,6 +39,8 @@ jobs:
       - name: Bills
         env:
           DRY_RUN: ${{ inputs.dry_run }}
+          MEMBER: ${{ inputs.member }}
         run: |
-          if [ "$DRY_RUN" = "true" ]; then node scripts/ingest/bills.mjs --dry-run --limit 2
+          if [[ "$MEMBER" =~ ^[A-Z][0-9]{6}$ ]]; then DEBUG_PAGES=1 node scripts/ingest/bills.mjs --dry-run --member "$MEMBER"
+          elif [ "$DRY_RUN" = "true" ]; then node scripts/ingest/bills.mjs --dry-run --limit 2
           else node scripts/ingest/bills.mjs; fi
