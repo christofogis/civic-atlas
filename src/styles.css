@@ -248,3 +248,6 @@ header.site nav { flex-wrap: wrap; row-gap: 4px; }
 .swatch-mine { display: inline-block; width: 14px; height: 10px; border: 3px solid var(--mark); vertical-align: middle; }
 @media (max-width: 600px) { .map-canvas { height: 60vh; } }
 .map-rep { font-size: 1.1rem; margin: 4px 0 14px; }
+
+.member-photo { float: left; margin: 4px 14px 6px 0; border-radius: 6px; object-fit: cover; }
+.member-photo.small { margin-right: 10px; }
