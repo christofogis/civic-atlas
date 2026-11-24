@@ -1,0 +1,40 @@
+name: Ingest FEC totals
+
+on:
+  schedule:
+    - cron: "41 13 * * 1"   # weekly, Mondays 5:41am Pacific
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "Fetch two candidates only; write nothing"
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ingest-fec
+  cancel-in-progress: false
+
+jobs:
+  ingest:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    env:
+      SUPABASE_URL: https://fkbzxaoeyrtzviyfzulq.supabase.co
+      SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+      DATA_GOV_API_KEY: ${{ secrets.DATA_GOV_API_KEY }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: FEC totals
+        env:
+          DRY_RUN: ${{ inputs.dry_run }}
+        run: |
+          if [ "$DRY_RUN" = "true" ]; then node scripts/ingest/fec.mjs --dry-run --limit 2
+          else node scripts/ingest/fec.mjs; fi
