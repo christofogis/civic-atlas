@@ -15,7 +15,7 @@ const PAUSE_MS = 3800;
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 const money = (v) => (v == null || v === "" ? null : Number(v));
 // Entries donors write in the employer field that don't name an employer. Listed on /methods.
-const NOT_AN_EMPLOYER = /^(|N\/?A|NONE|RETIRED|SELF|SELF[- ]?EMPLOYED|NOT EMPLOYED|UNEMPLOYED|HOMEMAKER|STUDENT|INFORMATION REQUESTED.*|REQUESTED|ENTREPRENEUR)$/i;
+const NOT_AN_EMPLOYER = /^(|N\/?A|NULL|NONE|RETIRED|SELF|SELF[- ]?EMPLOYED|NOT EMPLOYED|UNEMPLOYED|HOMEMAKER|STUDENT|INFORMATION REQUESTED.*|REQUESTED|ENTREPRENEUR)$/i;
 
 async function getJson(path, params, key) {
   const url = `${API}${path}?${new URLSearchParams(params)}`;
