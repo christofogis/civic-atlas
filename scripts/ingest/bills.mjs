@@ -1,17 +1,21 @@
 // Ingest bills sponsored and cosponsored by members, from the Congress.gov API.
 // Needs DATA_GOV_API_KEY (an api.data.gov key; sent as a header, never in URLs or logs).
 //
-//   node scripts/ingest/bills.mjs                      # serving members + former members not yet loaded
+//   node scripts/ingest/bills.mjs                      # full: every page back to the 118th Congress
+//   node scripts/ingest/bills.mjs --max-pages 2        # daily: each member's ~500 most recent bills
 //   node scripts/ingest/bills.mjs --dry-run --limit 2  # fetch a couple of members, write nothing
 //
 // Covers the 118th Congress onward (same window as votes). Each member's lists come back
-// newest first, so paging stops once it reaches older Congresses.
+// newest first by introduced date, so paging stops once it passes Jan 3, 2023. (The
+// `congress` field on list items isn't reliable for this: older numbers appear mixed in.)
+// Congress.gov allows ~5,000 requests/hour per key; requests are paced to ~3,600/hour.
 import { getClient, fetchAll, upsertBatches, withRun } from "./lib.mjs";
 
 const API = "https://api.congress.gov/v3";
 const FROM_CONGRESS = 118;
 const PAGE = 250;
-const PAUSE_MS = 250;
+const FROM_DATE = "2023-01-03"; // start of the 118th Congress
+const PAUSE_MS = 700;
 const BILL_TYPES = new Set(["hr", "s", "hjres", "sjres", "hconres", "sconres", "hres", "sres"]);
 const SLUG = {
   hr: "house-bill", s: "senate-bill", hres: "house-resolution", sres: "senate-resolution",
@@ -47,7 +51,7 @@ async function getJson(url, key) {
   for (let attempt = 0; attempt < 3; attempt++) {
     await sleep(PAUSE_MS);
     const res = await fetch(url, { headers: { "X-Api-Key": key, Accept: "application/json" } });
-    if (res.status === 429) { await sleep(60_000); continue; } // rate limited: wait a minute
+    if (res.status === 429) { console.log("  rate limited; waiting a minute"); await sleep(60_000); continue; }
     if (res.status === 404) return null;
     if (!res.ok) throw new Error(`GET ${url}: HTTP ${res.status}`);
     return res.json();
@@ -55,11 +59,11 @@ async function getJson(url, key) {
   throw new Error(`GET ${url}: still rate limited`);
 }
 
-// All items for one member's list, newest first, stopping before FROM_CONGRESS.
-async function memberList(bioguide, kind, key) {
+// All items for one member's list from the 118th Congress on (newest first, stops by date).
+async function memberList(bioguide, kind, key, maxPages = Infinity) {
   const listKey = kind === "sponsored" ? "sponsoredLegislation" : "cosponsoredLegislation";
   const items = [];
-  for (let offset = 0; ; offset += PAGE) {
+  for (let offset = 0, pages = 0; pages < maxPages; offset += PAGE, pages++) {
     const data = await getJson(`${API}/member/${bioguide}/${kind}-legislation?format=json&limit=${PAGE}&offset=${offset}`, key);
     const page = data?.[listKey] ?? [];
     items.push(...page);
@@ -67,7 +71,7 @@ async function memberList(bioguide, kind, key) {
       const cs = page.map((i) => parseInt(i.congress, 10)).filter(Boolean);
       console.log(`  ${bioguide} ${kind} offset=${offset} items=${page.length} congress ${Math.max(...cs)}..${Math.min(...cs)} first=${page[0]?.introducedDate} last=${page.at(-1)?.introducedDate} total=${data?.pagination?.count}`);
     }
-    const reachedOld = page.some((i) => parseInt(i.congress, 10) < FROM_CONGRESS);
+    const reachedOld = page.some((i) => i.introducedDate && i.introducedDate < FROM_DATE);
     if (page.length < PAGE || reachedOld || !data?.pagination?.next) break;
   }
   return items.filter((i) => parseInt(i.congress, 10) >= FROM_CONGRESS);
@@ -78,6 +82,7 @@ async function main() {
   const arg = (n) => (args.includes(n) ? args[args.indexOf(n) + 1] : undefined);
   const dryRun = args.includes("--dry-run");
   const limit = arg("--limit") ? parseInt(arg("--limit"), 10) : Infinity;
+  const maxPages = arg("--max-pages") ? parseInt(arg("--max-pages"), 10) : Infinity;
   const key = process.env.DATA_GOV_API_KEY;
   if (!key) throw new Error("DATA_GOV_API_KEY must be set");
 
@@ -97,13 +102,13 @@ async function main() {
     let sponsoredTotal = 0, cosponsorTotal = 0, done = 0;
     for (const bioguide of todo) {
       const sponsored = new Map();
-      for (const item of await memberList(bioguide, "sponsored", key)) {
+      for (const item of await memberList(bioguide, "sponsored", key, maxPages)) {
         const bill = mapItem(item);
         if (bill) sponsored.set(k(bill), { ...bill, sponsor_bioguide_id: bioguide });
       }
       const cosponsoredOnly = new Map();
       const cosponsors = new Map(); // keyed, in case a list shifts between pages
-      for (const item of await memberList(bioguide, "cosponsored", key)) {
+      for (const item of await memberList(bioguide, "cosponsored", key, maxPages)) {
         const bill = mapItem(item);
         if (!bill) continue;
         if (!known.has(k(bill)) && !sponsored.has(k(bill))) cosponsoredOnly.set(k(bill), bill);
@@ -128,7 +133,7 @@ async function main() {
   };
 
   if (dryRun) await run();
-  else await withRun(db, "bills", run);
+  else await withRun(db, maxPages === Infinity ? "bills" : "bills-recent", run);
 }
 
 if (import.meta.url === `file://${process.argv[1]}`) {

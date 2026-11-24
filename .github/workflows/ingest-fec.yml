@@ -2,7 +2,7 @@ name: Ingest FEC totals
 
 on:
   schedule:
-    - cron: "41 13 * * 1"   # weekly, Mondays 5:41am Pacific
+    - cron: "41 2 * * 3"    # weekly, Tuesday evenings Pacific (away from the bills runs; same API key)
   workflow_dispatch:
     inputs:
       dry_run:

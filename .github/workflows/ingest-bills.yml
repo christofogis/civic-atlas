@@ -2,7 +2,8 @@ name: Ingest bills
 
 on:
   schedule:
-    - cron: "23 13 * * *"   # daily, 5:23am Pacific
+    - cron: "23 13 * * 1-6"  # Mon-Sat 5:23am Pacific: recent pages only
+    - cron: "23 13 * * 0"    # Sundays: full re-read back to 2023
   workflow_dispatch:
     inputs:
       dry_run:
@@ -24,7 +25,7 @@ concurrency:
 jobs:
   ingest:
     runs-on: ubuntu-latest
-    timeout-minutes: 90
+    timeout-minutes: 180
     env:
       SUPABASE_URL: https://fkbzxaoeyrtzviyfzulq.supabase.co
       SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
@@ -40,7 +41,9 @@ jobs:
         env:
           DRY_RUN: ${{ inputs.dry_run }}
           MEMBER: ${{ inputs.member }}
+          SCHEDULE: ${{ github.event.schedule }}
         run: |
           if [[ "$MEMBER" =~ ^[A-Z][0-9]{6}$ ]]; then DEBUG_PAGES=1 node scripts/ingest/bills.mjs --dry-run --member "$MEMBER"
           elif [ "$DRY_RUN" = "true" ]; then node scripts/ingest/bills.mjs --dry-run --limit 2
+          elif [ "$SCHEDULE" = "23 13 * * 1-6" ]; then node scripts/ingest/bills.mjs --max-pages 2
           else node scripts/ingest/bills.mjs; fi
