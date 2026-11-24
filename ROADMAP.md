@@ -56,6 +56,8 @@
 - [x] Look up a news story (paste text; members and bill numbers matched in the browser)
 - [x] Bill text versions + what changed between them (section-level, computed; see /methods#text-versions)
 - [x] Nightly accessibility check (axe, WCAG 2.1 AA) + keyboard/screen-reader fixes
+- [x] Hearing pages (both chambers; House witnesses + statements; Senate links to committee sites), on committee and bill pages
+- [ ] Google address suggestions (built; waiting on a restricted key from Chris)
 - [ ] Story lookup by link (needs a server fetch; weigh paywalls and the 10 ms CPU limit first)
 - [ ] Email alerts (needs a decision on accounts and an email provider)
 - [x] Bill status bar from Library of Congress milestone codes
