@@ -40,7 +40,7 @@ async function loadMember(id) {
   const one = (q) => q.then(({ data, error }) => { if (error) throw error; return data; });
   const [member, terms, seat, memberships, votes, bills, sponsoredCount, cosponsoredCount, finance, freshness, voteStats, medians, billStats, billMedians, trades, filings, tradeSummary, bySize, employers, pacs, outside, laws] = await Promise.all([
     one(db.from("members").select("*").eq("bioguide_id", id).maybeSingle()),
-    one(db.from("terms").select("chamber,state,district,party,start_date,end_date").eq("bioguide_id", id).order("start_date", { ascending: false })),
+    one(db.from("terms").select("chamber,state,district,party,start_date,end_date,phone,address,contact_form,url").eq("bioguide_id", id).order("start_date", { ascending: false })),
     one(db.from("seat_holders").select("*").eq("bioguide_id", id).maybeSingle()),
     one(db.from("committee_memberships").select("congress,title,side,rank,committee:committees(committee_id,name,parent_id,url)").eq("bioguide_id", id)),
     one(db.from("votes")
@@ -125,6 +125,38 @@ function FinanceDetail({ cycle, bySize, employers, pacs, outside, fecId }) {
   );
 }
 
+const SOCIAL = [
+  ["social_x", "X", (h) => `https://x.com/${h}`],
+  ["social_bluesky", "Bluesky", (h) => `https://bsky.app/profile/${h}`],
+  ["social_facebook", "Facebook", (h) => `https://www.facebook.com/${h}`],
+  ["social_instagram", "Instagram", (h) => `https://www.instagram.com/${h}`],
+  ["social_youtube", "YouTube", (h) => (h.startsWith("UC") ? `https://www.youtube.com/channel/${h}` : `https://www.youtube.com/${h}`)],
+];
+
+// How to reach the member's Washington office, and their official accounts (links only).
+function Contact({ term, member }) {
+  const accounts = SOCIAL.filter(([k]) => member[k]);
+  if (!term?.phone && !term?.contact_form && !term?.address && accounts.length === 0) return null;
+  return (
+    <section className="contact">
+      <h2>Contact</h2>
+      {term.phone && <p>Washington office: <a href={`tel:+1-${term.phone}`}>{term.phone}</a></p>}
+      {term.address && <p className="fine">{term.address}</p>}
+      <p>
+        {term.contact_form && <><a href={term.contact_form}>Email through the official contact form</a></>}
+        {term.contact_form && term.url && " · "}
+        {term.url && <a href={term.url}>Official website</a>}
+      </p>
+      {accounts.length > 0 && (
+        <p className="fine">Official accounts: {accounts.map(([k, label, link], i) => (
+          <span key={k}>{i ? " · " : ""}<a href={link(member[k])} rel="noopener noreferrer">{label}</a></span>
+        ))}</p>
+      )}
+      <p className="fine">Source: unitedstates/congress-legislators. Offices usually ask for your address to confirm you're a constituent.</p>
+    </section>
+  );
+}
+
 function Section({ title, source, children }) {
   return (
     <section className="section">
@@ -181,6 +213,8 @@ export default function Member() {
           {seat?.url && <> · <a href={seat.url}>Official website</a></>}
         </p>
       </header>
+
+      {seat?.seat_status === "serving" && <Contact term={terms[0]} member={m} />}
 
       <AtAGlance terms={terms} voteStats={voteStats} medians={medians} billStats={billStats} laws={laws}
         finance={finance} bySize={bySize} tradeSummary={ts} delegate={delegate(latest)} />
