@@ -1,83 +1,105 @@
-// Ingest bills sponsored and cosponsored by members, from the Congress.gov API.
-// Needs DATA_GOV_API_KEY (an api.data.gov key; sent as a header, never in URLs or logs).
+// Ingest bills, sponsors, cosponsors and CRS summaries from GovInfo's official Bill Status
+// bulk data (the same records Congress.gov is built on). No API key, no rate limit.
+//   Listing: https://www.govinfo.gov/bulkdata/json/BILLSTATUS/{congress}/{type}
+//   File:    https://www.govinfo.gov/bulkdata/BILLSTATUS/{congress}/{type}/BILLSTATUS-{congress}{type}{n}.xml
 //
-//   node scripts/ingest/bills.mjs                      # full: every page back to the 118th Congress
-//   node scripts/ingest/bills.mjs --max-pages 2        # daily: each member's ~500 most recent bills
-//   node scripts/ingest/bills.mjs --dry-run --limit 2  # fetch a couple of members, write nothing
+//   node scripts/ingest/bills.mjs                       # files changed since the last successful run
+//   node scripts/ingest/bills.mjs --full                # every file (first load, or to repair)
+//   node scripts/ingest/bills.mjs --dry-run --limit 3   # list + parse a few, write nothing
 //
-// Covers the 118th Congress onward (same window as votes). Each member's lists come back
-// newest first by introduced date, so paging stops once it passes Jan 3, 2023. (The
-// `congress` field on list items isn't reliable for this: older numbers appear mixed in.)
-// Congress.gov allows ~5,000 requests/hour per key; requests are paced to ~3,600/hour.
+// Covers the 118th Congress on, the same window as votes.
+import { XMLParser } from "fast-xml-parser";
 import { getClient, fetchAll, upsertBatches, withRun } from "./lib.mjs";
 
-const API = "https://api.congress.gov/v3";
-const FROM_CONGRESS = 118;
-const PAGE = 250;
-const FROM_DATE = "2023-01-03"; // start of the 118th Congress
-const PAUSE_MS = 700;
-const BILL_TYPES = new Set(["hr", "s", "hjres", "sjres", "hconres", "sconres", "hres", "sres"]);
-const SLUG = {
-  hr: "house-bill", s: "senate-bill", hres: "house-resolution", sres: "senate-resolution",
-  hjres: "house-joint-resolution", sjres: "senate-joint-resolution",
-  hconres: "house-concurrent-resolution", sconres: "senate-concurrent-resolution",
-};
+const CONGRESSES_FROM = 118;
+const TYPES = ["hr", "s", "hjres", "sjres", "hconres", "sconres", "hres", "sres"];
+const CONCURRENCY = 6;
+const BATCH = 200;
+const LISTING = (c, t) => `https://www.govinfo.gov/bulkdata/json/BILLSTATUS/${c}/${t}`;
+
+const parser = new XMLParser({ ignoreAttributes: true, parseTagValue: false, trimValues: true });
+const list = (v) => (v == null ? [] : Array.isArray(v) ? v : [v]);
+const str = (v) => (v == null || v === "" ? null : String(v));
+const yn = (v) => String(v).toUpperCase() === "TRUE" || String(v).toUpperCase() === "Y";
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
 export function ordinal(n) {
   const s = ["th", "st", "nd", "rd"], v = n % 100;
   return n + (s[(v - 20) % 10] || s[v] || s[0]);
 }
+const SLUG = {
+  hr: "house-bill", s: "senate-bill", hres: "house-resolution", sres: "senate-resolution",
+  hjres: "house-joint-resolution", sjres: "senate-joint-resolution",
+  hconres: "house-concurrent-resolution", sconres: "senate-concurrent-resolution",
+};
 export const billPage = (c, t, n) => `https://www.congress.gov/bill/${ordinal(c)}-congress/${SLUG[t]}/${n}`;
 
-// One list item -> bill row (or null for amendments and anything that isn't a bill).
-export function mapItem(item) {
-  const type = String(item.type ?? "").toLowerCase();
-  const number = parseInt(item.number, 10);
-  const congress = parseInt(item.congress, 10);
-  if (!BILL_TYPES.has(type) || !number || !congress) return null;
+// CRS summaries are stored as plain text: strip any markup and collapse whitespace.
+export const plain = (html) =>
+  html == null ? null : String(html).replace(/<[^>]+>/g, " ").replace(/&nbsp;/g, " ").replace(/&amp;/g, "&")
+    .replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&quot;/g, '"').replace(/&#39;/g, "'").replace(/\s+/g, " ").trim() || null;
+
+export function parseBillStatus(xml) {
+  const b = parser.parse(xml)?.billStatus?.bill;
+  if (!b) return null;
+  const congress = parseInt(b.congress, 10);
+  const bill_type = String(b.type ?? b.billType ?? "").toLowerCase();
+  const number = parseInt(b.number ?? b.billNumber, 10);
+  if (!congress || !TYPES.includes(bill_type) || !number) return null;
+  const summaries = list(b.summaries?.summary ?? b.summaries?.billSummaries?.item)
+    .sort((a, z) => String(z.updateDate ?? z.actionDate ?? "").localeCompare(String(a.updateDate ?? a.actionDate ?? "")));
+  const sponsor = list(b.sponsors?.item)[0];
   return {
-    congress, bill_type: type, number,
-    title: item.title ?? item.latestTitle ?? "(untitled)",
-    introduced_date: item.introducedDate ?? null,
-    policy_area: item.policyArea?.name ?? null,
-    latest_action_date: item.latestAction?.actionDate ?? null,
-    latest_action_text: item.latestAction?.text ?? null,
-    source_url: billPage(congress, type, number),
+    bill: {
+      congress, bill_type, number,
+      title: str(b.title) ?? "(untitled)",
+      introduced_date: str(b.introducedDate),
+      sponsor_bioguide_id: str(sponsor?.bioguideId),
+      policy_area: str(b.policyArea?.name),
+      latest_action_date: str(b.latestAction?.actionDate),
+      latest_action_text: str(b.latestAction?.text),
+      crs_summary: plain(summaries[0]?.text),
+      source_url: billPage(congress, bill_type, number),
+    },
+    // One row per person: if someone withdrew and later re-joined, the active entry wins.
+    cosponsors: [...list(b.cosponsors?.item).filter((c) => c.bioguideId).reduce((m, c) => {
+      const row = {
+        congress, bill_type, number,
+        bioguide_id: String(c.bioguideId),
+        sponsored_date: str(c.sponsorshipDate),
+        withdrawn_date: str(c.sponsorshipWithdrawnDate),
+        is_original: yn(c.isOriginalCosponsor),
+      };
+      const prev = m.get(row.bioguide_id);
+      if (!prev || (prev.withdrawn_date && !row.withdrawn_date)) m.set(row.bioguide_id, row);
+      return m;
+    }, new Map()).values()],
   };
 }
 
-async function getJson(url, key) {
+async function get(url, as = "text") {
   for (let attempt = 0; attempt < 3; attempt++) {
-    await sleep(PAUSE_MS);
-    const res = await fetch(url, { headers: { "X-Api-Key": key, Accept: "application/json" } });
-    if (res.status === 429) { console.log("  rate limited; waiting a minute"); await sleep(60_000); continue; }
+    const res = await fetch(url, { headers: { Accept: as === "json" ? "application/json" : "application/xml",
+      "User-Agent": "civic-atlas (github.com/christofogis/civic-atlas)" } });
     if (res.status === 404) return null;
-    if (!res.ok) throw new Error(`GET ${url}: HTTP ${res.status}`);
-    return res.json();
+    if (res.ok) return as === "json" ? res.json() : res.text();
+    if (res.status === 429 || res.status >= 500) { await sleep(5000 * (attempt + 1)); continue; }
+    throw new Error(`GET ${url}: HTTP ${res.status}`);
   }
-  throw new Error(`GET ${url}: still rate limited`);
+  throw new Error(`GET ${url}: failed after retries`);
 }
 
-// All items for one member's list from the 118th Congress on (newest first, stops by date).
-async function memberList(bioguide, kind, key, maxPages = Infinity) {
-  const listKey = kind === "sponsored" ? "sponsoredLegislation" : "cosponsoredLegislation";
-  const items = [];
-  for (let offset = 0, pages = 0; pages < maxPages; offset += PAGE, pages++) {
-    const data = await getJson(`${API}/member/${bioguide}/${kind}-legislation?format=json&limit=${PAGE}&offset=${offset}`, key);
-    const page = data?.[listKey] ?? [];
-    items.push(...page);
-    if (process.env.DEBUG_PAGES) {
-      const cs = page.map((i) => parseInt(i.congress, 10)).filter(Boolean);
-      console.log(`  ${bioguide} ${kind} offset=${offset} items=${page.length} congress ${Math.max(...cs)}..${Math.min(...cs)} first=${page[0]?.introducedDate} last=${page.at(-1)?.introducedDate} total=${data?.pagination?.count}`);
-    }
-    // A few old items appear out of order, so judge by the page's last (oldest) entry.
-    const lastDate = page.at(-1)?.introducedDate;
-    const anyInWindow = page.some((i) => (i.introducedDate ?? "") >= FROM_DATE || parseInt(i.congress, 10) >= FROM_CONGRESS);
-    const reachedOld = Boolean(lastDate && lastDate < FROM_DATE) || !anyInWindow;
-    if (page.length < PAGE || reachedOld || !data?.pagination?.next) break;
-  }
-  return items.filter((i) => parseInt(i.congress, 10) >= FROM_CONGRESS);
+// Files in a listing, with last-modified time. Accepts the listing's known field spellings.
+export function listingFiles(json) {
+  return list(json?.files).filter((f) => !f.folder && /\.xml$/i.test(f.name ?? f.link ?? "")).map((f) => ({
+    url: f.link ?? f.url,
+    modified: new Date(f.lastModified ?? f.formattedLastModifiedTime ?? f.lastModifiedTime ?? 0),
+  }));
+}
+
+async function mapLimit(items, n, fn) {
+  let i = 0;
+  await Promise.all(Array.from({ length: n }, async () => { while (i < items.length) await fn(items[i++]); }));
 }
 
 async function main() {
@@ -85,58 +107,69 @@ async function main() {
   const arg = (n) => (args.includes(n) ? args[args.indexOf(n) + 1] : undefined);
   const dryRun = args.includes("--dry-run");
   const limit = arg("--limit") ? parseInt(arg("--limit"), 10) : Infinity;
-  const maxPages = arg("--max-pages") ? parseInt(arg("--max-pages"), 10) : Infinity;
-  const key = process.env.DATA_GOV_API_KEY;
-  if (!key) throw new Error("DATA_GOV_API_KEY must be set");
 
   const db = getClient();
   const run = async () => {
-    const serving = new Set((await fetchAll(db, "seat_holders", "bioguide_id")).map((r) => r.bioguide_id));
-    const members = (await fetchAll(db, "members", "bioguide_id")).map((r) => r.bioguide_id);
-    const withBills = new Set((await fetchAll(db, "bills", "sponsor_bioguide_id")).map((r) => r.sponsor_bioguide_id));
-    // Former members' records don't change, so load them once.
-    const only = arg("--member");
-    const todo = only ? [only] : members.filter((b) => serving.has(b) || !withBills.has(b)).slice(0, limit);
-    console.log(`members to refresh: ${todo.length} (${serving.size} serving)`);
+    const today = new Date().toISOString().slice(0, 10);
+    const congresses = (await fetchAll(db, "congresses", "number,start_date"))
+      .filter((c) => c.number >= CONGRESSES_FROM && c.start_date <= today).map((c) => c.number);
 
-    // Saved member by member, so a failure late in the run keeps what was already done.
-    const k = (b) => `${b.congress}|${b.bill_type}|${b.number}`;
-    const known = dryRun ? new Set() : new Set((await fetchAll(db, "bills", "congress,bill_type,number")).map(k));
-    let sponsoredTotal = 0, cosponsorTotal = 0, done = 0;
-    for (const bioguide of todo) {
-      const sponsored = new Map();
-      for (const item of await memberList(bioguide, "sponsored", key, maxPages)) {
-        const bill = mapItem(item);
-        if (bill) sponsored.set(k(bill), { ...bill, sponsor_bioguide_id: bioguide });
-      }
-      const cosponsoredOnly = new Map();
-      const cosponsors = new Map(); // keyed, in case a list shifts between pages
-      for (const item of await memberList(bioguide, "cosponsored", key, maxPages)) {
-        const bill = mapItem(item);
-        if (!bill) continue;
-        if (!known.has(k(bill)) && !sponsored.has(k(bill))) cosponsoredOnly.set(k(bill), bill);
-        cosponsors.set(k(bill), { congress: bill.congress, bill_type: bill.bill_type, number: bill.number, bioguide_id: bioguide });
-      }
-      if (dryRun) {
-        if (done === 0) console.log("sample bill:", JSON.stringify([...sponsored.values()][0] ?? null));
-      } else {
-        // Separate batches so a cosponsor-only row never blanks out a known sponsor.
-        await upsertBatches(db, "bills", [...sponsored.values()], "congress,bill_type,number");
-        await upsertBatches(db, "bills", [...cosponsoredOnly.values()], "congress,bill_type,number");
-        await upsertBatches(db, "bill_cosponsors", [...cosponsors.values()], "congress,bill_type,number,bioguide_id");
-      }
-      for (const key2 of [...sponsored.keys(), ...cosponsoredOnly.keys()]) known.add(key2);
-      sponsoredTotal += sponsored.size;
-      cosponsorTotal += cosponsors.size;
-      if (++done % 50 === 0) console.log(`  ${done}/${todo.length} members`);
+    // Changed since the last successful run (minus a day of overlap), unless --full.
+    let since = new Date(0);
+    if (!args.includes("--full") && !dryRun) {
+      const { data } = await db.from("ingest_runs").select("started_at").eq("job", "bills")
+        .eq("status", "succeeded").order("started_at", { ascending: false }).limit(1);
+      if (data?.[0]) since = new Date(new Date(data[0].started_at).getTime() - 86_400_000);
     }
-    console.log(`bills: ${sponsoredTotal} sponsored; ${cosponsorTotal} cosponsorships`);
+
+    const todo = [];
+    for (const c of congresses) {
+      for (const t of TYPES) {
+        const json = await get(LISTING(c, t), "json");
+        if (dryRun && todo.length === 0) console.log("listing sample:", JSON.stringify(json?.files?.slice(0, 2)));
+        todo.push(...listingFiles(json).filter((f) => f.modified > since));
+      }
+    }
+    const work = todo.slice(0, limit);
+    console.log(`congresses ${congresses.join(", ")}: ${work.length} bill files to read (since ${since.toISOString().slice(0, 10)})`);
+
+    const known = new Set((await fetchAll(db, "members", "bioguide_id")).map((m) => m.bioguide_id));
+    let bills = [], cosponsors = [], billCount = 0, cosponsorCount = 0, unknownPeople = 0, unparsed = 0;
+    const flush = async () => {
+      if (!bills.length) return;
+      const b = bills, c = cosponsors;
+      bills = []; cosponsors = [];
+      if (dryRun) return;
+      await upsertBatches(db, "bills", b, "congress,bill_type,number");
+      await upsertBatches(db, "bill_cosponsors", c, "congress,bill_type,number,bioguide_id");
+    };
+
+    await mapLimit(work, CONCURRENCY, async (f) => {
+      const xml = await get(f.url);
+      const parsed = xml && parseBillStatus(xml);
+      if (!parsed) { unparsed++; return; }
+      const { bill } = parsed;
+      if (bill.sponsor_bioguide_id && !known.has(bill.sponsor_bioguide_id)) { unknownPeople++; bill.sponsor_bioguide_id = null; }
+      const cos = parsed.cosponsors.filter((c) => known.has(c.bioguide_id) || (unknownPeople++, false));
+      if (dryRun && billCount < 2) console.log("sample:", JSON.stringify({ ...bill, crs_summary: bill.crs_summary?.slice(0, 120) }), `cosponsors=${cos.length}`);
+      bills.push(bill);
+      cosponsors.push(...cos);
+      billCount++;
+      cosponsorCount += cos.length;
+      if (bills.length >= BATCH) await flush();
+      if (billCount % 2000 === 0) console.log(`  ${billCount}/${work.length}`);
+    });
+    await flush();
+
+    console.log(`bills: ${billCount}, cosponsorships: ${cosponsorCount}`);
+    if (unknownPeople) console.log(`note: ${unknownPeople} sponsor/cosponsor entries not in members (left before 2023?)`);
+    if (unparsed) console.log(`warning: ${unparsed} files could not be parsed`);
     if (dryRun) console.log("dry run: nothing written");
-    return { rows_inserted: 0, rows_updated: sponsoredTotal + cosponsorTotal };
+    return { rows_inserted: 0, rows_updated: billCount + cosponsorCount };
   };
 
   if (dryRun) await run();
-  else await withRun(db, maxPages === Infinity ? "bills" : "bills-recent", run);
+  else await withRun(db, "bills", run);
 }
 
 if (import.meta.url === `file://${process.argv[1]}`) {
