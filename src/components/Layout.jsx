@@ -42,6 +42,7 @@ export default function Layout() {
           <Link to="/glossary">Glossary</Link>
           <Link to="/compare">Compare two members</Link>
           <Link to="/quiz">Quiz</Link>
+          <Link to="/elections">2028 candidates</Link>
           <ReportError />
         </div>
       </footer>

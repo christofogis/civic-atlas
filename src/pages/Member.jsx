@@ -2,10 +2,11 @@ import { useEffect, useState } from "react";
 import { voteKind, isFinal } from "../lib/voteKind.js";
 import { Link, useParams } from "react-router-dom";
 import { db } from "../lib/db.js";
+import { seatNextUp, nextElectionYear } from "../../lib/congress.js";
 import AtAGlance from "../components/AtAGlance.jsx";
 import Follow from "../components/Follow.jsx";
 import { KindLabel } from "../components/Explain.jsx";
-import { seatLabel, date, money, billLabel, ordinal } from "../lib/format.js";
+import { seatLabel, date, money, billLabel, ordinal, STATE_NAMES } from "../lib/format.js";
 
 const BIOGUIDE = /^[A-Z][0-9]{6}$/;
 const TERRITORIES = new Set(["DC", "PR", "GU", "VI", "AS", "MP"]);
@@ -39,7 +40,7 @@ function VoteStats({ s, median, delegate, independent }) {
 
 async function loadMember(id) {
   const one = (q) => q.then(({ data, error }) => { if (error) throw error; return data; });
-  const [member, terms, seat, memberships, votes, bills, sponsoredCount, cosponsoredCount, finance, freshness, voteStats, medians, billStats, billMedians, trades, filings, tradeSummary, bySize, employers, pacs, outside, laws] = await Promise.all([
+  const [member, terms, seat, memberships, votes, bills, sponsoredCount, cosponsoredCount, finance, freshness, voteStats, medians, billStats, billMedians, trades, filings, tradeSummary, bySize, employers, pacs, outside, laws, candidacies] = await Promise.all([
     one(db.from("members").select("*").eq("bioguide_id", id).maybeSingle()),
     one(db.from("terms").select("chamber,state,district,party,start_date,end_date,phone,address,contact_form,url").eq("bioguide_id", id).order("start_date", { ascending: false })),
     one(db.from("seat_holders").select("*").eq("bioguide_id", id).maybeSingle()),
@@ -66,8 +67,9 @@ async function loadMember(id) {
     one(db.from("finance_committee_contributions").select("*").eq("bioguide_id", id).order("rank")),
     one(db.from("outside_spending").select("*").eq("bioguide_id", id).order("total", { ascending: false })),
     one(db.from("bills").select("congress,bill_type,number").eq("sponsor_bioguide_id", id).not("became_law_date", "is", null)),
+    one(db.from("candidates").select("fec_candidate_id,election_year,office,state,district").eq("bioguide_id", id)),
   ]);
-  return { member, terms, seat, memberships, votes, bills, sponsoredCount, cosponsoredCount, finance, freshness, voteStats, medians, billStats, billMedians, trades, filings, tradeSummary, bySize, employers, pacs, outside, laws };
+  return { member, terms, seat, memberships, votes, bills, sponsoredCount, cosponsoredCount, finance, freshness, voteStats, medians, billStats, billMedians, trades, filings, tradeSummary, bySize, employers, pacs, outside, laws, candidacies };
 }
 
 const SIZE_LABEL = { 0: "Under $200", 200: "$200–$499", 500: "$500–$999", 1000: "$1,000–$1,999", 2000: "$2,000 and over" };
@@ -185,7 +187,7 @@ export default function Member() {
   if (state.status === "missing") return <main className="page"><h1>Member not found</h1><p><Link to="/">Back to search</Link></p></main>;
   if (state.status === "error") return <main className="page"><p className="notice">Couldn't load this page right now. Try again shortly.</p></main>;
 
-  const { member: m, terms, seat, memberships, votes, bills, sponsoredCount, cosponsoredCount, finance, freshness, voteStats, medians, billStats, billMedians, trades, filings: scannedFilings, tradeSummary: ts, bySize, employers, pacs, outside, laws } = state.data;
+  const { member: m, terms, seat, memberships, votes, bills, sponsoredCount, cosponsoredCount, finance, freshness, voteStats, medians, billStats, billMedians, trades, filings: scannedFilings, tradeSummary: ts, bySize, employers, pacs, outside, laws, candidacies } = state.data;
   // Finance detail is shown for the most recent cycle with detail on file.
   const detailCycle = Math.max(0, ...[...bySize, ...employers, ...pacs, ...outside].map((r) => r.cycle));
   const inCycle = (rows) => rows.filter((r) => r.cycle === detailCycle);
@@ -223,6 +225,19 @@ export default function Member() {
         finance={finance} bySize={bySize} tradeSummary={ts} delegate={delegate(latest)} />
 
       <Section title="Service in Congress" source={`unitedstates/congress-legislators.${updated("members")}`}>
+        {seat?.seat_status === "serving" && (() => {
+          const upIn = seatNextUp(seat.chamber, seat.senate_class);
+          const filed = candidacies.find((c) => c.election_year === upIn);
+          return upIn && (
+            <p>
+              This seat is next up for election in {upIn}.
+              {upIn === nextElectionYear() && (filed
+                ? <> Has filed with the FEC to run in {upIn}{filed.office === "S" ? " for the Senate" : ` for the House${filed.district ? `, District ${filed.district}` : ""}`} (<a href={`https://www.fec.gov/data/candidate/${filed.fec_candidate_id}/`}>FEC</a>).</>
+                : <> Hasn't filed with the FEC for {upIn} yet.</>)}
+              {" "}<Link to={`/elections?state=${seat.state}`}>Who has filed in {STATE_NAMES[seat.state] ?? seat.state}</Link>
+            </p>
+          );
+        })()}
         <ul className="plain">
           {terms.map((t) => (
             <li key={`${t.chamber}-${t.start_date}`}>{seatLabel(t)} · {t.party} · {date(t.start_date)} – {date(t.end_date)}</li>

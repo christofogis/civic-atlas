@@ -3,23 +3,13 @@
 // contributor data. Run weekly with the other FEC jobs.
 //   node scripts/ingest/fec-candidates.mjs [--dry-run] [--year 2028]
 import { getClient, fetchAll, upsertBatches, withRun } from "./lib.mjs";
+import { nextElectionYear } from "../../lib/congress.js";
 
 const API = "https://api.open.fec.gov/v1";
 const args = process.argv.slice(2);
 const DRY = args.includes("--dry-run");
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 const STATUS = { I: "Incumbent", C: "Challenger", O: "Open seat" };
-
-// The next general election: this year's if it hasn't happened yet (first Tuesday after the
-// first Monday in November), otherwise two years on.
-export function nextElectionYear(now = new Date()) {
-  const y = now.getUTCFullYear();
-  if (y % 2 === 1) return y + 1;
-  const nov1 = new Date(Date.UTC(y, 10, 1));
-  const firstMonday = 1 + ((8 - nov1.getUTCDay()) % 7);
-  const electionDay = new Date(Date.UTC(y, 10, firstMonday + 1, 23));
-  return now <= electionDay ? y : y + 2;
-}
 
 async function getJson(url, key) {
   for (let attempt = 0; attempt < 4; attempt++) {
