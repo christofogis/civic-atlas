@@ -43,30 +43,43 @@ async function run(db) {
     }
   }
   const rows = [];
-  for (const office of ["H", "S"]) {
+  // Every filer comes from /candidates/; money from /candidates/totals/ for the two-year period
+  // ending in the election year (election_full=false), so senators (six-year terms) and House
+  // candidates are counted over the same span. Before anyone has reported for that period,
+  // there are no totals and receipts stay empty.
+  async function pagesOf(path, params) {
+    const out = [];
     let page = 1, pages = 1;
     do {
-      // election_full=false: totals for the two-year period ending in the election year only, so
-      // senators (six-year terms) and House members are counted over the same span.
-      const q = new URLSearchParams({ election_year: String(year), cycle: String(year), election_full: "false", office, per_page: "100", page: String(page), sort: "name", is_active_candidate: "true" });
-      const data = await getJson(`${API}/candidates/totals/?${q}`, key);
+      const q = new URLSearchParams({ ...params, per_page: "100", page: String(page) });
+      const data = await getJson(`${API}${path}?${q}`, key);
       pages = data.pagination?.pages ?? 1;
-      for (const c of data.results ?? []) {
-        if (!c.candidate_id || !c.state) continue;
-        rows.push({
-          fec_candidate_id: c.candidate_id, election_year: year, name: c.name, party: c.party_full ?? null,
-          office, state: c.state, district: office === "H" ? Number(c.district_number ?? c.district ?? 0) : null,
-          incumbent_challenge: STATUS[c.incumbent_challenge] ?? c.incumbent_challenge_full ?? null,
-          receipts: c.receipts ?? null, disbursements: c.disbursements ?? null,
-          cash_on_hand: c.cash_on_hand_end_period ?? null, coverage_end_date: c.coverage_end_date?.slice(0, 10) ?? null,
-          bioguide_id: byFec.get(c.candidate_id) ?? null,
-        });
-      }
-      if (DRY && page === 1) console.log("sample:", JSON.stringify(data.results?.[0]));
+      out.push(...(data.results ?? []));
       page++;
     } while (page <= pages);
-    console.log(`${year} ${office === "H" ? "House" : "Senate"}: ${rows.filter((r) => r.office === office).length} candidates`);
+    return out;
   }
+  for (const office of ["H", "S"]) {
+    const filers = await pagesOf("/candidates/", { election_year: String(year), office, is_active_candidate: "true", sort: "name" });
+    const totals = new Map((await pagesOf("/candidates/totals/", { election_year: String(year), cycle: String(year), election_full: "false", office }))
+      .map((t) => [t.candidate_id, t]));
+    if (DRY) console.log("sample:", JSON.stringify(filers[0]), JSON.stringify([...totals.values()][0] ?? null));
+    for (const c of filers) {
+      if (!c.candidate_id || !c.state) continue;
+      const t = totals.get(c.candidate_id);
+      rows.push({
+        fec_candidate_id: c.candidate_id, election_year: year, name: c.name, party: c.party_full ?? null,
+        office, state: c.state, district: office === "H" ? Number(c.district_number ?? c.district ?? 0) : null,
+        incumbent_challenge: STATUS[c.incumbent_challenge] ?? c.incumbent_challenge_full ?? null,
+        receipts: t?.receipts ?? null, disbursements: t?.disbursements ?? null,
+        cash_on_hand: t?.cash_on_hand_end_period ?? null, coverage_end_date: t?.coverage_end_date?.slice(0, 10) ?? null,
+        bioguide_id: byFec.get(c.candidate_id) ?? null,
+      });
+    }
+    console.log(`${year} ${office === "H" ? "House" : "Senate"}: ${filers.length} candidates, ${totals.size} with ${year - 1}–${year} totals`);
+  }
+  // Guard: an empty or failed listing must not wipe the table.
+  if (rows.length === 0) throw new Error("OpenFEC returned no candidates; nothing changed");
   if (DRY) { console.log(`dry run: ${rows.length} candidates, nothing written`); return { rows_inserted: 0, rows_updated: 0 }; }
   await upsertBatches(db, "candidates", rows, "fec_candidate_id,election_year");
   // Candidates no longer listed as active for this election are removed.
