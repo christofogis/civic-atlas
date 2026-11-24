@@ -17,6 +17,7 @@ const PAGES = [
   ["/search?q=padilla", ["Alex Padilla"]],
   ["/compare?a=P000145&b=S000033", ["Votes where they differed"]],
   ["/glossary", ["Cloture"]],
+  ["/quiz", ["Do you vote like your representatives?", "Would you have voted for it?"]],
   ["/methods", ["Votes by issue"]],
 ];
 const FAILURE_TEXT = /Couldn't load|isn't working right now|not found/i;

@@ -87,6 +87,11 @@ export default function Home() {
         </section>
       )}
 
+      <section className="home-links">
+        <Link to="/quiz" className="home-card"><strong>Do you vote like your representatives?</strong><span>Answer 10 real bills Congress voted on and see who agrees with you.</span></Link>
+        <Link to="/week" className="home-card"><strong>This week in Congress</strong><span>What's scheduled, and what passed, failed or became law.</span></Link>
+      </section>
+
       <footer>
         Data sources: Congress.gov, GovInfo, House Clerk, Senate.gov, FEC. <Link to="/methods">How this site works</Link>
       </footer>
