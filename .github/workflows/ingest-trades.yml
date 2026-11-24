@@ -1,0 +1,43 @@
+name: Ingest stock trades
+
+# STOCK Act Periodic Transaction Reports from the House Clerk and Senate eFD.
+# Senate eFD's public-use agreement (5 U.S.C. § 13107) is accepted automatically, as authorized
+# by the project owner for Civic Atlas's free, non-commercial public use.
+on:
+  schedule:
+    - cron: "53 13 * * *"   # daily, 5:53am Pacific
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "Parse a few filings per chamber; write nothing"
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ingest-trades
+  cancel-in-progress: false
+
+jobs:
+  ingest:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    env:
+      SUPABASE_URL: https://fkbzxaoeyrtzviyfzulq.supabase.co
+      SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: sudo apt-get install -y -qq poppler-utils unzip >/dev/null
+      - run: npm ci
+      - name: Trades
+        env:
+          DRY_RUN: ${{ inputs.dry_run }}
+        run: |
+          if [ "$DRY_RUN" = "true" ]; then node scripts/ingest/trades.mjs --dry-run --limit 6
+          else node scripts/ingest/trades.mjs; fi
