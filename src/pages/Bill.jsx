@@ -2,6 +2,7 @@ import { Fragment, useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { db } from "../lib/db.js";
 import TextVersions from "../components/TextVersions.jsx";
+import MeetingList from "../components/MeetingList.jsx";
 import DownloadCsv from "../components/DownloadCsv.jsx";
 import { date, billLabel, ordinal, partyTag } from "../lib/format.js";
 import VoteBreakdown from "../components/VoteBreakdown.jsx";
@@ -18,7 +19,7 @@ async function loadBill(congress, type, number) {
   const one = (q) => q.then(({ data, error }) => { if (error) throw error; return data; });
   const key = (q) => q.eq("congress", congress).eq("bill_type", type).eq("number", number);
   const weekAgo = new Date(Date.now() - 7 * 864e5).toISOString().slice(0, 10);
-  const [bill, sponsor, cosponsors, votes, lobbying, lobbyCount, freshness, scheduled] = await Promise.all([
+  const [bill, sponsor, cosponsors, votes, lobbying, lobbyCount, freshness, scheduled, meetings] = await Promise.all([
     one(key(db.from("bills").select("*")).maybeSingle()),
     one(key(db.from("bill_sponsor_details").select("*")).maybeSingle()),
     one(key(db.from("bill_cosponsor_details").select("*")).order("sponsored_date").order("last_name")),
@@ -30,8 +31,10 @@ async function loadBill(congress, type, number) {
     one(db.from("data_freshness").select("*")),
     one(db.from("upcoming_events").select("event_id,chamber,kind,event_date,event_time,week_of,category,committee_id,committee_name,title,source_url")
       .contains("bill_refs", [`${congress}-${type}-${number}`]).gte("event_date", weekAgo).order("event_date")),
+    one(db.from("committee_meetings").select("event_id,meeting_at,title,meeting_type,status,committee_ids")
+      .contains("bill_refs", [`${congress}-${type}-${number}`]).order("meeting_at", { ascending: false }).limit(50)).catch(() => []),
   ]);
-  return { bill, sponsor, cosponsors, votes, lobbying, lobbyTotal: lobbyCount?.clients ?? lobbying?.length ?? 0, freshness, scheduled };
+  return { bill, sponsor, cosponsors, votes, lobbying, lobbyTotal: lobbyCount?.clients ?? lobbying?.length ?? 0, freshness, scheduled, meetings };
 }
 
 function Section({ title, source, children }) {
@@ -65,7 +68,7 @@ export default function Bill() {
   if (state.status === "missing") return <main className="page"><h1>Bill not found</h1><p>Bills from the 118th Congress (2023) on are covered. <Link to="/">Back to search</Link></p></main>;
   if (state.status === "error") return <main className="page"><p className="notice">Couldn't load this page right now. Try again shortly.</p></main>;
 
-  const { bill: b, sponsor, cosponsors, votes, lobbying, lobbyTotal, freshness, scheduled } = state.data;
+  const { bill: b, sponsor, cosponsors, votes, lobbying, lobbyTotal, freshness, scheduled, meetings } = state.data;
   const fresh = Object.fromEntries(freshness.map((f) => [f.job, f.last_success_at]));
   const updated = (job) => (fresh[job] ? ` Updated ${date(fresh[job])}.` : "");
   const current = cosponsors.filter((x) => !x.withdrawn_date);
@@ -132,6 +135,12 @@ export default function Bill() {
           <p className="fine">Withdrawn: {withdrawn.map((x, i) => <span key={x.bioguide_id}>{i ? "; " : ""}{x.name} ({date(x.withdrawn_date)})</span>)}</p>
         )}
       </Section>
+
+      {meetings.length > 0 && (
+        <Section title="Committee hearings and markups" source="Congress.gov committee meeting records, where the meeting lists this bill.">
+          <MeetingList meetings={meetings} />
+        </Section>
+      )}
 
       <Section title="Roll-call votes" source={<>House Clerk and Senate.gov roll-call records. <Link to="/methods#vote-types">About vote types</Link>.</>}>
         {votes.length === 0 ? <p>No recorded roll-call votes on this bill. Many bills pass by voice vote or never reach the floor.</p> : (

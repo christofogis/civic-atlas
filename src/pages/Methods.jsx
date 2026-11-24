@@ -115,6 +115,15 @@ export default function Methods() {
         is computed, not written by anyone, and it says where the text changed, not what a change does.
       </p>
 
+      <h2 id="hearings">Committee hearings and meetings</h2>
+      <p>
+        Hearings, markups and business meetings in both chambers come from Congress.gov's committee meeting records,
+        from 2023 on, updated daily: date, committee, location, video, documents, and the bills and nominations on the
+        agenda. Witness lists and written testimony appear for House hearings only. House committees file them in the
+        central record; Senate committees post them on their own websites, so Senate hearing pages link there instead.
+        A meeting's bills are the ones the record lists, which may not include every bill discussed.
+      </p>
+
       <h2 id="accuracy">Checking our accuracy</h2>
       <p>
         Every week, a program picks random facts from this site (how members voted, who sponsored and cosponsored

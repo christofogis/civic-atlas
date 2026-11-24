@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link, useParams, useSearchParams } from "react-router-dom";
 import { db } from "../lib/db.js";
+import MeetingList from "../components/MeetingList.jsx";
 import Follow from "../components/Follow.jsx";
 import { congressOn, congressYears } from "../../lib/congress.js";
 import { billLabel, ordinal, partyTag, date } from "../lib/format.js";
@@ -43,7 +44,12 @@ export default function Committee() {
         ? await db.from("member_directory").select("bioguide_id,name,party,chamber,state,district").in("bioguide_id", roster.map((r) => r.bioguide_id))
         : { data: [] };
       const byId = new Map((people ?? []).map((p) => [p.bioguide_id, p]));
-      setInfo({ status: "done", committee: c.data, subs: subs.data ?? [], rosterCongress: latest, events: events.data ?? [],
+      // Recent hearings and meetings of this committee and its subcommittees.
+      const ids = [id, ...(subs.data ?? []).map((x) => x.committee_id)];
+      const { data: meetings } = await db.from("committee_meetings").select("event_id,meeting_at,title,meeting_type,status,committee_ids")
+        .overlaps("committee_ids", ids).lte("meeting_at", new Date(Date.now() + 864e5).toISOString())
+        .order("meeting_at", { ascending: false }).limit(25);
+      setInfo({ status: "done", committee: c.data, subs: subs.data ?? [], rosterCongress: latest, events: events.data ?? [], meetings: meetings ?? [],
         roster: roster.map((r) => ({ ...r, person: byId.get(r.bioguide_id) })) });
     })().catch(() => setInfo({ status: "error" }));
   }, [id]);
@@ -60,7 +66,8 @@ export default function Committee() {
   if (info.status === "missing") return <main className="page"><h1>Committee not found</h1><p><Link to="/committees">All committees</Link></p></main>;
   if (info.status === "error") return <main className="page"><p className="notice">Couldn't load this committee right now.</p></main>;
   if (info.status === "loading") return <main className="page"><p>Loading…</p></main>;
-  const { committee: c, subs, roster, rosterCongress, events } = info;
+  const { committee: c, subs, roster, rosterCongress, events, meetings } = info;
+  const subNames = Object.fromEntries(subs.map((x) => [x.committee_id, x.name]));
   const sides = ["majority", "minority"].map((s) => [s, roster.filter((r) => r.side === s)]).filter(([, l]) => l.length);
   const chamberName = { house: "House", senate: "Senate", joint: "Joint" }[c.chamber] ?? c.chamber;
 
@@ -83,6 +90,14 @@ export default function Committee() {
               </li>
             ))}
           </ul>
+        </section>
+      )}
+
+      {meetings.length > 0 && (
+        <section className="section">
+          <h2>Recent hearings and meetings</h2>
+          <MeetingList meetings={meetings} showCommittee committees={{ [c.committee_id]: "Full committee", ...subNames }} />
+          <p className="fine">Source: Congress.gov committee meeting records. The 25 most recent are listed; each links to video, documents and, for House hearings, witnesses.</p>
         </section>
       )}
 
