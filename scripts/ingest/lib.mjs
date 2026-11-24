@@ -23,8 +23,14 @@ export async function fetchAll(db, table, columns, pageSize = 1000) {
 
 export async function upsertBatches(db, table, rows, onConflict, batchSize = 500) {
   for (let i = 0; i < rows.length; i += batchSize) {
-    const { error } = await db.from(table).upsert(rows.slice(i, i + batchSize), { onConflict });
-    if (error) throw new Error(`upsert ${table}: ${error.message}`);
+    for (let attempt = 1; ; attempt++) {
+      const { error } = await db.from(table).upsert(rows.slice(i, i + batchSize), { onConflict });
+      if (!error) break;
+      // Gateway hiccups return an HTML page or a network error; upserts are safe to repeat.
+      const transient = /^\s*<|fetch failed|timeout/i.test(error.message);
+      if (!transient || attempt >= 4) throw new Error(`upsert ${table}: ${String(error.message).slice(0, 200)}`);
+      await new Promise((r) => setTimeout(r, 5000 * attempt));
+    }
   }
 }
 
