@@ -16,12 +16,15 @@ const PACE_MS = 1100;   // ~3,300 calls/hour, under the 5,000/hour the key allow
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 if (!KEY) throw new Error("DATA_GOV_API_KEY is not set");
 
+let lastCall = 0;
 async function api(url) {
   const u = new URL(url);
   u.searchParams.set("format", "json");
   u.searchParams.set("api_key", KEY);
   for (let i = 0; ; i++) {
-    await sleep(PACE_MS);
+    // Space call starts PACE_MS apart (the request's own time counts toward the gap).
+    await sleep(Math.max(0, lastCall + PACE_MS - Date.now()));
+    lastCall = Date.now();
     const res = await fetch(u, { headers: { Accept: "application/json" } });
     if (res.ok) return res.json();
     if (res.status === 404) return null;
