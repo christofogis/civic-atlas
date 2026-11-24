@@ -19,12 +19,29 @@ const MEMBER_FIELDS = [
   "lis_id", "govtrack_id", "thomas_id", "icpsr_id", "wikidata_id", "fec_candidate_ids",
   "first_name", "middle_name", "last_name", "suffix", "nickname", "official_full_name",
   "birthday", "gender", "source_url",
+  "social_x", "social_facebook", "social_youtube", "social_instagram", "social_mastodon", "social_bluesky",
 ];
 const TERM_FIELDS = [
   "state", "district", "senate_class", "state_rank", "party", "caucus", "end_date", "how", "url",
+  "phone", "address", "contact_form",
 ];
 
-export function mapLegislators(legislators) {
+// Official accounts from legislators-social-media.yaml, keyed by bioguide ID.
+export function mapSocial(entries) {
+  const out = new Map();
+  for (const e of entries ?? []) {
+    const s = e.social ?? {};
+    out.set(e.id?.bioguide, {
+      social_x: s.twitter ?? null, social_facebook: s.facebook ?? null, social_youtube: s.youtube ?? s.youtube_id ?? null,
+      social_instagram: s.instagram ?? null, social_mastodon: s.mastodon ?? null, social_bluesky: s.bluesky ?? null,
+    });
+  }
+  return out;
+}
+
+const NO_SOCIAL = { social_x: null, social_facebook: null, social_youtube: null, social_instagram: null, social_mastodon: null, social_bluesky: null };
+
+export function mapLegislators(legislators, social = new Map()) {
   const members = [];
   const terms = [];
   for (const m of legislators) {
@@ -46,6 +63,7 @@ export function mapLegislators(legislators) {
       birthday: m.bio?.birthday ?? null,
       gender: m.bio?.gender ?? null,
       source_url: `https://bioguide.congress.gov/search/bio/${id.bioguide}`,
+      ...(social.get(id.bioguide) ?? NO_SOCIAL),
     });
     for (const t of m.terms) {
       const house = t.type === "rep";
@@ -62,6 +80,9 @@ export function mapLegislators(legislators) {
         end_date: t.end,
         how: t.how ?? null,
         url: t.url ?? null,
+        phone: t.phone ?? null,
+        address: t.address ?? null,
+        contact_form: t.contact_form ?? null,
       });
     }
   }
@@ -85,7 +106,8 @@ async function main() {
   const current = await load("legislators-current.yaml", arg("--dir"));
   const recentFormer = (await load("legislators-historical.yaml", arg("--dir")))
     .filter((m) => m.terms.at(-1).end >= HISTORY_FROM);
-  const { members, terms } = mapLegislators([...current, ...recentFormer]);
+  const social = mapSocial(await load("legislators-social-media.yaml", arg("--dir")));
+  const { members, terms } = mapLegislators([...current, ...recentFormer], social);
   console.log(`source: ${current.length} current + ${recentFormer.length} former members, ${terms.length} terms`);
 
   if (dryRun) {
