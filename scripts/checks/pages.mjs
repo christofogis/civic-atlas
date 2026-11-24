@@ -17,6 +17,7 @@ export const PAGES = [
   ["/nominations", ["Nominations", "Confirmation"]],
   ["/hearing/118927", ["Before the Whistle", "Witnesses", "Mike Sena", "Written statement", "Watch"]],
   ["/hearing/338900", ["export controls", "Senate committees post witness lists", "committee's website"]],
+  ["/embed/member/P000145", ["Alex Padilla", "Recent roll-call votes", "Full record"]],
   ["/story", ["Look up a news story", "Article text"]],
   ["/topics", ["Topics", "Health"]],
   ["/elections?state=CA", ["who has filed", "Senate"]],

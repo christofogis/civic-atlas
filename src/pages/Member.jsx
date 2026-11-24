@@ -4,6 +4,7 @@ import { Link, useParams, useLocation, useNavigate } from "react-router-dom";
 import { db } from "../lib/db.js";
 import { seatNextUp, nextElectionYear } from "../../lib/congress.js";
 import AtAGlance from "../components/AtAGlance.jsx";
+import EmbedCode from "../components/EmbedCode.jsx";
 import Scale from "../components/Scale.jsx";
 import Follow from "../components/Follow.jsx";
 import { KindLabel } from "../components/Explain.jsx";
@@ -258,6 +259,7 @@ export default function Member() {
 
       <AtAGlance terms={terms} voteStats={voteStats} medians={medians} billStats={billStats} laws={laws}
         finance={finance} bySize={bySize} tradeSummary={ts} delegate={delegate(latest)} />
+      <EmbedCode path={`/embed/member/${m.bioguide_id}`} title={`${name} on Civic Atlas`} />
 
       <Section title="Service in Congress" source={<>unitedstates/congress-legislators.{updated("members")} Biography: <a href={m.source_url}>Biographical Directory of the U.S. Congress</a>.</>}>
         {seat?.seat_status === "serving" && (() => {

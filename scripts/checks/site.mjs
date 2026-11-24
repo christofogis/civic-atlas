@@ -11,6 +11,8 @@ const FEEDS = [
   ["/api/feed/bill/119/hr/1", "rss", "Became law"],
   ["/api/calendar/committee/SSFI", "calendar", "BEGIN:VCALENDAR"],
   ["/api/calendar/member/P000145", "calendar", "END:VCALENDAR"],
+  ["/manifest.webmanifest", "manifest", "Civic Atlas"],
+  ["/sw.js", "javascript", "civic-atlas-v"],
 ];
 const FAILURE_TEXT = /Couldn't load|isn't working right now|not found/i;
 

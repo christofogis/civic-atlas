@@ -212,3 +212,10 @@ ul.bare { list-style: none; padding: 0; margin: 0; }
 .suggestions li[role=option] { padding: 10px 12px; cursor: pointer; }
 .suggestions li.on, .suggestions li[role=option]:hover { background: var(--accent-soft); }
 .suggestions .attribution { padding: 6px 12px 4px; font-size: 0.75rem; color: var(--muted); border-top: 1px solid var(--border); }
+
+/* Embeddable cards (shown inside other sites' pages) */
+.embed { font-size: 0.95rem; padding: 14px 16px; border: 1px solid var(--border); border-radius: 8px; background: var(--bg); max-width: 640px; }
+.embed h1 { font-size: 1.25rem; margin: 0 0 2px; }
+.embed h2 { font-size: 1rem; margin: 14px 0 6px; }
+.embed ul.plain li { margin-bottom: 6px; }
+.embed-foot { margin-top: 12px; padding-top: 8px; border-top: 1px solid var(--border); }

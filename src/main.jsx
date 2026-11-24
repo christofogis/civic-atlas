@@ -1,4 +1,4 @@
-import { StrictMode, lazy as lazyReact } from "react";
+import { StrictMode, Suspense, lazy as lazyReact } from "react";
 import { createRoot } from "react-dom/client";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Home from "./pages/Home.jsx";
@@ -36,12 +36,15 @@ const Corrections = lazy(() => import("./pages/Corrections.jsx"));
 const Nominations = lazy(() => import("./pages/Nominations.jsx"));
 const ExplainStory = lazy(() => import("./pages/ExplainStory.jsx"));
 const Hearing = lazy(() => import("./pages/Hearing.jsx"));
+const EmbedMember = lazy(() => import("./pages/EmbedMember.jsx"));
 const NotFound = lazy(() => import("./pages/NotFound.jsx"));
 
 createRoot(document.getElementById("root")).render(
   <StrictMode>
     <BrowserRouter>
       <Routes>
+        {/* Embeds render without the site header and footer. */}
+        <Route path="/embed/member/:id" element={<Suspense fallback={null}><EmbedMember /></Suspense>} />
         <Route element={<Layout />}>
         <Route path="/" element={<Home />} />
         <Route path="/search" element={<Search />} />
