@@ -36,7 +36,7 @@ function VoteStats({ s, median, delegate, independent }) {
 
 async function loadMember(id) {
   const one = (q) => q.then(({ data, error }) => { if (error) throw error; return data; });
-  const [member, terms, seat, memberships, votes, bills, sponsoredCount, cosponsoredCount, finance, freshness, voteStats, medians, billStats, billMedians, trades, filings, tradeSummary] = await Promise.all([
+  const [member, terms, seat, memberships, votes, bills, sponsoredCount, cosponsoredCount, finance, freshness, voteStats, medians, billStats, billMedians, trades, filings, tradeSummary, bySize, employers, pacs, outside] = await Promise.all([
     one(db.from("members").select("*").eq("bioguide_id", id).maybeSingle()),
     one(db.from("terms").select("chamber,state,district,party,start_date,end_date").eq("bioguide_id", id).order("start_date", { ascending: false })),
     one(db.from("seat_holders").select("*").eq("bioguide_id", id).maybeSingle()),
@@ -58,8 +58,68 @@ async function loadMember(id) {
       .eq("bioguide_id", id).order("transaction_date", { ascending: false }).limit(25)),
     one(db.from("ptr_filings").select("filing_id,filed_date,format,source_url").eq("bioguide_id", id).eq("format", "scanned").order("filed_date", { ascending: false })),
     one(db.from("member_trade_summary").select("*").eq("bioguide_id", id).maybeSingle()),
+    one(db.from("finance_by_size").select("*").eq("bioguide_id", id)),
+    one(db.from("finance_top_employers").select("*").eq("bioguide_id", id).order("rank")),
+    one(db.from("finance_committee_contributions").select("*").eq("bioguide_id", id).order("rank")),
+    one(db.from("outside_spending").select("*").eq("bioguide_id", id).order("total", { ascending: false })),
   ]);
-  return { member, terms, seat, memberships, votes, bills, sponsoredCount, cosponsoredCount, finance, freshness, voteStats, medians, billStats, billMedians, trades, filings, tradeSummary };
+  return { member, terms, seat, memberships, votes, bills, sponsoredCount, cosponsoredCount, finance, freshness, voteStats, medians, billStats, billMedians, trades, filings, tradeSummary, bySize, employers, pacs, outside };
+}
+
+const SIZE_LABEL = { 0: "Under $200", 200: "$200–$499", 500: "$500–$999", 1000: "$1,000–$1,999", 2000: "$2,000 and over" };
+
+// Where the money came from in one cycle: size of individual gifts, donors' employers, PACs,
+// and outside groups' spending. All figures are FEC aggregates; no donor is named.
+function FinanceDetail({ cycle, bySize, employers, pacs, outside, fecId }) {
+  const sizeTotal = bySize.reduce((a, r) => a + Number(r.total ?? 0), 0);
+  const support = outside.filter((o) => o.support_oppose === "support");
+  const oppose = outside.filter((o) => o.support_oppose === "oppose");
+  const sum = (rows) => rows.reduce((a, r) => a + Number(r.total ?? 0), 0);
+  return (
+    <div className="finance-detail">
+      <h3>{cycle} cycle in detail</h3>
+      {bySize.length > 0 && (
+        <>
+          <h4>Individual contributions by size</h4>
+          <table>
+            <tbody>
+              {[...bySize].sort((a, b) => a.size_bucket - b.size_bucket).map((r) => (
+                <tr key={r.size_bucket}><td>{SIZE_LABEL[r.size_bucket] ?? `$${r.size_bucket}+`}</td><td>{money(Number(r.total))}</td><td>{sizeTotal ? `${Math.round((100 * Number(r.total)) / sizeTotal)}%` : ""}</td></tr>
+              ))}
+            </tbody>
+          </table>
+        </>
+      )}
+      {employers.length > 0 && (
+        <>
+          <h4>Donors' employers</h4>
+          <p className="fine">Contributions from individuals who listed these employers. Companies can't give directly to federal campaigns.</p>
+          <ol className="plain">
+            {employers.slice(0, 10).map((e) => <li key={e.rank}>{e.employer} · {money(Number(e.total))} from {e.contributions?.toLocaleString() ?? "—"} contributions</li>)}
+          </ol>
+        </>
+      )}
+      {pacs.length > 0 && (
+        <>
+          <h4>PACs and other committees giving the most</h4>
+          <ol className="plain">
+            {pacs.slice(0, 10).map((p) => <li key={p.rank}><a href={`https://www.fec.gov/data/committee/${p.contributor_committee_id}/`}>{p.contributor_name}</a> · {money(Number(p.total))}</li>)}
+          </ol>
+        </>
+      )}
+      {outside.length > 0 && (
+        <>
+          <h4>Outside spending</h4>
+          <p className="fine">Independent expenditures by groups not coordinating with the campaign.</p>
+          <p>Supporting: <strong>{money(sum(support))}</strong> · Opposing: <strong>{money(sum(oppose))}</strong></p>
+          <ul className="plain">
+            {outside.slice(0, 8).map((o) => <li key={`${o.committee_id}-${o.support_oppose}`}><a href={`https://www.fec.gov/data/committee/${o.committee_id}/`}>{o.committee_name}</a> · {o.support_oppose === "support" ? "supporting" : "opposing"} · {money(Number(o.total))}</li>)}
+          </ul>
+        </>
+      )}
+      {fecId && <p className="fine"><a href={`https://www.fec.gov/data/candidate/${fecId}/?cycle=${cycle}`}>Full records at FEC.gov</a></p>}
+    </div>
+  );
 }
 
 function Section({ title, source, children }) {
@@ -89,7 +149,10 @@ export default function Member() {
   if (state.status === "missing") return <main className="page"><h1>Member not found</h1><p><Link to="/">Back to search</Link></p></main>;
   if (state.status === "error") return <main className="page"><p className="notice">Couldn't load this page right now. Try again shortly.</p></main>;
 
-  const { member: m, terms, seat, memberships, votes, bills, sponsoredCount, cosponsoredCount, finance, freshness, voteStats, medians, billStats, billMedians, trades, filings: scannedFilings, tradeSummary: ts } = state.data;
+  const { member: m, terms, seat, memberships, votes, bills, sponsoredCount, cosponsoredCount, finance, freshness, voteStats, medians, billStats, billMedians, trades, filings: scannedFilings, tradeSummary: ts, bySize, employers, pacs, outside } = state.data;
+  // Finance detail is shown for the most recent cycle with detail on file.
+  const detailCycle = Math.max(0, ...[...bySize, ...employers, ...pacs, ...outside].map((r) => r.cycle));
+  const inCycle = (rows) => rows.filter((r) => r.cycle === detailCycle);
   const delegate = latest => latest?.chamber === "house" && TERRITORIES.has(latest.state);
   const name = m.official_full_name ?? `${m.first_name} ${m.last_name}`;
   const latest = terms[0];
@@ -268,7 +331,7 @@ export default function Member() {
         )}
       </Section>
 
-      <Section title="Campaign finance" source={`Federal Election Commission (OpenFEC), totals by two-year cycle.${updated("fec-summaries")}`}>
+      <Section title="Campaign finance" source={<>Federal Election Commission (OpenFEC).{updated("fec-summaries")} <Link to="/methods#money">About this data</Link>.</>}>
         {finance.length === 0 ? <p>No FEC filings on record for this member.</p> : (
           <table>
             <thead><tr><th>Cycle</th><th>Raised</th><th>Spent</th><th>Cash on hand</th><th>Individuals</th><th>PACs</th><th>Through</th></tr></thead>
@@ -287,6 +350,7 @@ export default function Member() {
             </tbody>
           </table>
         )}
+        {detailCycle > 0 && <FinanceDetail cycle={detailCycle} bySize={inCycle(bySize)} employers={inCycle(employers)} pacs={inCycle(pacs)} outside={inCycle(outside)} fecId={finance.find((f) => f.cycle === detailCycle)?.fec_candidate_id} />}
       </Section>
     </main>
   );

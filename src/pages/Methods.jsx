@@ -85,6 +85,19 @@ export default function Methods() {
       </ul>
       <p>"Final votes only" on a member page shows final passage, veto overrides and confirmations.</p>
 
+      <h2 id="money">Campaign finance</h2>
+      <p>
+        Totals come from each campaign's reports to the Federal Election Commission, by two-year cycle.
+        For the most recent cycle, a member page also shows:
+      </p>
+      <ul className="plain">
+        <li><strong>Contributions by size:</strong> money from individuals, grouped by the size of each gift. Gifts under $200 don't have to be itemized, so they're shown as one total.</li>
+        <li><strong>Donors' employers:</strong> the employers individual donors wrote on their forms, ranked by total. Companies can't contribute directly to federal campaigns; these are gifts from people. Entries that don't name an employer (Retired, Self-employed, Not employed, Homemaker, Student, Information requested, N/A and blanks) are left out of the ranking.</li>
+        <li><strong>PACs and other committees:</strong> contributions reported as coming from other political committees, ranked by total among the campaign's 100 largest such contributions. Transfers between a candidate's own committees are not included. Federal limits keep each committee's giving to a few thousand dollars per election.</li>
+        <li><strong>Outside spending:</strong> money spent by groups such as super PACs to support or oppose the candidate without coordinating with the campaign, as reported to the FEC.</li>
+      </ul>
+      <p>No individual donor is named here, and FEC rules bar using donor names for soliciting contributions or commercial purposes.</p>
+
       <h2 id="trades">Stock trades</h2>
       <p>
         Under the STOCK Act, members of Congress must report each purchase, sale or exchange of stocks,

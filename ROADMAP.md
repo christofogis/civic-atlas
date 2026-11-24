@@ -27,8 +27,8 @@
 
 ## Phase 1c — Money & conflicts
 - [x] Stock trades (STOCK Act PTRs, House + Senate, 2025 on) with 45-day timing
-- [ ] Donors by industry and PAC
-- [ ] Outside spending for / against
+- [x] Donors: contributions by size, donors' employers, top PACs (FEC has no industry codes)
+- [x] Outside spending for / against
 - [ ] Lobbying on bills
 - [ ] Earmark requests
 

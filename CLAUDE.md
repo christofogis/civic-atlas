@@ -75,7 +75,8 @@ yes-man: flag weak ideas, scope creep, and shortcuts that will cost later.
 
 ## Ingest jobs (GitHub Actions, `scripts/ingest/`)
 - Daily: members + committees 4:17am PT, votes 4:47am, bills 5:23am, trades 5:53am.
-  FEC weekly, Tue evening. Vote and bill stats are recomputed in the database after their jobs.
+  FEC totals weekly Tue evening, FEC detail (sizes, employers, PACs, outside spending) Wed
+  evening (~3 hours, paced under the API limit). Vote and bill stats are recomputed in the database after their jobs.
 - Coverage starts with the 118th Congress (2023). Members include anyone who served since then.
 - Every run is logged in `ingest_runs` (public); never put secrets in error text.
 
