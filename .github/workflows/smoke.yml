@@ -1,6 +1,8 @@
 name: Smoke test
 
-# Manual check of the live site's API with public addresses (government buildings only).
+# Manual check of the live lookup API with public addresses (government buildings only).
+# With Turnstile enforced, the expected result is HTTP 403 for every lookup: a script
+# cannot pass the bot check. A 200 here means the check is off.
 on:
   workflow_dispatch:
     inputs:
