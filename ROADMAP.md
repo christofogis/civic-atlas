@@ -22,7 +22,7 @@
 - [x] Missed-vote rate
 - [x] Methods page (/methods)
 - [x] Label procedural vs. final votes (src/lib/voteKind.js), with "final votes only" filter
-- [ ] Bipartisan cosponsorship rate
+- [x] Bipartisan cosponsorship: cross-party cosponsorship and cross-party support rates
 - [ ] Members' statements beside their votes
 
 ## Phase 2 — Depth

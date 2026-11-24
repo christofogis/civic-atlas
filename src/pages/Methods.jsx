@@ -54,6 +54,22 @@ export default function Methods() {
         with the chamber.
       </p>
 
+      <h2 id="cosponsorship">Working across party lines</h2>
+      <p>
+        Cosponsoring a bill is a public statement of support, and members often cosponsor bills from
+        the other party. Two figures are shown, per Congress:
+      </p>
+      <ul className="plain">
+        <li><strong>Cross-party cosponsorship:</strong> of the bills a member cosponsored, the share introduced by a member of the other party.</li>
+        <li><strong>Cross-party support:</strong> of the bills a member introduced, the share that drew at least one cosponsor from the other party.</li>
+      </ul>
+      <p>
+        Party is taken as of the date the bill was introduced (for the sponsor) or cosponsored (for the
+        cosponsor); independents count with the party they caucus with. Withdrawn cosponsorships don't
+        count. Rates aren't shown below 20 cosponsored or 10 introduced bills. Cosponsorship reflects
+        support for introducing a bill, not how a member later votes on it.
+      </p>
+
       <h2 id="vote-types">Vote types</h2>
       <p>
         Many roll calls are about procedure rather than a bill itself, and a "no" on a procedural

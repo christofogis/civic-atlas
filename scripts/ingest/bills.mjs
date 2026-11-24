@@ -166,6 +166,11 @@ async function main() {
     if (unknownPeople) console.log(`note: ${unknownPeople} sponsor/cosponsor entries not in members (left before 2023?)`);
     if (unparsed) console.log(`warning: ${unparsed} files could not be parsed`);
     if (dryRun) console.log("dry run: nothing written");
+    else {
+      const { data: statRows, error: statErr } = await db.rpc("refresh_member_bill_stats");
+      if (statErr) throw new Error(`refresh bill stats: ${statErr.message}`);
+      console.log(`bipartisan cosponsorship stats refreshed: ${statRows} member rows`);
+    }
     return { rows_inserted: 0, rows_updated: billCount + cosponsorCount };
   };
 

@@ -36,7 +36,7 @@ function VoteStats({ s, median, delegate, independent }) {
 
 async function loadMember(id) {
   const one = (q) => q.then(({ data, error }) => { if (error) throw error; return data; });
-  const [member, terms, seat, memberships, votes, bills, sponsoredCount, cosponsoredCount, finance, freshness, voteStats, medians] = await Promise.all([
+  const [member, terms, seat, memberships, votes, bills, sponsoredCount, cosponsoredCount, finance, freshness, voteStats, medians, billStats, billMedians] = await Promise.all([
     one(db.from("members").select("*").eq("bioguide_id", id).maybeSingle()),
     one(db.from("terms").select("chamber,state,district,party,start_date,end_date").eq("bioguide_id", id).order("start_date", { ascending: false })),
     one(db.from("seat_holders").select("*").eq("bioguide_id", id).maybeSingle()),
@@ -52,8 +52,10 @@ async function loadMember(id) {
     one(db.from("data_freshness").select("*")),
     one(db.from("member_vote_stats").select("*").eq("bioguide_id", id).order("congress", { ascending: false })),
     one(db.from("chamber_vote_medians").select("*")),
+    one(db.from("member_bill_stats").select("*").eq("bioguide_id", id).order("congress", { ascending: false })),
+    one(db.from("chamber_bill_medians").select("*")),
   ]);
-  return { member, terms, seat, memberships, votes, bills, sponsoredCount, cosponsoredCount, finance, freshness, voteStats, medians };
+  return { member, terms, seat, memberships, votes, bills, sponsoredCount, cosponsoredCount, finance, freshness, voteStats, medians, billStats, billMedians };
 }
 
 function Section({ title, source, children }) {
@@ -83,7 +85,7 @@ export default function Member() {
   if (state.status === "missing") return <main className="page"><h1>Member not found</h1><p><Link to="/">Back to search</Link></p></main>;
   if (state.status === "error") return <main className="page"><p className="notice">Couldn't load this page right now. Try again shortly.</p></main>;
 
-  const { member: m, terms, seat, memberships, votes, bills, sponsoredCount, cosponsoredCount, finance, freshness, voteStats, medians } = state.data;
+  const { member: m, terms, seat, memberships, votes, bills, sponsoredCount, cosponsoredCount, finance, freshness, voteStats, medians, billStats, billMedians } = state.data;
   const delegate = latest => latest?.chamber === "house" && TERRITORIES.has(latest.state);
   const name = m.official_full_name ?? `${m.first_name} ${m.last_name}`;
   const latest = terms[0];
@@ -187,6 +189,29 @@ export default function Member() {
 
       <Section title="Legislation" source={`GovInfo Bill Status (Library of Congress), 118th Congress on.${updated("bills")}`}>
         <p>Sponsored: {sponsoredCount ?? 0} · Cosponsored: {cosponsoredCount ?? 0}</p>
+        {billStats.map((b) => {
+          const med = billMedians.find((x) => x.congress === b.congress && x.chamber === b.chamber);
+          return (
+            <div className="stat-block" key={`${b.congress}-${b.chamber}`}>
+              <h3>{ordinal(b.congress)} Congress, {b.chamber === "house" ? "House" : "Senate"}</h3>
+              {b.cosponsored >= 20 ? (
+                <p>
+                  Of the {b.cosponsored.toLocaleString()} bills they cosponsored, <strong>{pct(b.cosponsored_other_party, b.cosponsored)}</strong> were
+                  introduced by a member of the other party.
+                  {med?.median_cross_party_cosponsor_rate != null && <> Chamber median: {pct(med.median_cross_party_cosponsor_rate * 1000, 1000)}.</>}
+                </p>
+              ) : <p>Cosponsored {b.cosponsored} bills (too few to calculate a cross-party rate).</p>}
+              {b.sponsored >= 10 ? (
+                <p>
+                  Of the {b.sponsored.toLocaleString()} bills they introduced, <strong>{pct(b.sponsored_with_other_party, b.sponsored)}</strong> had
+                  at least one cosponsor from the other party.
+                  {med?.median_cross_party_support_rate != null && <> Chamber median: {pct(med.median_cross_party_support_rate * 1000, 1000)}.</>}
+                </p>
+              ) : b.sponsored > 0 && <p>Introduced {b.sponsored} bills (too few to calculate a cross-party rate).</p>}
+            </div>
+          );
+        })}
+        <p className="fine"><Link to="/methods#cosponsorship">How these are calculated</Link>.</p>
         {bills.length > 0 && (
           <ul className="plain">
             {bills.map((b) => (
