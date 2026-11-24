@@ -96,7 +96,8 @@ export default function Methods() {
         Trades are shown as filed: the asset's name, the amount as the range the law requires (exact
         figures are not disclosed), and who owned it. "Days to report" counts from the transaction date to
         the date the report was filed; more than 45 is noted, since that is the law's outer limit. The
-        records don't show whether a late fee was paid or waived. Reports filed on paper are linked but not
+        records don't show whether a late fee was paid or waived. When a report lists a trade date after
+        its own filing date, the dates are shown as filed and not counted either way. Reports filed on paper are linked but not
         itemized. Coverage starts January 2025.
       </p>
       <p>

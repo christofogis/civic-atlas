@@ -256,7 +256,8 @@ export default function Member() {
                       <td>{t.owner}</td>
                       <td>
                         <a href={filingUrl[t.filing_id]}>{date(t.filed_date)}</a>
-                        {t.days_to_file != null && <div className={t.days_to_file > 45 ? "fine late" : "fine"}>{t.days_to_file} days{t.days_to_file > 45 ? " (over 45)" : ""}</div>}
+                        {t.days_to_file != null && t.days_to_file >= 0 && <div className={t.days_to_file > 45 ? "fine late" : "fine"}>{t.days_to_file} days{t.days_to_file > 45 ? " (over 45)" : ""}</div>}
+                        {t.days_to_file != null && t.days_to_file < 0 && <div className="fine">Trade date as filed is after the report date</div>}
                       </td>
                     </tr>
                   ))}
