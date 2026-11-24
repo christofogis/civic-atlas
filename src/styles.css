@@ -225,8 +225,9 @@ h2.week-head { font-size: 1.4rem; margin-top: 44px; }
 
 /* Long titles: cut to a few lines, with "more" (Clamp.jsx) */
 .clamp { display: -webkit-box; -webkit-box-orient: vertical; overflow: hidden; }
-.clamp-wrap { display: block; }
-.clamp-more { margin-left: 2px; }
+.clamp-wrap { display: flex; align-items: baseline; gap: 8px; }
+.clamp-wrap > .clamp, .clamp-wrap > .clamp-open { flex: 1; min-width: 0; }
+.clamp-more { flex: none; }
 
 /* Schedule rows: time in its own column, then committee, then the title on one line */
 .events li.event-row { display: grid; grid-template-columns: 5.5rem 1fr; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--border); max-width: none; }

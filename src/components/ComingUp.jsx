@@ -43,7 +43,11 @@ export default function ComingUp({ myCommittees = new Set() }) {
   if (state.status === "error") return <p className="notice">{tr("Couldn't load the schedule right now.", "No se pudo cargar la agenda en este momento.")}</p>;
   const { floor, convene, meetings } = state;
   const weeks = [...new Set(floor.map((e) => e.event_date))];
-  const byDay = meetings.reduce((m, e) => m.set(e.event_date, [...(m.get(e.event_date) ?? []), e]), new Map());
+  // "02:00 PM" and "2:00 PM" both appear; sort by minutes after midnight, unknown times last.
+  const minutes = (t) => { const m = /^(\d{1,2}):(\d{2})\s*([AP])M/i.exec(t ?? ""); return m ? ((+m[1] % 12) + (/p/i.test(m[3]) ? 12 : 0)) * 60 + +m[2] : 9999; };
+  const tidy = (t) => (t ?? "").replace(/^0(\d)/, "$1");
+  const byDay = [...meetings].sort((a, z) => a.event_date.localeCompare(z.event_date) || minutes(a.event_time) - minutes(z.event_time))
+    .reduce((m, e) => m.set(e.event_date, [...(m.get(e.event_date) ?? []), e]), new Map());
 
   return (
     <>
@@ -81,7 +85,7 @@ export default function ComingUp({ myCommittees = new Set() }) {
           <ul className="bare events">
             {list.map((e) => (
               <li key={e.event_id} className={`event-row${myCommittees.has(e.committee_id) || myCommittees.has(e.committee_id?.slice(0, 4)) ? " mine-row" : ""}`}>
-                <span className="event-time">{e.event_time ?? ""}</span>
+                <span className="event-time">{tidy(e.event_time)}</span>
                 <span className="event-body">
                   <span className="event-meta">
                     {e.committee_id ? <Link to={`/committee/${e.committee_id}`}>{shortCommittee(e.committee_name)}</Link> : shortCommittee(e.committee_name)}
