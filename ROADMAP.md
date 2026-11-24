@@ -17,6 +17,14 @@
 - [x] Member profile page: service, committees, recent votes, sponsored bills, FEC totals, source links
 - [ ] Deploy publicly
 
+## Phase 1b — Accountability metrics
+- [x] Party-line rate on party-split votes, with chamber medians
+- [x] Missed-vote rate
+- [x] Methods page (/methods)
+- [ ] Label procedural vs. final votes
+- [ ] Bipartisan cosponsorship rate
+- [ ] Members' statements beside their votes
+
 ## Phase 2 — Depth
 - [ ] Vote ingest from House/Senate clerks; vote search by issue
 - [ ] Bill pages with CRS summaries (AI summary only as labeled fallback)

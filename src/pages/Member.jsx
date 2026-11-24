@@ -4,10 +4,38 @@ import { db } from "../lib/db.js";
 import { seatLabel, date, money, billLabel, ordinal } from "../lib/format.js";
 
 const BIOGUIDE = /^[A-Z][0-9]{6}$/;
+const TERRITORIES = new Set(["DC", "PR", "GU", "VI", "AS", "MP"]);
+const MIN_SPLIT_VOTES = 20; // below this, a rate says more about the sample than the member
+const pct = (n, d) => (d ? `${(Math.round((1000 * n) / d) / 10).toFixed(1)}%` : "—");
+const partyAdj = (p) => (p === "Democrat" ? "Democratic" : p);
+
+// One Congress and chamber of party-line and attendance figures, in plain sentences.
+function VoteStats({ s, median, delegate, independent }) {
+  const party = partyAdj(s.scoring_party);
+  return (
+    <div className="stat-block">
+      <h3>{ordinal(s.congress)} Congress, {s.chamber === "house" ? "House" : "Senate"}</h3>
+      {s.party_split_votes < MIN_SPLIT_VOTES ? (
+        <p>Party-line rate: not calculated ({s.party_split_votes} party-split votes; at least {MIN_SPLIT_VOTES} needed).</p>
+      ) : (
+        <p>
+          Voted with the {party} majority on <strong>{pct(s.with_party, s.party_split_votes)}</strong> of
+          party-split votes ({s.with_party.toLocaleString()} of {s.party_split_votes.toLocaleString()})
+          {independent && <> — the party this member caucuses with</>}.
+          {median && !delegate && <> Chamber median: {pct(median.median_party_line_rate * 1000, 1000)}.</>}
+        </p>
+      )}
+      <p>
+        Missed <strong>{pct(s.missed, s.roll_calls)}</strong> of roll-call votes ({s.missed.toLocaleString()} of {s.roll_calls.toLocaleString()}).
+        {median && !delegate && <> Chamber median: {pct(median.median_missed_rate * 1000, 1000)}.</>}
+      </p>
+    </div>
+  );
+}
 
 async function loadMember(id) {
   const one = (q) => q.then(({ data, error }) => { if (error) throw error; return data; });
-  const [member, terms, seat, memberships, votes, bills, sponsoredCount, cosponsoredCount, finance, freshness] = await Promise.all([
+  const [member, terms, seat, memberships, votes, bills, sponsoredCount, cosponsoredCount, finance, freshness, voteStats, medians] = await Promise.all([
     one(db.from("members").select("*").eq("bioguide_id", id).maybeSingle()),
     one(db.from("terms").select("chamber,state,district,party,start_date,end_date").eq("bioguide_id", id).order("start_date", { ascending: false })),
     one(db.from("seat_holders").select("*").eq("bioguide_id", id).maybeSingle()),
@@ -21,8 +49,10 @@ async function loadMember(id) {
     db.from("bill_cosponsors").select("*", { count: "exact", head: true }).eq("bioguide_id", id).is("withdrawn_date", null).then((r) => r.count),
     one(db.from("finance_summaries").select("*").eq("bioguide_id", id).order("cycle", { ascending: false })),
     one(db.from("data_freshness").select("*")),
+    one(db.from("member_vote_stats").select("*").eq("bioguide_id", id).order("congress", { ascending: false })),
+    one(db.from("chamber_vote_medians").select("*")),
   ]);
-  return { member, terms, seat, memberships, votes, bills, sponsoredCount, cosponsoredCount, finance, freshness };
+  return { member, terms, seat, memberships, votes, bills, sponsoredCount, cosponsoredCount, finance, freshness, voteStats, medians };
 }
 
 function Section({ title, source, children }) {
@@ -51,7 +81,8 @@ export default function Member() {
   if (state.status === "missing") return <main className="page"><h1>Member not found</h1><p><Link to="/">Back to search</Link></p></main>;
   if (state.status === "error") return <main className="page"><p className="notice">Couldn't load this page right now. Try again shortly.</p></main>;
 
-  const { member: m, terms, seat, memberships, votes, bills, sponsoredCount, cosponsoredCount, finance, freshness } = state.data;
+  const { member: m, terms, seat, memberships, votes, bills, sponsoredCount, cosponsoredCount, finance, freshness, voteStats, medians } = state.data;
+  const delegate = latest => latest?.chamber === "house" && TERRITORIES.has(latest.state);
   const name = m.official_full_name ?? `${m.first_name} ${m.last_name}`;
   const latest = terms[0];
   const currentCongress = Math.max(0, ...memberships.map((c) => c.congress));
@@ -101,6 +132,25 @@ export default function Member() {
               </li>
             ))}
           </ul>
+        )}
+      </Section>
+
+      <Section title="Voting record" source={<>Calculated from House Clerk and Senate.gov roll-call records. <Link to="/methods">How these are calculated</Link>.</>}>
+        {voteStats.length === 0 ? <p>No roll-call votes on record since 2023.</p> : (
+          <>
+            {delegate(latest) && (
+              <p className="notice">
+                Delegates and the Resident Commissioner can vote only on certain amendment votes, so these
+                figures cover far fewer roll calls than a member's and aren't compared with the chamber.
+              </p>
+            )}
+            {voteStats.map((s) => (
+              <VoteStats key={`${s.congress}-${s.chamber}`} s={s}
+                median={medians.find((x) => x.congress === s.congress && x.chamber === s.chamber)}
+                delegate={delegate(latest)}
+                independent={terms.some((t) => t.party === "Independent")} />
+            ))}
+          </>
         )}
       </Section>
 

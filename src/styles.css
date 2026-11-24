@@ -45,3 +45,8 @@ th { color: var(--muted); font-weight: 600; }
 button:disabled { opacity: 0.7; cursor: default; }
 @media (max-width: 600px) { .row { flex-direction: column; } table { font-size: 0.8rem; } }
 .turnstile { margin-top: 10px; min-height: 0; }
+.stat-block { margin: 12px 0 18px; }
+.stat-block h3 { font-size: 0.95rem; margin: 0 0 4px; color: var(--muted); font-weight: 600; }
+.stat-block p { margin: 4px 0; }
+.prose h2 { font-size: 1.15rem; margin-top: 32px; }
+.prose p, .prose li { max-width: 640px; }

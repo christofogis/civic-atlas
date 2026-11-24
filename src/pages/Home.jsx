@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import OfficialCard from "../components/OfficialCard.jsx";
 import Turnstile from "../components/Turnstile.jsx";
 import { TURNSTILE_SITE_KEY } from "../lib/config.js";
@@ -84,7 +85,9 @@ export default function Home() {
         </section>
       )}
 
-      <footer>Data sources: Congress.gov, GovInfo, House Clerk, Senate.gov, FEC.</footer>
+      <footer>
+        Data sources: Congress.gov, GovInfo, House Clerk, Senate.gov, FEC. <Link to="/methods">How this site works</Link>
+      </footer>
     </main>
   );
 }
