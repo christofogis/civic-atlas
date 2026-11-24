@@ -30,11 +30,14 @@ const CATEGORY = {
   present: "present",
   "not voting": "not_voting",
 };
+// Anything else (e.g. a candidate's name in the election of the Speaker) is 'other';
+// the run logs which positions landed there so surprises are visible.
+export const otherPositions = new Set();
 export function category(position) {
   const p = String(position).trim().toLowerCase();
   const c = CATEGORY[p] ?? (p.startsWith("present") ? "present" : null); // e.g. 'Present, Giving Live Pair'
-  if (!c) throw new Error(`unknown vote position "${position}"`);
-  return c;
+  if (!c) otherPositions.add(String(position).trim());
+  return c ?? "other";
 }
 
 const BILL_TYPES = new Set(["hr", "s", "hjres", "sjres", "hconres", "sconres", "hres", "sres"]);
@@ -240,6 +243,7 @@ async function main() {
       }
     }
     console.log(`Congress ${congress}: ${voteCount} votes, ${positionCount} positions, ${fetched} fetches`);
+    if (otherPositions.size) console.log(`note: positions counted as 'other': ${[...otherPositions].slice(0, 20).join(", ")}`);
     if (unmatched) console.log(`warning: ${unmatched} positions skipped, no matching member: ${[...unmatchedRefs].slice(0, 20).join(", ")}`);
     if (fetched >= MAX_FETCHES_PER_RUN) console.log("fetch cap reached; the next run continues where this one stopped");
     return { rows_inserted: voteCount + positionCount, rows_updated: 0 };
