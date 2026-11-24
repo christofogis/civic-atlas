@@ -60,8 +60,7 @@
 - [ ] Google address suggestions (built; waiting on a restricted key from Chris)
 - [x] Installable app (manifest, offline page; never caches records)
 - [x] Embeddable member card for news sites
-- [x] Spanish: home, member, bill, hearing, week, glossary (other pages say they're English-only)
-- [ ] Spanish: remaining pages (members, bills, search, committees, topics, quiz, methods...)
+- [x] Spanish: every page (records stay in English as published)
 - [ ] Push notifications (deferred by Chris until usability sessions)
 - [ ] Story lookup by link (needs a server fetch; weigh paywalls and the 10 ms CPU limit first)
 - [ ] Email alerts (needs a decision on accounts and an email provider)
