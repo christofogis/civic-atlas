@@ -222,3 +222,9 @@ ul.bare { list-style: none; padding: 0; margin: 0; }
 
 .lang-switch { font-size: 0.9rem; white-space: nowrap; }
 .lang-note { margin-top: 16px; margin-bottom: 0; }
+
+/* Longer Spanish labels: let the main nav wrap, and let wide tables scroll inside the page on phones. */
+header.site nav { flex-wrap: wrap; row-gap: 4px; }
+@media (max-width: 600px) {
+  main table { display: block; max-width: 100%; overflow-x: auto; }
+}
