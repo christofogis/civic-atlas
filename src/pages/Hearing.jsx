@@ -56,7 +56,7 @@ export default function Hearing() {
       {committees.length > 0 && (
         <p>
           {committees.map((c, i) => (
-            <span key={c.committee_id}>{i > 0 && " · "}<Link to={`/committee/${c.committee_id}`}>{c.parent ? `${c.parent.name}: ${c.name}` : `${chamberName} ${c.name}`}</Link></span>
+            <span key={c.committee_id}>{i > 0 && " · "}<Link to={`/committee/${c.committee_id}`}>{c.parent ? `${c.parent.name}: ${c.name}` : /^(House|Senate|Joint)\b/.test(c.name) ? c.name : `${chamberName} ${c.name}`}</Link></span>
           ))}
         </p>
       )}
