@@ -3,6 +3,7 @@ import { createRoot } from "react-dom/client";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Home from "./pages/Home.jsx";
 import Layout from "./components/Layout.jsx";
+import { LangProvider } from "./lib/i18n.jsx";
 import "@fontsource/public-sans/400.css";
 import "@fontsource/public-sans/600.css";
 import "@fontsource/public-sans/700.css";
@@ -41,6 +42,7 @@ const NotFound = lazy(() => import("./pages/NotFound.jsx"));
 
 createRoot(document.getElementById("root")).render(
   <StrictMode>
+    <LangProvider>
     <BrowserRouter>
       <Routes>
         {/* Embeds render without the site header and footer. */}
@@ -71,6 +73,7 @@ createRoot(document.getElementById("root")).render(
         </Route>
       </Routes>
     </BrowserRouter>
+    </LangProvider>
   </StrictMode>
 );
 

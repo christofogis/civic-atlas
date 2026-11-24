@@ -3,7 +3,8 @@ import { Link } from "react-router-dom";
 import OfficialCard from "../components/OfficialCard.jsx";
 import Turnstile from "../components/Turnstile.jsx";
 import { TURNSTILE_SITE_KEY, GOOGLE_PLACES_KEY } from "../lib/config.js";
-import { STATE_NAMES } from "../lib/format.js";
+import { stateName } from "../lib/format.js";
+import { useLang } from "../lib/i18n.jsx";
 import { rememberRepresentatives, myRepresentatives } from "../lib/myReps.js";
 import MyReps from "../components/MyReps.jsx";
 import AddressInput from "../components/AddressInput.jsx";
@@ -17,6 +18,7 @@ export default function Home() {
   const [lookups, setLookups] = useState(0);
   const needsCheck = Boolean(TURNSTILE_SITE_KEY);
   const [mine, setMine] = useState(() => myRepresentatives());
+  const { t } = useLang();
 
   async function handleSubmit(e) {
     e.preventDefault();
@@ -47,25 +49,25 @@ export default function Home() {
       <header>
         <h1>Civic Atlas</h1>
         <p className="lede">
-          Enter an address to see who represents you in Congress, with their votes, bills,
-          committees, and campaign finance, drawn from official sources.
+          {t("Enter an address to see who represents you in Congress, with their votes, bills, committees, and campaign finance, drawn from official sources.",
+            "Escriba una dirección para ver quién le representa en el Congreso, con sus votos, proyectos de ley, comités y finanzas de campaña, según fuentes oficiales.")}
         </p>
       </header>
 
       {mine.size > 0 && status !== "done" && <MyReps ids={mine} onForget={() => setMine(new Set())} />}
 
       <form onSubmit={handleSubmit} className="lookup">
-        <label htmlFor="address">{mine.size > 0 ? "Look up another address" : "Address"}</label>
+        <label htmlFor="address">{mine.size > 0 ? t("Look up another address", "Buscar otra dirección") : t("Address", "Dirección")}</label>
         <div className="row">
-          <AddressInput id="address" placeholder="123 Main St, City, State" value={address} onChange={setAddress} />
+          <AddressInput id="address" placeholder={t("123 Main St, City, State", "123 Main St, ciudad, estado")} value={address} onChange={setAddress} />
           <button type="submit" disabled={status === "loading" || (needsCheck && !token)}>
-            {status === "loading" ? "Looking up…" : "Look up"}
+            {status === "loading" ? t("Looking up…", "Buscando…") : t("Look up", "Buscar")}
           </button>
         </div>
         {needsCheck && <Turnstile siteKey={TURNSTILE_SITE_KEY} onToken={setToken} resetSignal={lookups} />}
         <p className="fine">
-          Your address is used only to find your district. We don't store it.
-          {GOOGLE_PLACES_KEY && " Suggestions as you type come from Google, which receives what you type in this box."}
+          {t("Your address is used only to find your district. We don't store it.", "Su dirección se usa solo para encontrar su distrito. No la guardamos.")}
+          {GOOGLE_PLACES_KEY && t(" Suggestions as you type come from Google, which receives what you type in this box.", " Las sugerencias mientras escribe vienen de Google, que recibe lo que escribe en esta casilla.")}
         </p>
       </form>
 
@@ -74,25 +76,25 @@ export default function Home() {
       {status === "done" && result && (
         <section className="results">
           <h2>
-            Representing {STATE_NAMES[result.state] ?? result.state}
+            {t("Representing", "Representantes de")} {stateName(result.state)}
             {result.districts.length === 1 && result.officials.some((o) => o.chamber === "house" && o.district !== 0)
-              ? `, District ${result.districts[0]}` : ""}
+              ? t(`, District ${result.districts[0]}`, `, distrito ${result.districts[0]}`) : ""}
           </h2>
           {result.approximate && (
             <p className="notice">
-              This location may fall in more than one district. A full street address gives an exact match.
+              {t("This location may fall in more than one district. A full street address gives an exact match.", "Este lugar puede estar en más de un distrito. Una dirección completa da un resultado exacto.")}
             </p>
           )}
           <ul className="cards">
             {result.officials.map((o) => <OfficialCard key={`${o.chamber}-${o.bioguide_id}`} official={o} />)}
           </ul>
-          <p className="fine">District: {result.sources.district}. Officials: {result.sources.officials}.</p>
+          <p className="fine">{t("District", "Distrito")}: {result.sources.district}. {t("Officials", "Funcionarios")}: {result.sources.officials}.</p>
         </section>
       )}
 
       <section className="home-links">
-        <Link to="/quiz" className="home-card"><strong>Do you vote like your representatives?</strong><span>Answer 10 real bills Congress voted on and see who agrees with you.</span></Link>
-        <Link to="/week" className="home-card"><strong>This week in Congress</strong><span>What's scheduled, and what passed, failed or became law.</span></Link>
+        <Link to="/quiz" className="home-card"><strong>{t("Do you vote like your representatives?", "¿Vota usted como sus representantes?")}</strong><span>{t("Answer 10 real bills Congress voted on and see who agrees with you.", "Responda sobre 10 proyectos reales que el Congreso votó y vea quién coincide con usted. (En inglés)")}</span></Link>
+        <Link to="/week" className="home-card"><strong>{t("This week in Congress", "Esta semana en el Congreso")}</strong><span>{t("What's scheduled, and what passed, failed or became law.", "Lo programado y lo que se aprobó, fracasó o se convirtió en ley.")}</span></Link>
       </section>
 
     </main>

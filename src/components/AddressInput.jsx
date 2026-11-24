@@ -1,5 +1,6 @@
 import { useEffect, useId, useRef, useState } from "react";
 import { GOOGLE_PLACES_KEY } from "../lib/config.js";
+import { useLang } from "../lib/i18n.jsx";
 
 // Address box with suggestions from Google Places Autocomplete (New), called straight from the
 // browser with a referrer-restricted key. Without a key, or if Google fails, it is a plain text
@@ -18,6 +19,7 @@ export default function AddressInput({ id, value, onChange, onPick, placeholder 
   const typed = useRef(false);   // only suggest for what the visitor typed, not a picked address
   const listId = useId();
   const enabled = Boolean(GOOGLE_PLACES_KEY);
+  const { t } = useLang();
 
   useEffect(() => {
     if (!enabled || !typed.current || value.trim().length < MIN_CHARS) { setItems([]); return; }
@@ -90,14 +92,14 @@ export default function AddressInput({ id, value, onChange, onPick, placeholder 
         onFocus={() => items.length && setOpen(true)}
       />
       {enabled && open && (
-        <ul id={listId} role="listbox" className="suggestions" aria-label="Address suggestions">
+        <ul id={listId} role="listbox" className="suggestions" aria-label={t("Address suggestions", "Sugerencias de dirección")}>
           {items.map((it, i) => (
             <li key={it.id} id={`${listId}-${i}`} role="option" aria-selected={i === active}
               className={i === active ? "on" : ""} onMouseDown={(e) => { e.preventDefault(); pick(it); }}>
               {it.text}
             </li>
           ))}
-          <li role="presentation" className="attribution">Suggestions from Google Maps</li>
+          <li role="presentation" className="attribution">{t("Suggestions from Google Maps", "Sugerencias de Google Maps")}</li>
         </ul>
       )}
     </div>

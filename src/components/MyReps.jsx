@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { db } from "../lib/db.js";
 import { partyTag, date } from "../lib/format.js";
+import { useLang } from "../lib/i18n.jsx";
 import { forgetRepresentatives } from "../lib/myReps.js";
 import { KindLabel } from "./Explain.jsx";
 
@@ -9,6 +10,7 @@ import { KindLabel } from "./Explain.jsx";
 // and how many hearings their committees have coming up.
 export default function MyReps({ ids, onForget }) {
   const [rows, setRows] = useState(null);
+  const { t } = useLang();
 
   useEffect(() => {
     const list = [...ids];
@@ -32,20 +34,20 @@ export default function MyReps({ ids, onForget }) {
     }).catch(() => setRows({ people: [], latest: {}, hearings: 0 }));
   }, [ids]);
 
-  if (!rows) return <p>Loading your representatives…</p>;
+  if (!rows) return <p>{t("Loading your representatives…", "Cargando sus representantes…")}</p>;
   if (rows.people.length === 0) return null;
   return (
     <section className="my-reps">
-      <h2>Your representatives</h2>
+      <h2>{t("Your representatives", "Sus representantes")}</h2>
       <ul className="bare">
         {rows.people.map((p) => {
           const v = rows.latest[p.bioguide_id];
           return (
             <li key={p.bioguide_id}>
-              <Link to={`/member/${p.bioguide_id}`} className="my-rep-name">{p.name}</Link> <span className="fine">{p.chamber === "senate" ? "Senator" : p.district > 0 || p.district === 0 ? "Representative" : ""} ({partyTag(p)})</span>
+              <Link to={`/member/${p.bioguide_id}`} className="my-rep-name">{p.name}</Link> <span className="fine">{p.chamber === "senate" ? t("Senator", "Senado") : p.district > 0 || p.district === 0 ? t("Representative", "Cámara") : ""} ({partyTag(p)})</span>
               {v && (
                 <div className="fine">
-                  Latest vote, {date(v.voted_at)}: <strong>{v.position}</strong> · <KindLabel v={v} />{" "}
+                  {t("Latest vote", "Último voto")}, {date(v.voted_at)}: <strong>{v.position}</strong> · <KindLabel v={v} />{" "}
                   {v.bill_type
                     ? <Link to={`/bill/${v.bill_congress}/${v.bill_type}/${v.bill_number}`}>{v.bill_title ?? v.question}</Link>
                     : v.description ?? v.question}
@@ -56,13 +58,13 @@ export default function MyReps({ ids, onForget }) {
         })}
       </ul>
       <p>
-        <Link to="/week">This week in Congress</Link>
-        {rows.hearings > 0 && <> · their committees have {rows.hearings} hearing{rows.hearings === 1 ? "" : "s"} or markup{rows.hearings === 1 ? "" : "s"} coming up</>}
-        {" · "}<Link to="/quiz">Do you vote like them?</Link>
+        <Link to="/week">{t("This week in Congress", "Esta semana en el Congreso")}</Link>
+        {rows.hearings > 0 && <> · {t(`their committees have ${rows.hearings} hearing${rows.hearings === 1 ? "" : "s"} or markup${rows.hearings === 1 ? "" : "s"} coming up`, `sus comités tienen ${rows.hearings} audiencia${rows.hearings === 1 ? "" : "s"} o sesi${rows.hearings === 1 ? "ón" : "ones"} de enmiendas próximas`)}</>}
+        {" · "}<Link to="/quiz">{t("Do you vote like them?", "¿Vota como ellos?")}</Link>
       </p>
       <p className="fine">
-        Remembered on this device from your last lookup (member IDs only, never your address).{" "}
-        <button type="button" className="link fine" onClick={() => { forgetRepresentatives(); onForget(); }}>Forget them</button>
+        {t("Remembered on this device from your last lookup (member IDs only, never your address).", "Guardado en este dispositivo desde su última búsqueda (solo los identificadores de los miembros, nunca su dirección).")}{" "}
+        <button type="button" className="link fine" onClick={() => { forgetRepresentatives(); onForget(); }}>{t("Forget them", "Olvidarlos")}</button>
       </p>
     </section>
   );
