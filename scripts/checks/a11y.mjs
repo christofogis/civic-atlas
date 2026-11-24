@@ -9,9 +9,11 @@ const BASE = process.argv.slice(2).find((a) => !a.startsWith("--")) ?? "https://
 const REPORT = process.argv.includes("--report");
 const browser = await chromium.launch();
 const failures = [];
+let broken = 0;   // pages the check couldn't run on; fails even in report mode
 for (const [path] of PAGES) {
   for (const width of [1280, 390]) {
-    const page = await browser.newPage({ viewport: { width, height: 900 } });
+    const context = await browser.newContext({ viewport: { width, height: 900 } });   // axe needs a context
+    const page = await context.newPage();
     try {
       await page.goto(BASE + path, { waitUntil: path === "/" ? "load" : "networkidle", timeout: 45_000 });
       await page.waitForFunction(() => !document.body.innerText.includes("Loading…"), null, { timeout: 30_000 }).catch(() => {});
@@ -26,12 +28,13 @@ for (const [path] of PAGES) {
       }
       console.log(`${path} @${width}px: ${violations.length} rule(s) flagged`);
     } catch (err) {
-      failures.push(`${path} @${width}px: ${err.message.split("\n")[0]}`);
+      broken++;
+      failures.push(`${path} @${width}px: check didn't run: ${err.message.split("\n")[0]}`);
     }
-    await page.close();
+    await context.close();
   }
 }
 await browser.close();
 const unique = [...new Set(failures)];
 console.log(unique.length ? `\n${unique.join("\n")}` : "\nNo serious accessibility problems found.");
-if (unique.length && !REPORT) process.exit(1);
+if (broken || (unique.length && !REPORT)) process.exit(1);
