@@ -127,6 +127,16 @@ export default function Methods() {
         A meeting's bills are the ones the record lists, which may not include every bill discussed.
       </p>
 
+      <h2 id="map">The map</h2>
+      <p>
+        District lines come from the Census Bureau: its cartographic boundary file for the current Congress, and its
+        2026 TIGER/Line files for the next one, trimmed to the coastline. Lines are simplified so the map loads quickly,
+        so near a boundary the map can be off by a block or so; the address lookup uses exact lines. Districts are all
+        drawn in one color; party appears only beside names. The street map is from OpenFreeMap, built on
+        OpenStreetMap data; it needs no account, and we don't send it anything about you, though like any website it
+        sees requests for the map tiles your browser shows.
+      </p>
+
       <h2 id="accuracy">Checking our accuracy</h2>
       <p>
         Every week, a program picks random facts from this site (how members voted, who sponsored and cosponsored

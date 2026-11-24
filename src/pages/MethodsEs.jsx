@@ -120,6 +120,17 @@ export default function MethodsEs() {
         reunión son los que indica el registro, que puede no incluir todos los que se trataron.
       </p>
 
+      <h2 id="map">El mapa</h2>
+      <p>
+        Las líneas de los distritos provienen de la Oficina del Censo: su archivo cartográfico de límites para el
+        Congreso actual y sus archivos TIGER/Line de 2026 para el siguiente, recortados a la costa. Las líneas se
+        simplifican para que el mapa cargue rápido, así que cerca de un límite el mapa puede diferir por una cuadra o
+        algo así; la búsqueda por dirección usa las líneas exactas. Todos los distritos se dibujan del mismo color; el
+        partido aparece solo junto a los nombres. El mapa de calles es de OpenFreeMap, basado en datos de
+        OpenStreetMap; no necesita cuenta y no le enviamos nada sobre usted, aunque, como cualquier sitio web, recibe
+        las solicitudes de las imágenes del mapa que muestra su navegador.
+      </p>
+
       <h2 id="accuracy">Cómo verificamos la exactitud</h2>
       <p>
         Cada semana, un programa elige datos al azar de este sitio (cómo votaron los miembros, quién patrocinó y copatrocinó

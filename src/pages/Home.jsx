@@ -111,6 +111,7 @@ export default function Home() {
 
       <section className="home-links">
         <Link to="/quiz" className="home-card"><strong>{t("Do you vote like your representatives?", "¿Vota usted como sus representantes?")}</strong><span>{t("Answer 10 real bills Congress voted on and see who agrees with you.", "Responda sobre 10 proyectos reales que el Congreso votó y vea quién coincide con usted.")}</span></Link>
+        <Link to="/map" className="home-card"><strong>{t("Explore the map", "Explore el mapa")}</strong><span>{t("States and congressional districts, down to your street. Tap one to see who represents it.", "Estados y distritos del Congreso, hasta su calle. Toque uno para ver quién lo representa.")}</span></Link>
         <Link to="/week" className="home-card"><strong>{t("This week in Congress", "Esta semana en el Congreso")}</strong><span>{t("What's scheduled, and what passed, failed or became law.", "Lo programado y lo que se aprobó, fracasó o se convirtió en ley.")}</span></Link>
       </section>
 

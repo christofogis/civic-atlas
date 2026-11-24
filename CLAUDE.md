@@ -72,8 +72,9 @@ yes-man: flag weak ideas, scope creep, and shortcuts that will cost later.
   over third-party aggregators.
 
 ## Congress transitions
-- The 120th Congress convenes Jan 3, 2027. Several states redrew districts mid-decade
-  (incl. CA, TX, OH, NC, MO, UT). Districts, votes, bills, and committee seats carry a
+- The 120th Congress convenes Jan 3, 2027. Several states redrew districts mid-decade; per the
+  Census 120th Congress boundary files, lines change in AL, CA, FL, LA, NC, OH, TN, TX and UT
+  (Missouri's new plan was not used; see `public/maps/meta.json`, rebuilt by the build-maps workflow). Districts, votes, bills, and committee seats carry a
   `congress` number; terms carry dates (a Senate term spans three Congresses) and map to
   Congresses via the `term_congresses` view. Never assume "current" is fixed. Geocodio's
   `cd` default flips to the 120th on Jan 3, 2027.
