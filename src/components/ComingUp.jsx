@@ -83,7 +83,7 @@ export default function ComingUp({ myCommittees = new Set() }) {
                 <span className="fine">{e.event_time ?? ""} · {e.chamber === "house" ? tr("House", "Cámara") : tr("Senate", "Senado")} · {KIND()[e.kind]}</span><br />
                 {e.committee_id ? <Link to={`/committee/${e.committee_id}`}>{e.committee_name}</Link> : e.committee_name}: <a href={e.source_url}>{e.title}</a>
                 {e.status && e.status !== "Scheduled" && <strong> ({e.status})</strong>}
-                {(myCommittees.has(e.committee_id) || myCommittees.has(e.committee_id?.slice(0, 4))) && <span className="fine"> · one of your representatives sits on this committee</span>}
+                {(myCommittees.has(e.committee_id) || myCommittees.has(e.committee_id?.slice(0, 4))) && <span className="fine"> · {tr("one of your representatives sits on this committee", "uno de sus representantes forma parte de este comité")}</span>}
               </li>
             ))}
           </ul>
