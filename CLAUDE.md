@@ -35,10 +35,12 @@ yes-man: flag weak ideas, scope creep, and shortcuts that will cost later.
 ## Data sources (checked Nov 2026)
 - Members, terms, IDs: unitedstates/congress-legislators (public domain; crosswalk of
   bioguide, FEC, GovTrack, etc.)
-- Bills, sponsors, actions, CRS summaries: Congress.gov API (free api.data.gov key)
-- House roll-call votes: Congress.gov `/house-vote` (beta, 118th Congress onward) or House
-  Clerk XML. Senate roll-call votes: senate.gov XML — Congress.gov has no Senate vote endpoint.
-- Campaign finance: OpenFEC API (~1,000 calls/hour with a key). FEC rules bar using
+- Bills, sponsors, cosponsors, CRS summaries: GovInfo Bill Status bulk data (official record
+  behind Congress.gov; no key, no rate limit; daily runs read only files modified since the
+  last success). Don't page Congress.gov's per-member lists: deep pages take ~8s each.
+- Roll-call votes: House Clerk XML and senate.gov XML (no key). The Clerk returns an ordinary
+  page, not a 404, past the last roll number. Speaker elections record candidate names.
+- Campaign finance: OpenFEC API (~1,000 calls/hour with the `DATA_GOV_API_KEY`; runs weekly). FEC rules bar using
   individual contributor names for solicitation or commercial purposes — display is fine.
 - Address → district: Geocodio `cd` field (free tier 2,500 lookups/day). Results may be stored.
 - Do not use: ProPublica Congress API (no new keys issued). Prefer the official sources above
@@ -59,6 +61,11 @@ yes-man: flag weak ideas, scope creep, and shortcuts that will cost later.
 - Address lookup reads `seat_holders`, not `current_terms`. A `pending_update` seat must be
   shown as "new term began; data updating", never as the current representative — after
   redistricting the previous holder may have represented a different area.
+
+## Ingest jobs (GitHub Actions, `scripts/ingest/`)
+- Daily: members + committees 4:17am PT, votes 4:47am, bills 5:23am. FEC weekly, Tue evening.
+- Coverage starts with the 118th Congress (2023). Members include anyone who served since then.
+- Every run is logged in `ingest_runs` (public); never put secrets in error text.
 
 ## Conventions
 - Small, reviewable commits. Explain *why* in commit messages.

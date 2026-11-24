@@ -12,6 +12,7 @@
 - [x] Ingest: congress-legislators → members/terms (daily, GitHub Actions)
 - [x] Ingest: committees and committee memberships (same daily workflow)
 - [ ] Address lookup → your 2 senators + 1 representative
+- [x] Ingest: roll-call votes (House + Senate), bills + cosponsors + CRS summaries (GovInfo), FEC totals
 - [ ] Member profile page: bio, committees, sponsored bills, recent votes, FEC totals, source links
 - [ ] Deploy publicly
 
