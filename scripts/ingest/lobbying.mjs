@@ -59,13 +59,14 @@ async function* pages(params) {
 
 // One LD-2 -> filing row + bill mentions (possibly none). Registrations (RR, RA) are skipped.
 function parse(f, tracked) {
-  if (!f.filing_period || /^R/.test(f.filing_type) || !PERIODS.includes(f.filing_period)) return null;
+  if (!f.filing_period || /^R/.test(f.filing_type) || !PERIODS.includes(f.filing_period)) { stats.skipped++; return null; }
   const congress = congressForYear(f.filing_year);
   const byBill = new Map();
   for (const a of f.lobbying_activities ?? []) {
     for (const ref of extractBillRefs(a.description)) {
       const k = `${congress}|${ref.bill_type}|${ref.number}`;
-      if (!tracked.has(k)) continue;
+      stats.refs++;
+      if (!tracked.has(k)) { stats.untracked++; continue; }
       const m = byBill.get(k) ?? { filing_uuid: f.filing_uuid, congress, ...ref, issue_codes: [] };
       if (a.general_issue_code && !m.issue_codes.includes(a.general_issue_code)) m.issue_codes.push(a.general_issue_code);
       byBill.set(k, m);
@@ -81,6 +82,7 @@ function parse(f, tracked) {
   };
 }
 
+const stats = { refs: 0, untracked: 0, skipped: 0 };
 const keyOf = (r) => `${r.registrant_id}|${r.client_id}|${r.filing_year}|${r.filing_period}`;
 
 // Apply one page of parsed filings: newest version per key wins, against the database too.
@@ -159,6 +161,7 @@ async function run(db, counts) {
       if (seen % 2500 < 25) console.log(`  ${seen} read, ${counts.rows_inserted} kept, ${counts.rows_deleted} superseded`);
     }
   }
+  console.log(`bill numbers found: ${stats.refs} (${stats.untracked} not in our bills table); non-LD-2 skipped: ${stats.skipped}`);
   console.log(`done: ${seen} filings read, ${counts.rows_inserted} with tracked bills, ${counts.rows_deleted} removed`);
   return counts;
 }
