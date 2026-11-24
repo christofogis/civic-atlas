@@ -1,0 +1,46 @@
+name: Ingest committee meetings
+
+# Daily: committee hearings, markups and business meetings, both chambers (Congress.gov API).
+on:
+  schedule:
+    - cron: "41 14 * * *"   # daily, 6:41am Pacific, after the schedule job
+  workflow_dispatch:
+    inputs:
+      limit:
+        description: "Meeting records to read this run (backfill in chunks; ~3,300 an hour)"
+        type: string
+        default: "2500"
+      dry_run:
+        description: "Read a few records; write nothing"
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ingest-meetings
+  cancel-in-progress: false
+
+jobs:
+  ingest:
+    runs-on: ubuntu-latest
+    timeout-minutes: 75
+    env:
+      SUPABASE_URL: https://fkbzxaoeyrtzviyfzulq.supabase.co
+      SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+      DATA_GOV_API_KEY: ${{ secrets.DATA_GOV_API_KEY }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Meetings
+        env:
+          DRY_RUN: ${{ inputs.dry_run }}
+          LIMIT: ${{ inputs.limit || '2500' }}
+        run: |
+          if [ "$DRY_RUN" = "true" ]; then node scripts/ingest/meetings.mjs --dry-run --limit 3
+          else node scripts/ingest/meetings.mjs --limit "$LIMIT"; fi
