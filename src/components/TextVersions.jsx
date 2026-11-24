@@ -53,13 +53,13 @@ export default function TextVersions({ congress, type, number }) {
             <li key={v.version_code}>
               <strong>{v.version_name}</strong>{v.version_date && <> · {date(v.version_date)}</>} · <a href={readUrl(v)}>Read the text</a>
               {v.full_text === false && <div className="fine">Lists only the changes this chamber made, so it isn't compared section by section.</div>}
-              {c && (
+              {c && (c.added_count + c.removed_count + c.changed_count === 0
+                ? <div className="fine">Compared with {name[c.from_code] ?? c.from_code}: no section's text changed.</div>
+                : (
                 <details>
                   <summary>
-                    Compared with {name[c.from_code] ?? c.from_code}:{" "}
-                    {c.added_count + c.removed_count + c.changed_count === 0
-                      ? "no changes to the text of any section"
-                      : [c.added_count && `${plural(c.added_count, "section")} added`, c.removed_count && `${fmt(c.removed_count)} removed`, c.changed_count && `${fmt(c.changed_count)} changed`].filter(Boolean).join(", ")}
+                    Compared with {name[c.from_code] ?? c.from_code}: sections{" "}
+                    {[c.added_count && `${fmt(c.added_count)} added`, c.removed_count && `${fmt(c.removed_count)} removed`, c.changed_count && `${fmt(c.changed_count)} changed`].filter(Boolean).join(", ")}
                     {" "}· {fmt(c.words_from)} → {fmt(c.words_to)} words
                   </summary>
                   <SectionList title="Added" rows={c.added} total={c.added_count} />
@@ -68,7 +68,7 @@ export default function TextVersions({ congress, type, number }) {
                     extra={(s) => s.words_to !== s.words_from && <> ({s.words_to > s.words_from ? "+" : "−"}{fmt(Math.abs(s.words_to - s.words_from))} words)</>} />
                   <p className="fine">{plural(c.unchanged_count, "section")} unchanged.</p>
                 </details>
-              )}
+              ))}
             </li>
           );
         })}

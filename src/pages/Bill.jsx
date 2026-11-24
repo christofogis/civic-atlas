@@ -24,13 +24,14 @@ async function loadBill(congress, type, number) {
     one(key(db.from("bill_cosponsor_details").select("*")).order("sponsored_date").order("last_name")),
     one(db.from("votes").select("vote_id,chamber,voted_at,question,result,yea_total,nay_total,present_total,not_voting_total,source_url")
       .eq("bill_congress", congress).eq("bill_type", type).eq("bill_number", number).order("voted_at", { ascending: false })),
-    one(key(db.from("bill_lobbying").select("*")).order("quarters", { ascending: false }).order("client_name").limit(1000)),
-    one(key(db.from("bill_lobbying_counts").select("clients")).maybeSingle()),
+    // Lobbying is the heaviest query; if it fails, the rest of the page still shows.
+    one(key(db.from("bill_lobbying").select("*")).order("quarters", { ascending: false }).order("client_name").limit(1000)).catch(() => null),
+    one(key(db.from("bill_lobbying_counts").select("clients")).maybeSingle()).catch(() => null),
     one(db.from("data_freshness").select("*")),
     one(db.from("upcoming_events").select("event_id,chamber,kind,event_date,event_time,week_of,category,committee_id,committee_name,title,source_url")
       .contains("bill_refs", [`${congress}-${type}-${number}`]).gte("event_date", weekAgo).order("event_date")),
   ]);
-  return { bill, sponsor, cosponsors, votes, lobbying, lobbyTotal: lobbyCount?.clients ?? lobbying.length, freshness, scheduled };
+  return { bill, sponsor, cosponsors, votes, lobbying, lobbyTotal: lobbyCount?.clients ?? lobbying?.length ?? 0, freshness, scheduled };
 }
 
 function Section({ title, source, children }) {
@@ -71,7 +72,7 @@ export default function Bill() {
   const withdrawn = cosponsors.filter((x) => x.withdrawn_date);
   const byParty = Object.entries(current.reduce((acc, x) => ({ ...acc, [x.party ?? "Unknown"]: (acc[x.party ?? "Unknown"] ?? 0) + 1 }), {}))
     .sort((a, z) => a[0].localeCompare(z[0]));
-  const shownLobbying = allLobbying ? lobbying : lobbying.slice(0, LOBBY_PREVIEW);
+  const shownLobbying = !lobbying ? [] : allLobbying ? lobbying : lobbying.slice(0, LOBBY_PREVIEW);
   const person = (p) => (
     <><Link to={`/member/${p.bioguide_id}`}>{p.name}</Link>{p.party && <> ({partyTag(p)})</>}</>
   );
@@ -162,7 +163,8 @@ export default function Bill() {
 
       <Section title="Lobbying reports naming this bill"
         source={<>Quarterly lobbying reports (LD-2) filed under the Lobbying Disclosure Act, retrieved from LDA.gov.{updated("lobbying")} The Senate Office of Public Records can't vouch for data or analyses derived from these reports after they're retrieved. <Link to="/methods#lobbying">About this data</Link>.</>}>
-        {lobbying.length === 0 ? <p>No lobbying reports on file name this bill.</p> : (
+        {lobbying == null ? <p className="notice">Lobbying reports didn't load. Reload the page to try again.</p>
+          : lobbying.length === 0 ? <p>No lobbying reports on file name this bill.</p> : (
           <>
             <p>
               {lobbyTotal.toLocaleString()} organization{lobbyTotal === 1 ? "" : "s"} reported lobbying on this bill.
