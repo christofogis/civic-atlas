@@ -1,0 +1,42 @@
+name: Ingest FEC detail
+
+# Donations by size, top donor employers, largest committee (PAC) contributions, and outside
+# spending, per serving member. Aggregates only; no individual donor names are stored.
+on:
+  schedule:
+    - cron: "11 3 * * 4"    # weekly, Wednesday evenings Pacific (FEC totals run Tuesday)
+  workflow_dispatch:
+    inputs:
+      probe:
+        description: "Bioguide ID: print raw API fields for one member, write nothing"
+        type: string
+        default: ""
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ingest-fec-detail
+  cancel-in-progress: false
+
+jobs:
+  ingest:
+    runs-on: ubuntu-latest
+    timeout-minutes: 350
+    env:
+      SUPABASE_URL: https://fkbzxaoeyrtzviyfzulq.supabase.co
+      SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+      DATA_GOV_API_KEY: ${{ secrets.DATA_GOV_API_KEY }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: FEC detail
+        env:
+          PROBE: ${{ inputs.probe }}
+        run: |
+          if [[ "$PROBE" =~ ^[A-Z][0-9]{6}$ ]]; then node scripts/ingest/fec-detail.mjs --probe "$PROBE"
+          else node scripts/ingest/fec-detail.mjs; fi
