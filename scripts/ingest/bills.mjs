@@ -10,6 +10,7 @@
 // Covers the 118th Congress on, the same window as votes.
 import { XMLParser } from "fast-xml-parser";
 import { getClient, fetchAll, upsertBatches, withRun } from "./lib.mjs";
+import { billProgress } from "../../lib/billprogress.js";
 
 const CONGRESSES_FROM = 118;
 const TYPES = ["hr", "s", "hjres", "sjres", "hconres", "sconres", "hres", "sres"];
@@ -86,6 +87,7 @@ export function parseBillStatus(xml) {
       // Text sits at summary > text in some files and summary > cdata > text in others.
       crs_summary: plain(summaries[0]?.text ?? summaries[0]?.cdata?.text),
       source_url: billPage(congress, bill_type, number),
+      ...billProgress(list(b.actions?.item), b.laws?.item),
     },
     committees: [...committees.values()],
     // One row per person: if someone withdrew and later re-joined, the active entry wins.
