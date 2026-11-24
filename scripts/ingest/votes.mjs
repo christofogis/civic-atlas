@@ -253,11 +253,7 @@ async function main() {
     if (otherPositions.size) console.log(`note: positions counted as 'other': ${[...otherPositions].slice(0, 20).join(", ")}`);
     if (unmatched) console.log(`warning: ${unmatched} positions skipped, no matching member: ${[...unmatchedRefs].slice(0, 20).join(", ")}`);
     if (fetched >= MAX_FETCHES_PER_RUN) console.log("fetch cap reached; the next run continues where this one stopped");
-    if (db) {
-      const { data: statRows, error: statErr } = await db.rpc("refresh_member_vote_stats");
-      if (statErr) throw new Error(`refresh vote stats: ${statErr.message}`);
-      console.log(`vote stats refreshed: ${statRows} member rows`);
-    }
+
     return { rows_inserted: voteCount + positionCount, rows_updated: 0 };
   };
 
