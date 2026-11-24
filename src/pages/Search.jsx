@@ -74,7 +74,7 @@ export default function Search() {
           </section>
           <section className="section">
             <h2>Bills</h2>
-            {state.bills.length === 0 ? <p className="fine">No bills match{state.byNumber ? " that number in the 118th or 119th Congress" : ""}.</p> : (
+            {state.bills.length === 0 ? <p className="fine">No bills match{state.byNumber ? " that number since the 118th Congress (2023)" : ""}.</p> : (
               <ul className="plain">
                 {state.bills.map((b) => (
                   <li key={`${b.congress}-${b.bill_type}-${b.number}`}>

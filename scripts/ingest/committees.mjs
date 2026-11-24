@@ -101,6 +101,20 @@ async function main() {
       (await fetchAll(db, "seat_holders", "bioguide_id,seat_status"))
         .filter((r) => r.seat_status === "serving").map((r) => r.bioguide_id)
     );
+    // A new Congress organizes its committees weeks after it convenes. Until the source file
+    // has been updated since this Congress began, its assignments are the previous Congress's,
+    // so don't record them under the new number.
+    const { data: haveRows } = await db.from("committee_memberships").select("congress").eq("congress", congress).limit(1);
+    if (!haveRows?.length) {
+      const res = await fetch("https://api.github.com/repos/unitedstates/congress-legislators/commits?path=committee-membership-current.yaml&per_page=1",
+        { headers: { Accept: "application/vnd.github+json", ...(process.env.GITHUB_TOKEN ? { Authorization: `Bearer ${process.env.GITHUB_TOKEN}` } : {}) } });
+      const lastChange = res.ok ? (await res.json())?.[0]?.commit?.committer?.date?.slice(0, 10) : null;
+      const { data: c } = await db.from("congresses").select("start_date").eq("number", congress).single();
+      if (!lastChange || lastChange < c.start_date) {
+        console.log(`committee assignments not yet updated for Congress ${congress} (file last changed ${lastChange ?? "unknown"}); keeping the previous Congress's`);
+        return { rows_inserted: inserted, rows_updated: updated, rows_deleted: 0 };
+      }
+    }
     const all = mapMemberships(membershipSource, congress);
     const rows = all.filter((r) => serving.has(r.bioguide_id));
     const staleShare = 1 - rows.length / all.length;

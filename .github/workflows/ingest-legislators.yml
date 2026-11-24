@@ -19,6 +19,7 @@ jobs:
     env:
       SUPABASE_URL: https://fkbzxaoeyrtzviyfzulq.supabase.co
       SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+      GITHUB_TOKEN: ${{ github.token }}   # read-only: checks when the committee file last changed
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4

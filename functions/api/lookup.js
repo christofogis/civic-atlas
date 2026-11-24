@@ -2,6 +2,7 @@
 //
 // Privacy: the address is sent to Geocodio to find the district and is never stored,
 // logged, or cached here. Only the district and the officials are returned.
+import { congressOn } from "../../lib/congress.js";
 import { districtsFromGeocodio } from "../../lib/geocodio.js";
 import { verifyTurnstile } from "../../lib/turnstile.js";
 import { SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY } from "../../src/lib/config.js";
@@ -30,7 +31,9 @@ export async function onRequestGet({ request, env }) {
   }
 
   const geo = await fetch(
-    `https://api.geocod.io/v2.1/geocode?q=${encodeURIComponent(address)}&fields=cd&limit=1&api_key=${env.GEOCODIO_API_KEY}`
+    // Ask for the districts of the Congress in session by date (cd119, then cd120 from Jan 3,
+    // 2027) rather than Geocodio's default, so the map can't switch ahead of or behind our data.
+    `https://api.geocod.io/v2.1/geocode?q=${encodeURIComponent(address)}&fields=cd${congressOn()}&limit=1&api_key=${env.GEOCODIO_API_KEY}`
   );
   if (geo.status === 422) return json({ error: "That address couldn't be found." }, 404);
   if (!geo.ok) return json({ error: "The address service is unavailable. Try again shortly." }, 502);

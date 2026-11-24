@@ -1,9 +1,13 @@
 import { useEffect, useState } from "react";
 import { Link, useParams, useSearchParams } from "react-router-dom";
 import { db } from "../lib/db.js";
+import { congressOn, congressYears } from "../../lib/congress.js";
 import { billLabel, ordinal, partyTag, date } from "../lib/format.js";
 
 const PAGE = 50;
+const CURRENT = congressOn();
+// Coverage starts with the 118th Congress.
+const CONGRESS_OPTIONS = Array.from({ length: CURRENT - 117 }, (_, i) => CURRENT - i);
 const SORTS = {
   action: { label: "Most recent action", column: "latest_action_date" },
   referred: { label: "Most recently referred", column: "first_activity_date" },
@@ -13,7 +17,7 @@ const SORTS = {
 export default function Committee() {
   const { id } = useParams();
   const [params, setParams] = useSearchParams();
-  const congress = Number(params.get("congress")) || 119;
+  const congress = Number(params.get("congress")) || CURRENT;
   const sort = SORTS[params.get("sort")] ? params.get("sort") : "action";
   const [info, setInfo] = useState({ status: "loading" });
   const [bills, setBills] = useState({ status: "loading", rows: [] });
@@ -93,8 +97,7 @@ export default function Committee() {
         <div className="filters">
           <label>Congress{" "}
             <select value={congress} onChange={(e) => set("congress", e.target.value)}>
-              <option value="119">119th (2025–2026)</option>
-              <option value="118">118th (2023–2024)</option>
+              {CONGRESS_OPTIONS.map((c) => <option key={c} value={c}>{ordinal(c)} ({congressYears(c)})</option>)}
             </select>
           </label>
           <label>Sort{" "}
