@@ -166,7 +166,6 @@ export default function Member() {
 
   return (
     <main className="page">
-      <p><Link to="/">← Search</Link></p>
       <header>
         <h1>{name}</h1>
         {seat?.seat_status === "serving" ? (

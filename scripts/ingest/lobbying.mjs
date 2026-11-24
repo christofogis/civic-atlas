@@ -172,6 +172,11 @@ async function run(db, counts) {
     }
   }
   console.log(`bill numbers found: ${stats.refs} (${stats.untracked} not in our bills table); non-LD-2 skipped: ${stats.skipped}`);
+  if (!DRY) {
+    const { data: n, error } = await db.rpc("refresh_bill_lobbying_totals");
+    if (error) throw new Error(`refresh lobbying totals: ${error.message}`);
+    console.log(`lobbying totals refreshed: ${n} bills`);
+  }
   console.log(`done: ${seen} filings read, ${counts.rows_inserted} with tracked bills, ${counts.rows_deleted} removed`);
   return counts;
 }

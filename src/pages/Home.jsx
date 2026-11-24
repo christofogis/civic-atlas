@@ -4,6 +4,7 @@ import OfficialCard from "../components/OfficialCard.jsx";
 import Turnstile from "../components/Turnstile.jsx";
 import { TURNSTILE_SITE_KEY } from "../lib/config.js";
 import { STATE_NAMES } from "../lib/format.js";
+import { rememberRepresentatives } from "../lib/myReps.js";
 
 export default function Home() {
   const [address, setAddress] = useState("");
@@ -26,6 +27,7 @@ export default function Home() {
       const body = await res.json();
       if (!res.ok) throw new Error(body.error ?? "Lookup failed.");
       setResult(body);
+      rememberRepresentatives(body.officials.filter((o) => o.seat_status !== "pending_update").map((o) => o.bioguide_id));
       setStatus("done");
     } catch (err) {
       setError(err.message);

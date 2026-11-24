@@ -1,7 +1,8 @@
-import { useEffect, useState } from "react";
+import { Fragment, useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { db } from "../lib/db.js";
 import { date, billLabel, ordinal, partyTag } from "../lib/format.js";
+import VoteBreakdown from "../components/VoteBreakdown.jsx";
 
 const TYPES = new Set(["hr", "s", "hres", "sres", "hjres", "sjres", "hconres", "sconres"]);
 const LOBBY_PREVIEW = 40;
@@ -40,6 +41,7 @@ export default function Bill() {
   const valid = Number.isInteger(congress) && TYPES.has(type) && Number.isInteger(number) && number > 0;
   const [state, setState] = useState({ status: "loading" });
   const [allLobbying, setAllLobbying] = useState(false);
+  const [openVote, setOpenVote] = useState(null);
 
   useEffect(() => {
     if (!valid) { setState({ status: "missing" }); return; }
@@ -68,7 +70,6 @@ export default function Bill() {
 
   return (
     <main className="page">
-      <p><Link to="/">← Search</Link></p>
       <header>
         <p className="fine">{billLabel(b)} · {ordinal(b.congress)} Congress</p>
         <h1 className="bill-title">{b.short_title ?? b.title}</h1>
@@ -109,13 +110,22 @@ export default function Bill() {
             <thead><tr><th>Date</th><th>Chamber</th><th>Question</th><th>Result</th><th>Yea–Nay</th></tr></thead>
             <tbody>
               {votes.map((v) => (
-                <tr key={v.vote_id}>
-                  <td>{date(v.voted_at)}</td>
-                  <td>{v.chamber === "house" ? "House" : "Senate"}</td>
-                  <td><a href={v.source_url}>{v.question}</a></td>
-                  <td>{v.result}</td>
-                  <td>{v.yea_total}–{v.nay_total}</td>
-                </tr>
+                <Fragment key={v.vote_id}>
+                  <tr>
+                    <td>{date(v.voted_at)}</td>
+                    <td>{v.chamber === "house" ? "House" : "Senate"}</td>
+                    <td>
+                      <a href={v.source_url}>{v.question}</a>
+                      <div><button className="link fine" aria-expanded={openVote === v.vote_id}
+                        onClick={() => setOpenVote(openVote === v.vote_id ? null : v.vote_id)}>
+                        {openVote === v.vote_id ? "Hide how members voted" : "How members voted"}
+                      </button></div>
+                    </td>
+                    <td>{v.result}</td>
+                    <td>{v.yea_total}–{v.nay_total}</td>
+                  </tr>
+                  {openVote === v.vote_id && <tr><td colSpan={5}><VoteBreakdown voteId={v.vote_id} /></td></tr>}
+                </Fragment>
               ))}
             </tbody>
           </table>

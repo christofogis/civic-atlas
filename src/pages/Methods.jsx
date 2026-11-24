@@ -10,7 +10,6 @@ export default function Methods() {
   }, [hash]);
   return (
     <main className="page prose">
-      <p><Link to="/">← Search</Link></p>
       <h1>How this site works</h1>
       <p className="lede">
         Every figure here comes from official public records, is calculated the same way for every
@@ -97,6 +96,15 @@ export default function Methods() {
       <p>
         Votes on nominations are grouped as "Nominations". Votes with no bill or nominee, such as electing
         the Speaker or motions about chamber procedure, are grouped as "Other votes".
+      </p>
+
+      <h2 id="compare">Comparing two members</h2>
+      <p>
+        The comparison counts roll calls where both members voted Yea or Nay (Guilty or Not Guilty in impeachment
+        trials) and reports how often their votes matched. Every kind of roll call counts, including procedural
+        votes and amendments, so the figure describes all recorded votes rather than final passage alone. Roll calls
+        where either member was absent or voted Present are left out. Only members of the same chamber can be
+        compared, since each chamber votes separately.
       </p>
 
       <h2 id="money">Campaign finance</h2>

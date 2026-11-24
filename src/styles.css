@@ -69,3 +69,21 @@ button.link { background: none; border: 0; padding: 0; color: var(--accent); tex
 .filters label { font-size: 0.9rem; color: var(--muted); }
 .filters select, .filters input { font-size: 0.95rem; padding: 6px 8px; border: 1px solid var(--border); border-radius: 6px; max-width: 280px; }
 .filters .toggle { margin-bottom: 0; }
+header.site { border-bottom: 1px solid var(--border); background: #fafafa; }
+.site-inner { max-width: 900px; margin: 0 auto; padding: 10px 20px; display: flex; flex-wrap: wrap; gap: 8px 20px; align-items: center; }
+.brand { font-weight: 700; text-decoration: none; color: var(--text); }
+header.site nav { display: flex; gap: 16px; }
+header.site nav a { text-decoration: none; }
+header.site nav a.active { font-weight: 600; text-decoration: underline; }
+.site-search { margin-left: auto; }
+.site-search input { padding: 6px 10px; border: 1px solid var(--border); border-radius: 6px; font-size: 0.9rem; width: 220px; max-width: 100%; }
+.page { padding-top: 28px; }
+.picker { min-width: 260px; }
+.picker input { margin-left: 4px; }
+.pager { display: flex; gap: 20px; }
+table.dim { opacity: 0.5; }
+.breakdown { padding: 8px 0; }
+.breakdown table { margin: 8px 0; }
+h3.small { font-size: 0.95rem; margin: 12px 0 4px; }
+.names { font-size: 0.85rem; margin: 0; }
+.names .mine { font-weight: 700; background: #fff3c4; }
