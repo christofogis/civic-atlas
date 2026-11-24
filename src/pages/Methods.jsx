@@ -203,7 +203,7 @@ export default function Methods() {
         <li><strong>Bills, cosponsors, summaries:</strong> GovInfo Bill Status records from the Library of Congress. Summaries are written by the nonpartisan Congressional Research Service.</li>
         <li><strong>Stock trades:</strong> Periodic Transaction Reports from the Clerk of the House and the Senate's electronic financial disclosure system.</li>
         <li><strong>Campaign finance:</strong> the Federal Election Commission, totals by two-year cycle.</li>
-        <li><strong>Your district:</strong> Geocodio, using Census Bureau district boundaries. Your address is used only for the lookup and is never stored.</li>
+        <li><strong>Your district:</strong> Geocodio, using Census Bureau district boundaries. Your address is used only for the lookup and is never stored by us. When address suggestions are on, what you type in the address box is sent to Google Places to suggest matching addresses.</li>
       </ul>
       <p>
         Data is refreshed automatically every day (campaign finance weekly), and each section of a member

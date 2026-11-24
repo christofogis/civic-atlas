@@ -2,10 +2,11 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import OfficialCard from "../components/OfficialCard.jsx";
 import Turnstile from "../components/Turnstile.jsx";
-import { TURNSTILE_SITE_KEY } from "../lib/config.js";
+import { TURNSTILE_SITE_KEY, GOOGLE_PLACES_KEY } from "../lib/config.js";
 import { STATE_NAMES } from "../lib/format.js";
 import { rememberRepresentatives, myRepresentatives } from "../lib/myReps.js";
 import MyReps from "../components/MyReps.jsx";
+import AddressInput from "../components/AddressInput.jsx";
 
 export default function Home() {
   const [address, setAddress] = useState("");
@@ -56,20 +57,16 @@ export default function Home() {
       <form onSubmit={handleSubmit} className="lookup">
         <label htmlFor="address">{mine.size > 0 ? "Look up another address" : "Address"}</label>
         <div className="row">
-          <input
-            id="address"
-            type="text"
-            autoComplete="street-address"
-            placeholder="123 Main St, City, State"
-            value={address}
-            onChange={(e) => setAddress(e.target.value)}
-          />
+          <AddressInput id="address" placeholder="123 Main St, City, State" value={address} onChange={setAddress} />
           <button type="submit" disabled={status === "loading" || (needsCheck && !token)}>
             {status === "loading" ? "Looking up…" : "Look up"}
           </button>
         </div>
         {needsCheck && <Turnstile siteKey={TURNSTILE_SITE_KEY} onToken={setToken} resetSignal={lookups} />}
-        <p className="fine">Your address is used only to find your district. It isn't stored.</p>
+        <p className="fine">
+          Your address is used only to find your district. We don't store it.
+          {GOOGLE_PLACES_KEY && " Suggestions as you type come from Google, which receives what you type in this box."}
+        </p>
       </form>
 
       {status === "error" && <p className="notice">{error}</p>}

@@ -22,7 +22,7 @@ h1 { font-size: 2rem; margin: 0 0 8px; }
 .lede { color: var(--muted); margin: 0 0 32px; }
 .lookup label { display: block; font-weight: 600; margin-bottom: 6px; }
 .row { display: flex; gap: 8px; }
-.row input {
+.row input, .address-input input {
   flex: 1; padding: 10px 12px; font-size: 1rem;
   border: 1px solid var(--border); border-radius: 6px;
 }
@@ -203,3 +203,12 @@ ul.bare { list-style: none; padding: 0; margin: 0; }
 
 /* Read by screen readers, not shown. */
 .visually-hidden { position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
+
+/* Address box with suggestions */
+.address-input { position: relative; flex: 1; display: flex; }
+.address-input input { width: 100%; }
+.suggestions { position: absolute; top: calc(100% + 4px); left: 0; right: 0; z-index: 10; margin: 0; padding: 4px 0; list-style: none;
+  background: var(--bg); border: 1px solid var(--border); border-radius: 6px; box-shadow: 0 6px 18px rgba(27, 36, 32, 0.12); }
+.suggestions li[role=option] { padding: 10px 12px; cursor: pointer; }
+.suggestions li.on, .suggestions li[role=option]:hover { background: var(--accent-soft); }
+.suggestions .attribution { padding: 6px 12px 4px; font-size: 0.75rem; color: var(--muted); border-top: 1px solid var(--border); }
