@@ -99,6 +99,22 @@ export default function Methods() {
         the Speaker or motions about chamber procedure, are grouped as "Other votes".
       </p>
 
+      <h2 id="text-versions">What changed between bill versions</h2>
+      <p>
+        Each time a bill moves a step, the Government Publishing Office prints a new official version. For each
+        version, we compare its full text with the version before it, section by section. A section is matched by its
+        heading inside its title; when a title is renamed, sections with a heading found once in each version are still
+        matched. A section counts as changed when any of its words differ (spacing and quote styles are ignored), so a
+        one-word fix and a full rewrite both count as one changed section. Section numbers are left out, because
+        renumbering changes nothing. A renamed section counts as one removed and one added. Text quoted into existing
+        law belongs to the section that quotes it. Text a committee struck is left out, as it is no longer part of the bill.
+      </p>
+      <p>
+        An "engrossed amendment" lists only the changes the second chamber made, so it is shown but not compared; the
+        enrolled version, which has the final text, is compared with the version before the amendment. The comparison
+        is computed, not written by anyone, and it says where the text changed, not what a change does.
+      </p>
+
       <h2 id="accuracy">Checking our accuracy</h2>
       <p>
         Every week, a program picks random facts from this site (how members voted, who sponsored and cosponsored

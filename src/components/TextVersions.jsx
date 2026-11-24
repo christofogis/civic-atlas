@@ -73,7 +73,7 @@ export default function TextVersions({ congress, type, number }) {
         })}
       </ol>
       <p className="fine">
-        Source: GovInfo (Government Publishing Office). Comparisons are computed automatically by matching section
+        Source: GovInfo (Government Publishing Office). <a href="/methods#text-versions">How the comparison works</a>. Comparisons are computed automatically by matching section
         headings: they show where the text changed, not what a change does, so read the text for that. A renamed
         section counts as one removed and one added; renumbering alone isn't counted.
       </p>
