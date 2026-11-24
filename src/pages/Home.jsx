@@ -4,7 +4,8 @@ import OfficialCard from "../components/OfficialCard.jsx";
 import Turnstile from "../components/Turnstile.jsx";
 import { TURNSTILE_SITE_KEY } from "../lib/config.js";
 import { STATE_NAMES } from "../lib/format.js";
-import { rememberRepresentatives } from "../lib/myReps.js";
+import { rememberRepresentatives, myRepresentatives } from "../lib/myReps.js";
+import MyReps from "../components/MyReps.jsx";
 
 export default function Home() {
   const [address, setAddress] = useState("");
@@ -14,6 +15,7 @@ export default function Home() {
   const [token, setToken] = useState("");
   const [lookups, setLookups] = useState(0);
   const needsCheck = Boolean(TURNSTILE_SITE_KEY);
+  const [mine, setMine] = useState(() => myRepresentatives());
 
   async function handleSubmit(e) {
     e.preventDefault();
@@ -27,7 +29,9 @@ export default function Home() {
       const body = await res.json();
       if (!res.ok) throw new Error(body.error ?? "Lookup failed.");
       setResult(body);
-      rememberRepresentatives(body.officials.filter((o) => o.seat_status !== "pending_update").map((o) => o.bioguide_id));
+      const ids = body.officials.filter((o) => o.seat_status !== "pending_update").map((o) => o.bioguide_id);
+      rememberRepresentatives(ids);
+      setMine(new Set(ids));
       setStatus("done");
     } catch (err) {
       setError(err.message);
@@ -47,8 +51,10 @@ export default function Home() {
         </p>
       </header>
 
+      {mine.size > 0 && status !== "done" && <MyReps ids={mine} onForget={() => setMine(new Set())} />}
+
       <form onSubmit={handleSubmit} className="lookup">
-        <label htmlFor="address">Address</label>
+        <label htmlFor="address">{mine.size > 0 ? "Look up another address" : "Address"}</label>
         <div className="row">
           <input
             id="address"

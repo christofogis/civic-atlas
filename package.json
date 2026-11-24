@@ -13,6 +13,7 @@
     "node": ">=20"
   },
   "dependencies": {
+    "@fontsource/public-sans": "^5.3.0",
     "@supabase/postgrest-js": "^2.119.2",
     "@supabase/supabase-js": "^2.119.2",
     "fast-xml-parser": "^5.12.1",

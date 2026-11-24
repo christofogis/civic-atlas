@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
 import { voteKind, isFinal } from "../lib/voteKind.js";
-import { Link, useParams } from "react-router-dom";
+import { Link, useParams, useLocation, useNavigate } from "react-router-dom";
 import { db } from "../lib/db.js";
 import { seatNextUp, nextElectionYear } from "../../lib/congress.js";
 import AtAGlance from "../components/AtAGlance.jsx";
+import Scale from "../components/Scale.jsx";
 import Follow from "../components/Follow.jsx";
 import { KindLabel } from "../components/Explain.jsx";
 import { seatLabel, date, money, billLabel, ordinal, STATE_NAMES } from "../lib/format.js";
@@ -30,10 +31,16 @@ function VoteStats({ s, median, delegate, independent }) {
           {median && !delegate && <> Chamber median: {pct(median.median_party_line_rate * 1000, 1000)}.</>}
         </p>
       )}
+      {s.party_split_votes >= MIN_SPLIT_VOTES && (
+        <Scale value={s.with_party / s.party_split_votes} typical={median && !delegate ? median.median_party_line_rate : null}
+          label={`with the ${party} majority`} typicalLabel="chamber median" />
+      )}
       <p>
         Missed <strong>{pct(s.missed, s.roll_calls)}</strong> of roll-call votes ({s.missed.toLocaleString()} of {s.roll_calls.toLocaleString()}).
         {median && !delegate && <> Chamber median: {pct(median.median_missed_rate * 1000, 1000)}.</>}
       </p>
+      {s.roll_calls > 0 && <Scale value={s.missed / s.roll_calls} typical={median && !delegate ? median.median_missed_rate : null}
+        label="of roll calls missed" typicalLabel="chamber median" />}
     </div>
   );
 }
@@ -160,6 +167,8 @@ function Contact({ term, member }) {
   );
 }
 
+const TABS = [["overview", "Overview"], ["votes", "Votes"], ["bills", "Bills"], ["money", "Money"], ["trades", "Stock trades"]];
+
 function Section({ title, source, children }) {
   return (
     <section className="section">
@@ -174,6 +183,9 @@ export default function Member() {
   const { bioguide } = useParams();
   const [state, setState] = useState({ status: "loading" });
   const [finalOnly, setFinalOnly] = useState(false);
+  const { hash } = useLocation();
+  const navigate = useNavigate();
+  const tab = TABS.some(([id]) => `#${id}` === hash) ? hash.slice(1) : "overview";
 
   useEffect(() => {
     if (!BIOGUIDE.test(bioguide ?? "")) { setState({ status: "missing" }); return; }
@@ -219,6 +231,17 @@ export default function Member() {
         </p>
       </header>
 
+      <nav className="tabs" role="tablist" aria-label="Sections of this page">
+        {TABS.map(([id, label]) => (
+          <button key={id} type="button" role="tab" id={`tab-${id}`} aria-selected={tab === id} aria-controls={`panel-${id}`}
+            className={tab === id ? "on" : ""} onClick={() => navigate({ hash: id === "overview" ? "" : id }, { replace: true })}>
+            {label}
+          </button>
+        ))}
+      </nav>
+
+      <div role="tabpanel" id={`panel-${tab}`} aria-labelledby={`tab-${tab}`}>
+      {tab === "overview" && <>
       {seat?.seat_status === "serving" && <Contact term={terms[0]} member={m} />}
 
       <AtAGlance terms={terms} voteStats={voteStats} medians={medians} billStats={billStats} laws={laws}
@@ -263,6 +286,9 @@ export default function Member() {
         )}
       </Section>
 
+      </>}
+
+      {tab === "votes" && <>
       <Section title="Voting record" source={<>Calculated from House Clerk and Senate.gov roll-call records. <Link to="/methods">How these are calculated</Link>.</>}>
         {voteStats.length === 0 ? <p>No roll-call votes on record since 2023.</p> : (
           <>
@@ -312,6 +338,9 @@ export default function Member() {
         )}
       </Section>
 
+      </>}
+
+      {tab === "bills" && <>
       <Section title="Legislation" source={`GovInfo Bill Status (Library of Congress), 118th Congress on.${updated("bills")}`}>
         <p>Sponsored: {sponsoredCount ?? 0} · Cosponsored: {cosponsoredCount ?? 0}</p>
         {billStats.map((b) => {
@@ -349,6 +378,9 @@ export default function Member() {
         )}
       </Section>
 
+      </>}
+
+      {tab === "trades" && <>
       <Section title="Stock trades" source={<>Periodic Transaction Reports filed under the STOCK Act with the House Clerk and Senate, 2025 on.{updated("trades")} <Link to="/methods#trades">About this data</Link>.</>}>
         {!ts ? <p>No periodic transaction reports on record since 2025.</p> : (
           <>
@@ -389,6 +421,9 @@ export default function Member() {
         )}
       </Section>
 
+      </>}
+
+      {tab === "money" && <>
       <Section title="Campaign finance" source={<>Federal Election Commission (OpenFEC).{updated("fec-summaries")} <Link to="/methods#money">About this data</Link>.</>}>
         {finance.length === 0 ? <p>No FEC filings on record for this member.</p> : (
           <table>
@@ -410,6 +445,8 @@ export default function Member() {
         )}
         {detailCycle > 0 && <FinanceDetail cycle={detailCycle} bySize={inCycle(bySize)} employers={inCycle(employers)} pacs={inCycle(pacs)} outside={inCycle(outside)} fecId={finance.find((f) => f.cycle === detailCycle)?.fec_candidate_id} />}
       </Section>
+      </>}
+      </div>
     </main>
   );
 }

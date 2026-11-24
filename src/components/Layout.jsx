@@ -15,6 +15,7 @@ export default function Layout() {
 
   return (
     <>
+      <a className="skip-link" href="#main">Skip to content</a>
       <header className="site">
         <div className="site-inner">
           <Link to="/" className="brand">Civic Atlas</Link>
@@ -33,9 +34,11 @@ export default function Layout() {
           )}
         </div>
       </header>
-      <Suspense fallback={<main className="page"><p>Loading…</p></main>}>
-        <Outlet />
-      </Suspense>
+      <div id="main" tabIndex={-1}>
+        <Suspense fallback={<main className="page"><p>Loading…</p></main>}>
+          <Outlet />
+        </Suspense>
+      </div>
       <footer className="site-footer">
         <div className="site-inner">
           <Link to="/methods">How this site works</Link>

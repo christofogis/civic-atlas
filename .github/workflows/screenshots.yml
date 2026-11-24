@@ -1,0 +1,30 @@
+name: Screenshots (design review)
+
+on:
+  workflow_dispatch:
+    inputs:
+      paths:
+        description: "Comma-separated paths"
+        type: string
+        default: "/,/member/P000145"
+      width:
+        description: "Viewport width"
+        type: string
+        default: "390"
+
+permissions:
+  contents: read
+
+jobs:
+  shoot:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - run: node scripts/checks/screenshots.mjs https://civic-atlas-cub.pages.dev "${{ inputs.paths }}" "${{ inputs.width }}"

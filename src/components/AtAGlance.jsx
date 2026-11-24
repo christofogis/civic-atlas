@@ -1,5 +1,6 @@
 import { Explain } from "./Explain.jsx";
 import { ordinal, money, date } from "../lib/format.js";
+import Scale from "./Scale.jsx";
 
 const MIN_SPLIT_VOTES = 20;
 const pct = (n, d) => `${Math.round((100 * n) / d)}%`;
@@ -20,12 +21,16 @@ export default function AtAGlance({ terms, voteStats, medians, billStats, laws, 
     lines.push(<>
       In the {ordinal(s.congress)} Congress, voted on {pct(s.roll_calls - s.missed, s.roll_calls)} of <Explain id="roll-call">roll calls</Explain>
       {med && !delegate ? <> (typical {chamber}: {rate(1 - med.median_missed_rate)})</> : null}.
+      <Scale value={(s.roll_calls - s.missed) / s.roll_calls} typical={med && !delegate ? 1 - med.median_missed_rate : null}
+        label="of roll calls voted on" typicalLabel={`typical ${chamber}`} />
     </>);
     if (s.party_split_votes >= MIN_SPLIT_VOTES && ["Democrat", "Republican"].includes(s.scoring_party)) {
       const side = s.scoring_party === "Democrat" ? "Democratic" : "Republican";
       lines.push(<>
         When most Democrats and most Republicans voted on opposite sides, voted with the {side} side {pct(s.with_party, s.party_split_votes)} of
         the time{med && !delegate ? <> (typical {chamber}: {rate(med.median_party_line_rate)})</> : null}. <Explain id="party-split" />
+        <Scale value={s.with_party / s.party_split_votes} typical={med && !delegate ? med.median_party_line_rate : null}
+          label={`with the ${side} side`} typicalLabel={`typical ${chamber}`} />
       </>);
     }
   }
