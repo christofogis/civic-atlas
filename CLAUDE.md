@@ -56,6 +56,9 @@ yes-man: flag weak ideas, scope creep, and shortcuts that will cost later.
 - Party is snapshotted on each term and each vote position, so party switches don't
   rewrite history. Clerk wording (`position`, `question`, `result`) is stored verbatim.
 - User addresses are never stored.
+- Address lookup reads `seat_holders`, not `current_terms`. A `pending_update` seat must be
+  shown as "new term began; data updating", never as the current representative — after
+  redistricting the previous holder may have represented a different area.
 
 ## Conventions
 - Small, reviewable commits. Explain *why* in commit messages.
