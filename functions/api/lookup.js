@@ -38,7 +38,10 @@ export async function onRequestGet({ request, env }) {
       `seat_holders?state=eq.${state}&select=bioguide_id,chamber,state,district,state_rank,party,start_date,end_date,seat_status,url`
     );
     const house = seats.filter((s) => s.chamber === "house");
-    const houseSeats = house.length === 1 ? house : house.filter((s) => place.districts.includes(s.district));
+    // A single-seat state is at-large however Geocodio numbers it (0, or 98 for D.C.).
+    // When a location spans districts, list them by how much of it each covers.
+    const houseSeats = house.length === 1 ? house : house.filter((s) => place.districts.includes(s.district))
+      .sort((a, b) => place.districts.indexOf(a.district) - place.districts.indexOf(b.district));
     const senate = seats.filter((s) => s.chamber === "senate")
       .sort((a, b) => (a.state_rank === "senior" ? -1 : 1) - (b.state_rank === "senior" ? -1 : 1));
     const picked = [...senate, ...houseSeats];
