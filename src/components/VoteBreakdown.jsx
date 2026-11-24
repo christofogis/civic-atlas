@@ -4,6 +4,7 @@ import { tr } from "../lib/lang.js";
 import { partyName } from "../lib/format.js";
 import { db } from "../lib/db.js";
 import { myRepresentatives } from "../lib/myReps.js";
+import { PartyTag, PartyName } from "./PartyTag.jsx";
 
 // How each member voted on one roll call: counts by party, then everyone by position.
 // Members the visitor looked up on the home page (kept only in this browser tab) are marked.
@@ -47,7 +48,7 @@ export default function VoteBreakdown({ voteId }) {
         <thead><tr><th>{tr("Party", "Partido")}</th>{positions.map((p) => <th key={p}>{p}</th>)}</tr></thead>
         <tbody>
           {parties.map((party) => (
-            <tr key={party}><td>{partyName(party)}</td>{positions.map((p) => <td key={p}>{table[party][p]}</td>)}</tr>
+            <tr key={party}><td><PartyName party={party} /></td>{positions.map((p) => <td key={p}>{table[party][p]}</td>)}</tr>
           ))}
         </tbody>
       </table>
@@ -63,7 +64,7 @@ export default function VoteBreakdown({ voteId }) {
           <p className="names">
             {list.map((r, i) => (
               <span key={r.bioguide_id} className={mine.has(r.bioguide_id) ? "mine" : ""}>
-                {i ? ", " : ""}<Link to={`/member/${r.bioguide_id}`}>{r.last_name}</Link> ({r.party_at_vote?.[0]}-{r.state_at_vote})
+                {i ? ", " : ""}<Link to={`/member/${r.bioguide_id}`}>{r.last_name}</Link> <PartyTag p={{ party: r.party_at_vote, state: r.state_at_vote }} />
               </span>
             ))}
           </p>

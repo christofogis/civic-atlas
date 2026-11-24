@@ -5,6 +5,7 @@ import { partyTag, date } from "../lib/format.js";
 import { useLang } from "../lib/i18n.jsx";
 import { forgetRepresentatives } from "../lib/myReps.js";
 import { KindLabel } from "./Explain.jsx";
+import { PartyTag } from "./PartyTag.jsx";
 
 // The home page for a returning visitor: their representatives, the latest vote each cast,
 // and how many hearings their committees have coming up.
@@ -44,7 +45,7 @@ export default function MyReps({ ids, onForget }) {
           const v = rows.latest[p.bioguide_id];
           return (
             <li key={p.bioguide_id}>
-              <Link to={`/member/${p.bioguide_id}`} className="my-rep-name">{p.name}</Link> <span className="fine">{p.chamber === "senate" ? t("Senator", "Senado") : p.district > 0 || p.district === 0 ? t("Representative", "Cámara") : ""} ({partyTag(p)})</span>
+              <Link to={`/member/${p.bioguide_id}`} className="my-rep-name">{p.name}</Link> <PartyTag p={p} /> <span className="fine">{p.chamber === "senate" ? t("Senator", "Senado") : p.district > 0 || p.district === 0 ? t("Representative", "Cámara") : ""}</span>
               {v && (
                 <div className="fine">
                   {t("Latest vote", "Último voto")}, {date(v.voted_at)}: <strong>{v.position}</strong> · <KindLabel v={v} />{" "}

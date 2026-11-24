@@ -232,3 +232,10 @@ header.site nav { flex-wrap: wrap; row-gap: 4px; }
 /* Language toggle at the top of the home page (the header link does the same on every page). */
 .home-title { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 8px 16px; }
 .home-title h1 { margin-right: auto; }
+
+/* Party badges (names only). White on these meets WCAG AA contrast. */
+.party { display: inline-block; padding: 0 6px; border-radius: 4px; font-size: 0.78em; font-weight: 600; line-height: 1.6;
+  color: #fff; vertical-align: 0.08em; white-space: nowrap; letter-spacing: 0.01em; }
+.party-d { background: #1f4e9c; }
+.party-r { background: #b42318; }
+.party-other { background: #5b6470; }

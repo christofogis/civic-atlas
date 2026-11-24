@@ -5,6 +5,7 @@ import { ordinal } from "../lib/format.js";
 import { findMembers, findBills } from "../../lib/explain.js";
 import { congressOn } from "../../lib/congress.js";
 import { tr } from "../lib/lang.js";
+import { PartyTag } from "../components/PartyTag.jsx";
 
 const CURRENT = congressOn();
 const MAX_CHARS = 100_000;
@@ -75,8 +76,9 @@ export default function ExplainStory() {
               {result.people.map((m) => (
                 <li key={m.bioguide_id}>
                   <Link to={`/member/${m.bioguide_id}`}>{m.name}</Link>{" "}
+                  <PartyTag p={m} />{" "}
                   <span className="fine">
-                    {m.party?.[0]}-{m.state}{m.chamber === "house" && m.district != null ? `-${m.district}` : ""} · {m.chamber === "senate" ? tr("Senate", "Senado") : tr("House", "Cámara")}{m.serving ? "" : tr(" · former member", " · exmiembro")}
+                    {m.chamber === "senate" ? tr("Senate", "Senado") : tr("House", "Cámara")}{m.serving ? "" : tr(" · former member", " · exmiembro")}
                   </span>
                 </li>
               ))}

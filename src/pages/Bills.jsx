@@ -6,6 +6,7 @@ import { POLICY_AREAS, areaName } from "../lib/policyAreas.js";
 import { congressOn, congressYears } from "../../lib/congress.js";
 import { billLabel, ordinal, partyTag, date } from "../lib/format.js";
 import { tr } from "../lib/lang.js";
+import { PartyTag } from "../components/PartyTag.jsx";
 
 const SORTS = {
   action: { label: "Most recent action", es: "Acción más reciente", column: "latest_action_date" },
@@ -78,7 +79,7 @@ export default function Bills() {
                   {b.policy_area && <div className="fine">{areaName(b.policy_area)}</div>}
                 </td>
                 <td>{b.sponsor_bioguide_id
-                  ? <><Link to={`/member/${b.sponsor_bioguide_id}`}>{b.sponsor_name}</Link>{b.sponsor_party && <> ({partyTag({ party: b.sponsor_party, chamber: b.sponsor_chamber, state: b.sponsor_state, district: b.sponsor_district })})</>}</>
+                  ? <><Link to={`/member/${b.sponsor_bioguide_id}`}>{b.sponsor_name}</Link>{b.sponsor_party && <> <PartyTag p={{ party: b.sponsor_party, chamber: b.sponsor_chamber, state: b.sponsor_state, district: b.sponsor_district }} /></>}</>
                   : ""}</td>
                 <td><span className="fine">{date(b.latest_action_date)}</span><div>{b.latest_action_text}</div></td>
                 {sort === "lobbying" && <td>{b.lobbying_clients.toLocaleString()}</td>}

@@ -4,6 +4,7 @@ import { db } from "../lib/db.js";
 import { date, seatLabel, partyName } from "../lib/format.js";
 import AtAGlance from "../components/AtAGlance.jsx";
 import { tr } from "../lib/lang.js";
+import { PartyName } from "../components/PartyTag.jsx";
 
 const TERRITORIES = new Set(["DC", "PR", "GU", "VI", "AS", "MP"]);
 const SITE = typeof window !== "undefined" ? window.location.origin : "";
@@ -46,7 +47,7 @@ export default function EmbedMember() {
     <div className="embed">
       <h1><a href={full} target="_blank" rel="noopener">{name}</a></h1>
       <p className="fine">
-        {seat?.seat_status === "serving" ? `${seatLabel(seat)} · ${partyName(seat.party)}` : latest ? `${tr("Former member", "Exmiembro")} · ${seatLabel(latest)} · ${partyName(latest.party)}` : ""}
+        {seat?.seat_status === "serving" ? <>{seatLabel(seat)} <PartyName party={seat.party} /></> : latest ? <>{tr("Former member", "Exmiembro")} · {seatLabel(latest)} <PartyName party={latest.party} /></> : ""}
       </p>
       <AtAGlance terms={terms} voteStats={d.voteStats} medians={d.medians} billStats={d.billStats} laws={d.laws}
         finance={d.finance} bySize={d.bySize} tradeSummary={d.tradeSummary} delegate={latest?.chamber === "house" && TERRITORIES.has(latest.state)}

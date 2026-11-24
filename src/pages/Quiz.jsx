@@ -6,6 +6,7 @@ import { voteKind } from "../lib/voteKind.js";
 import { myRepresentatives } from "../lib/myReps.js";
 import { congressOn } from "../../lib/congress.js";
 import { tr } from "../lib/lang.js";
+import { PartyTag } from "../components/PartyTag.jsx";
 
 const QUESTIONS = 10;
 const MIN_SHARE = 0.1;   // each side needs at least 10% of the votes, so the vote was contested
@@ -99,7 +100,7 @@ export default function Quiz() {
   if (results) {
     if (results.status === "loading") return <main className="page"><h1>{tr("Your results", "Sus resultados")}</h1><p>{tr("Comparing…", "Comparando…")}</p></main>;
     const pct = (t) => `${Math.round((100 * t.same) / t.total)}%`;
-    const row = (t) => <li key={t.bioguide_id}><Link to={`/member/${t.bioguide_id}`}>{t.name}</Link> ({partyTag({ party: t.party_at_vote, state: t.state_at_vote, chamber: t.chamber })}): {tr(`agreed on ${t.same} of ${t.total}`, `coincidió en ${t.same} de ${t.total}`)} ({pct(t)})</li>;
+    const row = (t) => <li key={t.bioguide_id}><Link to={`/member/${t.bioguide_id}`}>{t.name}</Link> <PartyTag p={{ party: t.party_at_vote, state: t.state_at_vote, chamber: t.chamber }} />: {tr(`agreed on ${t.same} of ${t.total}`, `coincidió en ${t.same} de ${t.total}`)} ({pct(t)})</li>;
     return (
       <main className="page">
         <h1>{tr("Your results", "Sus resultados")}</h1>

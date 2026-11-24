@@ -6,6 +6,7 @@ import Follow from "../components/Follow.jsx";
 import { congressOn, congressYears } from "../../lib/congress.js";
 import { billLabel, ordinal, partyTag, date } from "../lib/format.js";
 import { tr } from "../lib/lang.js";
+import { PartyTag } from "../components/PartyTag.jsx";
 
 const PAGE = 50;
 const CURRENT = congressOn();
@@ -118,7 +119,7 @@ export default function Committee() {
               {list.map((r) => (
                 <li key={r.bioguide_id}>
                   <Link to={`/member/${r.bioguide_id}`}>{r.person?.name ?? r.bioguide_id}</Link>
-                  {r.person && <> ({partyTag(r.person)})</>}{r.title && <span className="fine"> · {r.title}</span>}
+                  {r.person && <> <PartyTag p={r.person} /></>}{r.title && <span className="fine"> · {r.title}</span>}
                 </li>
               ))}
             </ul>

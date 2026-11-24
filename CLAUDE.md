@@ -15,8 +15,15 @@ yes-man: flag weak ideas, scope creep, and shortcuts that will cost later.
 - Treat every party and official identically in layout, wording, and data coverage.
 
 ## Scope
-- **Milestone 1 is federal only**: 535 members of Congress, keyed on `bioguide_id`.
-- State and local officials come later. Do not build for them yet.
+- **Milestone 1 is federal**: 535 members of Congress, keyed on `bioguide_id`.
+- **Decided Nov 24, 2026 (Chris): widen to state and local, eventually, however possible.** Start with
+  a California pilot for the 2028 ballot (statewide measures and races), then other states and local
+  offices. Each new level needs its own primary sources and must keep the editorial rules: for ballot
+  measures, show the official text, the official nonpartisan analysis (e.g. California's Legislative
+  Analyst's Office), each side's official arguments unedited, and who is funding each side — never our
+  own reading of a measure's effect. Don't start a new level until the federal work it depends on is done.
+- Party is shown as a letter badge (D blue, R red, independents and others neutral grey), always with
+  the letter, on names only — never as page or section color.
 
 ## Stack
 - Frontend: React + Vite, hosted on Cloudflare Pages (free plan; static assets unlimited).

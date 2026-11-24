@@ -5,6 +5,7 @@ import { searchMembers } from "../lib/members.js";
 import { billLabel, ordinal, partyTag, date } from "../lib/format.js";
 import { extractBillRefs } from "../../lib/billrefs.js";
 import { tr } from "../lib/lang.js";
+import { PartyTag } from "../components/PartyTag.jsx";
 
 const BILL_COLUMNS = "congress,bill_type,number,title,short_title,latest_action_date,policy_area,sponsor_name";
 
@@ -66,7 +67,7 @@ export default function Search() {
               <ul className="plain">
                 {state.members.map((m) => (
                   <li key={m.bioguide_id}>
-                    <Link to={`/member/${m.bioguide_id}`}>{m.name}</Link> ({partyTag(m)}){" "}
+                    <Link to={`/member/${m.bioguide_id}`}>{m.name}</Link> <PartyTag p={m} />{" "}
                     <span className="fine">{m.chamber === "senate" ? tr("Senate", "Senado") : tr("House", "Cámara")}{m.serving ? "" : tr(`, served until ${date(m.end_date)}`, `, en el cargo hasta el ${date(m.end_date)}`)}</span>
                   </li>
                 ))}

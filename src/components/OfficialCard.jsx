@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import { seatLabel, date, partyName } from "../lib/format.js";
 import { useLang } from "../lib/i18n.jsx";
+import { PartyName } from "./PartyTag.jsx";
 
 // One official in the lookup results. Identical layout for every party.
 export default function OfficialCard({ official }) {
@@ -17,7 +18,7 @@ export default function OfficialCard({ official }) {
     <li className="card">
       <p className="seat">{seatLabel(official)}</p>
       <h3><Link to={`/member/${official.bioguide_id}`}>{official.name}</Link></h3>
-      <p className="meta">{partyName(official.party)} · {t("Serving since", "En el cargo desde el")} {date(official.start_date)}</p>
+      <p className="meta"><PartyName party={official.party} /> · {t("Serving since", "En el cargo desde el")} {date(official.start_date)}</p>
     </li>
   );
 }

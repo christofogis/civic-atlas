@@ -11,6 +11,7 @@ import VoteBreakdown from "../components/VoteBreakdown.jsx";
 import StatusBar from "../components/StatusBar.jsx";
 import Follow from "../components/Follow.jsx";
 import { Explain } from "../components/Explain.jsx";
+import { PartyTag } from "../components/PartyTag.jsx";
 
 const TYPES = new Set(["hr", "s", "hres", "sres", "hjres", "sjres", "hconres", "sconres"]);
 const LOBBY_PREVIEW = 40;
@@ -79,7 +80,7 @@ export default function Bill() {
     .sort((a, z) => a[0].localeCompare(z[0]));
   const shownLobbying = !lobbying ? [] : allLobbying ? lobbying : lobbying.slice(0, LOBBY_PREVIEW);
   const person = (p) => (
-    <><Link to={`/member/${p.bioguide_id}`}>{p.name}</Link>{p.party && <> ({partyTag(p)})</>}</>
+    <><Link to={`/member/${p.bioguide_id}`}>{p.name}</Link>{p.party && <> <PartyTag p={p} /></>}</>
   );
 
   return (

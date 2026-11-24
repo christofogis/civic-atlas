@@ -4,6 +4,7 @@ import { db } from "../lib/db.js";
 import DownloadCsv from "../components/DownloadCsv.jsx";
 import { STATE_NAMES, stateName, partyTag, date } from "../lib/format.js";
 import { tr } from "../lib/lang.js";
+import { PartyTag } from "../components/PartyTag.jsx";
 
 // Every member since 2023, by state. Defaults to those serving now.
 export default function Members() {
@@ -67,7 +68,7 @@ export default function Members() {
           <ul className="plain columns">
             {list.map((m) => (
               <li key={m.bioguide_id}>
-                <Link to={`/member/${m.bioguide_id}`}>{m.name}</Link> <span className="fine">({partyTag(m)}){m.chamber === "senate" ? tr(" · Senate", " · Senado") : ""}{m.serving ? "" : tr(` · served until ${date(m.end_date)}`, ` · en el cargo hasta el ${date(m.end_date)}`)}</span>
+                <Link to={`/member/${m.bioguide_id}`}>{m.name}</Link> <PartyTag p={m} /> <span className="fine">{m.chamber === "senate" ? tr(" · Senate", " · Senado") : ""}{m.serving ? "" : tr(` · served until ${date(m.end_date)}`, ` · en el cargo hasta el ${date(m.end_date)}`)}</span>
               </li>
             ))}
           </ul>

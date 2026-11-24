@@ -5,6 +5,7 @@ import DownloadCsv from "../components/DownloadCsv.jsx";
 import { KindLabel } from "../components/Explain.jsx";
 import { billLabel, ordinal, partyTag, date } from "../lib/format.js";
 import { tr } from "../lib/lang.js";
+import { PartyTag } from "../components/PartyTag.jsx";
 
 const BIOGUIDE = /^[A-Z][0-9]{6}$/;
 const pct = (n, d) => (d ? `${Math.round((1000 * n) / d) / 10}%` : "—");
@@ -21,13 +22,13 @@ function Picker({ label, value, members, onPick }) {
       <label>{label}{" "}
         <input type="search" value={text} placeholder={chosen ? chosen.name : tr("Type a name", "Escriba un nombre")} onChange={(e) => setText(e.target.value)} />
       </label>
-      {chosen && !text && <div className="fine">{chosen.name} ({partyTag(chosen)}), {chosen.chamber === "senate" ? tr("Senate", "Senado") : tr("House", "Cámara")}</div>}
+      {chosen && !text && <div className="fine">{chosen.name} <PartyTag p={chosen} />, {chosen.chamber === "senate" ? tr("Senate", "Senado") : tr("House", "Cámara")}</div>}
       {matches.length > 0 && (
         <ul className="plain">
           {matches.map((m) => (
             <li key={m.bioguide_id}>
               <button className="link" onClick={() => { onPick(m.bioguide_id); setText(""); }}>{m.name}</button>{" "}
-              <span className="fine">({partyTag(m)}){m.chamber === "senate" ? tr(" · Senate", " · Senado") : tr(" · House", " · Cámara")}</span>
+              <span className="fine"><PartyTag p={m} />{m.chamber === "senate" ? tr(" · Senate", " · Senado") : tr(" · House", " · Cámara")}</span>
             </li>
           ))}
         </ul>

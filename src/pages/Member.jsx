@@ -10,6 +10,7 @@ import Follow from "../components/Follow.jsx";
 import { KindLabel } from "../components/Explain.jsx";
 import { seatLabel, date, money, billLabel, ordinal, stateName, partyName } from "../lib/format.js";
 import { tr } from "../lib/lang.js";
+import { PartyName } from "../components/PartyTag.jsx";
 
 const BIOGUIDE = /^[A-Z][0-9]{6}$/;
 const TERRITORIES = new Set(["DC", "PR", "GU", "VI", "AS", "MP"]);
@@ -236,9 +237,9 @@ export default function Member() {
       <header>
         <h1>{name}</h1>
         {seat?.seat_status === "serving" ? (
-          <p className="lede">{seatLabel(seat)} · {partyName(seat.party)} · {tr("Current term", "Período actual")} {date(seat.start_date)} – {date(seat.end_date)}</p>
+          <p className="lede">{seatLabel(seat)} <PartyName party={seat.party} /> · {tr("Current term", "Período actual")} {date(seat.start_date)} – {date(seat.end_date)}</p>
         ) : (
-          <p className="lede">{tr("Not currently serving. Most recent", "No está en el cargo. Último cargo")}: {seatLabel(latest)}, {date(latest.start_date)} – {date(latest.end_date)} ({partyName(latest.party)})</p>
+          <p className="lede">{tr("Not currently serving. Most recent", "No está en el cargo. Último cargo")}: {seatLabel(latest)}, {date(latest.start_date)} – {date(latest.end_date)} <PartyName party={latest.party} /></p>
         )}
       </header>
 
@@ -279,7 +280,7 @@ export default function Member() {
         })()}
         <ul className="plain">
           {terms.map((t) => (
-            <li key={`${t.chamber}-${t.start_date}`}>{seatLabel(t)} · {partyName(t.party)} · {date(t.start_date)} – {date(t.end_date)}</li>
+            <li key={`${t.chamber}-${t.start_date}`}>{seatLabel(t)} <PartyName party={t.party} /> · {date(t.start_date)} – {date(t.end_date)}</li>
           ))}
         </ul>
       </Section>
