@@ -70,8 +70,14 @@ jobs:
               url = base + m.group(1)
               open(f"report{i}.html", "w").write(op.open(url).read().decode()); print("ok", row[:3], url)
           EOF
-      - uses: actions/upload-artifact@v4
-        with:
-          name: ptr-samples
-          path: out/
-          retention-days: 3
+      - name: Print samples as text (logs are readable where artifacts aren't)
+        run: |
+          sudo apt-get install -y -qq poppler-utils >/dev/null
+          for f in out/house/*.pdf; do
+            echo "=====PDF $f"; pdffonts "$f" 2>/dev/null | tail -n +3 | wc -l | sed 's/^/fonts: /'
+            pdftotext -layout "$f" - | head -120
+          done
+          for f in out/senate/report*.html; do
+            echo "=====HTML $f"
+            python3 -c "import re,sys; h=open(sys.argv[1]).read(); m=re.search(r'<h1.*?</h1>|<h2.*?</h2>', h, re.S); print(re.sub(r'<[^>]+>',' ',m.group(0)) if m else ''); t=re.search(r'<table.*?</table>', h, re.S); print(t.group(0)[:6000] if t else 'NO TABLE: '+re.sub(r'\\s+',' ',re.sub(r'<[^>]+>',' ',h))[:1500])" "$f"
+          done
