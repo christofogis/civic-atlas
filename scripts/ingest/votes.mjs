@@ -115,7 +115,9 @@ export function parseSenate(xml, url) {
   if (m[6].toUpperCase() === "PM") hour += 12;
   const doc = v.document ?? {};
   const docName = text(doc.document_name);
-  const ref = parseBillRef(`${text(doc.document_type) ?? ""} ${text(doc.document_number) ?? ""}`.trim());
+  let ref = parseBillRef(`${text(doc.document_type) ?? ""} ${text(doc.document_number) ?? ""}`.trim());
+  // Amendment votes name the amendment as the document; the bill it amends is separate.
+  if (!ref.bill_type) ref = parseBillRef(text(v.amendment?.amendment_to_document_number));
   const congress = int(v.congress);
   const count = v.count ?? {};
   const vote = {
@@ -130,7 +132,7 @@ export function parseSenate(xml, url) {
     required: text(v.majority_requirement),
     description: text(v.vote_title),
     document_name: docName,
-    bill_congress: ref.bill_type ? int(doc.document_congress) ?? congress : null,
+    bill_congress: ref.bill_type ? int(doc.document_congress) ?? congress : null, // amendment targets: same Congress
     bill_type: ref.bill_type,
     bill_number: ref.bill_number,
     amendment_ref: text(v.amendment?.amendment_number),
