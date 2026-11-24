@@ -52,3 +52,10 @@
 - [x] vote_positions stored against integer vote keys (153 MB -> 99 MB)
 - [ ] Finance cycle picker (early 2027 pages will show the new 2028 cycle)
 - [ ] Email alerts (needs a decision on accounts and an email provider)
+- [x] Bill status bar from Library of Congress milestone codes
+- [x] Tap-to-explain terms and /glossary
+- [x] "At a glance" sentences on member pages (template, no AI)
+- [x] /week: latest week with votes, laws, chamber passage, your reps' votes
+- [x] Report an error on every page (error_reports, read in the Supabase dashboard)
+- [ ] AI bill summaries: cheapest model, labeled, from official text only. Needs Chris to pick
+      a provider, add the API key as a GitHub secret, and set a monthly spending cap
