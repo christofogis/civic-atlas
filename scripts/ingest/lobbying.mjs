@@ -67,9 +67,7 @@ function parse(f, tracked) {
       const k = `${congress}|${ref.bill_type}|${ref.number}`;
       stats.refs++;
       if (!tracked.has(k)) { stats.untracked++; continue; }
-      const m = byBill.get(k) ?? { filing_uuid: f.filing_uuid, congress, ...ref, issue_codes: [] };
-      if (a.general_issue_code && !m.issue_codes.includes(a.general_issue_code)) m.issue_codes.push(a.general_issue_code);
-      byBill.set(k, m);
+      if (!byBill.has(k)) byBill.set(k, { filing_uuid: f.filing_uuid, congress, ...ref });
     }
   }
   return {
