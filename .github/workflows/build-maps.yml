@@ -1,0 +1,50 @@
+name: Build map files
+
+# Run by hand when the Census publishes new district boundaries. Downloads the Census files,
+# builds public/maps/ (states and congressional districts, 119th and 120th Congress), and
+# commits the result so the site serves them as static files.
+on:
+  workflow_dispatch:
+    inputs:
+      commit:
+        description: "Commit the built files (off = build and report only)"
+        type: boolean
+        default: true
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    env:
+      GEO_DIR: /tmp/geo
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Download Census boundary files
+        run: |
+          set -e
+          UA="civic-atlas map build (github.com/christofogis/civic-atlas)"
+          mkdir -p $GEO_DIR/states $GEO_DIR/cd119 $GEO_DIR/cd120
+          get() { curl -sSfL -A "$UA" --retry 3 -o "$1" "$2"; }
+          get /tmp/s.zip https://www2.census.gov/geo/tiger/GENZ2025/shp/cb_2025_us_state_500k.zip && unzip -qo /tmp/s.zip -d $GEO_DIR/states
+          get /tmp/c.zip https://www2.census.gov/geo/tiger/GENZ2025/shp/cb_2025_us_cd119_500k.zip && unzip -qo /tmp/c.zip -d $GEO_DIR/cd119
+          for f in $(curl -sSf -A "$UA" https://www2.census.gov/geo/tiger/TIGER2026/CD/ | grep -oE 'tl_2026_[0-9]{2}_cd120\.zip' | sort -u); do
+            get /tmp/$f https://www2.census.gov/geo/tiger/TIGER2026/CD/$f && unzip -qo /tmp/$f -d $GEO_DIR/cd120
+          done
+          ls $GEO_DIR/cd120/*.shp | wc -l
+      - name: Build
+        run: NODE_OPTIONS=--max-old-space-size=6144 node scripts/maps/build.mjs
+      - name: Commit
+        if: inputs.commit
+        run: |
+          git config user.name "civic-atlas maps"
+          git config user.email "christofogis@users.noreply.github.com"
+          git add public/maps
+          git diff --cached --quiet && echo "no changes" || (git commit -m "Map files rebuilt from Census boundary files" && git push)
