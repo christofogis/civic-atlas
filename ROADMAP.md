@@ -50,7 +50,11 @@
 - [x] Committee pages with members and bills referred
 - [x] 120th Congress transition prep (docs/transition-120th.md)
 - [x] vote_positions stored against integer vote keys (153 MB -> 99 MB)
-- [ ] Finance cycle picker (early 2027 pages will show the new 2028 cycle)
+- [x] Finance cycle picker (early 2027 pages will show the new 2028 cycle)
+- [x] Nominations page (Senate cloture and confirmation votes)
+- [x] Spreadsheet (CSV) downloads on vote, member, bill, lobbying and comparison lists
+- [x] Look up a news story (paste text; members and bill numbers matched in the browser)
+- [ ] Story lookup by link (needs a server fetch; weigh paywalls and the 10 ms CPU limit first)
 - [ ] Email alerts (needs a decision on accounts and an email provider)
 - [x] Bill status bar from Library of Congress milestone codes
 - [x] Tap-to-explain terms and /glossary
