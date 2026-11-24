@@ -52,9 +52,11 @@ async function loadMember(id) {
     one(db.from("terms").select("chamber,state,district,party,start_date,end_date,phone,address,contact_form,url").eq("bioguide_id", id).order("start_date", { ascending: false })),
     one(db.from("seat_holders").select("*").eq("bioguide_id", id).maybeSingle()),
     one(db.from("committee_memberships").select("congress,title,side,rank,committee:committees(committee_id,name,parent_id,url)").eq("bioguide_id", id)),
-    one(db.from("votes")
-      .select("vote_id,chamber,question,result,voted_at,description,document_name,source_url,vote_positions!inner(position)")
-      .eq("vote_positions.bioguide_id", id).order("voted_at", { ascending: false }).limit(120)),
+    // member_votes starts from the member's positions (indexed), so this stays fast.
+    one(db.from("member_votes")
+      .select("vote_id,chamber,question,result,voted_at,description,document_name,source_url,position")
+      .eq("bioguide_id", id).order("voted_at", { ascending: false }).limit(120))
+      .then((rows) => rows.map((v) => ({ ...v, vote_positions: [{ position: v.position }] }))),
     one(db.from("bills").select("congress,bill_type,number,title,short_title,introduced_date,latest_action_date,latest_action_text,source_url,law_number")
       .eq("sponsor_bioguide_id", id).order("introduced_date", { ascending: false }).limit(10)),
     db.from("bills").select("*", { count: "exact", head: true }).eq("sponsor_bioguide_id", id).then((r) => r.count),
