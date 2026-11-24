@@ -34,7 +34,7 @@
   has no consolidated list and appropriations.senate.gov blocks automated downloads)
 
 ## Phase 2 — Depth
-- [ ] Vote search by issue (vote ingest from House/Senate clerks is done)
+- [x] Vote search by issue (/member/:id/votes; policy area of the bill each vote was on). Votes cover the 118th and 119th Congresses.
 - [x] Bill pages with CRS summaries (AI summary only as labeled fallback; none generated yet)
 - [x] FEC detail: donation sizes, donors' employers, PACs, outside spending (no industry codes: the FEC has none)
 - [x] Scheduled refresh jobs + data-freshness indicator on each page
