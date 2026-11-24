@@ -1,0 +1,40 @@
+name: Ingest schedule
+
+# House floor schedule, committee hearings and markups, and when the Senate next meets.
+on:
+  schedule:
+    - cron: "29 14 * * *"   # daily, 6:29am Pacific
+    - cron: "29 22 * * 1-5" # weekdays, 2:29pm Pacific, for same-day updates
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "Read the feeds; write nothing"
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ingest-schedule
+  cancel-in-progress: false
+
+jobs:
+  ingest:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      SUPABASE_URL: https://fkbzxaoeyrtzviyfzulq.supabase.co
+      SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Schedule
+        env:
+          DRY_RUN: ${{ inputs.dry_run }}
+        run: |
+          if [ "$DRY_RUN" = "true" ]; then node scripts/ingest/schedule.mjs --dry-run; else node scripts/ingest/schedule.mjs; fi

@@ -12,6 +12,7 @@ on:
       - Ingest lobbying reports
       - Ingest FEC totals
       - Ingest FEC detail
+      - Ingest schedule
       - Site check
     types: [completed]
 
