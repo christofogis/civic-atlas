@@ -235,6 +235,7 @@ export default function Member() {
   return (
     <main className="page">
       <header>
+        <img className="member-photo" src={`https://unitedstates.github.io/images/congress/225x275/${m.bioguide_id}.jpg`} alt={name} width="90" height="110" loading="lazy" onError={(e) => { e.currentTarget.style.display = "none"; }} />
         <h1>{name}</h1>
         {seat?.seat_status === "serving" ? (
           <p className="lede">{seatLabel(seat)} <PartyName party={seat.party} /> · {tr("Current term", "Período actual")} {date(seat.start_date)} – {date(seat.end_date)}</p>
