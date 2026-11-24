@@ -63,17 +63,31 @@ function WeekGrid({ start, mine }) {
   const last = Math.max(18 * 60, ...timed.map((m) => m.min + BLOCK_MIN));
   const startHour = Math.floor(first / 60), endHour = Math.ceil(last / 60);
   const hours = Array.from({ length: endHour - startHour }, (_, i) => startHour + i);
-  // Side-by-side lanes for meetings that overlap within a day.
+  // Side-by-side lanes only where meetings overlap: each group of overlapping meetings splits
+  // its own width; a meeting with nothing beside it gets the whole column.
   const placed = (day) => {
-    const list = timed.filter((m) => m.day === day).sort((a, z) => a.min - z.min);
-    const lanes = [];
+    const list = timed.filter((m) => m.day === day).sort((a, z) => a.min - z.min).map((m) => ({ ...m }));
+    const out = [];
+    let group = [], groupEnd = -1;
+    const flush = () => {
+      const lanes = [];
+      for (const m of group) {
+        let lane = lanes.findIndex((endMin) => endMin <= m.min);
+        if (lane < 0) { lane = lanes.length; lanes.push(0); }
+        lanes[lane] = m.min + BLOCK_MIN;
+        out.push({ ...m, lane, lanes: lanes.length });
+      }
+      const n = lanes.length;
+      for (const m of out.slice(out.length - group.length)) m.lanes = n;
+      group = []; groupEnd = -1;
+    };
     for (const m of list) {
-      let lane = lanes.findIndex((endMin) => endMin <= m.min);
-      if (lane < 0) { lane = lanes.length; lanes.push(0); }
-      lanes[lane] = m.min + BLOCK_MIN;
-      m.lane = lane;
+      if (group.length && m.min >= groupEnd) flush();
+      group.push(m);
+      groupEnd = Math.max(groupEnd, m.min + BLOCK_MIN);
     }
-    return list.map((m) => ({ ...m, lanes: lanes.length }));
+    if (group.length) flush();
+    return out;
   };
   return (
     <>
