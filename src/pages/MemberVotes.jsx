@@ -118,8 +118,8 @@ export default function MemberVotes() {
           <input type="search" value={q} placeholder="Bill, nominee or keyword" onChange={(e) => setParam("q", e.target.value)} />
         </label>
         <div className="toggle" role="group" aria-label="Which votes to show">
-          <button type="button" className={finalOnly ? "" : "on"} onClick={() => setParam("final", "")}>All votes</button>
-          <button type="button" className={finalOnly ? "on" : ""} onClick={() => setParam("final", "1")}>Final votes only</button>
+          <button type="button" aria-pressed={!finalOnly} className={finalOnly ? "" : "on"} onClick={() => setParam("final", "")}>All votes</button>
+          <button type="button" aria-pressed={finalOnly} className={finalOnly ? "on" : ""} onClick={() => setParam("final", "1")}>Final votes only</button>
         </div>
       </div>
 

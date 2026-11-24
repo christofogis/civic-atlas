@@ -89,8 +89,8 @@ export default function Week() {
           <section className="section">
             <h2>Roll-call votes</h2>
             <div className="toggle" role="group" aria-label="Which votes to show">
-              <button type="button" className={allVotes ? "" : "on"} onClick={() => setAllVotes(false)}>Final votes</button>
-              <button type="button" className={allVotes ? "on" : ""} onClick={() => setAllVotes(true)}>All {votes.length} votes</button>
+              <button type="button" aria-pressed={!allVotes} className={allVotes ? "" : "on"} onClick={() => setAllVotes(false)}>Final votes</button>
+              <button type="button" aria-pressed={allVotes} className={allVotes ? "on" : ""} onClick={() => setAllVotes(true)}>All {votes.length} votes</button>
             </div>
             {mine.size === 0 && <p className="fine"><Link to="/">Look up your address</Link> to see how your representatives voted.</p>}
             {shown.length === 0 ? <p>No final votes this week.</p> : (

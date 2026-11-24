@@ -51,7 +51,7 @@ export default function Nominations() {
       </div>
       {!rows ? <p>Loading…</p> : (
         <>
-          <p>{filtered.length.toLocaleString()} nomination{filtered.length === 1 ? "" : "s"} with a recorded vote.</p>
+          <p role="status">{filtered.length.toLocaleString()} nomination{filtered.length === 1 ? "" : "s"} with a recorded vote.</p>
           <table>
             <thead><tr><th>Nominee</th><th>Cloture</th><th>Confirmation</th></tr></thead>
             <tbody>

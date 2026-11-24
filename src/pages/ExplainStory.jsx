@@ -63,6 +63,9 @@ export default function ExplainStory() {
           ("Sen. Padilla") when only one member of that chamber has that last name, so some mentions may be missed.
         </p>
       </form>
+      <p role="status" className="visually-hidden">
+        {result ? `Found ${result.people.length} member${result.people.length === 1 ? "" : "s"} and ${result.bills.length} bill number${result.bills.length === 1 ? "" : "s"}.` : ""}
+      </p>
       {result && (
         <>
           <h2>Members of Congress named</h2>

@@ -188,6 +188,15 @@ export default function Member() {
   const [pickedCycle, setPickedCycle] = useState(null);
   const { hash } = useLocation();
   const navigate = useNavigate();
+  const tabKeys = (e) => {
+    const i = TABS.findIndex(([id]) => id === tab);
+    const next = { ArrowRight: i + 1, ArrowLeft: i - 1, Home: 0, End: TABS.length - 1 }[e.key];
+    if (next === undefined) return;
+    e.preventDefault();
+    const id = TABS[(next + TABS.length) % TABS.length][0];
+    navigate({ hash: id === "overview" ? "" : id }, { replace: true });
+    requestAnimationFrame(() => document.getElementById(`tab-${id}`)?.focus());
+  };
   const tab = TABS.some(([id]) => `#${id}` === hash) ? hash.slice(1) : "overview";
 
   useEffect(() => {
@@ -230,9 +239,11 @@ export default function Member() {
         )}
       </header>
 
+      {/* Arrow keys, Home and End move between tabs (the standard tab pattern); Tab moves into the panel. */}
       <nav className="tabs" role="tablist" aria-label="Sections of this page">
         {TABS.map(([id, label]) => (
           <button key={id} type="button" role="tab" id={`tab-${id}`} aria-selected={tab === id} aria-controls={`panel-${id}`}
+            tabIndex={tab === id ? 0 : -1} onKeyDown={tabKeys}
             className={tab === id ? "on" : ""} onClick={() => navigate({ hash: id === "overview" ? "" : id }, { replace: true })}>
             {label}
           </button>
@@ -313,8 +324,8 @@ export default function Member() {
         {votes.length === 0 ? <p>No roll-call votes on record since 2023.</p> : (
           <>
           <div className="toggle" role="group" aria-label="Which votes to show">
-            <button type="button" className={finalOnly ? "" : "on"} onClick={() => setFinalOnly(false)}>All votes</button>
-            <button type="button" className={finalOnly ? "on" : ""} onClick={() => setFinalOnly(true)}>Final votes only</button>
+            <button type="button" aria-pressed={!finalOnly} className={finalOnly ? "" : "on"} onClick={() => setFinalOnly(false)}>All votes</button>
+            <button type="button" aria-pressed={finalOnly} className={finalOnly ? "on" : ""} onClick={() => setFinalOnly(true)}>Final votes only</button>
           </div>
           <table>
             <thead><tr><th>Date</th><th>Question</th><th>Vote</th><th>Result</th></tr></thead>
@@ -446,7 +457,7 @@ export default function Member() {
         )}
         {detailCycles.length > 1 && (
           <div className="toggle" role="group" aria-label="Election cycle to show in detail">
-            {detailCycles.map((c) => <button key={c} type="button" className={c === detailCycle ? "on" : ""} onClick={() => setPickedCycle(c)}>{c} cycle</button>)}
+            {detailCycles.map((c) => <button key={c} type="button" aria-pressed={c === detailCycle} className={c === detailCycle ? "on" : ""} onClick={() => setPickedCycle(c)}>{c} cycle</button>)}
           </div>
         )}
         {detailCycle > 0 && <FinanceDetail cycle={detailCycle} bySize={inCycle(bySize)} employers={inCycle(employers)} pacs={inCycle(pacs)} outside={inCycle(outside)} fecId={finance.find((f) => f.cycle === detailCycle)?.fec_candidate_id} />}
