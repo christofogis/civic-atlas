@@ -47,7 +47,7 @@ export default function LocalMeetings({ data, city, count = 3, showBoard = true,
       {rule && (
         <Body title={tr(`${city.name} City Council`, `Concejo Municipal de ${city.name}`)} rows={ruleDates(rule, from, count)} time={rule.time}
           place={rule.place} posted={rule.agendas_posted} agendasUrl={city.agendas_url} count={count}
-          source={<>{tr(city.meetings.en, city.meetings.es)}; <a href={rule.rule_source.url} rel="noopener">{rule.rule_source.label}</a></>} />
+          source={<a href={rule.rule_source.url} rel="noopener">{rule.rule_source.label}</a>} />
       )}
       {board && (
         <Body title={tr(`${data.county} Board of Supervisors`, `Junta de Supervisores del ${data.county}`)} rows={listedDates(board.dates, from, count)} time={board.time}
