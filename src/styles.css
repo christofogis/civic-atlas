@@ -415,3 +415,5 @@ label.check { display: inline-flex; align-items: center; gap: 6px; font-size: 0.
 .my-reps-list > li { padding: 12px 0; border-bottom: 1px solid var(--border); }
 .week-facts { margin: 6px 0 0; }
 .week-facts > li { margin: 6px 0; }
+.week-facts { list-style: none; padding-left: 0; }
+.week-facts > li { padding-left: 0; }
