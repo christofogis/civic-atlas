@@ -82,6 +82,98 @@ function Bars({ rows, perHundred, total }) {
   );
 }
 
+// Spending by year, stacked by the six largest budget functions plus everything else, with a
+// mark at what came in: the part of a bar above the mark is the deficit. Colors avoid the party
+// red and blue; the order was checked for color-blind separation (adjacent segments).
+const GROUPS = [
+  { key: "Social Security", color: "#00b894" },
+  { key: "Medicare", color: "#f47230" },
+  { key: "Health", color: "#6a4ce2" },
+  { key: "Net Interest", color: "#f2a600" },
+  { key: "Income Security", color: "#ee7fac" },
+  { key: "National Defense", color: "#008a17" },
+];
+const OTHER = "#b9c0bc";
+function grouped(y) {
+  const parts = GROUPS.map((g) => ({ ...g, amount: y.outlays.find((o) => o.label === g.key)?.amount ?? 0 }));
+  const rest = y.outlays_total - parts.reduce((a, p) => a + p.amount, 0);
+  return [...parts, { key: "Everything else", color: OTHER, amount: rest }];
+}
+const groupName = (k) => (k === "Everything else" ? tr("Everything else", "Todo lo demás") : <Label en={k} />);
+
+function Stacked({ years }) {
+  const [share, setShare] = useState(false);
+  const [sel, setSel] = useState(years.length - 1);
+  const W = 480, H = 280, L = 40, R = 8, Tp = 12, Bt = 26;
+  const max = share ? 1 : Math.ceil(Math.max(...years.map((y) => y.outlays_total)) / 1e12) * 1e12;
+  const slot = (W - L - R) / years.length;
+  const bw = Math.max(8, slot - 8);
+  const y = (v) => Tp + (H - Tp - Bt) * (1 - v / max);
+  const ticks = share ? [0, 0.25, 0.5, 0.75, 1] : Array.from({ length: max / 1e12 + 1 }, (_, t) => t * 1e12).filter((t, i) => i % 2 === 0);
+  const cur = years[sel];
+  const curParts = grouped(cur);
+  return (
+    <div className="stack">
+      <div className="seg-toggle" role="group" aria-label={tr("Show as", "Mostrar como")}>
+        <button type="button" aria-pressed={!share} onClick={() => setShare(false)}>{tr("Dollars", "Dólares")}</button>
+        <button type="button" aria-pressed={share} onClick={() => setShare(true)}>{tr("Share of spending", "Parte del gasto")}</button>
+      </div>
+      <svg viewBox={`0 0 ${W} ${H}`} role="img"
+        aria-label={tr("Spending by year, stacked by category, with a mark at receipts; the table below has the figures.", "Gasto por año, apilado por categoría, con una marca en los ingresos; la tabla de abajo tiene las cifras.")}>
+        {ticks.map((t) => (
+          <g key={t}>
+            <line x1={L} x2={W - R} y1={y(t)} y2={y(t)} stroke="var(--border)" />
+            <text x={L - 6} y={y(t) + 4} textAnchor="end" className="axis">{share ? `${Math.round(t * 100)}%` : `$${t / 1e12}T`}</text>
+          </g>
+        ))}
+        {years.map((yr, i) => {
+          const x = L + i * slot + (slot - bw) / 2;
+          const total = yr.outlays_total;
+          let acc = 0;
+          const scale = share ? 1 / total : 1;
+          const rec = yr.receipts_total * scale;
+          return (
+            <g key={yr.fiscal_year} className={i === sel ? "bar sel" : "bar"} onMouseEnter={() => setSel(i)} onClick={() => setSel(i)}>
+              <rect x={L + i * slot} y={Tp} width={slot} height={H - Tp - Bt} fill="transparent" />
+              {grouped(yr).map((p) => {
+                const v = Math.max(0, p.amount) * scale;
+                const y0 = y(acc), y1 = y(acc + v);
+                acc += v;
+                return <rect key={p.key} x={x} y={y1} width={bw} height={Math.max(0, y0 - y1 - 2)} fill={p.color} />;
+              })}
+              <line x1={x - 3} x2={x + bw + 3} y1={y(rec)} y2={y(rec)} stroke="var(--text)" strokeWidth="2.5" />
+              {((years.length - 1 - i) % 3 === 0) && <text x={x + bw / 2} y={H - 8} textAnchor="middle" className="axis">{yr.fiscal_year}</text>}
+            </g>
+          );
+        })}
+      </svg>
+      <ul className="stack-legend fine">
+        {[...GROUPS, { key: "Everything else", color: OTHER }].slice().reverse().map((g) => (
+          <li key={g.key}><span className="swatch" style={{ background: g.color }} />{groupName(g.key)}</li>
+        ))}
+        <li><span className="swatch marker" />{tr("What came in (receipts). Spending above this line is the deficit.", "Lo que entró (ingresos). El gasto por encima de esta línea es el déficit.")}</li>
+      </ul>
+      <div className="stack-detail" aria-live="polite">
+        <p><strong>{tr(`FY${cur.fiscal_year}`, `AF${cur.fiscal_year}`)}</strong>{tr(" · tap or point at a year", " · toque o señale un año")}</p>
+        <table>
+          <tbody>
+            {curParts.slice().reverse().map((p) => (
+              <tr key={p.key}><td><span className="swatch" style={{ background: p.color }} />{groupName(p.key)}</td><td>{B(p.amount)}</td><td>{per100(p.amount, cur.outlays_total)}%</td></tr>
+            ))}
+            <tr className="total"><td>{tr("Spending (outlays)", "Gasto (egresos)")}</td><td>{B(cur.outlays_total)}</td><td></td></tr>
+            <tr><td>{tr("What came in (receipts)", "Lo que entró (ingresos)")}</td><td>{B(cur.receipts_total)}</td><td></td></tr>
+            <tr><td>{cur.deficit >= 0 ? tr("Deficit", "Déficit") : tr("Surplus", "Superávit")}</td><td>{B(Math.abs(cur.deficit))}</td><td></td></tr>
+          </tbody>
+        </table>
+        <p className="fine">
+          {tr("Everything else is the other 13 budget functions, net of offsetting receipts, such as veterans' benefits, transportation and education. Dollars are not adjusted for inflation.",
+            "Todo lo demás son las otras 13 funciones presupuestarias, descontando los ingresos compensatorios, como beneficios para veteranos, transporte y educación. Los dólares no están ajustados por inflación.")}
+        </p>
+      </div>
+    </div>
+  );
+}
+
 // Receipts and outlays by fiscal year: two lines, one axis, crosshair tooltip.
 function Trend({ years }) {
   const [hover, setHover] = useState(null);
@@ -182,6 +274,8 @@ export default function Budget() {
 
       <section>
         <h2>{tr("Year by year", "Año por año")}</h2>
+        <Stacked years={data.years} />
+        <h3>{tr("Receipts and spending", "Ingresos y gasto")}</h3>
         <Trend years={data.years} />
         <details>
           <summary>{tr("Show as a table", "Ver como tabla")}</summary>

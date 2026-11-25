@@ -468,3 +468,18 @@ label.check { display: inline-flex; align-items: center; gap: 6px; font-size: 0.
 .meetings-block { margin: 1.5rem 0; }
 .local-meetings { margin: 0.5rem 0 1rem; }
 .local-meetings ul { margin: 0.25rem 0; }
+
+/* Budget: spending stacked by category */
+.stack svg { width: 100%; max-width: 34rem; height: auto; display: block; }
+.stack .axis { font-size: 13px; fill: var(--muted); }
+.stack .bar { cursor: pointer; }
+.stack .bar:not(.sel) rect:not([fill="transparent"]) { opacity: 0.55; }
+.seg-toggle { display: inline-flex; border: 1px solid var(--border-strong); border-radius: 999px; overflow: hidden; margin: 0.25rem 0 0.75rem; }
+.seg-toggle button { border: 0; background: transparent; padding: 0.35rem 0.9rem; font: inherit; cursor: pointer; color: var(--text); }
+.seg-toggle button[aria-pressed="true"] { background: var(--text); color: var(--bg); }
+.stack-legend { list-style: none; padding: 0; margin: 0.5rem 0; display: flex; flex-wrap: wrap; gap: 0.25rem 1rem; }
+.stack-legend .swatch, .stack-detail .swatch { display: inline-block; width: 0.8rem; height: 0.8rem; border-radius: 2px; margin-right: 0.35rem; vertical-align: -1px; }
+.stack-legend .swatch.marker { height: 3px; width: 1rem; background: var(--text); vertical-align: 3px; border-radius: 0; }
+.stack-detail table { max-width: 28rem; }
+.stack-detail td:nth-child(n+2) { text-align: right; font-variant-numeric: tabular-nums; }
+.stack-detail tr.total td { border-top: 1px solid var(--text); font-weight: 600; }

@@ -185,6 +185,9 @@ export default function MethodsEs() {
         el mes más reciente. Los gastos son el dinero realmente pagado, que difiere de lo que el Congreso asigna en un año dado.
         Las categorías y sus nombres son del Tesoro; algunas, como los ingresos compensatorios no distribuidos, se registran
         como montos negativos y reducen el total. "De cada $100" divide cada categoría entre el gasto total (o los ingresos).
+        La gráfica año por año agrupa el gasto en las seis funciones más grandes en la mayoría de los años desde 2015
+        (Seguro Social, Medicare, salud, intereses netos, seguridad de ingresos, defensa nacional) y todo lo demás, que es el
+        gasto total menos esas seis. Su línea marca los ingresos totales.
       </p>
       <p>
         Las cifras de deuda vienen de Debt to the Penny: la deuda pública total, dividida en deuda en manos del público y

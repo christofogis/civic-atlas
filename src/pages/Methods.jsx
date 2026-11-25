@@ -191,6 +191,9 @@ export default function Methods() {
         out, which differs from what Congress appropriates in a given year. Categories and their names
         are Treasury's; some, such as undistributed offsetting receipts, are recorded as negative amounts
         and reduce the total. "Of every $100" divides each category by total outlays (or receipts).
+        The year-by-year chart groups spending into the six functions that were largest in most years
+        since 2015 (Social Security, Medicare, Health, Net Interest, Income Security, National Defense)
+        and everything else, which is total outlays minus those six. Its line marks total receipts.
       </p>
       <p>
         Debt figures come from Debt to the Penny: total public debt outstanding, split into debt held by
