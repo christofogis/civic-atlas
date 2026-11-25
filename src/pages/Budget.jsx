@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { date } from "../lib/format.js";
 import { tr } from "../lib/lang.js";
+import { NotesList, NotesProvider, Ref } from "../components/Notes.jsx";
 
 // Federal money in and out, from the Treasury's Monthly Treasury Statement (Table 9) and Debt to
 // the Penny, built monthly into /data/budget.json by scripts/data/budget.mjs. Category names are
@@ -167,8 +168,7 @@ function Stacked({ years }) {
           </tbody>
         </table>
         <p className="fine">
-          {tr("Everything else is the other 13 budget functions, net of offsetting receipts, such as veterans' benefits, transportation and education. Dollars are not adjusted for inflation.",
-            "Todo lo demás son las otras 13 funciones presupuestarias, descontando los ingresos compensatorios, como beneficios para veteranos, transporte y educación. Los dólares no están ajustados por inflación.")}
+          {tr("Dollars are not adjusted for inflation.", "Los dólares no están ajustados por inflación.")}<Ref id="grouping" />
         </p>
       </div>
     </div>
@@ -253,14 +253,24 @@ export default function Budget() {
   const { current, debt } = data;
   const debtFy = debt.fiscal_years.find((d) => d.fiscal_year === fy);
   const yi = data.years.findIndex((y) => y.fiscal_year === fy);
+  const first = data.years[0].fiscal_year, last = data.years.at(-1).fiscal_year;
+  const notes = [
+    { id: "mts", text: <>{tr("Receipts and outlays: ", "Ingresos y gastos: ")}<a href={data.sources.mts}>{tr("Monthly Treasury Statement, Table 9", "Estado Mensual del Tesoro, Tabla 9")}</a>{tr(", Bureau of the Fiscal Service. Each fiscal year is the September statement's year-to-date total. Rebuilt monthly; last updated ", ", Oficina del Servicio Fiscal. Cada año fiscal es el total acumulado del estado de septiembre. Se actualiza cada mes; última actualización: ")}{date(data.built_at.slice(0, 10))}.</> },
+    { id: "spark", text: tr(`The small lines under each figure run from FY${first} to FY${last}; the dot marks the year chosen above. "Year by year" has the full chart and a table.`, `Las líneas pequeñas bajo cada cifra van del AF${first} al AF${last}; el punto marca el año elegido arriba. "Año por año" tiene la gráfica completa y una tabla.`) },
+    { id: "debt", text: <>{tr("Debt: ", "Deuda: ")}<a href={data.sources.debt}>Debt to the Penny</a>{tr(", Bureau of the Fiscal Service: total public debt outstanding on the last business day of each fiscal year, and on the latest day published. Debt held by the public is owed to investors, including foreign governments and the Federal Reserve; intragovernmental holdings are owed to government accounts such as the Social Security trust funds.", ", Oficina del Servicio Fiscal: deuda pública total el último día hábil de cada año fiscal y el día más reciente publicado. La deuda en manos del público se debe a inversionistas, incluidos gobiernos extranjeros y la Reserva Federal; las tenencias intragubernamentales se deben a cuentas del gobierno como los fondos fiduciarios del Seguro Social.")}</> },
+    { id: "functions", text: tr("Outlays are grouped by budget function, the categories the government uses to group spending by purpose. Category names are the Treasury's own. Outlays are money actually paid out, which differs from what Congress appropriates in a given year.", "Los gastos se agrupan por función presupuestaria, las categorías que el gobierno usa para agrupar el gasto según su propósito. Los nombres de las categorías son del Tesoro. Los gastos son el dinero realmente pagado, que difiere de lo que el Congreso asigna en un año dado.") },
+    { id: "payroll", text: tr("Social insurance and retirement receipts are mostly payroll taxes for Social Security and Medicare; their parts are listed under that row.", "Las contribuciones al seguro social y la jubilación son sobre todo impuestos sobre la nómina para el Seguro Social y Medicare; sus partes aparecen bajo esa fila.") },
+    { id: "grouping", text: <>{tr("The chart groups spending into the six budget functions that were largest in most years since 2015, and everything else: the other 13 functions, net of offsetting receipts, such as veterans' benefits, transportation and education. The line marks total receipts. ", "La gráfica agrupa el gasto en las seis funciones presupuestarias más grandes en la mayoría de los años desde 2015, y todo lo demás: las otras 13 funciones, descontando los ingresos compensatorios, como beneficios para veteranos, transporte y educación. La línea marca los ingresos totales. ")}<Link to="/methods#budget">{tr("How this page is built", "Cómo se construye esta página")}</Link>.</> },
+  ];
   const sparkLabel = tr("Trend by fiscal year; the table under Year by year has the figures.", "Tendencia por año fiscal; la tabla en Año por año tiene las cifras.");
 
   return (
+    <NotesProvider notes={notes}>
     <main className="page wide budget">
       <h1>{tr("Federal budget", "Presupuesto federal")}</h1>
       <p className="lede">
         {tr("Congress sets taxes and approves spending; the Treasury reports what actually came in and went out. These figures are the Treasury's, for each fiscal year (October through September).",
-          "El Congreso fija los impuestos y aprueba el gasto; el Tesoro informa lo que realmente entró y salió. Estas cifras son del Tesoro, para cada año fiscal (de octubre a septiembre).")}
+          "El Congreso fija los impuestos y aprueba el gasto; el Tesoro informa lo que realmente entró y salió. Estas cifras son del Tesoro, para cada año fiscal (de octubre a septiembre).")}<Ref id="mts" />
       </p>
 
       <label className="fy-pick">
@@ -271,24 +281,21 @@ export default function Budget() {
       </label>
 
       <div className="budget-figures">
-        <div><span className="fig">{T(year.receipts_total)}</span><span>{tr("came in (receipts)", "entró (ingresos)")}</span><Spark values={data.years.map((y) => y.receipts_total)} at={yi} label={sparkLabel} /></div>
+        <div><span className="fig">{T(year.receipts_total)}</span><span>{tr("came in (receipts)", "entró (ingresos)")}<Ref id="spark" /></span><Spark values={data.years.map((y) => y.receipts_total)} at={yi} label={sparkLabel} /></div>
         <div><span className="fig">{T(year.outlays_total)}</span><span>{tr("went out (outlays)", "salió (gastos)")}</span><Spark values={data.years.map((y) => y.outlays_total)} at={yi} label={sparkLabel} /></div>
         <div><span className="fig">{T(Math.abs(year.deficit))}</span><span>{year.deficit >= 0 ? tr("more spent than collected (deficit)", "más gastado que recaudado (déficit)") : tr("more collected than spent (surplus)", "más recaudado que gastado (superávit)")}</span><Spark values={data.years.map((y) => y.deficit)} at={yi} label={sparkLabel} /></div>
-        {debtFy && <div><span className="fig">{T(debtFy.total)}</span><span>{tr(`total debt on ${date(debtFy.record_date)}`, `deuda total al ${date(debtFy.record_date)}`)}</span><Spark values={debt.fiscal_years.map((d) => d.total)} at={debt.fiscal_years.findIndex((d) => d.fiscal_year === fy)} label={sparkLabel} /></div>}
+        {debtFy && <div><span className="fig">{T(debtFy.total)}</span><span>{tr(`total debt on ${date(debtFy.record_date)}`, `deuda total al ${date(debtFy.record_date)}`)}<Ref id="debt" /></span><Spark values={debt.fiscal_years.map((d) => d.total)} at={debt.fiscal_years.findIndex((d) => d.fiscal_year === fy)} label={sparkLabel} /></div>}
       </div>
-      <p className="fine spark-note">{tr(`Small lines: FY${data.years[0].fiscal_year} to FY${data.years.at(-1).fiscal_year}; the dot is the year chosen. "Year by year" below has the full chart.`, `Líneas pequeñas: AF${data.years[0].fiscal_year} a AF${data.years.at(-1).fiscal_year}; el punto es el año elegido. "Año por año", más abajo, tiene la gráfica completa.`)}</p>
 
       <div className="budget-two">
       <section>
-        <h2>{tr("Where the money went", "En qué se gastó")}</h2>
-        <p className="fine">{tr("Outlays by budget function, the categories the government uses to group spending by purpose.", "Gastos por función presupuestaria, las categorías que el gobierno usa para agrupar el gasto según su propósito.")}</p>
+        <h2>{tr("Where the money went", "En qué se gastó")}<Ref id="functions" /></h2>
         <Bars rows={year.outlays} perHundred total={year.outlays_total} />
       </section>
 
       <section>
-        <h2>{tr("Where the money came from", "De dónde vino el dinero")}</h2>
+        <h2>{tr("Where the money came from", "De dónde vino el dinero")}<Ref id="payroll" /></h2>
         <Bars rows={year.receipts} perHundred total={year.receipts_total} />
-        <p className="fine">{tr("Social insurance and retirement receipts are mostly payroll taxes for Social Security and Medicare.", "Las contribuciones al seguro social y la jubilación son sobre todo impuestos sobre la nómina para el Seguro Social y Medicare.")}</p>
       </section>
 
       </div>
@@ -333,9 +340,8 @@ export default function Budget() {
         </section>
       )}
 
-      <p className="source fine">
-        {tr("Sources: ", "Fuentes: ")}<a href={data.sources.mts}>{tr("Monthly Treasury Statement, Table 9", "Estado Mensual del Tesoro, Tabla 9")}</a>; <a href={data.sources.debt}>Debt to the Penny</a>{tr(", Bureau of the Fiscal Service. Updated ", ", Oficina del Servicio Fiscal. Actualizado el ")}{date(data.built_at.slice(0, 10))}. <Link to="/methods#budget">{tr("About this data", "Sobre estos datos")}</Link>.
-      </p>
+      <NotesList />
     </main>
+    </NotesProvider>
   );
 }
