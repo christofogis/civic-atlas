@@ -1,5 +1,5 @@
 import LocalOfficials from "./LocalOfficials.jsx";
-import StateOfficialCard from "./StateOfficialCard.jsx";
+import StateOfficialCard, { ExtraStatewideCards } from "./StateOfficialCard.jsx";
 import OfficialCard from "./OfficialCard.jsx";
 import ShareResults from "./ShareResults.jsx";
 import { stateName } from "../lib/format.js";
@@ -50,9 +50,13 @@ export default function LookupResults({ result, sectionRef, shared = false }) {
               "La legislatura estatal redacta las leyes y el presupuesto del estado (escuelas, carreteras, salud, derecho penal). El gobernador y otros funcionarios estatales dirigen el gobierno del estado.")}</p>
             <ul className="cards">
               {result.state_officials.map((o) => <StateOfficialCard key={`${o.type}-${o.id}`} official={o} state={result.state} />)}
+              <ExtraStatewideCards state={result.state} />
             </ul>
-            <p className="fine">{t("Statewide offices shown: governor, lieutenant governor, attorney general and secretary of state, where Open States lists them. Others, such as treasurer, aren't on Civic Atlas yet for any state.",
-              "Cargos estatales que se muestran: gobernador, vicegobernador, fiscal general y secretario de estado, donde Open States los incluye. Otros, como tesorero, aún no están en Civic Atlas para ningún estado.")}</p>
+            <p className="fine">{result.state === "CA"
+              ? t("Statewide offices shown: governor, lieutenant governor, attorney general and secretary of state (from Open States), and treasurer, controller, insurance commissioner and superintendent of public instruction (from each office's website). Board of Equalization districts aren't on Civic Atlas yet.",
+                "Cargos estatales que se muestran: gobernador, vicegobernador, fiscal general y secretario de estado (de Open States), y tesorero, contralor, comisionado de seguros y superintendente de instrucción pública (del sitio web de cada oficina). Los distritos de la Junta de Igualación aún no están en Civic Atlas.")
+              : t("Statewide offices shown: governor, lieutenant governor, attorney general and secretary of state, where Open States lists them. Others, such as treasurer, are on Civic Atlas for California only so far.",
+                "Cargos estatales que se muestran: gobernador, vicegobernador, fiscal general y secretario de estado, donde Open States los incluye. Otros, como tesorero, por ahora solo están en Civic Atlas para California.")}</p>
           </section>
         )}
 

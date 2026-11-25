@@ -1,5 +1,6 @@
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { date } from "../lib/format.js";
+import { date, stateName } from "../lib/format.js";
 import { tr } from "../lib/lang.js";
 import { stateOfficeLabel, stateParty } from "../lib/stateOffices.js";
 
@@ -13,6 +14,14 @@ export const statePersonPath = (id) => `/state/person/${id.replace(/^ocd-person\
 
 // One state official in the lookup results. Same layout as federal cards, for every party.
 export default function StateOfficialCard({ official, state }) {
+  if (official.updating) {
+    return (
+      <li className="card pending">
+        <p className="seat">{stateOfficeLabel(official, state)}</p>
+        <p>{tr(`A new term began on ${date(official.term_ended)}. Information for this office is being updated.`, `Un nuevo período comenzó el ${date(official.term_ended)}. La información de este cargo se está actualizando.`)}</p>
+      </li>
+    );
+  }
   return (
     <li className="card">
       <p className="seat">{stateOfficeLabel(official, state)}</p>
@@ -24,4 +33,34 @@ export default function StateOfficialCard({ official, state }) {
       {official.phone && <p className="fine card-phone"><a href={`tel:${official.phone.replace(/[^\d+]/g, "")}`}>{official.phone}</a></p>}
     </li>
   );
+}
+
+// California statewide offices that Open States doesn't list, from /data/state/ca-statewide.json.
+// Same card layout; the name links to the office's own website (there's no person page).
+export function ExtraStatewideCards({ state }) {
+  const [data, setData] = useState(null);
+  useEffect(() => {
+    if (state !== "CA") return;
+    fetch(`/data/state/${state.toLowerCase()}-statewide.json`).then((r) => (r.ok ? r.json() : null)).then(setData).catch(() => {});
+  }, [state]);
+  if (!data) return null;
+  const today = new Date().toISOString().slice(0, 10);
+  const updating = data.seat_change_by && data.seat_change_by <= today;
+  return data.offices.map((o) => (
+    updating ? (
+      <li key={o.office} className="card pending">
+        <p className="seat">{tr(`${stateName(state)} ${o.title[0]}`, `${o.title[1]} de ${stateName(state)}`)}</p>
+        <p>{tr(`A new term began on ${date(data.seat_change_by)}. Information for this office is being updated.`, `Un nuevo período comenzó el ${date(data.seat_change_by)}. La información de este cargo se está actualizando.`)}</p>
+      </li>
+    ) : (
+      <li key={o.office} className="card">
+        <p className="seat">{tr(`${stateName(state)} ${o.title[0]}`, `${o.title[1]} de ${stateName(state)}`)}</p>
+        <h3><a href={o.website} rel="noopener">{o.name}</a></h3>
+        <p className="meta">
+          {o.nonpartisan ? tr("Nonpartisan office", "Cargo no partidista") : <><StatePartyTag party={o.party} /> {o.party}</>}
+          {o.start_date && <> · {tr("In this office since", "En este cargo desde el")} {date(o.start_date)}</>}
+        </p>
+      </li>
+    )
+  ));
 }
