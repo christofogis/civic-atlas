@@ -18,6 +18,10 @@
     {
       "label": "Los Alamitos City Council",
       "url": "https://cityoflosalamitos.org/165/City-Council"
+    },
+    {
+      "label": "City council districts (Registrar of Voters)",
+      "url": "https://ocvote.gov/maps-and-gis"
     }
   ],
   "meetings_url": "https://board.oc.gov/meetings-agendas",
@@ -103,10 +107,9 @@
         "en": "Third Monday of each month, 6:00 p.m., City Hall Council Chamber, 3191 Katella Avenue",
         "es": "Tercer lunes de cada mes, 6:00 p. m., Sala del Concejo en el Ayuntamiento, 3191 Katella Avenue"
       },
-      "council_map": "/maps/local/ca-orange-los-alamitos-council.json",
       "map_source": {
-        "label": "Adopted council districts (2022–2031)",
-        "url": "https://experience.arcgis.com/experience/118312376df140dbb9f5dff642f7e309"
+        "label": "Council districts (Orange County Registrar of Voters)",
+        "url": "https://ocvote.gov/maps-and-gis"
       },
       "roles_until": "2026-12-07",
       "members": [

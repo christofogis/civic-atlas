@@ -12,8 +12,9 @@ const CASES = [
   ["New Hampshire State House", "107 N Main St, Concord, NH 03301", { upper: 1, lower: 1 }],
   ["Vermont State House", "115 State St, Montpelier, VT 05633", { upper: 1, lower: 1 }],
   ["Nebraska State Capitol", "1445 K St, Lincoln, NE 68508", { legislature: 1 }],
-  ["Orange County Hall of Administration", "400 W Civic Center Dr, Santa Ana, CA 92701", { upper: 1, lower: 1 }, { supervisor: 2 }],
+  ["Orange County Hall of Administration", "400 W Civic Center Dr, Santa Ana, CA 92701", { upper: 1, lower: 1 }, { supervisor: 2, city: "santa-ana" }],
   ["Rossmoor (unincorporated)", "3001 Blume Dr, Rossmoor, CA 90720", { upper: 1, lower: 1 }, { supervisor: 1, unincorporated: "Rossmoor" }],
+  ["Anaheim City Hall", "200 S Anaheim Blvd, Anaheim, CA 92805", { upper: 1, lower: 1 }, { city: "anaheim" }],
   ["Los Alamitos City Hall", "3191 Katella Ave, Los Alamitos, CA 90720", { upper: 1, lower: 1 }, { supervisor: 1, city: "los-alamitos" }],
 ];
 

@@ -19,7 +19,8 @@ const LOCAL = { "CA|Orange County": {
     "Fullerton", "Garden Grove", "Huntington Beach", "Irvine", "La Habra", "La Palma", "Laguna Beach", "Laguna Hills", "Laguna Niguel",
     "Laguna Woods", "Lake Forest", "Los Alamitos", "Mission Viejo", "Newport Beach", "Orange", "Placentia", "Rancho Santa Margarita",
     "San Clemente", "San Juan Capistrano", "Santa Ana", "Seal Beach", "Stanton", "Tustin", "Villa Park", "Westminster", "Yorba Linda"]),
-  cities: { "Los Alamitos": { id: "los-alamitos", map: "/maps/local/ca-orange-los-alamitos-council.json" } },
+  // Council district maps, one file per city that elects by district (built from the Registrar's file).
+  councilMap: (city) => `/maps/local/ca-orange-council/${city.toLowerCase().replace(/[^a-z]+/g, "-")}.json`,
 } };
 
 async function localFor(geoJson, request, env) {
@@ -43,10 +44,13 @@ async function localFor(geoJson, request, env) {
       // Unincorporated land outside a named community comes back as "Supervisory District N".
       out.place = { name: city || place.type === "City" ? place.name : null, type: city ? "city" : "unincorporated" };
     }
-    const city = place && conf.cities[place.name];
-    if (city) {
-      const council = containing((await load(city.map)).features ?? [], lng, lat)?.properties?.district ?? null;
-      out.city = { id: city.id, name: place.name, council_district: council };
+    if (out.place?.type === "city") {
+      out.city = { id: out.place.name.toLowerCase().replace(/[^a-z]+/g, "-"), name: out.place.name, council_district: null };
+      try {
+        // Cities that elect at large have no file; Pages may answer with the site's HTML, which won't parse.
+        const council = await load(conf.councilMap(out.place.name));
+        out.city.council_district = containing(council.features ?? [], lng, lat)?.properties?.district ?? null;
+      } catch { /* at-large city, or map unavailable */ }
     }
   } catch { /* districts stay unknown; countywide officials still show */ }
   return out;

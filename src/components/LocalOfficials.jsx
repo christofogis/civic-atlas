@@ -64,6 +64,7 @@ export default function LocalOfficials({ local, approximate }) {
   if (!data) return null;
   const sup = data.supervisors.find((s) => s.district === local.supervisor_district);
   const city = local.city && data.cities?.find((c) => c.id === local.city.id);
+  const otherCity = local.city && !city ? local.city : null;
   const member = city?.members.find((m) => m.district === local.city.council_district);
   const place = local.place;
   return (
@@ -87,7 +88,9 @@ export default function LocalOfficials({ local, approximate }) {
         {!city && place?.type === "unincorporated" && (place.name
           ? tr(`This address is in ${place.name}, an unincorporated community: it has no city council, and the Board of Supervisors governs local matters. `, `Esta dirección está en ${place.name}, una comunidad no incorporada: no tiene concejo municipal, y la Junta de Supervisores gobierna los asuntos locales. `)
           : tr("This address is in an unincorporated area: it has no city council, and the Board of Supervisors governs local matters. ", "Esta dirección está en una zona no incorporada: no tiene concejo municipal, y la Junta de Supervisores gobierna los asuntos locales. "))}
-        {!city && place?.type === "city" && tr(`${place.name}'s city council isn't on Civic Atlas yet. `, `El concejo municipal de ${place.name} aún no está en Civic Atlas. `)}
+        {otherCity && (otherCity.council_district
+          ? tr(`This address is in ${otherCity.name} City Council District ${otherCity.council_district}. ${otherCity.name}'s council members aren't listed on Civic Atlas yet. `, `Esta dirección está en el distrito ${otherCity.council_district} del Concejo Municipal de ${otherCity.name}. Los miembros del concejo de ${otherCity.name} aún no aparecen en Civic Atlas. `)
+          : tr(`This address is in ${otherCity.name}. Its city council members aren't listed on Civic Atlas yet. `, `Esta dirección está en ${otherCity.name}. Los miembros de su concejo municipal aún no aparecen en Civic Atlas. `))}
         <Link to={`/local/${local.id}`}>{tr(`All ${data.county} officials`, `Todos los funcionarios del ${data.county}`)}</Link>
       </p>
     </>
