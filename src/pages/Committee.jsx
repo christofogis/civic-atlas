@@ -1,3 +1,4 @@
+import { Fold, useFolds } from "../components/Fold.jsx";
 import { NotesList, Ref } from "../components/Notes.jsx";
 import { useEffect, useState } from "react";
 import { Link, useParams, useSearchParams } from "react-router-dom";
@@ -28,6 +29,7 @@ export default function Committee() {
   const [info, setInfo] = useState({ status: "loading" });
   const [bills, setBills] = useState({ status: "loading", rows: [] });
   const [shown, setShown] = useState(PAGE);
+  const { open, toggle } = useFolds(["upcoming", "meetings", "members", "bills", "subcommittees"], info.status === "done", id);
   const set = (k, v) => { const n = new URLSearchParams(params); n.set(k, v); setParams(n, { replace: true }); setShown(PAGE); };
 
   useEffect(() => {
@@ -73,6 +75,8 @@ export default function Committee() {
   const { committee: c, subs, roster, rosterCongress, events, meetings } = info;
   const subNames = Object.fromEntries(subs.map((x) => [x.committee_id, x.name]));
   const sides = ["majority", "minority"].map((s) => [s, roster.filter((r) => r.side === s)]).filter(([, l]) => l.length);
+  const chair = roster.find((r) => /^chair/i.test(r.title ?? ""))?.person?.name;
+  const ranking = roster.find((r) => /ranking member/i.test(r.title ?? ""))?.person?.name;
   const chamberName = { house: tr("House", "Cámara:"), senate: tr("Senate", "Senado:"), joint: tr("Joint", "Conjunto:") }[c.chamber] ?? c.chamber;
 
   return (
@@ -82,9 +86,11 @@ export default function Committee() {
       {c.url && <p className="fine"><a href={c.url}>{tr("Committee website", "Sitio web del comité (en inglés)")}</a></p>}
       <Follow calendar={`/api/calendar/committee/${c.committee_id}`} />
 
+      <p className="fold-hint">{tr("Tap a topic to see the details.", "Toque un tema para ver los detalles.")}</p>
+      <div className="folds">
       {events.length > 0 && (
-        <section className="section">
-          <h2>{tr("Coming up", "Próximamente")}</h2>
+        <Fold id="upcoming" title={tr("Coming up", "Próximamente")} open={open.has("upcoming")} onToggle={toggle}
+          summary={tr(`${events.length} hearing${events.length === 1 ? "" : "s"} or meeting${events.length === 1 ? "" : "s"} scheduled, next on ${date(events[0].event_date)}`, `${events.length} audiencia${events.length === 1 ? "" : "s"} o reuni${events.length === 1 ? "ón programada" : "ones programadas"}, la próxima el ${date(events[0].event_date)}`)}>
           <ul className="plain">
             {events.map((e) => (
               <li key={e.event_id}>
@@ -94,25 +100,30 @@ export default function Committee() {
               </li>
             ))}
           </ul>
-        </section>
+        </Fold>
       )}
 
       {meetings.length > 0 && (
+        <Fold id="meetings" title={tr("Recent hearings and meetings", "Audiencias y reuniones recientes")} open={open.has("meetings")} onToggle={toggle}
+          summary={tr(`The ${meetings.length} most recent, latest on ${date(meetings[0].meeting_at ?? meetings[0].date)}`, `Las ${meetings.length} más recientes, la última el ${date(meetings[0].meeting_at ?? meetings[0].date)}`)}>
         <section className="section">
-          <h2>{tr("Recent hearings and meetings", "Audiencias y reuniones recientes")}<Ref id="src-meetings" text={<>{tr("Source: Congress.gov committee meeting records. The 25 most recent are listed; each links to video, documents and, for House hearings, witnesses.", "Fuente: registros de reuniones de comités de Congress.gov. Se listan las 25 más recientes; cada una enlaza a video, documentos y, en audiencias de la Cámara, testigos.")}</>} /></h2>
+          <h3>{tr("Recent hearings and meetings", "Audiencias y reuniones recientes")}<Ref id="src-meetings" text={<>{tr("Source: Congress.gov committee meeting records. The 25 most recent are listed; each links to video, documents and, for House hearings, witnesses.", "Fuente: registros de reuniones de comités de Congress.gov. Se listan las 25 más recientes; cada una enlaza a video, documentos y, en audiencias de la Cámara, testigos.")}</>} /></h3>
           <MeetingList meetings={meetings} showCommittee committees={{ [c.committee_id]: tr("Full committee", "Comité en pleno"), ...subNames }} />
         </section>
+        </Fold>
       )}
 
       {subs.length > 0 && (
-        <section className="section">
-          <h2>{tr("Subcommittees", "Subcomités")}</h2>
+        <Fold id="subcommittees" title={tr("Subcommittees", "Subcomités")} open={open.has("subcommittees")} onToggle={toggle}
+          summary={tr(`${subs.length} subcommittee${subs.length === 1 ? "" : "s"}`, `${subs.length} subcomité${subs.length === 1 ? "" : "s"}`)}>
           <ul className="plain columns">{subs.map((s) => <li key={s.committee_id}><Link to={`/committee/${s.committee_id}`}>{s.name}</Link></li>)}</ul>
-        </section>
+        </Fold>
       )}
 
+      <Fold id="members" title={tr("Members", "Miembros")} open={open.has("members")} onToggle={toggle}
+        summary={roster.length ? [tr(`${roster.length} member${roster.length === 1 ? "" : "s"}`, `${roster.length} miembro${roster.length === 1 ? "" : "s"}`), chair && tr(`chair: ${chair}`, `presidencia: ${chair}`), ranking && tr(`ranking member: ${ranking}`, `miembro de mayor rango de la minoría: ${ranking}`)].filter(Boolean).join("; ") : tr("No membership on record", "No hay miembros registrados")}>
       <section className="section">
-        <h2>{tr("Members", "Miembros")}{rosterCongress && tr(` (${ordinal(rosterCongress)} Congress)`, ` (${ordinal(rosterCongress)} Congreso)`)}<Ref id="src-members" text={<>{tr("Source: unitedstates/congress-legislators. Listed in committee rank order.", "Fuente: unitedstates/congress-legislators. En el orden de rango del comité.")}</>} /></h2>
+        <h3>{tr("Members", "Miembros")}{rosterCongress && tr(` (${ordinal(rosterCongress)} Congress)`, ` (${ordinal(rosterCongress)} Congreso)`)}<Ref id="src-members" text={<>{tr("Source: unitedstates/congress-legislators. Listed in committee rank order.", "Fuente: unitedstates/congress-legislators. En el orden de rango del comité.")}</>} /></h3>
         {sides.length === 0 ? <p>{tr("No membership on record.", "No hay miembros registrados.")}</p> : sides.map(([side, list]) => (
           <div key={side}>
             <h3 className="small">{side === "majority" ? tr("Majority", "Mayoría") : tr("Minority", "Minoría")}</h3>
@@ -127,9 +138,12 @@ export default function Committee() {
           </div>
         ))}
       </section>
+      </Fold>
 
+      <Fold id="bills" title={tr("Bills referred", "Proyectos remitidos")} open={open.has("bills")} onToggle={toggle}
+        summary={bills.status === "done" ? tr(`${(bills.count ?? bills.rows.length).toLocaleString()} in the ${ordinal(congress)} Congress`, `${(bills.count ?? bills.rows.length).toLocaleString()} en el ${ordinal(congress)} Congreso`) : tr("Loading…", "Cargando…")}>
       <section className="section">
-        <h2>{tr("Bills referred", "Proyectos remitidos")}<Ref id="src-bills" text={<>{tr("Source: GovInfo Bill Status (Library of Congress). Includes bills referred to this committee or later handled by it.", "Fuente: GovInfo Bill Status (Biblioteca del Congreso). Incluye proyectos remitidos a este comité o que este tramitó después.")}</>} /></h2>
+        <h3>{tr("Bills referred", "Proyectos remitidos")}<Ref id="src-bills" text={<>{tr("Source: GovInfo Bill Status (Library of Congress). Includes bills referred to this committee or later handled by it.", "Fuente: GovInfo Bill Status (Biblioteca del Congreso). Incluye proyectos remitidos a este comité o que este tramitó después.")}</>} /></h3>
         <div className="filters">
           <label>{tr("Congress", "Congreso")}{" "}
             <select value={congress} onChange={(e) => set("congress", e.target.value)}>
@@ -163,6 +177,8 @@ export default function Committee() {
         {bills.rows.length > shown && <p><button className="link" onClick={() => setShown(shown + PAGE)}>{tr("Show more", "Mostrar más")}</button></p>}
         {bills.count > bills.rows.length && <p className="fine">{tr("Showing the first 1,000.", "Se muestran los primeros 1,000.")}</p>}
       </section>
+      </Fold>
+      </div>
       <NotesList />
     </main>
   );
