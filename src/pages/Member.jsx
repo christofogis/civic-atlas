@@ -51,7 +51,7 @@ function VoteStats({ s, median, delegate, independent }) {
 
 async function loadMember(id) {
   const one = (q) => q.then(({ data, error }) => { if (error) throw error; return data; });
-  const [member, terms, seat, memberships, votes, bills, sponsoredCount, cosponsoredCount, finance, freshness, voteStats, medians, billStats, billMedians, trades, filings, tradeSummary, bySize, employers, pacs, outside, laws, candidacies] = await Promise.all([
+  const [member, terms, seat, memberships, votes, bills, sponsoredCount, cosponsoredCount, finance, freshness, voteStats, medians, billStats, billMedians, trades, filings, tradeSummary, bySize, byState, employers, pacs, outside, laws, candidacies] = await Promise.all([
     one(db.from("members").select("*").eq("bioguide_id", id).maybeSingle()),
     one(db.from("terms").select("chamber,state,district,party,start_date,end_date,phone,address,contact_form,url").eq("bioguide_id", id).order("start_date", { ascending: false })),
     one(db.from("seat_holders").select("*").eq("bioguide_id", id).maybeSingle()),
@@ -76,20 +76,46 @@ async function loadMember(id) {
     one(db.from("ptr_filings").select("filing_id,filed_date,format,source_url").eq("bioguide_id", id).eq("format", "scanned").order("filed_date", { ascending: false })),
     one(db.from("member_trade_summary").select("*").eq("bioguide_id", id).maybeSingle()),
     one(db.from("finance_by_size").select("*").eq("bioguide_id", id)),
+    one(db.from("finance_by_state").select("cycle,state,total,contributions").eq("bioguide_id", id)),
     one(db.from("finance_top_employers").select("*").eq("bioguide_id", id).order("rank")),
     one(db.from("finance_committee_contributions").select("*").eq("bioguide_id", id).order("rank")),
     one(db.from("outside_spending").select("*").eq("bioguide_id", id).order("total", { ascending: false })),
     one(db.from("bills").select("congress,bill_type,number").eq("sponsor_bioguide_id", id).not("became_law_date", "is", null)),
     one(db.from("candidates").select("fec_candidate_id,election_year,office,state,district").eq("bioguide_id", id)),
   ]);
-  return { member, terms, seat, memberships, votes, bills, sponsoredCount, cosponsoredCount, finance, freshness, voteStats, medians, billStats, billMedians, trades, filings, tradeSummary, bySize, employers, pacs, outside, laws, candidacies };
+  return { member, terms, seat, memberships, votes, bills, sponsoredCount, cosponsoredCount, finance, freshness, voteStats, medians, billStats, billMedians, trades, filings, tradeSummary, bySize, byState, employers, pacs, outside, laws, candidacies };
 }
 
 const SIZE_LABEL = () => ({ 0: tr("Under $200", "Menos de $200"), 200: "$200–$499", 500: "$500–$999", 1000: "$1,000–$1,999", 2000: tr("$2,000 and over", "$2,000 o más") });
 
 // Where the money came from in one cycle: size of individual gifts, donors' employers, PACs,
 // and outside groups' spending. All figures are FEC aggregates; no donor is named.
-function FinanceDetail({ cycle, bySize, employers, pacs, outside, fecId }) {
+// Itemized individual contributions (over $200 in the cycle) split by the donor's state.
+function ByStateShare({ home, rows }) {
+  const total = rows.reduce((a, r) => a + Number(r.total ?? 0), 0);
+  if (!(total > 0)) return null;
+  const inState = rows.filter((r) => r.state === home).reduce((a, r) => a + Number(r.total ?? 0), 0);
+  const pct = Math.round((100 * inState) / total);
+  const top = [...rows].filter((r) => r.state !== home && /^[A-Z]{2}$/.test(r.state)).sort((a, z) => z.total - a.total).slice(0, 5);
+  return (
+    <>
+      <h4>{tr("Where itemized donors live", "Dónde viven los donantes detallados")}</h4>
+      <div className="share-bar" role="img" aria-label={tr(`${pct}% from ${stateName(home)}, ${100 - pct}% from elsewhere`, `${pct}% de ${stateName(home)}, ${100 - pct}% de otros lugares`)}>
+        <span className="share-in" style={{ width: `${pct}%` }} />
+      </div>
+      <table>
+        <tbody>
+          <tr><td>{tr(`From ${stateName(home)}`, `De ${stateName(home)}`)}</td><td>{money(inState)}</td><td>{pct}%</td></tr>
+          <tr><td>{tr("From other states and abroad", "De otros estados y del extranjero")}</td><td>{money(total - inState)}</td><td>{100 - pct}%</td></tr>
+        </tbody>
+      </table>
+      {top.length > 0 && <p className="fine">{tr("Largest other states: ", "Otros estados con más: ")}{top.map((r) => `${stateName(r.state)} ${money(Number(r.total))}`).join(", ")}.</p>}
+      <p className="fine">{tr("Only contributions from individuals that add up to more than $200 in the cycle are reported with an address. Smaller gifts aren't included here.", "Solo las contribuciones de personas que suman más de $200 en el ciclo se reportan con dirección. Las donaciones menores no se incluyen aquí.")}</p>
+    </>
+  );
+}
+
+function FinanceDetail({ cycle, bySize, byState, home, employers, pacs, outside, fecId }) {
   const sizeTotal = bySize.reduce((a, r) => a + Number(r.total ?? 0), 0);
   const support = outside.filter((o) => o.support_oppose === "support");
   const oppose = outside.filter((o) => o.support_oppose === "oppose");
@@ -109,6 +135,7 @@ function FinanceDetail({ cycle, bySize, employers, pacs, outside, fecId }) {
           </table>
         </>
       )}
+      {byState.length > 0 && home && <ByStateShare home={home} rows={byState} />}
       {employers.length > 0 && (
         <>
           <h4>{tr("Donors' employers", "Empleadores de los donantes")}</h4>
@@ -215,7 +242,7 @@ export default function Member() {
   if (state.status === "missing") return <main className="page"><h1>{tr("Member not found", "Miembro no encontrado")}</h1><p><Link to="/">{tr("Back to search", "Volver a la búsqueda")}</Link></p></main>;
   if (state.status === "error") return <main className="page"><p className="notice">{tr("Couldn't load this page right now. Try again shortly.", "No se pudo cargar esta página. Inténtelo de nuevo en un momento.")}</p></main>;
 
-  const { member: m, terms, seat, memberships, votes, bills, sponsoredCount, cosponsoredCount, finance, freshness, voteStats, medians, billStats, billMedians, trades, filings: scannedFilings, tradeSummary: ts, bySize, employers, pacs, outside, laws, candidacies } = state.data;
+  const { member: m, terms, seat, memberships, votes, bills, sponsoredCount, cosponsoredCount, finance, freshness, voteStats, medians, billStats, billMedians, trades, filings: scannedFilings, tradeSummary: ts, bySize, byState, employers, pacs, outside, laws, candidacies } = state.data;
   // Finance detail is shown for the most recent cycle with detail on file.
   // Cycles with detail on file, newest first; the visitor can switch between them.
   const detailCycles = [...new Set([...bySize, ...employers, ...pacs, ...outside].map((r) => r.cycle))].sort((a, z) => z - a);
@@ -467,7 +494,7 @@ export default function Member() {
             {detailCycles.map((c) => <button key={c} type="button" aria-pressed={c === detailCycle} className={c === detailCycle ? "on" : ""} onClick={() => setPickedCycle(c)}>{tr(`${c} cycle`, `Ciclo ${c}`)}</button>)}
           </div>
         )}
-        {detailCycle > 0 && <FinanceDetail cycle={detailCycle} bySize={inCycle(bySize)} employers={inCycle(employers)} pacs={inCycle(pacs)} outside={inCycle(outside)} fecId={finance.find((f) => f.cycle === detailCycle)?.fec_candidate_id} />}
+        {detailCycle > 0 && <FinanceDetail cycle={detailCycle} bySize={inCycle(bySize)} byState={inCycle(byState)} home={latest?.state} employers={inCycle(employers)} pacs={inCycle(pacs)} outside={inCycle(outside)} fecId={finance.find((f) => f.cycle === detailCycle)?.fec_candidate_id} />}
       </Section>
       </>}
       </div>
