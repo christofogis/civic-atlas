@@ -1,0 +1,24 @@
+import { tr } from "./lang.js";
+
+// Local offices (pilot: Orange County, CA). County offices in California are nonpartisan, so
+// these cards carry no party badge, for anyone.
+const OFFICES = {
+  assessor: ["Assessor", "Tasador(a)"],
+  auditor_controller: ["Auditor-Controller", "Auditor(a)-Contralor(a)"],
+  clerk_recorder: ["Clerk-Recorder", "Secretario(a)-Registrador(a)"],
+  district_attorney: ["District Attorney-Public Administrator", "Fiscal de Distrito-Administrador(a) Público(a)"],
+  sheriff_coroner: ["Sheriff-Coroner", "Alguacil-Médico(a) Forense"],
+  treasurer_tax_collector: ["Treasurer-Tax Collector", "Tesorero(a)-Recaudador(a) de Impuestos"],
+};
+export const officeName = (o) => tr(...(OFFICES[o] ?? [o, o]));
+export const supervisorSeat = (county, d) => tr(`${county} Board of Supervisors, District ${d}`, `Junta de Supervisores del Condado de ${county.replace(/ County$/, "")}, distrito ${d}`);
+export const roleName = (r) => (r === "chair" ? tr("Chair", "Presidente(a)") : r === "vice_chair" ? tr("Vice Chair", "Vicepresidente(a)") : null);
+
+// A term that has ended with no newer record means the file is behind: show the seat as updating.
+export const termEnded = (s) => Boolean(s.term_end && s.term_end < new Date().toISOString().slice(0, 10));
+
+let cache = {};
+export function loadLocal(id) {
+  cache[id] ??= fetch(`/data/local/${id}.json`).then((r) => r.json());
+  return cache[id];
+}

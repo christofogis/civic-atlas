@@ -12,10 +12,11 @@ const CASES = [
   ["New Hampshire State House", "107 N Main St, Concord, NH 03301", { upper: 1, lower: 1 }],
   ["Vermont State House", "115 State St, Montpelier, VT 05633", { upper: 1, lower: 1 }],
   ["Nebraska State Capitol", "1445 K St, Lincoln, NE 68508", { legislature: 1 }],
+  ["Orange County Hall of Administration", "400 W Civic Center Dr, Santa Ana, CA 92701", { upper: 1, lower: 1 }, { supervisor: 2 }],
 ];
 
 let failed = 0;
-for (const [label, address, want] of CASES) {
+for (const [label, address, want, local] of CASES) {
   const res = await fetch(`${base}/api/lookup?address=${encodeURIComponent(address)}`, { headers: { "X-Check-Token": token } });
   const body = await res.json().catch(() => ({}));
   const problems = [];
@@ -28,6 +29,8 @@ for (const [label, address, want] of CASES) {
     for (const [type, n] of Object.entries(want)) {
       if (st.filter((o) => o.type === type).length < n) problems.push(`no state ${type} member (districts ${JSON.stringify(body.state_districts)})`);
     }
+    if (local?.supervisor && body.local?.supervisor_district !== local.supervisor) problems.push(`expected supervisor district ${local.supervisor}, got ${JSON.stringify(body.local)}`);
+    if (!local && body.local?.covered) problems.push("local officials shown outside Orange County");
     const names = st.filter((o) => ["upper", "lower", "legislature"].includes(o.type)).map((o) => `${o.type} ${o.district}: ${o.name}`);
     console.log(`${problems.length ? "FAIL" : "ok  "} ${label} — ${names.join("; ") || "no legislators"}`);
   }

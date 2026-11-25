@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
+import LocalOfficials from "../components/LocalOfficials.jsx";
 import StateOfficialCard from "../components/StateOfficialCard.jsx";
 import OfficialCard from "../components/OfficialCard.jsx";
 import Turnstile from "../components/Turnstile.jsx";
@@ -116,6 +117,7 @@ export default function Home() {
                 "Los legisladores estatales que se muestran son los de los distritos que incluyen esta dirección. Los cargos estatales que se muestran son gobernador, vicegobernador, fiscal general y secretario de estado según Open States; algunos estados aún no aparecen allí, y otros cargos estatales (como tesorero) no se muestran para ningún estado.")}</p>
             </>
           )}
+          <LocalOfficials local={result.local} approximate={result.approximate} />
           <p className="fine">{t("District", "Distrito")}: {result.sources.district}. {t("Officials", "Funcionarios")}: {result.sources.officials}{result.sources.state_officials ? `; ${result.sources.state_officials}` : ""}.</p>
         </section>
       )}

@@ -7,6 +7,28 @@ import { districtsFromGeocodio } from "../../lib/geocodio.js";
 import { isCheckRequest, verifyTurnstile } from "../../lib/turnstile.js";
 import { rest } from "../../lib/rest.js";
 import { districtKey, stateDistrictsFromGeocodio, STATEWIDE } from "../../lib/stateleg.js";
+import { containing } from "../../lib/geo.js";
+
+// Counties with local officials on the site (pilot: Orange County, CA). The district map is a
+// static file built from the county's own GIS layer; the officials are in public/data/local/.
+const LOCAL = { "CA|Orange County": { id: "ca-orange", map: "/maps/local/ca-orange-supervisors.json" } };
+
+async function localFor(geoJson, request, env) {
+  const r = geoJson?.results?.[0];
+  const ac = r?.address_components ?? {};
+  const st = ac.state_province ?? ac.state;
+  const county = ac.county;
+  const conf = LOCAL[`${st}|${county}`];
+  if (!conf) return { covered: false, county: county ?? null };
+  const out = { covered: true, id: conf.id, county, supervisor_district: null };
+  const { lat, lng } = r.location ?? {};
+  if (lat == null || lng == null || !env.ASSETS) return out;
+  try {
+    const map = await (await env.ASSETS.fetch(new URL(conf.map, request.url))).json();
+    out.supervisor_district = containing(map.features ?? [], lng, lat)?.properties?.district ?? null;
+  } catch { /* district stays unknown; countywide officials still show */ }
+  return out;
+}
 
 const json = (body, status = 200) =>
   Response.json(body, { status, headers: { "Cache-Control": "no-store" } });
@@ -36,6 +58,7 @@ export async function onRequestGet({ request, env }) {
   const geoJson = await geo.json();
   const place = districtsFromGeocodio(geoJson);
   const stateDistricts = stateDistrictsFromGeocodio(geoJson);
+  const local = await localFor(geoJson, request, env);
   if (!place?.state) return json({ error: "That address couldn't be found." }, 404);
 
   try {
@@ -88,6 +111,7 @@ export async function onRequestGet({ request, env }) {
         };
       }),
       state_districts: stateDistricts,
+      local,
       state_officials: stateOfficials,
       sources: {
         district: "Geocodio (U.S. Census Bureau district boundaries)",
