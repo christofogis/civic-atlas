@@ -1,0 +1,1785 @@
+{
+ "built_at": "2026-11-25T06:29:16.161Z",
+ "sources": {
+  "mts": "https://fiscaldata.treasury.gov/datasets/monthly-treasury-statement/summary-of-receipts-and-outlays-of-the-u-s-government",
+  "debt": "https://fiscaldata.treasury.gov/datasets/debt-to-the-penny/"
+ },
+ "years": [
+  {
+   "fiscal_year": 2015,
+   "record_date": "2015-09-30",
+   "receipts": [
+    {
+     "label": "Individual Income Taxes",
+     "amount": 1540802375212.6
+    },
+    {
+     "label": "Corporation Income Taxes",
+     "amount": 343797276067.09
+    },
+    {
+     "label": "Social Insurance and Retirement Receipts",
+     "amount": 1065277352875.36,
+     "parts": [
+      {
+       "label": "Employment and General Retirement",
+       "amount": 1010448753612.58
+      },
+      {
+       "label": "Unemployment Insurance",
+       "amount": 51177428272.86
+      },
+      {
+       "label": "Other Retirement",
+       "amount": 3651170989.92
+      }
+     ]
+    },
+    {
+     "label": "Excise Taxes",
+     "amount": 98278948223.77
+    },
+    {
+     "label": "Estate and Gift Taxes",
+     "amount": 19231606071.18
+    },
+    {
+     "label": "Customs Duties",
+     "amount": 35041196205.29
+    },
+    {
+     "label": "Miscellaneous Receipts",
+     "amount": 146294446260.44
+    }
+   ],
+   "outlays": [
+    {
+     "label": "National Defense",
+     "amount": 591372205224.07
+    },
+    {
+     "label": "International Affairs",
+     "amount": 48598332870.71
+    },
+    {
+     "label": "General Science, Space, and Technology",
+     "amount": 29468354193.34
+    },
+    {
+     "label": "Energy",
+     "amount": 6909770961.59
+    },
+    {
+     "label": "Natural Resources and Environment",
+     "amount": 33987672775.99
+    },
+    {
+     "label": "Agriculture",
+     "amount": 20229070873.91
+    },
+    {
+     "label": "Commerce and Housing Credit",
+     "amount": -38335201849.05
+    },
+    {
+     "label": "Transportation",
+     "amount": 90040935237.84
+    },
+    {
+     "label": "Community and Regional Development",
+     "amount": 21648628410.51
+    },
+    {
+     "label": "Education, Training, Employment, and Social Services",
+     "amount": 120375734592.39
+    },
+    {
+     "label": "Health",
+     "amount": 482153111817.46
+    },
+    {
+     "label": "Medicare",
+     "amount": 546202525840.74
+    },
+    {
+     "label": "Income Security",
+     "amount": 509429152709.52
+    },
+    {
+     "label": "Social Security",
+     "amount": 887770817463.99
+    },
+    {
+     "label": "Veterans Benefits and Services",
+     "amount": 159739333048.38
+    },
+    {
+     "label": "Administration of Justice",
+     "amount": 53581741959.71
+    },
+    {
+     "label": "General Government",
+     "amount": 16916804934.25
+    },
+    {
+     "label": "Net Interest",
+     "amount": 223336132268.23
+    },
+    {
+     "label": "Undistributed Offsetting Receipts",
+     "amount": -115803064295.14
+    }
+   ],
+   "receipts_total": 3248723200915.73,
+   "outlays_total": 3687622059038.44,
+   "deficit": 438898858122.70996
+  },
+  {
+   "fiscal_year": 2016,
+   "record_date": "2016-09-30",
+   "receipts": [
+    {
+     "label": "Individual Income Taxes",
+     "amount": 1546074928107.74
+    },
+    {
+     "label": "Corporation Income Taxes",
+     "amount": 299570939628.32
+    },
+    {
+     "label": "Social Insurance and Retirement Receipts",
+     "amount": 1115062819158.23,
+     "parts": [
+      {
+       "label": "Employment and General Retirement",
+       "amount": 1062305011164.46
+      },
+      {
+       "label": "Unemployment Insurance",
+       "amount": 48852716273.3
+      },
+      {
+       "label": "Other Retirement",
+       "amount": 3905091720.47
+      }
+     ]
+    },
+    {
+     "label": "Excise Taxes",
+     "amount": 95045415455.04
+    },
+    {
+     "label": "Estate and Gift Taxes",
+     "amount": 21354002316.66
+    },
+    {
+     "label": "Customs Duties",
+     "amount": 34837269316.54
+    },
+    {
+     "label": "Miscellaneous Receipts",
+     "amount": 154742996990.82
+    }
+   ],
+   "outlays": [
+    {
+     "label": "National Defense",
+     "amount": 595303439435.41
+    },
+    {
+     "label": "International Affairs",
+     "amount": 45304204110.79
+    },
+    {
+     "label": "General Science, Space, and Technology",
+     "amount": 30230316084.43
+    },
+    {
+     "label": "Energy",
+     "amount": 3748706890.45
+    },
+    {
+     "label": "Natural Resources and Environment",
+     "amount": 37792268568.36
+    },
+    {
+     "label": "Agriculture",
+     "amount": 20174987360.06
+    },
+    {
+     "label": "Commerce and Housing Credit",
+     "amount": -32789094410.02
+    },
+    {
+     "label": "Transportation",
+     "amount": 92940730983.02
+    },
+    {
+     "label": "Community and Regional Development",
+     "amount": 21051938355.95
+    },
+    {
+     "label": "Education, Training, Employment, and Social Services",
+     "amount": 108057798196.1
+    },
+    {
+     "label": "Health",
+     "amount": 511320133269.73
+    },
+    {
+     "label": "Medicare",
+     "amount": 594535157426.09
+    },
+    {
+     "label": "Income Security",
+     "amount": 514582983291.1
+    },
+    {
+     "label": "Social Security",
+     "amount": 916077987132.59
+    },
+    {
+     "label": "Veterans Benefits and Services",
+     "amount": 174514511683.73
+    },
+    {
+     "label": "Administration of Justice",
+     "amount": 57144161860.45
+    },
+    {
+     "label": "General Government",
+     "amount": 18639539276.13
+    },
+    {
+     "label": "Net Interest",
+     "amount": 240721540897.61
+    },
+    {
+     "label": "Undistributed Offsetting Receipts",
+     "amount": -95251169802.33
+    }
+   ],
+   "receipts_total": 3266688370973.35,
+   "outlays_total": 3854100140609.65,
+   "deficit": 587411769636.2998
+  },
+  {
+   "fiscal_year": 2017,
+   "record_date": "2017-09-30",
+   "receipts": [
+    {
+     "label": "Individual Income Taxes",
+     "amount": 1587119168060.09
+    },
+    {
+     "label": "Corporation Income Taxes",
+     "amount": 297047881064.55
+    },
+    {
+     "label": "Social Insurance and Retirement Receipts",
+     "amount": 1161895526037.0898,
+     "parts": [
+      {
+       "label": "Employment and General Retirement",
+       "amount": 1111896553575.01
+      },
+      {
+       "label": "Unemployment Insurance",
+       "amount": 45808340166.15
+      },
+      {
+       "label": "Other Retirement",
+       "amount": 4190632295.93
+      }
+     ]
+    },
+    {
+     "label": "Excise Taxes",
+     "amount": 83822381040.73
+    },
+    {
+     "label": "Estate and Gift Taxes",
+     "amount": 22767709579.77
+    },
+    {
+     "label": "Customs Duties",
+     "amount": 34575150111.34
+    },
+    {
+     "label": "Miscellaneous Receipts",
+     "amount": 127666088630.61
+    }
+   ],
+   "outlays": [
+    {
+     "label": "National Defense",
+     "amount": 600277920490.87
+    },
+    {
+     "label": "International Affairs",
+     "amount": 46316973214.74
+    },
+    {
+     "label": "General Science, Space, and Technology",
+     "amount": 30453853217.48
+    },
+    {
+     "label": "Energy",
+     "amount": 3952381781.74
+    },
+    {
+     "label": "Natural Resources and Environment",
+     "amount": 36067540649.05
+    },
+    {
+     "label": "Agriculture",
+     "amount": 20761652848.18
+    },
+    {
+     "label": "Commerce and Housing Credit",
+     "amount": -27271987833.4
+    },
+    {
+     "label": "Transportation",
+     "amount": 93943349015.08
+    },
+    {
+     "label": "Community and Regional Development",
+     "amount": 26415626473.41
+    },
+    {
+     "label": "Education, Training, Employment, and Social Services",
+     "amount": 142156579659.55
+    },
+    {
+     "label": "Health",
+     "amount": 533058672766.95
+    },
+    {
+     "label": "Medicare",
+     "amount": 597304755180.54
+    },
+    {
+     "label": "Income Security",
+     "amount": 504013992231.39
+    },
+    {
+     "label": "Social Security",
+     "amount": 944878364646.45
+    },
+    {
+     "label": "Veterans Benefits and Services",
+     "amount": 176542429396.1
+    },
+    {
+     "label": "Administration of Justice",
+     "amount": 58943634886.81
+    },
+    {
+     "label": "General Government",
+     "amount": 19833532504.79
+    },
+    {
+     "label": "Net Interest",
+     "amount": 262780896891.58
+    },
+    {
+     "label": "Undistributed Offsetting Receipts",
+     "amount": -89824750434.87
+    }
+   ],
+   "receipts_total": 3314893904524.18,
+   "outlays_total": 3980605417586.44,
+   "deficit": 665711513062.2598
+  },
+  {
+   "fiscal_year": 2018,
+   "record_date": "2018-09-30",
+   "receipts": [
+    {
+     "label": "Individual Income Taxes",
+     "amount": 1683537216744.8
+    },
+    {
+     "label": "Corporation Income Taxes",
+     "amount": 204733303759.09
+    },
+    {
+     "label": "Social Insurance and Retirement Receipts",
+     "amount": 1170699412099.2598,
+     "parts": [
+      {
+       "label": "Employment and General Retirement",
+       "amount": 1121154972925.63
+      },
+      {
+       "label": "Unemployment Insurance",
+       "amount": 45041614844.75
+      },
+      {
+       "label": "Other Retirement",
+       "amount": 4502824328.88
+      }
+     ]
+    },
+    {
+     "label": "Excise Taxes",
+     "amount": 94988171025.65
+    },
+    {
+     "label": "Estate and Gift Taxes",
+     "amount": 22983076198.43
+    },
+    {
+     "label": "Customs Duties",
+     "amount": 41298963821.8
+    },
+    {
+     "label": "Miscellaneous Receipts",
+     "amount": 110505101069.17
+    }
+   ],
+   "outlays": [
+    {
+     "label": "National Defense",
+     "amount": 664669552390.37
+    },
+    {
+     "label": "International Affairs",
+     "amount": 48974860965.43
+    },
+    {
+     "label": "General Science, Space, and Technology",
+     "amount": 31590872541.13
+    },
+    {
+     "label": "Energy",
+     "amount": 2220889406.03
+    },
+    {
+     "label": "Natural Resources and Environment",
+     "amount": 37329501342.42
+    },
+    {
+     "label": "Agriculture",
+     "amount": 23739378610.47
+    },
+    {
+     "label": "Commerce and Housing Credit",
+     "amount": -9857539440.26
+    },
+    {
+     "label": "Transportation",
+     "amount": 93170089549.13
+    },
+    {
+     "label": "Community and Regional Development",
+     "amount": 44250688003.89
+    },
+    {
+     "label": "Education, Training, Employment, and Social Services",
+     "amount": 93877468395.18
+    },
+    {
+     "label": "Health",
+     "amount": 518508364566.03
+    },
+    {
+     "label": "Medicare",
+     "amount": 588706453191.01
+    },
+    {
+     "label": "Income Security",
+     "amount": 495802270172.32
+    },
+    {
+     "label": "Social Security",
+     "amount": 987795949710.47
+    },
+    {
+     "label": "Veterans Benefits and Services",
+     "amount": 178852753221.84
+    },
+    {
+     "label": "Administration of Justice",
+     "amount": 61473646311
+    },
+    {
+     "label": "General Government",
+     "amount": 19808539515.26
+    },
+    {
+     "label": "Net Interest",
+     "amount": 324697247981.35
+    },
+    {
+     "label": "Undistributed Offsetting Receipts",
+     "amount": -97869489848.76
+    }
+   ],
+   "receipts_total": 3328745244718.2,
+   "outlays_total": 4107741496584.31,
+   "deficit": 778996251866.1099
+  },
+  {
+   "fiscal_year": 2019,
+   "record_date": "2019-09-30",
+   "receipts": [
+    {
+     "label": "Individual Income Taxes",
+     "amount": 1717857487901.92
+    },
+    {
+     "label": "Corporation Income Taxes",
+     "amount": 230244746813.76
+    },
+    {
+     "label": "Social Insurance and Retirement Receipts",
+     "amount": 1243086864806.42,
+     "parts": [
+      {
+       "label": "Employment and General Retirement",
+       "amount": 1197393962693.75
+      },
+      {
+       "label": "Unemployment Insurance",
+       "amount": 40933978371.21
+      },
+      {
+       "label": "Other Retirement",
+       "amount": 4758923741.46
+      }
+     ]
+    },
+    {
+     "label": "Excise Taxes",
+     "amount": 98914554367.88
+    },
+    {
+     "label": "Estate and Gift Taxes",
+     "amount": 16671532322.28
+    },
+    {
+     "label": "Customs Duties",
+     "amount": 70783723012.49
+    },
+    {
+     "label": "Miscellaneous Receipts",
+     "amount": 84636700924.45
+    }
+   ],
+   "outlays": [
+    {
+     "label": "National Defense",
+     "amount": 687602824303.59
+    },
+    {
+     "label": "International Affairs",
+     "amount": 52747521527.98
+    },
+    {
+     "label": "General Science, Space, and Technology",
+     "amount": 32463560111.6
+    },
+    {
+     "label": "Energy",
+     "amount": 5108741690.03
+    },
+    {
+     "label": "Natural Resources and Environment",
+     "amount": 35872830042.26
+    },
+    {
+     "label": "Agriculture",
+     "amount": 40157741444.93
+    },
+    {
+     "label": "Commerce and Housing Credit",
+     "amount": -26139299484.15
+    },
+    {
+     "label": "Transportation",
+     "amount": 96220213803.14
+    },
+    {
+     "label": "Community and Regional Development",
+     "amount": 29147825843.47
+    },
+    {
+     "label": "Education, Training, Employment, and Social Services",
+     "amount": 134965928822.64
+    },
+    {
+     "label": "Health",
+     "amount": 584764101328.67
+    },
+    {
+     "label": "Medicare",
+     "amount": 650997403730.82
+    },
+    {
+     "label": "Income Security",
+     "amount": 515433103680.44
+    },
+    {
+     "label": "Social Security",
+     "amount": 1044415951892.3
+    },
+    {
+     "label": "Veterans Benefits and Services",
+     "amount": 200036255254.31
+    },
+    {
+     "label": "Administration of Justice",
+     "amount": 65962820513.31
+    },
+    {
+     "label": "General Government",
+     "amount": 19413178175.57
+    },
+    {
+     "label": "Net Interest",
+     "amount": 375606338036.69
+    },
+    {
+     "label": "Undistributed Offsetting Receipts",
+     "amount": -98193404237.02
+    }
+   ],
+   "receipts_total": 3462195610149.2,
+   "outlays_total": 4446583636480.58,
+   "deficit": 984388026331.3799
+  },
+  {
+   "fiscal_year": 2020,
+   "record_date": "2020-09-30",
+   "receipts": [
+    {
+     "label": "Individual Income Taxes",
+     "amount": 1608661926485.33
+    },
+    {
+     "label": "Corporation Income Taxes",
+     "amount": 211844662323.66
+    },
+    {
+     "label": "Social Insurance and Retirement Receipts",
+     "amount": 1309954436375.4001,
+     "parts": [
+      {
+       "label": "Employment and General Retirement",
+       "amount": 1261650036143.35
+      },
+      {
+       "label": "Unemployment Insurance",
+       "amount": 43103787706.28
+      },
+      {
+       "label": "Other Retirement",
+       "amount": 5200612525.77
+      }
+     ]
+    },
+    {
+     "label": "Excise Taxes",
+     "amount": 86782067345.86
+    },
+    {
+     "label": "Estate and Gift Taxes",
+     "amount": 17624156021.78
+    },
+    {
+     "label": "Customs Duties",
+     "amount": 68550229845.51
+    },
+    {
+     "label": "Miscellaneous Receipts",
+     "amount": 116537527367.8
+    }
+   ],
+   "outlays": [
+    {
+     "label": "National Defense",
+     "amount": 726151468010.1
+    },
+    {
+     "label": "International Affairs",
+     "amount": 67660337596.65
+    },
+    {
+     "label": "General Science, Space, and Technology",
+     "amount": 34058562158.16
+    },
+    {
+     "label": "Energy",
+     "amount": 7167805888.48
+    },
+    {
+     "label": "Natural Resources and Environment",
+     "amount": 40690620067.97
+    },
+    {
+     "label": "Agriculture",
+     "amount": 49152682966.88
+    },
+    {
+     "label": "Commerce and Housing Credit",
+     "amount": 571656751609.85
+    },
+    {
+     "label": "Transportation",
+     "amount": 146156220373.84
+    },
+    {
+     "label": "Community and Regional Development",
+     "amount": 83619153717.85
+    },
+    {
+     "label": "Education, Training, Employment, and Social Services",
+     "amount": 236722686775.1
+    },
+    {
+     "label": "Health",
+     "amount": 748292683863.54
+    },
+    {
+     "label": "Medicare",
+     "amount": 776224012762.94
+    },
+    {
+     "label": "Income Security",
+     "amount": 1262558242934.46
+    },
+    {
+     "label": "Social Security",
+     "amount": 1095817057877.81
+    },
+    {
+     "label": "Veterans Benefits and Services",
+     "amount": 218673996984.9
+    },
+    {
+     "label": "Administration of Justice",
+     "amount": 72102351855.48
+    },
+    {
+     "label": "General Government",
+     "amount": 176824813727.46
+    },
+    {
+     "label": "Net Interest",
+     "amount": 344704683968.99
+    },
+    {
+     "label": "Undistributed Offsetting Receipts",
+     "amount": -106361878486.82
+    }
+   ],
+   "receipts_total": 3419955005765.34,
+   "outlays_total": 6551872254653.64,
+   "deficit": 3131917248888.3
+  },
+  {
+   "fiscal_year": 2021,
+   "record_date": "2021-09-30",
+   "receipts": [
+    {
+     "label": "Individual Income Taxes",
+     "amount": 2044377037669.21
+    },
+    {
+     "label": "Corporation Income Taxes",
+     "amount": 371831354722.44
+    },
+    {
+     "label": "Social Insurance and Retirement Receipts",
+     "amount": 1314088927583.66,
+     "parts": [
+      {
+       "label": "Employment and General Retirement",
+       "amount": 1251857750842.89
+      },
+      {
+       "label": "Unemployment Insurance",
+       "amount": 56601808949.47
+      },
+      {
+       "label": "Other Retirement",
+       "amount": 5629367791.3
+      }
+     ]
+    },
+    {
+     "label": "Excise Taxes",
+     "amount": 75271184579.46
+    },
+    {
+     "label": "Estate and Gift Taxes",
+     "amount": 27140075206.15
+    },
+    {
+     "label": "Customs Duties",
+     "amount": 79984829486.3
+    },
+    {
+     "label": "Miscellaneous Receipts",
+     "amount": 133285449480.19
+    }
+   ],
+   "outlays": [
+    {
+     "label": "National Defense",
+     "amount": 754848780225.38
+    },
+    {
+     "label": "International Affairs",
+     "amount": 46945792210.06
+    },
+    {
+     "label": "General Science, Space, and Technology",
+     "amount": 35576131922.19
+    },
+    {
+     "label": "Energy",
+     "amount": 6073949307.02
+    },
+    {
+     "label": "Natural Resources and Environment",
+     "amount": 42073470154.73
+    },
+    {
+     "label": "Agriculture",
+     "amount": 49505166665.21
+    },
+    {
+     "label": "Commerce and Housing Credit",
+     "amount": 304147041496.02
+    },
+    {
+     "label": "Transportation",
+     "amount": 154791903949.63
+    },
+    {
+     "label": "Community and Regional Development",
+     "amount": 46517131963.19
+    },
+    {
+     "label": "Education, Training, Employment, and Social Services",
+     "amount": 296592622616.46
+    },
+    {
+     "label": "Health",
+     "amount": 796762309961.83
+    },
+    {
+     "label": "Medicare",
+     "amount": 696460520815.17
+    },
+    {
+     "label": "Income Security",
+     "amount": 1648844849395.31
+    },
+    {
+     "label": "Social Security",
+     "amount": 1134592529731.97
+    },
+    {
+     "label": "Veterans Benefits and Services",
+     "amount": 234277678862.47
+    },
+    {
+     "label": "Administration of Justice",
+     "amount": 72151912146.55
+    },
+    {
+     "label": "General Government",
+     "amount": 269591523905.31
+    },
+    {
+     "label": "Net Interest",
+     "amount": 352264012863.77
+    },
+    {
+     "label": "Undistributed Offsetting Receipts",
+     "amount": -123859681175.44
+    }
+   ],
+   "receipts_total": 4045978858727.41,
+   "outlays_total": 6818157647016.83,
+   "deficit": 2772178788289.42
+  },
+  {
+   "fiscal_year": 2022,
+   "record_date": "2022-09-30",
+   "receipts": [
+    {
+     "label": "Individual Income Taxes",
+     "amount": 2632145029572.13
+    },
+    {
+     "label": "Corporation Income Taxes",
+     "amount": 424865169899.91
+    },
+    {
+     "label": "Social Insurance and Retirement Receipts",
+     "amount": 1483527132766.3699,
+     "parts": [
+      {
+       "label": "Employment and General Retirement",
+       "amount": 1410735251952.13
+      },
+      {
+       "label": "Unemployment Insurance",
+       "amount": 66497452818.74
+      },
+      {
+       "label": "Other Retirement",
+       "amount": 6294427995.5
+      }
+     ]
+    },
+    {
+     "label": "Excise Taxes",
+     "amount": 87726258304.53
+    },
+    {
+     "label": "Estate and Gift Taxes",
+     "amount": 32550398044.75
+    },
+    {
+     "label": "Customs Duties",
+     "amount": 99907565997.1
+    },
+    {
+     "label": "Miscellaneous Receipts",
+     "amount": 135397489336.21
+    }
+   ],
+   "outlays": [
+    {
+     "label": "National Defense",
+     "amount": 766657430794.22
+    },
+    {
+     "label": "International Affairs",
+     "amount": 71677717697.11
+    },
+    {
+     "label": "General Science, Space, and Technology",
+     "amount": 37481994712.02
+    },
+    {
+     "label": "Energy",
+     "amount": -9057949948.31
+    },
+    {
+     "label": "Natural Resources and Environment",
+     "amount": 39631194669.85
+    },
+    {
+     "label": "Agriculture",
+     "amount": 34887007441.3
+    },
+    {
+     "label": "Commerce and Housing Credit",
+     "amount": -19493449616.43
+    },
+    {
+     "label": "Transportation",
+     "amount": 131573173362.58
+    },
+    {
+     "label": "Community and Regional Development",
+     "amount": 72062522229.93
+    },
+    {
+     "label": "Education, Training, Employment, and Social Services",
+     "amount": 676593222021.53
+    },
+    {
+     "label": "Health",
+     "amount": 914466284012.76
+    },
+    {
+     "label": "Medicare",
+     "amount": 755094428009.37
+    },
+    {
+     "label": "Income Security",
+     "amount": 865449106216.47
+    },
+    {
+     "label": "Social Security",
+     "amount": 1218674437413.83
+    },
+    {
+     "label": "Veterans Benefits and Services",
+     "amount": 274409836598.5
+    },
+    {
+     "label": "Administration of Justice",
+     "amount": 72090892981.5
+    },
+    {
+     "label": "General Government",
+     "amount": 128653970841.24
+    },
+    {
+     "label": "Net Interest",
+     "amount": 475120812162.87
+    },
+    {
+     "label": "Undistributed Offsetting Receipts",
+     "amount": -234465034724.34
+    }
+   ],
+   "receipts_total": 4896119043921,
+   "outlays_total": 6271507596876,
+   "deficit": 1375388552955
+  },
+  {
+   "fiscal_year": 2023,
+   "record_date": "2023-09-30",
+   "receipts": [
+    {
+     "label": "Individual Income Taxes",
+     "amount": 2176480648910.74
+    },
+    {
+     "label": "Corporation Income Taxes",
+     "amount": 419583849964.32
+    },
+    {
+     "label": "Social Insurance and Retirement Receipts",
+     "amount": 1614453772007.45,
+     "parts": [
+      {
+       "label": "Employment and General Retirement",
+       "amount": 1558147763130.71
+      },
+      {
+       "label": "Unemployment Insurance",
+       "amount": 49402230149.42
+      },
+      {
+       "label": "Other Retirement",
+       "amount": 6903778727.32
+      }
+     ]
+    },
+    {
+     "label": "Excise Taxes",
+     "amount": 75803570858.15
+    },
+    {
+     "label": "Estate and Gift Taxes",
+     "amount": 33668147783.93
+    },
+    {
+     "label": "Customs Duties",
+     "amount": 80337268464.15
+    },
+    {
+     "label": "Miscellaneous Receipts",
+     "amount": 38956481931.8
+    }
+   ],
+   "outlays": [
+    {
+     "label": "National Defense",
+     "amount": 820734092776.06
+    },
+    {
+     "label": "International Affairs",
+     "amount": 69306106586.44
+    },
+    {
+     "label": "General Science, Space, and Technology",
+     "amount": 41376198693.09
+    },
+    {
+     "label": "Energy",
+     "amount": -334128106.88
+    },
+    {
+     "label": "Natural Resources and Environment",
+     "amount": 45889922815.09
+    },
+    {
+     "label": "Agriculture",
+     "amount": 35554318672.58
+    },
+    {
+     "label": "Commerce and Housing Credit",
+     "amount": 99954455188.26
+    },
+    {
+     "label": "Transportation",
+     "amount": 127234007406.41
+    },
+    {
+     "label": "Community and Regional Development",
+     "amount": 88904859613.16
+    },
+    {
+     "label": "Education, Training, Employment, and Social Services",
+     "amount": -3125242892.64
+    },
+    {
+     "label": "Health",
+     "amount": 889296678110.57
+    },
+    {
+     "label": "Medicare",
+     "amount": 847544067210.3
+    },
+    {
+     "label": "Income Security",
+     "amount": 774168449954.23
+    },
+    {
+     "label": "Social Security",
+     "amount": 1354318827503.37
+    },
+    {
+     "label": "Veterans Benefits and Services",
+     "amount": 301606396605.34
+    },
+    {
+     "label": "Administration of Justice",
+     "amount": 81173433144.5
+    },
+    {
+     "label": "General Government",
+     "amount": 33573494402.53
+    },
+    {
+     "label": "Net Interest",
+     "amount": 659182313583.33
+    },
+    {
+     "label": "Undistributed Offsetting Receipts",
+     "amount": -131926210814.43
+    }
+   ],
+   "receipts_total": 4439283739920.54,
+   "outlays_total": 6134432040451.31,
+   "deficit": 1695148300530.7695
+  },
+  {
+   "fiscal_year": 2024,
+   "record_date": "2024-09-30",
+   "receipts": [
+    {
+     "label": "Individual Income Taxes",
+     "amount": 2426066988325.89
+    },
+    {
+     "label": "Corporation Income Taxes",
+     "amount": 529866802637.57
+    },
+    {
+     "label": "Social Insurance and Retirement Receipts",
+     "amount": 1709558485436.4,
+     "parts": [
+      {
+       "label": "Employment and General Retirement",
+       "amount": 1652997812476.74
+      },
+      {
+       "label": "Unemployment Insurance",
+       "amount": 48606716906.94
+      },
+      {
+       "label": "Other Retirement",
+       "amount": 7953956052.72
+      }
+     ]
+    },
+    {
+     "label": "Excise Taxes",
+     "amount": 101435326697.24
+    },
+    {
+     "label": "Estate and Gift Taxes",
+     "amount": 31615876108.98
+    },
+    {
+     "label": "Customs Duties",
+     "amount": 77036909944.89
+    },
+    {
+     "label": "Miscellaneous Receipts",
+     "amount": 43155255587.28
+    }
+   ],
+   "outlays": [
+    {
+     "label": "National Defense",
+     "amount": 874040585085.73
+    },
+    {
+     "label": "International Affairs",
+     "amount": 71992379484.96
+    },
+    {
+     "label": "General Science, Space, and Technology",
+     "amount": 41562428368.18
+    },
+    {
+     "label": "Energy",
+     "amount": 13789670148.44
+    },
+    {
+     "label": "Natural Resources and Environment",
+     "amount": 56891590715.51
+    },
+    {
+     "label": "Agriculture",
+     "amount": 34746670947.9
+    },
+    {
+     "label": "Commerce and Housing Credit",
+     "amount": 35567576543.4
+    },
+    {
+     "label": "Transportation",
+     "amount": 137122245411.69
+    },
+    {
+     "label": "Community and Regional Development",
+     "amount": 87766196368.41
+    },
+    {
+     "label": "Education, Training, Employment, and Social Services",
+     "amount": 305026199447.41
+    },
+    {
+     "label": "Health",
+     "amount": 911683804349.74
+    },
+    {
+     "label": "Medicare",
+     "amount": 874134335792.92
+    },
+    {
+     "label": "Income Security",
+     "amount": 671075997542.26
+    },
+    {
+     "label": "Social Security",
+     "amount": 1460913705752.69
+    },
+    {
+     "label": "Veterans Benefits and Services",
+     "amount": 325362727505.67
+    },
+    {
+     "label": "Administration of Justice",
+     "amount": 85034018367.2
+    },
+    {
+     "label": "General Government",
+     "amount": 29928288919.59
+    },
+    {
+     "label": "Net Interest",
+     "amount": 881650995035.46
+    },
+    {
+     "label": "Undistributed Offsetting Receipts",
+     "amount": -146737781974.87
+    }
+   ],
+   "receipts_total": 4918735644738.25,
+   "outlays_total": 6751551633812.29,
+   "deficit": 1832815989074.04
+  },
+  {
+   "fiscal_year": 2025,
+   "record_date": "2025-09-30",
+   "receipts": [
+    {
+     "label": "Individual Income Taxes",
+     "amount": 2656044447275.63
+    },
+    {
+     "label": "Corporation Income Taxes",
+     "amount": 452089303419.78
+    },
+    {
+     "label": "Social Insurance and Retirement Receipts",
+     "amount": 1748293811962.85,
+     "parts": [
+      {
+       "label": "Employment and General Retirement",
+       "amount": 1685631506240.23
+      },
+      {
+       "label": "Unemployment Insurance",
+       "amount": 54048570145.06
+      },
+      {
+       "label": "Other Retirement",
+       "amount": 8613735577.56
+      }
+     ]
+    },
+    {
+     "label": "Excise Taxes",
+     "amount": 105936465307.63
+    },
+    {
+     "label": "Estate and Gift Taxes",
+     "amount": 29462045090.45
+    },
+    {
+     "label": "Customs Duties",
+     "amount": 194865739872.82
+    },
+    {
+     "label": "Miscellaneous Receipts",
+     "amount": 47924573386.27
+    }
+   ],
+   "outlays": [
+    {
+     "label": "National Defense",
+     "amount": 916648676662.05
+    },
+    {
+     "label": "International Affairs",
+     "amount": 45169891179.7
+    },
+    {
+     "label": "General Science, Space, and Technology",
+     "amount": 42084437535.94
+    },
+    {
+     "label": "Energy",
+     "amount": 20892010637.8
+    },
+    {
+     "label": "Natural Resources and Environment",
+     "amount": 88312257165.92
+    },
+    {
+     "label": "Agriculture",
+     "amount": 49337681356.37
+    },
+    {
+     "label": "Commerce and Housing Credit",
+     "amount": -28620513919.81
+    },
+    {
+     "label": "Transportation",
+     "amount": 145804369616.67
+    },
+    {
+     "label": "Community and Regional Development",
+     "amount": 84529870131.32
+    },
+    {
+     "label": "Education, Training, Employment, and Social Services",
+     "amount": 69194134949.41
+    },
+    {
+     "label": "Health",
+     "amount": 978877168639.95
+    },
+    {
+     "label": "Medicare",
+     "amount": 996719243004.76
+    },
+    {
+     "label": "Income Security",
+     "amount": 701583598129.63
+    },
+    {
+     "label": "Social Security",
+     "amount": 1580685783033.83
+    },
+    {
+     "label": "Veterans Benefits and Services",
+     "amount": 377161882980.59
+    },
+    {
+     "label": "Administration of Justice",
+     "amount": 85180458290
+    },
+    {
+     "label": "General Government",
+     "amount": 36278602219.52
+    },
+    {
+     "label": "Net Interest",
+     "amount": 970358886994.32
+    },
+    {
+     "label": "Undistributed Offsetting Receipts",
+     "amount": -150224771558.67
+    }
+   ],
+   "receipts_total": 5234616386315.43,
+   "outlays_total": 7009973667049.3,
+   "deficit": 1775357280733.87
+  },
+  {
+   "fiscal_year": 2026,
+   "record_date": "2026-09-30",
+   "receipts": [
+    {
+     "label": "Individual Income Taxes",
+     "amount": 2845526866159.55
+    },
+    {
+     "label": "Corporation Income Taxes",
+     "amount": 381414689057.62
+    },
+    {
+     "label": "Social Insurance and Retirement Receipts",
+     "amount": 1811794721160.92,
+     "parts": [
+      {
+       "label": "Employment and General Retirement",
+       "amount": 1754273234159.58
+      },
+      {
+       "label": "Unemployment Insurance",
+       "amount": 49090010812.43
+      },
+      {
+       "label": "Other Retirement",
+       "amount": 8431476188.91
+      }
+     ]
+    },
+    {
+     "label": "Excise Taxes",
+     "amount": 105995126578.38
+    },
+    {
+     "label": "Estate and Gift Taxes",
+     "amount": 38720146356.13
+    },
+    {
+     "label": "Customs Duties",
+     "amount": 173218614643.4
+    },
+    {
+     "label": "Miscellaneous Receipts",
+     "amount": 46656595004.81
+    }
+   ],
+   "outlays": [
+    {
+     "label": "National Defense",
+     "amount": 965160356821.48
+    },
+    {
+     "label": "International Affairs",
+     "amount": 48014568338.42
+    },
+    {
+     "label": "General Science, Space, and Technology",
+     "amount": 39876759073.93
+    },
+    {
+     "label": "Energy",
+     "amount": 20970860009.28
+    },
+    {
+     "label": "Natural Resources and Environment",
+     "amount": 57098136028.25
+    },
+    {
+     "label": "Agriculture",
+     "amount": 52566167744.02
+    },
+    {
+     "label": "Commerce and Housing Credit",
+     "amount": -15465292145.92
+    },
+    {
+     "label": "Transportation",
+     "amount": 142864249326.25
+    },
+    {
+     "label": "Community and Regional Development",
+     "amount": 62429584486.16
+    },
+    {
+     "label": "Education, Training, Employment, and Social Services",
+     "amount": 107551403356.47
+    },
+    {
+     "label": "Health",
+     "amount": 1025587234576.31
+    },
+    {
+     "label": "Medicare",
+     "amount": 1072626018868.53
+    },
+    {
+     "label": "Income Security",
+     "amount": 694224470394.36
+    },
+    {
+     "label": "Social Security",
+     "amount": 1667097265194.46
+    },
+    {
+     "label": "Veterans Benefits and Services",
+     "amount": 416204104589.87
+    },
+    {
+     "label": "Administration of Justice",
+     "amount": 109915442478.9
+    },
+    {
+     "label": "General Government",
+     "amount": 32343463387.61
+    },
+    {
+     "label": "Net Interest",
+     "amount": 1051753969311.11
+    },
+    {
+     "label": "Undistributed Offsetting Receipts",
+     "amount": -155018778526.26
+    }
+   ],
+   "receipts_total": 5403326758960.81,
+   "outlays_total": 7395799983313.23,
+   "deficit": 1992473224352.421
+  }
+ ],
+ "current": {
+  "fiscal_year": 2027,
+  "record_date": "2026-10-31",
+  "receipts": [
+   {
+    "label": "Individual Income Taxes",
+    "amount": 186376346288.16
+   },
+   {
+    "label": "Corporation Income Taxes",
+    "amount": 18042284142.96
+   },
+   {
+    "label": "Social Insurance and Retirement Receipts",
+    "amount": 131474133449.48999,
+    "parts": [
+     {
+      "label": "Employment and General Retirement",
+      "amount": 128626348038.47
+     },
+     {
+      "label": "Unemployment Insurance",
+      "amount": 2150345587.93
+     },
+     {
+      "label": "Other Retirement",
+      "amount": 697439823.09
+     }
+    ]
+   },
+   {
+    "label": "Excise Taxes",
+    "amount": 5929495055.21
+   },
+   {
+    "label": "Estate and Gift Taxes",
+    "amount": 3765792152.82
+   },
+   {
+    "label": "Customs Duties",
+    "amount": 19217228460.18
+   },
+   {
+    "label": "Miscellaneous Receipts",
+    "amount": 4134839053.95
+   }
+  ],
+  "outlays": [
+   {
+    "label": "National Defense",
+    "amount": 128878982148.27
+   },
+   {
+    "label": "International Affairs",
+    "amount": 4478544602.39
+   },
+   {
+    "label": "General Science, Space, and Technology",
+    "amount": 3313779291.48
+   },
+   {
+    "label": "Energy",
+    "amount": 1875689497.98
+   },
+   {
+    "label": "Natural Resources and Environment",
+    "amount": 5451587841.93
+   },
+   {
+    "label": "Agriculture",
+    "amount": 17597908130.98
+   },
+   {
+    "label": "Commerce and Housing Credit",
+    "amount": 457491731.71
+   },
+   {
+    "label": "Transportation",
+    "amount": 12984923519.61
+   },
+   {
+    "label": "Community and Regional Development",
+    "amount": 3595707793.74
+   },
+   {
+    "label": "Education, Training, Employment, and Social Services",
+    "amount": 13717884894.65
+   },
+   {
+    "label": "Health",
+    "amount": 93528269732.7
+   },
+   {
+    "label": "Medicare",
+    "amount": 170045487303.15
+   },
+   {
+    "label": "Income Security",
+    "amount": 58482931628.59
+   },
+   {
+    "label": "Social Security",
+    "amount": 142687221456.78
+   },
+   {
+    "label": "Veterans Benefits and Services",
+    "amount": 54298485848.95
+   },
+   {
+    "label": "Administration of Justice",
+    "amount": 8723223119.63
+   },
+   {
+    "label": "General Government",
+    "amount": 5004583094.96
+   },
+   {
+    "label": "Net Interest",
+    "amount": 103076056306.27
+   },
+   {
+    "label": "Undistributed Offsetting Receipts",
+    "amount": -55195091463.41
+   }
+  ],
+  "receipts_total": 368940118602.77,
+  "outlays_total": 773003666480.36,
+  "deficit": 404063547877.58997,
+  "prior_same_period": {
+   "receipts_total": 404371348973.7,
+   "outlays_total": 688721399756.5,
+   "deficit": 284350050782.8
+  }
+ },
+ "debt": {
+  "latest": {
+   "record_date": "2026-11-23",
+   "total": 40727354329919.53,
+   "held_by_public": 32902453860814.01,
+   "intragovernmental": 7824900469105.52
+  },
+  "fiscal_years": [
+   {
+    "fiscal_year": 2015,
+    "record_date": "2015-09-30",
+    "total": 18150617666484.33,
+    "held_by_public": 13123847198347.81,
+    "intragovernmental": 5026770468136.52
+   },
+   {
+    "fiscal_year": 2016,
+    "record_date": "2016-09-30",
+    "total": 19573444713936.79,
+    "held_by_public": 14173423516895.82,
+    "intragovernmental": 5400021197040.97
+   },
+   {
+    "fiscal_year": 2017,
+    "record_date": "2017-09-29",
+    "total": 20244900016053.51,
+    "held_by_public": 14673428663140.94,
+    "intragovernmental": 5571471352912.57
+   },
+   {
+    "fiscal_year": 2018,
+    "record_date": "2018-09-28",
+    "total": 21516058183180.23,
+    "held_by_public": 15761154524132.45,
+    "intragovernmental": 5754903659047.78
+   },
+   {
+    "fiscal_year": 2019,
+    "record_date": "2019-09-30",
+    "total": 22719401753433.78,
+    "held_by_public": 16809092325171.8,
+    "intragovernmental": 5910309428261.98
+   },
+   {
+    "fiscal_year": 2020,
+    "record_date": "2020-09-30",
+    "total": 26945391194615.15,
+    "held_by_public": 21018952080385.63,
+    "intragovernmental": 5926439114229.52
+   },
+   {
+    "fiscal_year": 2021,
+    "record_date": "2021-09-30",
+    "total": 28428918570048.68,
+    "held_by_public": 22282900363084.77,
+    "intragovernmental": 6146018206963.91
+   },
+   {
+    "fiscal_year": 2022,
+    "record_date": "2022-09-30",
+    "total": 30928911613306.73,
+    "held_by_public": 24299192620158.51,
+    "intragovernmental": 6629718993148.22
+   },
+   {
+    "fiscal_year": 2023,
+    "record_date": "2023-09-29",
+    "total": 33167334044723.16,
+    "held_by_public": 26330142473191.94,
+    "intragovernmental": 6837191571531.22
+   },
+   {
+    "fiscal_year": 2024,
+    "record_date": "2024-09-30",
+    "total": 35464673929171.69,
+    "held_by_public": 28307312290783,
+    "intragovernmental": 7157361638388.69
+   },
+   {
+    "fiscal_year": 2025,
+    "record_date": "2025-09-30",
+    "total": 37637553494935.61,
+    "held_by_public": 30277766440770.58,
+    "intragovernmental": 7359787054165.03
+   },
+   {
+    "fiscal_year": 2026,
+    "record_date": "2026-09-30",
+    "total": 40171825101340.31,
+    "held_by_public": 32425012546390.57,
+    "intragovernmental": 7746812554949.74
+   }
+  ]
+ }
+}
