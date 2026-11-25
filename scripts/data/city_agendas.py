@@ -48,9 +48,11 @@ for city, client in CITIES.items():
                 title = (it.get("EventItemTitle") or "").strip()
                 if not title:
                     continue
-                if not it.get("EventItemMatterFile") and not it.get("EventItemMatterAttachments") and len(title) < 80 and title.upper() == title:
-                    # A section heading (CONSENT CALENDAR, PUBLIC HEARINGS) or a procedural line (ROLL CALL).
-                    heading = title.title()
+                if not it.get("EventItemMatterFile") and not it.get("EventItemMatterAttachments"):
+                    # Headings (CONSENT CALENDAR), procedure (ROLL CALL) and layout lines: only
+                    # all-capitals short lines are kept, as the heading for the items after them.
+                    if len(title) < 80 and title.upper() == title and re.search(r"[A-Z]{4}", title):
+                        heading = title.title()
                     continue
                 atts = [{"name": a.get("MatterAttachmentName"), "url": a.get("MatterAttachmentHyperlink")}
                         for a in (it.get("EventItemMatterAttachments") or []) if a.get("MatterAttachmentHyperlink")]

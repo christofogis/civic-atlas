@@ -6,6 +6,7 @@ import { loadLocal } from "../lib/local.js";
 import { CouncilCard, OfficerCard, SupervisorCard } from "../components/LocalOfficials.jsx";
 import LocalMeetings from "../components/LocalMeetings.jsx";
 import CountyAgenda from "../components/CountyAgenda.jsx";
+import CityAgendas from "../components/CityAgendas.jsx";
 import { savedDistricts } from "../lib/savedDistricts.js";
 import { NotesList, NotesProvider, Ref } from "../components/Notes.jsx";
 
@@ -62,6 +63,7 @@ export default function County() {
           </p>
         </section>
       ))}
+      {id === "ca-orange" && <CityAgendas />}
       {data.city_websites && (
         <section id="all-cities">
           <h3>{tr("All 34 cities", "Las 34 ciudades")}<Ref id="cities" /></h3>

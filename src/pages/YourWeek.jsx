@@ -8,6 +8,7 @@ import { loadLocal } from "../lib/local.js";
 import { listedDates, ruleDates } from "../../lib/localMeetings.js";
 import MyReps from "../components/MyReps.jsx";
 import { loadAgendas, onlyDistrict } from "../components/CountyAgenda.jsx";
+import { loadCityAgendas } from "../components/CityAgendas.jsx";
 import { NotesList, Ref } from "../components/Notes.jsx";
 
 // "Your week": everything coming up for the officials from the visitor's last lookup, at every
@@ -121,6 +122,16 @@ export default function YourWeek() {
         const cityId = result.local?.city?.id;
         const city = (local.cities ?? []).find((c) => c.id === cityId);
         if (city?.meeting_rule) for (const m of ruleDates(city.meeting_rule, today, 3)) add(`cc-${m.date}`, m.date, city.meeting_rule.time, "America/Los_Angeles", "city", tr(`${city.name} City Council meeting`, `Reunión del Concejo Municipal de ${city.name}`), `/local/${params.get("co")}#${city.id}`, city.agendas_url);
+        // Cities that publish through Legistar: their posted council meetings and item counts.
+        const cityName = result.local?.city?.name;
+        if (cityName && !city?.meeting_rule) {
+          const ca = await loadCityAgendas();
+          for (const m of ca?.cities?.[cityName]?.meetings ?? []) {
+            add(`cc-${m.date}`, m.date, clock(m.time) ? `${clock(m.time)[0]}:${String(clock(m.time)[1]).padStart(2, "0")}` : null, "America/Los_Angeles", "city",
+              tr(`${cityName} City Council meeting${m.items.length ? `: ${m.items.length} items on the agenda` : ""}`, `Reunión del Concejo Municipal de ${cityName}${m.items.length ? `: ${m.items.length} asuntos en la agenda` : ""}`),
+              `/local/${params.get("co")}#city-agendas`, m.meeting_url);
+          }
+        }
         const seat = (city?.members ?? []).find((m) => m.district === result.local?.city?.council_district && m.seat_change_by);
         if (seat) add("cc-seat", seat.seat_change_by, null, "America/Los_Angeles", "city", tr(`${city.name} City Council seats newly elected in November are filled; a new mayor is chosen`, `Se ocupan los escaños del Concejo Municipal de ${city.name} elegidos en noviembre; se elige nueva alcaldía`), null, null);
       }
