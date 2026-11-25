@@ -8,6 +8,7 @@
 // "at:YYYY-MM-DD|<path>" shoots it with the browser's clock set to that date (noon Eastern),
 // to rehearse date-driven changes such as a new Congress.
 // "dark:" before a path shoots it with the device set to dark mode (the System theme).
+// "click:<selector>|<path>" clicks that element after the page loads (e.g. to open a menu).
 import { chromium } from "playwright";
 
 const BASE = process.argv[2] ?? "https://civic-atlas-cub.pages.dev";
@@ -32,6 +33,8 @@ for (let path of PATHS) {
     await page.clock.setFixedTime(new Date(`${at[1]}T17:00:00Z`));
     path = at[2];
   }
+  const click = /^click:([^|]+)\|(.*)$/.exec(path);
+  if (click) path = click[2];
   const dark = path.startsWith("dark:");
   if (dark) path = path.slice(5);
   const print = path.startsWith("print:");
@@ -54,6 +57,7 @@ for (let path of PATHS) {
     await page.waitForTimeout(1500);
   }
   await page.waitForFunction(() => !/Loading|Cargando/.test(document.body.innerText), null, { timeout: 20000 }).catch(() => {});
+  if (click) { await page.locator(click[1]).first().click().catch((e) => console.log("click failed:", e.message)); await page.waitForTimeout(300); }
   // "path>>selector": start the shot at that element (for sections far down a long page).
   const start = path.includes(">>") ? await page.locator(path.split(">>")[1]).first().boundingBox().catch(() => null) : null;
   // Very tall pages can't be captured whole; cap the height.

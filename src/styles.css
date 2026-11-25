@@ -330,7 +330,6 @@ h2.week-head { font-size: 1.4rem; margin-top: 44px; }
   h1, .home h1 { font-size: 1.85rem; }
   .bill-title { font-size: 1.6rem; }
   .site-inner { padding: 10px 16px; gap: 6px 16px; }
-  header.site nav { order: 3; width: 100%; gap: 2px 18px; }
   .site-search input { width: 160px; }
   .row { flex-direction: column; }
   main table { display: block; max-width: 100%; overflow-x: auto; font-size: 0.86rem; }
@@ -422,24 +421,30 @@ label.check { display: inline-flex; align-items: center; gap: 6px; font-size: 0.
 .party-counts { display: inline-flex; flex-wrap: wrap; gap: 4px 12px; font-size: 0.88rem; }
 @media (max-width: 900px) { .branches { grid-template-columns: 1fr; } .branch-drawing { max-width: 200px; } }
 
-/* ---- Phone header: sections and search behind a Menu button ---------------------------------- */
-.menu-button { display: none; }
-.site-menu { display: contents; }
+/* ---- Header: a three-line menu button (every screen size), the name, search (wide screens),
+   language and theme. The menu opens as a panel under the button. */
+header.site .site-inner { position: relative; flex-wrap: nowrap; gap: 8px 14px; }
+.menu-button { display: inline-flex; align-items: center; justify-content: center; width: 38px; height: 38px; padding: 0;
+  background: none; border: 1px solid transparent; border-radius: 8px; color: var(--text); cursor: pointer; }
+.menu-button:hover, .menu-button[aria-expanded="true"] { border-color: var(--border-strong); background: var(--surface); }
+.brand { margin-right: auto; }
+.header-search { margin-left: 0; }
+.site-menu { display: none; }
+.site-menu.open { display: block; position: absolute; top: calc(100% + 1px); left: 24px; width: min(20rem, calc(100vw - 32px)); max-height: calc(100vh - 80px); overflow-y: auto;
+  background: var(--bg); border: 1px solid var(--border); border-radius: 0 0 10px 10px; padding: 6px 16px 14px; box-shadow: 0 10px 24px var(--shadow); z-index: 30; }
+.site-menu.open nav { display: flex; flex-direction: column; gap: 0; }
+.site-menu.open nav a { padding: 10px 0; font-size: 1rem; border-bottom: 1px solid var(--border); color: var(--text); white-space: normal; }
+.site-menu.open nav a:last-child { border-bottom: 0; }
+.site-menu.open nav a.active { font-weight: 600; border-bottom-color: var(--border); }
+.menu-search { display: none; }
 @media (max-width: 640px) {
-  header.site .site-inner { flex-wrap: nowrap; }
-  .brand { margin-right: auto; }
-  .menu-button { display: inline-block; order: 3; background: none; border: 1px solid var(--border-strong); border-radius: 999px; padding: 6px 14px; font: inherit; font-size: 0.9rem; color: var(--text); cursor: pointer; }
-  .lang-switch { order: 2; }
-  .theme-switch { order: 2; }
-  .site-menu { display: none; }
-  .site-menu.open { display: block; position: absolute; left: 0; right: 0; top: 100%; background: var(--bg); border-bottom: 1px solid var(--border); padding: 8px 16px 16px; box-shadow: 0 8px 16px rgba(27, 36, 32, 0.08); }
-  .site-menu.open nav { display: flex; flex-direction: column; gap: 0; order: initial; width: auto; }
-  .site-menu.open nav a { padding: 12px 0; font-size: 1.05rem; border-bottom: 1px solid var(--border); color: var(--text); }
-  .site-menu.open nav a.active { border-bottom-color: var(--border); font-weight: 600; }
-  .site-menu.open .site-search { margin: 14px 0 0; }
-  .site-menu.open .site-search input { width: 100%; padding: 11px 14px; font-size: 1rem; }
+  header.site .site-inner { gap: 6px 10px; }
+  .header-search { display: none; }
+  .site-menu.open { left: 0; width: 100%; border-radius: 0; border-left: 0; border-right: 0; padding: 6px 16px 16px; }
+  .site-menu.open nav a { padding: 12px 0; font-size: 1.05rem; }
+  .site-menu.open .menu-search { display: block; margin: 12px 0 0; }
+  .site-menu.open .menu-search input { width: 100%; padding: 11px 14px; font-size: 1rem; }
 }
-@media (min-width: 641px) { header.site nav a[href="/"] { display: none; } }
 
 /* ---- Lookup results grouped by level of government ------------------------------------------- */
 .level { margin-top: 28px; }

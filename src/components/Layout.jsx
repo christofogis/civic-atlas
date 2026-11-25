@@ -1,4 +1,4 @@
-import { Suspense, useEffect, useState } from "react";
+import { Suspense, useEffect, useRef, useState } from "react";
 import { Link, NavLink, Outlet, useNavigate, useLocation } from "react-router-dom";
 import ReportError from "./ReportError.jsx";
 // Every page can cite a source with <Ref id text>; the page puts <NotesList /> at its end.
@@ -32,6 +32,16 @@ export default function Layout() {
   // On phones the sections and search fold behind a Menu button; it closes on every page change.
   const [menuOpen, setMenuOpen] = useState(false);
   useEffect(() => setMenuOpen(false), [location.pathname, location.search]);
+  const menuRef = useRef(null);
+  useEffect(() => {
+    if (!menuOpen) return undefined;
+    const close = (e) => {
+      if (e.type === "keydown" ? e.key === "Escape" : !menuRef.current?.contains(e.target) && !e.target.closest?.(".menu-button")) setMenuOpen(false);
+    };
+    document.addEventListener("pointerdown", close);
+    document.addEventListener("keydown", close);
+    return () => { document.removeEventListener("pointerdown", close); document.removeEventListener("keydown", close); };
+  }, [menuOpen]);
   // A plain title for each section, so tabs, bookmarks and search results say where they lead.
   // Pages with a record (a member, a bill, a county) replace it with the record's name once loaded.
   useEffect(() => {
@@ -50,23 +60,41 @@ export default function Layout() {
       <a className="skip-link" href="#main">{t("Skip to content", "Ir al contenido")}</a>
       <header className="site">
         <div className="site-inner">
-          <Link to="/" className="brand">Civic Atlas</Link>
-          <button type="button" className="menu-button" aria-expanded={menuOpen} aria-controls="site-menu" onClick={() => setMenuOpen(!menuOpen)}>
-            {menuOpen ? t("Close", "Cerrar") : t("Menu", "Menú")}
+          {/* One menu on every screen size (a three-line button, like Wikipedia's), so the header
+              stays quiet; the search box stays in the header on wider screens. */}
+          <button type="button" className="menu-button" aria-expanded={menuOpen} aria-controls="site-menu"
+            aria-label={menuOpen ? t("Close menu", "Cerrar menú") : t("Menu", "Menú")} onClick={() => setMenuOpen(!menuOpen)}>
+            <svg viewBox="0 0 20 20" width="20" height="20" aria-hidden="true" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round">
+              {menuOpen ? <><line x1="5" y1="5" x2="15" y2="15" /><line x1="15" y1="5" x2="5" y2="15" /></>
+                : <><line x1="3" y1="6" x2="17" y2="6" /><line x1="3" y1="10" x2="17" y2="10" /><line x1="3" y1="14" x2="17" y2="14" /></>}
+            </svg>
           </button>
-          <div id="site-menu" className={`site-menu${menuOpen ? " open" : ""}`}>
+          <Link to="/" className="brand">Civic Atlas</Link>
+          {location.pathname !== "/search" && (
+            <form onSubmit={submit} role="search" className="site-search header-search">
+              <input type="search" aria-label={t("Search members and bills", "Buscar miembros y proyectos de ley")}
+                placeholder={t("Name or bill (e.g. H.R. 1)", "Nombre o proyecto (p. ej., H.R. 1)")}
+                value={q} onChange={(e) => setQ(e.target.value)} />
+            </form>
+          )}
+          <div id="site-menu" className={`site-menu${menuOpen ? " open" : ""}`} ref={menuRef}>
           <nav aria-label={t("Main", "Principal")}>
             <NavLink to="/" end>{t("Find your officials", "Sus funcionarios")}</NavLink>
-            <NavLink to="/week">{t("This week", "Esta semana")}</NavLink>
+            <NavLink to="/week">{t("This week in Congress", "Esta semana en el Congreso")}</NavLink>
             <NavLink to="/map">{t("Map", "Mapa")}</NavLink>
-            <NavLink to="/members">{t("Members", "Miembros")}</NavLink>
-            <NavLink to="/topics">{t("Topics", "Temas")}</NavLink>
+            <NavLink to="/members">{t("Members of Congress", "Miembros del Congreso")}</NavLink>
             <NavLink to="/bills">{t("Bills", "Proyectos de ley")}</NavLink>
+            <NavLink to="/topics">{t("Topics", "Temas")}</NavLink>
             <NavLink to="/committees">{t("Committees", "Comités")}</NavLink>
             <NavLink to="/government">{t("Three branches", "Los tres poderes")}</NavLink>
+            <NavLink to="/budget">{t("Federal budget", "Presupuesto federal")}</NavLink>
+            <NavLink to="/measures">{t("2028 ballot measures (CA)", "Medidas en la boleta 2028 (CA)")}</NavLink>
+            <NavLink to="/elections">{t("2028 candidates", "Candidatos 2028")}</NavLink>
+            <NavLink to="/quiz">{t("Quiz: do you vote like them?", "Cuestionario: ¿vota como ellos?")}</NavLink>
+            <NavLink to="/methods">{t("How this site works", "Cómo funciona este sitio")}</NavLink>
           </nav>
           {location.pathname !== "/search" && (
-            <form onSubmit={submit} role="search" className="site-search">
+            <form onSubmit={submit} role="search" className="site-search menu-search">
               <input type="search" aria-label={t("Search members and bills", "Buscar miembros y proyectos de ley")}
                 placeholder={t("Name or bill (e.g. H.R. 1)", "Nombre o proyecto (p. ej., H.R. 1)")}
                 value={q} onChange={(e) => setQ(e.target.value)} />
