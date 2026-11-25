@@ -71,12 +71,19 @@ const run = async () => {
     await upsertBatches(db, "bill_version_changes", c, "congress,bill_type,number,from_code,to_code", 100);
   };
 
+  const failed = [];
   await mapLimit(work, CONCURRENCY, async (vs) => {
     const sections = new Map();
     let gap = false;
     for (const v of vs) {
       if (v.full_text === false && !RECOMPUTE) continue;
-      const xml = await get(v.xml_url);
+      let xml;
+      try { xml = await get(v.xml_url); }
+      catch (err) {
+        // A server error on one file (after retries) shouldn't stop every other bill: count it,
+        // leave this bill uncompared, and the next run tries it again.
+        failed.push(err.message); gap = true; continue;
+      }
       if (xml == null) { missing++; gap = true; continue; }   // not published yet; tried again next run
       const s = sectionsFromXml(xml);
       checked++;
@@ -96,7 +103,10 @@ const run = async () => {
     if (changeRows.length >= 200) await flush();
   });
   await flush();
-  console.log(`versions read: ${checked}, comparisons: ${compared}, not yet published: ${missing}${DRY ? " (dry run: nothing written)" : ""}`);
+  console.log(`versions read: ${checked}, comparisons: ${compared}, not yet published: ${missing}, failed after retries: ${failed.length}${DRY ? " (dry run: nothing written)" : ""}`);
+  for (const f of failed.slice(0, 10)) console.log(`  ${f}`);
+  // Many failures means GovInfo itself is down: fail the run so it shows in ingest_runs.
+  if (failed.length > 20) throw new Error(`${failed.length} files failed after retries, e.g. ${failed[0]}`);
   return { rows_inserted: compared, rows_updated: 0 };
 };
 
