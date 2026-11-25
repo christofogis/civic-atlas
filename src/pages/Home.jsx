@@ -9,6 +9,7 @@ import { useLang } from "../lib/i18n.jsx";
 import { rememberRepresentatives, myRepresentatives, representativesOutdated } from "../lib/myReps.js";
 import MyReps from "../components/MyReps.jsx";
 import AddressInput from "../components/AddressInput.jsx";
+import HomeDashboard from "../components/HomeDashboard.jsx";
 
 // Lookup errors come from /api/lookup in English; these are their Spanish versions.
 const ERR_ES = {
@@ -137,6 +138,7 @@ export default function Home() {
       {status === "error" && <p className="notice">{error}</p>}
 
       {status === "done" && result && <LookupResults result={result} sectionRef={resultsRef} />}
+      {status !== "done" && <HomeDashboard />}
 
       </div>
       <div className="home-side">

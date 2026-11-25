@@ -483,3 +483,16 @@ label.check { display: inline-flex; align-items: center; gap: 6px; font-size: 0.
 .stack-detail table { max-width: 28rem; }
 .stack-detail td:nth-child(n+2) { text-align: right; font-variant-numeric: tabular-nums; }
 .stack-detail tr.total td { border-top: 1px solid var(--text); font-weight: 600; }
+
+/* Home: at a glance */
+.glance { margin: 2rem 0 1rem; }
+.glance-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr)); gap: 1rem; }
+.glance-tile { border: 1px solid var(--border); border-radius: 8px; padding: 0.9rem 1rem; display: flex; flex-direction: column; }
+.glance-tile h3 { margin: 0 0 0.5rem; font-size: 1rem; }
+.glance-tile .glance-link { margin: auto 0 0; padding-top: 0.5rem; }
+.glance-figures { list-style: none; padding: 0; margin: 0; display: grid; gap: 0.35rem; }
+.glance-tile .fig { font-weight: 700; font-variant-numeric: tabular-nums; }
+.glance-bars { display: grid; gap: 0.35rem; }
+.glance-bars > div { display: grid; grid-template-columns: 4.5rem 1fr auto; gap: 0.5rem; align-items: center; font-size: 0.9rem; }
+.glance-bars .gb { display: block; height: 0.7rem; }
+.glance-bars .gb span { display: block; height: 100%; border-radius: 0 3px 3px 0; }
