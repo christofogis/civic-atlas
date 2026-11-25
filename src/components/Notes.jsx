@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useId, useRef, useState } from "react";
+import { createContext, useContext, useEffect, useId, useLayoutEffect, useRef, useState } from "react";
 import { tr } from "../lib/lang.js";
 
 // Wikipedia-style notes: a numbered superscript where a source or explanation applies, which
@@ -18,6 +18,18 @@ export function NotesProvider({ notes, children }) {
   const counts = useRef(new Map());
   const [ids, setIds] = useState([]);
   const listed = notes ? notes.filter(Boolean) : null;
+  // Collected notes are numbered in page order, not the order they arrived (parts of a page
+  // load at different times): after each change, read the order of the marks on the page.
+  useLayoutEffect(() => {
+    if (listed || ids.length < 2) return;
+    const seen = [];
+    for (const el of document.querySelectorAll("[data-note-ref]")) {
+      const id = el.getAttribute("data-note-ref");
+      if (ids.includes(id) && !seen.includes(id)) seen.push(id);
+    }
+    for (const id of ids) if (!seen.includes(id)) seen.push(id);
+    if (seen.some((id, k) => id !== ids[k])) setIds(seen);
+  });
   const value = listed
     ? { list: listed, textOf: (id) => listed.find((n) => n.id === id)?.text }
     : {
@@ -69,10 +81,10 @@ export function Ref({ id, text }) {
   // Outside any provider, a note with text still shows as a plain small line.
   if (!ctx) return text ? <span className="fine ref-inline"> ({text})</span> : null;
   const i = ctx.list.findIndex((n) => n.id === id);
-  if (i < 0) return null;
+  if (i < 0) return collect ? <span data-note-ref={id} hidden /> : null;
   const n = i + 1;
   return (
-    <span className="ref" ref={box}>
+    <span className="ref" ref={box} data-note-ref={id}>
       <sup>
         <button type="button" id={`ref-${id}`} className="ref-mark" aria-expanded={open} aria-controls={`${uid}-pop`}
           aria-label={tr(`Note ${n}`, `Nota ${n}`)} onClick={() => setOpen((o) => !o)}>[{n}]</button>
