@@ -31,14 +31,14 @@ async function loadBill(congress, type, number) {
     one(db.from("votes").select("vote_id,chamber,voted_at,question,result,yea_total,nay_total,present_total,not_voting_total,source_url")
       .eq("bill_congress", congress).eq("bill_type", type).eq("bill_number", number).order("voted_at", { ascending: false })),
     // Lobbying is the heaviest query; if it fails, the rest of the page still shows.
-    one(key(db.from("bill_lobbying").select("*")).order("quarters", { ascending: false }).order("client_name").limit(1000)).catch(() => null),
-    one(key(db.from("bill_lobbying_counts").select("clients")).maybeSingle()).catch(() => null),
+    one(key(db.from("bill_lobbying_clients").select("*")).order("quarters", { ascending: false }).order("client_name").limit(1000)).catch(() => null),
+    one(key(db.from("bill_lobbying_totals").select("clients")).maybeSingle()).catch(() => null),
     one(db.from("data_freshness").select("*")),
     one(db.from("upcoming_events").select("event_id,chamber,kind,event_date,event_time,week_of,category,committee_id,committee_name,title,source_url")
       .contains("bill_refs", [`${congress}-${type}-${number}`]).gte("event_date", weekAgo).order("event_date")),
     one(db.from("committee_meetings").select("event_id,meeting_at,title,meeting_type,status,committee_ids")
       .contains("bill_refs", [`${congress}-${type}-${number}`]).order("meeting_at", { ascending: false }).limit(50)).catch(() => []),
-    one(key(db.from("bill_lobbying_former_officials").select("lobbyist_name,covered_position,clients,last_quarter_key,latest_filing_uuid"))
+    one(key(db.from("bill_lobbying_former").select("lobbyist_name,covered_position,clients,last_quarter_key,latest_filing_uuid"))
       .order("lobbyist_name").limit(500)).catch(() => []),
   ]);
   return { bill, sponsor, cosponsors, votes, lobbying, lobbyTotal: lobbyCount?.clients ?? lobbying?.length ?? 0, freshness, scheduled, meetings, former };
