@@ -228,5 +228,58 @@
         "url": "https://board.oc.gov/sites/bos.egovoc.com/files/2026-11/2027%20Approved%20BOS%20Meeting%20Schedule.pdf"
       }
     ]
+  },
+  "city_websites": {
+    "source": {
+      "label": "Orange County LAFCO, Cities",
+      "url": "https://oclafco.org/agency-boundaries/cities/"
+    },
+    "cities": {
+      "Aliso Viejo": "https://avcity.org/",
+      "Anaheim": "https://www.anaheim.net/",
+      "Brea": "https://www.cityofbrea.gov/",
+      "Buena Park": "https://www.buenapark.com/",
+      "Costa Mesa": "https://www.costamesaca.gov/",
+      "Cypress": "https://www.cypressca.org/",
+      "Dana Point": "https://www.danapoint.org/",
+      "Fountain Valley": "https://www.fountainvalley.gov/",
+      "Fullerton": "https://www.cityoffullerton.com/",
+      "Garden Grove": "https://ggcity.org/",
+      "Huntington Beach": "https://www.huntingtonbeachca.gov/",
+      "Irvine": "https://www.cityofirvine.org/",
+      "La Habra": "https://www.lahabraca.gov/",
+      "La Palma": "https://www.cityoflapalma.org/",
+      "Laguna Beach": "https://www.lagunabeachcity.net/",
+      "Laguna Hills": "https://www.lagunahillsca.gov/",
+      "Laguna Niguel": "https://www.cityoflagunaniguel.org/",
+      "Laguna Woods": "https://www.cityoflagunawoods.org/",
+      "Lake Forest": "https://www.lakeforestca.gov/en",
+      "Los Alamitos": "https://cityoflosalamitos.org/",
+      "Mission Viejo": "https://cityofmissionviejo.org/",
+      "Newport Beach": "https://www.newportbeachca.gov/",
+      "Orange": "https://www.cityoforange.org/",
+      "Placentia": "https://www.placentia.org/",
+      "Rancho Santa Margarita": "https://www.cityofrsm.org/",
+      "San Clemente": "https://www.san-clemente.org/",
+      "San Juan Capistrano": "https://www.sanjuancapistrano.org/",
+      "Santa Ana": "https://www.santa-ana.org/",
+      "Seal Beach": "https://www.sealbeachca.gov/",
+      "Stanton": "https://www.stantonca.gov/",
+      "Tustin": "https://www.tustinca.org/",
+      "Villa Park": "https://villapark.org/",
+      "Westminster": "https://www.westminster-ca.gov/",
+      "Yorba Linda": "https://www.yorbalindaca.gov/"
+    },
+    "at_large": [
+      "Brea",
+      "Fountain Valley",
+      "Huntington Beach",
+      "La Habra",
+      "Laguna Beach",
+      "Laguna Woods",
+      "Villa Park",
+      "Yorba Linda"
+    ],
+    "at_large_note": "Cities with no council districts in the Registrar of Voters' city subdistrict file."
   }
 }

@@ -49,6 +49,18 @@ export default function County() {
           </p>
         </section>
       ))}
+      {data.city_websites && (
+        <section id="all-cities">
+          <h3>{tr("All 34 cities", "Las 34 ciudades")}</h3>
+          <p className="fine">{tr("Each city's own website lists its council members, agendas and meetings. Cities marked citywide elect their councils at large rather than by district.", "El sitio web de cada ciudad tiene los miembros de su concejo, agendas y reuniones. Las ciudades marcadas como en toda la ciudad eligen su concejo en general, no por distrito.")}</p>
+          <ul className="city-list">
+            {Object.entries(data.city_websites.cities).map(([name, url]) => (
+              <li key={name}><a href={url} rel="noopener">{name}</a>{data.city_websites.at_large.includes(name) && <span className="fine"> · {tr("citywide", "en toda la ciudad")}</span>}</li>
+            ))}
+          </ul>
+          <p className="fine">{tr("List: ", "Lista: ")}<a href={data.city_websites.source.url} rel="noopener">{data.city_websites.source.label}</a>.</p>
+        </section>
+      )}
       <p className="notice">{tr("Votes and campaign money for county and city officials aren't on Civic Atlas yet.", "Los votos y los fondos de campaña de los funcionarios del condado y de la ciudad aún no están en Civic Atlas.")}</p>
       <p className="fine">
         {tr(`Sources (checked ${date(data.checked)}): `, `Fuentes (verificadas el ${date(data.checked)}): `)}

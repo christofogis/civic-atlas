@@ -80,7 +80,13 @@ export default function LocalOfficials({ local, approximate }) {
             {city && <Link to={`/local/${local.id}#${city.id}`}>{tr(`Whole ${city.name} City Council`, `Todo el Concejo Municipal de ${city.name}`)}</Link>}
             {otherCity && (otherCity.council_district
               ? tr(`This address is in City Council District ${otherCity.council_district}. ${otherCity.name}'s council members aren't listed on Civic Atlas yet.`, `Esta dirección está en el distrito ${otherCity.council_district} del concejo municipal. Los miembros del concejo de ${otherCity.name} aún no aparecen en Civic Atlas.`)
-              : tr(`${otherCity.name}'s council members aren't listed on Civic Atlas yet.`, `Los miembros del concejo de ${otherCity.name} aún no aparecen en Civic Atlas.`))}
+              : data.city_websites?.at_large.includes(otherCity.name)
+                ? tr(`${otherCity.name} elects its council members citywide, not by district. They aren't listed on Civic Atlas yet.`, `${otherCity.name} elige a los miembros de su concejo en toda la ciudad, no por distrito. Aún no aparecen en Civic Atlas.`)
+                : tr(`${otherCity.name}'s council members aren't listed on Civic Atlas yet.`, `Los miembros del concejo de ${otherCity.name} aún no aparecen en Civic Atlas.`))}
+            {otherCity && data.city_websites?.cities[otherCity.name] && (
+              <> {tr("The city's website lists its council, agendas and meetings: ", "El sitio web de la ciudad tiene su concejo, agendas y reuniones: ")}
+                <a href={data.city_websites.cities[otherCity.name]} rel="noopener">{tr(`City of ${otherCity.name}`, `Ciudad de ${otherCity.name}`)}</a>.</>
+            )}
           </p>
         </>
       )}
