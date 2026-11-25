@@ -3,13 +3,39 @@ import StateOfficialCard, { ExtraStatewideCards } from "./StateOfficialCard.jsx"
 import OfficialCard from "./OfficialCard.jsx";
 import ShareResults from "./ShareResults.jsx";
 import { stateName } from "../lib/format.js";
+import { useEffect, useState } from "react";
+import { flushSync } from "react-dom";
 import { useLang } from "../lib/i18n.jsx";
+import { Fold } from "./Fold.jsx";
 import { NotesList, NotesProvider, Ref } from "./Notes.jsx";
 
 // Everyone elected to represent a place, grouped by level of government. Used after an address
 // or location lookup on the home page, and on /officials for a saved or shared link.
 export default function LookupResults({ result, sectionRef, shared = false }) {
   const { t } = useLang();
+  // Each level opens in place; its label lists who's in it. Federal starts open. Printing opens
+  // every level first, so the printed list is complete.
+  const [open, setOpen] = useState(() => new Set(["level-federal"]));
+  const toggle = (id, isOpen) => setOpen((prev) => {
+    if (prev.has(id) === isOpen) return prev;
+    const next = new Set(prev); if (isOpen) next.add(id); else next.delete(id); return next;
+  });
+  // Printing from the browser's own menu opens every level too.
+  useEffect(() => {
+    const all = () => flushSync(() => setOpen(new Set(["level-federal", "level-state", "level-local"])));
+    window.addEventListener("beforeprint", all);
+    return () => window.removeEventListener("beforeprint", all);
+  }, []);
+  const printList = () => {
+    setOpen(new Set(["level-federal", "level-state", "level-local"]));
+    setTimeout(() => window.print(), 150);
+  };
+  const names = (list) => {
+    const n = list.filter(Boolean);
+    return n.length <= 3 ? n.join(", ") : t(`${n.slice(0, 3).join(", ")} and ${n.length - 3} more`, `${n.slice(0, 3).join(", ")} y ${n.length - 3} más`);
+  };
+  const fedNames = names(result.officials.filter((o) => o.seat_status !== "pending_update").map((o) => o.name));
+  const stateNames = names((result.state_officials ?? []).filter((o) => !o.updating).map((o) => o.name));
   const notes = [
     { id: "federal", text: <>{t("Districts: ", "Distritos: ")}{result.sources.district}. {t("Members of Congress and their terms: ", "Miembros del Congreso y sus períodos: ")}<a href="https://github.com/unitedstates/congress-legislators" rel="noopener">unitedstates/congress-legislators</a>{t(", updated daily. Your address is used only to find the districts; it isn't stored.", ", actualizado a diario. Su dirección se usa solo para encontrar los distritos; no se guarda.")}</> },
     result.state_officials?.length > 0 && { id: "state", text: <>{t("State legislators and the governor, lieutenant governor, attorney general and secretary of state: ", "Legisladores estatales y gobernador, vicegobernador, fiscal general y secretario de estado: ")}<a href="https://github.com/openstates/people" rel="noopener">Open States</a>{t(", updated daily.", ", actualizado a diario.")}{result.state === "CA"
@@ -36,36 +62,35 @@ export default function LookupResults({ result, sectionRef, shared = false }) {
             {t("This location may fall in more than one district. A full street address gives an exact match.", "Este lugar puede estar en más de un distrito. Una dirección completa da un resultado exacto.")}
           </p>
         )}
-        <ul className="level-jump" aria-label={t("Jump to", "Ir a")}>
-          <li><a href="#level-federal">{t("Federal", "Federal")}</a></li>
-          {result.state_officials?.length > 0 && <li><a href="#level-state">{t("State", "Estatal")}</a></li>}
-          {result.local?.covered && <li><a href="#level-local">{t("County and city", "Condado y ciudad")}</a></li>}
-        </ul>
 
-        <section className="level" id="level-federal">
-          <h2>{t("Federal: U.S. Congress", "Federal: Congreso de EE. UU.")}<Ref id="federal" /></h2>
+        <div className="folds levels">
+        <Fold id="level-federal" title={t("Federal: U.S. Congress", "Federal: Congreso de EE. UU.")} summary={fedNames} open={open.has("level-federal")} onToggle={toggle}>
           <p className="level-what">{t("Writes national laws, sets the federal budget and taxes, and oversees federal agencies. Every state has two senators; each House member represents one district.",
-            "Redacta las leyes nacionales, fija el presupuesto y los impuestos federales y supervisa a las agencias federales. Cada estado tiene dos senadores; cada miembro de la Cámara representa un distrito.")}</p>
+            "Redacta las leyes nacionales, fija el presupuesto y los impuestos federales y supervisa a las agencias federales. Cada estado tiene dos senadores; cada miembro de la Cámara representa un distrito.")}<Ref id="federal" /></p>
           <ul className="cards">
             {result.officials.map((o) => <OfficialCard key={`${o.chamber}-${o.bioguide_id}`} official={o} />)}
           </ul>
-        </section>
+        </Fold>
 
         {result.state_officials?.length > 0 && (
-          <section className="level" id="level-state">
-            <h2>{t(`State: ${stateName(result.state)}`, `Estatal: ${stateName(result.state)}`)}<Ref id="state" /></h2>
+          <Fold id="level-state" title={t(`State: ${stateName(result.state)}`, `Estatal: ${stateName(result.state)}`)} summary={stateNames} open={open.has("level-state")} onToggle={toggle}>
             <p className="level-what">{t("The state legislature writes state laws and the state budget (schools, roads, health care, criminal law). The governor and other statewide officials run state government.",
-              "La legislatura estatal redacta las leyes y el presupuesto del estado (escuelas, carreteras, salud, derecho penal). El gobernador y otros funcionarios estatales dirigen el gobierno del estado.")}</p>
+              "La legislatura estatal redacta las leyes y el presupuesto del estado (escuelas, carreteras, salud, derecho penal). El gobernador y otros funcionarios estatales dirigen el gobierno del estado.")}<Ref id="state" /></p>
             <ul className="cards">
               {result.state_officials.map((o) => <StateOfficialCard key={`${o.type}-${o.id}`} official={o} state={result.state} />)}
               <ExtraStatewideCards state={result.state} />
             </ul>
-          </section>
+          </Fold>
         )}
 
-        <section className="level" id="level-local">
+        <Fold id="level-local" title={t("County and city", "Condado y ciudad")} open={open.has("level-local")} onToggle={toggle}
+          summary={result.local?.covered
+            ? [result.local.place?.name, result.local.county].filter(Boolean).join(", ") || t("Your county and city officials", "Sus funcionarios del condado y la ciudad")
+            : t("On Civic Atlas for Orange County, CA only, so far", "Por ahora, solo para el Condado de Orange, CA")}>
           <LocalOfficials local={result.local} approximate={result.approximate} />
-        </section>
+        </Fold>
+        </div>
+        <p className="no-print"><button type="button" className="button-secondary" onClick={printList}>{t("Print this list", "Imprimir esta lista")}</button></p>
         {!shared && <ShareResults result={result} />}
         <NotesList />      </section>
     </NotesProvider>
