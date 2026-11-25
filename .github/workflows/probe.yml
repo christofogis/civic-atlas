@@ -1,0 +1,17 @@
+name: Probe
+
+# One-off checks of outside data sources, by hand. Prints only; writes nothing.
+on:
+  workflow_dispatch:
+    inputs:
+      script:
+        description: "Script under scripts/probe/ to run"
+        required: true
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - run: python3 "scripts/probe/${{ inputs.script }}"
