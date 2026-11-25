@@ -1,0 +1,29 @@
+name: Build federal budget data
+
+# Monthly, after the Monthly Treasury Statement (8th business day), and by hand: receipts,
+# outlays, deficit and debt from the Treasury's Fiscal Data API. Commits public/data/budget.json.
+on:
+  schedule:
+    - cron: "29 18 12-16 * *"   # 12th–16th of each month, 11:29am Pacific
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Build
+        run: node scripts/data/budget.mjs
+      - name: Commit
+        run: |
+          git config user.name "civic-atlas bot"
+          git config user.email "christofogis@users.noreply.github.com"
+          git add public/data/budget.json
+          git diff --cached --quiet || (git commit -m "Federal budget data rebuilt from Treasury Fiscal Data" && git push)
