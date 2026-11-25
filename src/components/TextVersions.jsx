@@ -31,7 +31,7 @@ function SectionList({ title, rows, total, extra }) {
 }
 
 // Official text versions of a bill and, between consecutive full texts, which sections changed.
-export default function TextVersions({ congress, type, number }) {
+export default function TextVersions({ congress, type, number, inFold = false }) {
   const [data, setData] = useState(null);
   useEffect(() => {
     const key = (q) => q.eq("congress", congress).eq("bill_type", type).eq("number", number);
@@ -40,13 +40,14 @@ export default function TextVersions({ congress, type, number }) {
       key(db.from("bill_version_changes").select("*")),
     ]).then(([v, c]) => setData({ versions: v.data ?? [], changes: c.data ?? [] }));
   }, [congress, type, number]);
-  if (!data || !data.versions.length) return null;
+  if (!data) return inFold ? <p className="fine">{tr("Loading…", "Cargando…")}</p> : null;
+  if (!data.versions.length) return inFold ? <p>{tr("No text versions have been published for this bill yet.", "Todavía no se han publicado versiones del texto de este proyecto.")}</p> : null;
   const name = Object.fromEntries(data.versions.map((v) => [v.version_code, v.version_name]));
   const changeTo = Object.fromEntries(data.changes.map((c) => [c.to_code, c]));
 
   return (
     <section className="section">
-      <h2>{tr("Text versions", "Versiones del texto")}</h2>
+      {!inFold && <h2>{tr("Text versions", "Versiones del texto")}</h2>}
       <p className="fine">{tr("Each ", "Cada ")}<Explain id="text-version">{tr("version", "versión")}</Explain>{tr(" is the official text at that step. Where we could compare a version with the one before it, the changes are listed.", " es el texto oficial en ese paso. Cuando se pudo comparar una versión con la anterior, se listan los cambios.")}</p>
       <ol className="plain versions">
         {data.versions.map((v) => {

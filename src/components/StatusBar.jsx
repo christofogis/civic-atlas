@@ -9,7 +9,7 @@ const ES = {
   "Agreed to in House": "Adoptado por la Cámara", "Agreed to in Senate": "Adoptado por el Senado",
 };
 // "Became law (Public Law 119-21)" keeps the law number as published.
-const label = (l) => tr(l, l.startsWith("Became law (") ? `Se convirtió en ley (${l.slice(12, -1)})` : ES[l]);
+export const label = (l) => tr(l, l.startsWith("Became law (") ? `Se convirtió en ley (${l.slice(12, -1)})` : ES[l]);
 
 // Where a bill stands: each step with the date it happened. Steps not reached are grey.
 // "Reported by committee" is shown as skipped when the bill moved on without it.

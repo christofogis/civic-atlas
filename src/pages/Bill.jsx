@@ -1,3 +1,6 @@
+import { label as stepLabel } from "../components/StatusBar.jsx";
+import { Fold, useFolds } from "../components/Fold.jsx";
+import { billSteps } from "../../lib/billprogress.js";
 import { Fragment, useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { db } from "../lib/db.js";
@@ -49,7 +52,7 @@ const slug = (s) => String(s).toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(
 function Section({ title, source, children }) {
   return (
     <section className="section">
-      <h2>{title}{source && <Ref id={`src-${slug(title)}`} text={<>{tr("Source", "Fuente")}: {source}</>} />}</h2>
+      <h3>{title}{source && <Ref id={`src-${slug(title)}`} text={<>{tr("Source", "Fuente")}: {source}</>} />}</h3>
       {children}
     </section>
   );
@@ -80,11 +83,33 @@ function FormerOfficials({ rows }) {
   );
 }
 
+// A plain summary at the top of a bill page, filled in from the records in the same words for
+// every bill. Step names are the progress bar's own.
+function BillGlance({ b, sponsor, cosponsors, votes, lobbyTotal }) {
+  const steps = billSteps(b).filter((x) => x.date);
+  const last = steps.at(-1);
+  const lines = [];
+  lines.push(sponsor
+    ? tr(`Introduced ${date(b.introduced_date)} by ${sponsor.name}.`, `Presentado el ${date(b.introduced_date)} por ${sponsor.name}.`)
+    : tr(`Introduced ${date(b.introduced_date)}.`, `Presentado el ${date(b.introduced_date)}.`));
+  if (last && last.label !== "Introduced") lines.push(tr(`Furthest step so far: ${last.label}, ${date(last.date)}.`, `Etapa más avanzada hasta ahora: ${stepLabel(last.label)}, ${date(last.date)}.`));
+  else lines.push(tr("Hasn't moved past introduction yet.", "Todavía no ha avanzado más allá de su presentación."));
+  lines.push(tr(`${cosponsors} cosponsor${cosponsors === 1 ? "" : "s"}; ${votes} recorded roll-call vote${votes === 1 ? "" : "s"}.`, `${cosponsors} copatrocinador${cosponsors === 1 ? "" : "es"}; ${votes} votaci${votes === 1 ? "ón nominal registrada" : "ones nominales registradas"}.`));
+  if (lobbyTotal != null) lines.push(tr(`${lobbyTotal.toLocaleString()} organization${lobbyTotal === 1 ? "" : "s"} reported lobbying on it.`, `${lobbyTotal.toLocaleString()} organizaci${lobbyTotal === 1 ? "ón informó" : "ones informaron"} cabildeo sobre este proyecto.`));
+  return (
+    <section className="glance">
+      <h2>{tr("At a glance", "En resumen")}</h2>
+      <ul>{lines.map((l, k) => <li key={k}>{l}</li>)}</ul>
+    </section>
+  );
+}
+
 export default function Bill() {
   const { congress: c, type: t, number: n } = useParams();
   const congress = Number(c), type = String(t ?? "").toLowerCase(), number = Number(n);
   const valid = Number.isInteger(congress) && TYPES.has(type) && Number.isInteger(number) && number > 0;
   const [state, setState] = useState({ status: "loading" });
+  const { open, toggle } = useFolds(["text", "cosponsors", "hearings", "votes", "lobbying"], state.status === "done", `${congress}-${type}-${number}`);
   const [allLobbying, setAllLobbying] = useState(false);
   const [openVote, setOpenVote] = useState(null);
 
@@ -157,13 +182,22 @@ export default function Bill() {
       <div className="split-main">
       <StatusBar bill={b} />
 
+      <BillGlance b={b} sponsor={sponsor} cosponsors={current.length} votes={votes.length} lobbyTotal={lobbying ? lobbyTotal : null} />
+
       <Section title={tr("Summary", "Resumen")} source={<>{tr("Congressional Research Service, via GovInfo Bill Status.", "Servicio de Investigación del Congreso, vía GovInfo Bill Status. Los resúmenes se publican solo en inglés.")} <Explain id="crs-summary">{tr("About these summaries", "Sobre estos resúmenes")}</Explain></>}>
         {b.crs_summary
           ? <p>{b.crs_summary}</p>
           : <p>{tr("The Congressional Research Service hasn't published a summary of this bill yet. The bill text is at Congress.gov.", "El Servicio de Investigación del Congreso todavía no ha publicado un resumen de este proyecto. El texto está en Congress.gov.")}</p>}
       </Section>
 
-      <TextVersions congress={congress} type={type} number={number} />
+      <p className="fold-hint">{tr("Tap a topic to see the details and records.", "Toque un tema para ver los detalles y registros.")}</p>
+      <div className="folds">
+      <Fold id="text" title={tr("Text versions", "Versiones del texto")} open={open.has("text")} onToggle={toggle}
+        summary={tr("The official text, and which sections changed between versions", "El texto oficial y qué secciones cambiaron entre versiones")}>
+        <TextVersions congress={congress} type={type} number={number} inFold />
+      </Fold>
+      <Fold id="cosponsors" title={tr("Cosponsors", "Copatrocinadores")} open={open.has("cosponsors")} onToggle={toggle}
+        summary={current.length ? tr(`${current.length} cosponsor${current.length === 1 ? "" : "s"}`, `${current.length} copatrocinador${current.length === 1 ? "" : "es"}`) : tr("No cosponsors", "Sin copatrocinadores")}>
 
       <Section title={tr("Cosponsors", "Copatrocinadores")} source={tr(`GovInfo Bill Status (Library of Congress).${updated("bills")} Party and seat as of the day each member signed on.`, `GovInfo Bill Status (Biblioteca del Congreso).${updated("bills")} Partido y escaño a la fecha en que cada miembro se sumó.`)}>
         {current.length === 0 ? <p>{tr("No cosponsors.", "Sin copatrocinadores.")}</p> : (
@@ -180,13 +214,19 @@ export default function Bill() {
           <p className="fine">{tr("Withdrawn", "Retirados")}: {withdrawn.map((x, i) => <span key={x.bioguide_id}>{i ? "; " : ""}{x.name} ({date(x.withdrawn_date)})</span>)}</p>
         )}
       </Section>
+      </Fold>
 
       {meetings.length > 0 && (
+        <Fold id="hearings" title={tr("Committee hearings", "Audiencias de comités")} open={open.has("hearings")} onToggle={toggle}
+          summary={tr(`${meetings.length} hearing${meetings.length === 1 ? "" : "s"} or markup${meetings.length === 1 ? "" : "s"} that listed this bill`, `${meetings.length} audiencia${meetings.length === 1 ? "" : "s"} o sesi${meetings.length === 1 ? "ón" : "ones"} que incluyeron este proyecto`)}>
         <Section title={tr("Committee hearings and markups", "Audiencias y sesiones de comités")} source={tr("Congress.gov committee meeting records, where the meeting lists this bill.", "Registros de reuniones de comités de Congress.gov que mencionan este proyecto.")}>
           <MeetingList meetings={meetings} />
         </Section>
+        </Fold>
       )}
 
+      <Fold id="votes" title={tr("Votes", "Votaciones")} open={open.has("votes")} onToggle={toggle}
+        summary={votes.length ? tr(`${votes.length} recorded roll-call vote${votes.length === 1 ? "" : "s"}`, `${votes.length} votaci${votes.length === 1 ? "ón nominal registrada" : "ones nominales registradas"}`) : tr("No recorded roll-call votes", "No hay votaciones nominales registradas")}>
       <Section title={tr("Roll-call votes", "Votaciones nominales")} source={<>{tr("House Clerk and Senate.gov roll-call records.", "Registros de votaciones del Secretario de la Cámara y de Senate.gov.")} <Link to="/methods#vote-types">{tr("About vote types", "Sobre los tipos de votación")}</Link>.</>}>
         {votes.length === 0 ? <p>{tr("No recorded roll-call votes on this bill. Many bills pass by voice vote or never reach the floor.", "No hay votaciones nominales registradas sobre este proyecto. Muchos proyectos se aprueban a viva voz o nunca llegan al pleno.")}</p> : (
           <table>
@@ -215,6 +255,12 @@ export default function Bill() {
         )}
       </Section>
 
+      </Fold>
+
+      <Fold id="lobbying" title={tr("Lobbying", "Cabildeo")} open={open.has("lobbying")} onToggle={toggle}
+        summary={lobbying == null ? tr("Reports filed under the Lobbying Disclosure Act", "Informes presentados según la Ley de Divulgación de Cabildeo")
+          : lobbyTotal ? tr(`${lobbyTotal.toLocaleString()} organization${lobbyTotal === 1 ? "" : "s"} reported lobbying on it`, `${lobbyTotal.toLocaleString()} organizaci${lobbyTotal === 1 ? "ón informó" : "ones informaron"} cabildeo sobre este proyecto`)
+          : tr("No lobbying reports name this bill", "Ningún informe de cabildeo menciona este proyecto")}>
       <Section title={tr("Lobbying reports naming this bill", "Informes de cabildeo que mencionan este proyecto")}
         source={<>{tr("Quarterly lobbying reports (LD-2) filed under the Lobbying Disclosure Act, retrieved from LDA.gov.", "Informes trimestrales de cabildeo (LD-2) presentados según la Ley de Divulgación de Cabildeo, obtenidos de LDA.gov.")}{updated("lobbying")} {tr("The Senate Office of Public Records can't vouch for data or analyses derived from these reports after they're retrieved.", "La Oficina de Registros Públicos del Senado no puede garantizar los datos ni los análisis derivados de estos informes después de obtenerlos.")} <Link to="/methods#lobbying">{tr("About this data", "Sobre estos datos")}</Link>.</>}>
         {lobbying == null ? <p className="notice">{tr("Lobbying reports didn't load. Reload the page to try again.", "Los informes de cabildeo no se cargaron. Vuelva a cargar la página para intentarlo de nuevo.")}</p>
@@ -257,6 +303,8 @@ export default function Bill() {
           </>
         )}
       </Section>
+      </Fold>
+      </div>
       </div>
       </div>
       <NotesList />

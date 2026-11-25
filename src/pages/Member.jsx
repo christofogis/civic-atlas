@@ -1,3 +1,4 @@
+import { Fold } from "../components/Fold.jsx";
 import { memberPage } from "../lib/memberPage.js";
 import { useEffect, useState } from "react";
 import { voteKind, isFinal } from "../lib/voteKind.js";
@@ -215,21 +216,6 @@ function Contact({ term, member }) {
 // to open it. Contents render only when open (faster, and the notes list matches what's shown).
 // #votes, #bills, #money and #trades open that section (old tab links keep working).
 const FOLDS = ["contact", "service", "committees", "votes", "bills", "money", "trades", "follow"];
-function Fold({ id, title, summary, open, onToggle, status, children }) {
-  return (
-    <details className="fold" id={id} open={open} onToggle={(e) => onToggle(id, e.currentTarget.open)}>
-      <summary>
-        <h2>{title}</h2>
-        {summary && <span className="fold-summary">{summary}</span>}
-      </summary>
-      {open && <div className="fold-body">
-        {status === "loading" ? <p className="fine">{tr("Loading…", "Cargando…")}</p>
-          : status === "error" ? <p className="notice">{tr("Couldn't load this section. Close and open it to try again.", "No se pudo cargar esta sección. Ciérrela y ábrala para intentarlo de nuevo.")}</p>
-          : children}
-      </div>}
-    </details>
-  );
-}
 
 // A section's source goes in the page's notes, cited from its heading.
 const slug = (s) => String(s).toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
