@@ -45,6 +45,9 @@ jobs:
           get $GEO_DIR/acs/Geos20245YR.txt $ACS/documentation/Geos20245YR.txt
           for t in b01003 b01002 b19013 b25077 b15003 b17001; do get $GEO_DIR/acs/acsdt5y2024-$t.dat $ACS/data/5YRData/acsdt5y2024-$t.dat; done
           get /tmp/gaz.zip https://www2.census.gov/geo/docs/maps-data/data/gazetteer/2025_Gazetteer/2025_Gaz_place_national.zip && unzip -qo /tmp/gaz.zip -d $GEO_DIR/gazetteer
+          # District-to-place relationship file (optional; used for big cities that span districts).
+          mkdir -p $GEO_DIR/rel
+          curl -fsSL -o $GEO_DIR/rel/cd119_place.txt https://www2.census.gov/geo/docs/maps-data/data/rel2020/cd-sld/tab20_cd11920_place20_natl.txt || echo "relationship file not found"
       - name: Build
         run: NODE_OPTIONS=--max-old-space-size=6144 node scripts/maps/build.mjs
       - name: District facts

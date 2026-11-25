@@ -35,7 +35,8 @@ function table(name) {
 // ACS marks unavailable values with large negative numbers.
 const ok = (n) => (Number.isFinite(n) && n >= 0 ? n : null);
 const key = (st, cd) => `${FIPS[st]}-${cd}`;
-const cdOf = (code) => (code === "00" || code === "98" ? 0 : Number(code));
+// "00" at-large, "98" non-voting delegate; "ZZ" (water, no district) is skipped.
+const cdOf = (code) => (code === "00" || code === "98" ? 0 : /^\d+$/.test(code) ? Number(code) : null);
 
 const names = new Map();   // GEO_ID -> name, from the ACS geography file
 for (const line of readFileSync(join(GEO, "acs", "Geos20245YR.txt"), "utf8").split("\n")) {
@@ -49,7 +50,7 @@ const facts = {};
 for (const [id, p] of pop) {
   if (!id.startsWith("5001900US")) continue;
   const st = id.slice(9, 11), cd = id.slice(11, 13);
-  if (!FIPS[st]) continue;
+  if (!FIPS[st] || cdOf(cd) == null) continue;
   const e = edu.get(id), v = pov.get(id);
   const ba = e && e.B15003_E001 ? (e.B15003_E022 + e.B15003_E023 + e.B15003_E024 + e.B15003_E025) / e.B15003_E001 : null;
   facts[key(st, cdOf(cd))] = {
@@ -69,8 +70,9 @@ for (const [id, p] of pop) {
   if (!id.startsWith("5101900US")) continue;
   const st = id.slice(9, 11), cd = id.slice(11, 13);
   const f = facts[key(st, cdOf(cd))];
-  const name = (names.get(id) ?? "").split(",")[0];
-  if (f && name) f.counties.push({ name, population: ok(p.B01003_E001) });
+  const name = (names.get(id) ?? "").split(",")[0].replace(/ \(part\)$/, "");
+  const people = ok(p.B01003_E001);
+  if (f && name && people) f.counties.push({ name, population: people });
 }
 
 // Largest cities and towns: places whose center point falls inside the district.
@@ -82,11 +84,13 @@ const gh = gaz[0].replace(/^\uFEFF/, "").split(SEP).map((s) => s.trim());
 const gi = (n) => { const i = gh.findIndex((h) => h.toUpperCase() === n); if (i < 0) throw new Error(`Gazetteer column ${n} not in: ${gh.join(", ")}`); return i; };
 const [G_ID, G_NAME, G_LON, G_LAT] = ["GEOID", "NAME", "INTPTLONG", "INTPTLAT"].map(gi);
 const rows = ["geoid,name,lon,lat,population"];
+const placeName = new Map();
 for (const line of gaz.slice(1)) {
   const f = line.split(SEP).map((s) => s.trim());
   const geoid = f[G_ID], p = ok(pop.get(`1600000US${geoid}`)?.B01003_E001);
   if (!p || p < 2500) continue;
   const name = (names.get(`1600000US${geoid}`) ?? f[G_NAME]).split(",")[0].replace(/ (city|town|village|borough|CDP|municipality|city and borough|urban county|consolidated government \(balance\)|metropolitan government \(balance\)|unified government \(balance\))$/i, "");
+  placeName.set(geoid, name);
   const lon = Number(f[G_LON]), lat = Number(f[G_LAT]);
   if (!Number.isFinite(lon) || !Number.isFinite(lat)) continue;
   rows.push([geoid, JSON.stringify(name), lon, lat, p].join(","));
@@ -99,9 +103,41 @@ for (const p of JSON.parse(readFileSync("/tmp/placed.json", "utf8"))) {
   if (!p.STATEFP || !FIPS[p.STATEFP] || p.CD119FP === "ZZ") continue;
   facts[key(p.STATEFP, cdOf(p.CD119FP))]?.places.push({ name: p.name, population: p.population });
 }
+// A big city's center falls in only one of the districts it spans (San Francisco, Philadelphia,
+// New York City). For a district with no place centered in it, list the places that cover the
+// most of its land, from the Census district-to-place relationship file, marked as partial.
+const relDir = join(GEO, "rel");
+const relName = (() => { try { return readdirSync(relDir).find((n) => /place/i.test(n) && n.endsWith(".txt")); } catch { return null; } })();
+if (relName) {
+  const [rh, ...rl] = readFileSync(join(relDir, relName), "utf8").replace(/^\uFEFF/, "").trim().split("\n");
+  const rs = rh.includes("|") ? "|" : ",";
+  const cols = rh.split(rs).map((c) => c.trim().toUpperCase());
+  const col = (re) => cols.findIndex((c) => re.test(c));
+  const iCd = col(/^GEOID_CD119/), iPl = col(/^GEOID_PLACE/), iPart = col(/^AREALAND_PART$/);
+  console.log(`relationship file ${relName}: ${cols.join(",")}`);
+  if (iCd >= 0 && iPl >= 0 && iPart >= 0) {
+    const byCd = new Map();
+    for (const line of rl) {
+      const v = line.split(rs);
+      const cdId = v[iCd], pl = v[iPl], area = Number(v[iPart]);
+      if (!cdId || !pl || !(area > 0)) continue;
+      const k = FIPS[cdId.slice(0, 2)] && cdOf(cdId.slice(2, 4)) != null ? key(cdId.slice(0, 2), cdOf(cdId.slice(2, 4))) : null;
+      if (k && facts[k] && !facts[k].places.length) byCd.set(k, [...(byCd.get(k) ?? []), { pl, area }]);
+    }
+    for (const [k, list] of byCd) {
+      const total = list.reduce((n, r) => n + r.area, 0);
+      facts[k].places = list
+        .filter((r) => r.area / total >= 0.05)
+        .map((r) => ({ name: placeName.get(r.pl), population: ok(pop.get(`1600000US${r.pl}`)?.B01003_E001), area: r.area }))
+        .filter((r) => r.name && r.population >= 2500)
+        .sort((a, z) => z.area - a.area).slice(0, 3)
+        .map(({ name, population }) => ({ name, population, part: true }));
+    }
+  }
+}
 for (const f of Object.values(facts)) {
   f.counties.sort((a, z) => z.population - a.population);
-  f.places = f.places.sort((a, z) => z.population - a.population).slice(0, 8);
+  if (!f.places.some((p) => p.part)) f.places = f.places.sort((a, z) => z.population - a.population).slice(0, 8);
 }
 
 writeFileSync("public/maps/cd119/facts.json", JSON.stringify({
@@ -109,4 +145,6 @@ writeFileSync("public/maps/cd119/facts.json", JSON.stringify({
   years: ACS_YEARS,
   districts: facts,
 }));
+console.log("no places:", Object.entries(facts).filter(([, f]) => !f.places.length).map(([k]) => k).join(" ") || "none");
+console.log("CA-11:", JSON.stringify(facts["CA-11"]?.places), "NY-12:", JSON.stringify(facts["NY-12"]?.places));
 console.log(`facts for ${Object.keys(facts).length} districts; CA-12:`, JSON.stringify(facts["CA-12"]).slice(0, 500));
