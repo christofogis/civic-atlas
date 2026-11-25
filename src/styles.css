@@ -464,3 +464,7 @@ label.check { display: inline-flex; align-items: center; gap: 6px; font-size: 0.
 .trend .axis { font-size: 13px; fill: var(--muted); }
 .legend .swatch { display: inline-block; width: 0.8rem; height: 0.8rem; border-radius: 2px; margin: 0 0.3rem 0 0.8rem; vertical-align: -1px; }
 .legend .swatch:first-child { margin-left: 0; }
+
+.meetings-block { margin: 1.5rem 0; }
+.local-meetings { margin: 0.5rem 0 1rem; }
+.local-meetings ul { margin: 0.25rem 0; }

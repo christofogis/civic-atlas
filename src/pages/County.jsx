@@ -4,6 +4,7 @@ import { date } from "../lib/format.js";
 import { tr } from "../lib/lang.js";
 import { loadLocal } from "../lib/local.js";
 import { CouncilCard, OfficerCard, SupervisorCard } from "../components/LocalOfficials.jsx";
+import LocalMeetings from "../components/LocalMeetings.jsx";
 
 // A county's elected officials (pilot: Orange County, CA). Data: a small file kept from the
 // county's own pages, checked weekly against them; districts from the county's GIS layer.
@@ -30,6 +31,7 @@ export default function County() {
         <a href={data.meetings_url} rel="noopener">{tr("Meetings and agendas", "Reuniones y agendas")}</a>
         <a href={data.results_url} rel="noopener">{tr("Election results (Registrar of Voters)", "Resultados electorales (Registro de Votantes)")}</a>
       </p>
+      <LocalMeetings data={data} />
       <h2>{tr("Countywide elected officials", "Funcionarios elegidos en todo el condado")}</h2>
       <ul className="cards">{data.officers.map((o) => <OfficerCard key={o.office} o={o} county={data.county} />)}</ul>
       <h2>{tr("City councils", "Concejos municipales")}</h2>
@@ -39,6 +41,7 @@ export default function County() {
           <h3>{tr(`${c.name} City Council`, `Concejo Municipal de ${c.name}`)}</h3>
           <p className="fine">{tr("Five members, each elected by one district for four years. Each December the council chooses one member as mayor.", "Cinco miembros, cada uno elegido por un distrito por cuatro años. Cada diciembre el concejo elige a uno de sus miembros como alcalde.")} {tr("Meets:", "Se reúne:")} {tr(c.meetings.en, c.meetings.es)}.</p>
           <ul className="cards">{c.members.map((m) => <CouncilCard key={m.district} m={m} city={c} />)}</ul>
+          <LocalMeetings data={data} city={c} showBoard={false} heading={false} />
           <p className="branch-links">
             <a href={c.agendas_url} rel="noopener">{tr("Agendas and minutes", "Agendas y actas")}</a>
             <a href={c.website} rel="noopener">{tr("City Council page", "Página del Concejo Municipal")}</a>

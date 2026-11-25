@@ -144,8 +144,89 @@
           "on_ballot": "2026-11-03",
           "seat_change_by": "2026-12-07"
         }
-      ]
+      ],
+      "meeting_rule": {
+        "nth": 3,
+        "weekday": 1,
+        "time": "18:00",
+        "rule_source": {
+          "label": "Los Alamitos Municipal Code 2.04.010",
+          "url": "https://cityoflosalamitos.org/165/City-Council"
+        },
+        "place": {
+          "en": "City Hall Council Chamber, 3191 Katella Avenue",
+          "es": "Sala del Concejo en el Ayuntamiento, 3191 Katella Avenue"
+        },
+        "agendas_posted": {
+          "en": "The agenda packet is posted online the Friday before each meeting.",
+          "es": "El paquete de la agenda se publica en línea el viernes anterior a cada reunión."
+        }
+      }
     }
   ],
-  "places_map": "/maps/local/ca-orange-places.json"
+  "places_map": "/maps/local/ca-orange-places.json",
+  "board_meetings": {
+    "time": "09:30",
+    "place": {
+      "en": "Board Hearing Room, County Administration North, 400 West Civic Center Drive, Santa Ana",
+      "es": "Sala de Audiencias de la Junta, County Administration North, 400 West Civic Center Drive, Santa Ana"
+    },
+    "agendas_posted": {
+      "en": "Agendas are posted on Wednesdays, two weeks before each regular Tuesday meeting.",
+      "es": "Las agendas se publican los miércoles, dos semanas antes de cada reunión ordinaria del martes."
+    },
+    "dates": [
+      "2026-12-01",
+      "2026-12-15",
+      "2027-01-12",
+      "2027-01-26",
+      "2027-02-09",
+      "2027-02-23",
+      "2027-03-09",
+      "2027-03-23",
+      "2027-04-13",
+      "2027-04-27",
+      "2027-05-11",
+      "2027-05-25",
+      "2027-06-08",
+      "2027-06-09",
+      "2027-06-22",
+      "2027-08-10",
+      "2027-08-24",
+      "2027-09-14",
+      "2027-09-28",
+      "2027-10-12",
+      "2027-10-26",
+      "2027-11-02",
+      "2027-11-16",
+      "2027-12-07",
+      "2027-12-14",
+      "2028-01-11",
+      "2028-01-25"
+    ],
+    "notes": {
+      "2027-01-12": {
+        "en": "Election of officers",
+        "es": "Elección de autoridades"
+      },
+      "2027-06-08": {
+        "en": "Budget hearing",
+        "es": "Audiencia del presupuesto"
+      },
+      "2027-06-09": {
+        "en": "Budget hearing",
+        "es": "Audiencia del presupuesto"
+      }
+    },
+    "sources": [
+      {
+        "label": "2026 Board of Supervisors Meeting Schedule (approved 10/28/2025)",
+        "url": "https://board.oc.gov/sites/bos.egovoc.com/files/2025-11/2026%20APPROVED%20BOS%20Meeting%20Schedule.pdf"
+      },
+      {
+        "label": "2027 Board of Supervisors Meeting Schedule (approved 10/27/26)",
+        "url": "https://board.oc.gov/sites/bos.egovoc.com/files/2026-11/2027%20Approved%20BOS%20Meeting%20Schedule.pdf"
+      }
+    ]
+  }
 }

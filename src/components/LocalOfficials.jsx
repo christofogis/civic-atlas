@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import LocalMeetings from "./LocalMeetings.jsx";
 import { Link } from "react-router-dom";
 import { date } from "../lib/format.js";
 import { tr } from "../lib/lang.js";
@@ -100,6 +101,7 @@ export default function LocalOfficials({ local, approximate }) {
       <p className="fine">
         <Link to={`/local/${local.id}`}>{tr(`All ${data.county} officials`, `Todos los funcionarios del ${data.county}`)}</Link>
       </p>
+      <LocalMeetings data={data} city={city} count={2} />
     </>
   );
 }

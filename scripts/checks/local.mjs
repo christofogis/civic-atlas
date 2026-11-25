@@ -37,5 +37,16 @@ for (const c of file.cities ?? []) {
 }
 for (const s of file.supervisors) if (s.term_end < today) problems.push(`District ${s.district}: term ended ${s.term_end}; update the file with the new term`);
 
+// The board's schedule is a list of dates from its yearly PDF; flag when the list runs short.
+const lastMeeting = file.board_meetings?.dates.at(-1);
+if (lastMeeting) {
+  const soon = new Date(Date.now() + 45 * 864e5).toISOString().slice(0, 10);
+  if (lastMeeting < soon) problems.push(`Board of Supervisors: schedule ends ${lastMeeting}; add next year's dates from the approved schedule PDF`);
+  for (const src of file.board_meetings.sources) {
+    const r = await fetch(src.url, { method: "HEAD" }).catch(() => null);
+    if (!r?.ok) problems.push(`Board schedule source unreachable: ${src.url} (${r?.status ?? "error"})`);
+  }
+}
+
 if (problems.length) { console.log(problems.join("\n")); process.exit(1); }
 console.log(`Orange County officials match the county's sources (file checked ${file.checked}).`);
