@@ -26,8 +26,10 @@ if probe:
         t = re.sub(r"<[^>]+>|\s+", " ", text).strip()
         if re.search(r"agenda|ExtDocViewer|\d{1,2}/\d{1,2}/\d{2}", href + " " + t, re.I):
             print("LINK", href, "|", t[:100])
-    for pat in [r"ocagendaext[^\"' <]*", r"<iframe[^>]+>", r"granicus[^\"' <]*", r"legistar[^\"' <]*", r"primegov[^\"' <]*", r"\.json[^\"' <]*", r"api/[^\"' <]*"]:
+    for pat in [r"ocagendaext[^\"'<>]*", r"<iframe[^>]+>", r"granicus[^\"' <]*", r"legistar[^\"' <]*", r"primegov[^\"' <]*", r"\.json[^\"' <]*", r"api/[^\"' <]*"]:
         for m in sorted(set(re.findall(pat, html, re.I)))[:15]: print("FOUND", pat[:12], m[:200])
+    for m in re.finditer(r"ocagendaext", html):
+        print("CTX", re.sub(r"\s+", " ", html[max(0, m.start() - 300):m.start() + 300]))
     # Context around the first agenda link
     m = re.search(r"ExtDocViewer", html)
     if m: print("CONTEXT", re.sub(r"\s+", " ", html[max(0, m.start() - 1500):m.start() + 500]))
