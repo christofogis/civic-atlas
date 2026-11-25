@@ -1,7 +1,8 @@
 name: Build federal budget data
 
 # Monthly, after the Monthly Treasury Statement (8th business day), and by hand: receipts,
-# outlays, deficit and debt from the Treasury's Fiscal Data API. Commits public/data/budget.json.
+# outlays, deficit and debt from the Treasury's Fiscal Data API, and the long-run series since 1940
+# from OMB's Historical Tables. Commits public/data/budget.json and budget-history.json.
 on:
   schedule:
     - cron: "29 18 12-16 * *"   # 12th–16th of each month, 11:29am Pacific
@@ -21,9 +22,13 @@ jobs:
           node-version: 22
       - name: Build
         run: node scripts/data/budget.mjs
+      - name: Long-run history (OMB Historical Tables)
+        run: |
+          pip install --quiet openpyxl xlrd
+          python3 scripts/data/budget_history.py
       - name: Commit
         run: |
           git config user.name "civic-atlas bot"
           git config user.email "christofogis@users.noreply.github.com"
-          git add public/data/budget.json
-          git diff --cached --quiet || (git commit -m "Federal budget data rebuilt from Treasury Fiscal Data" && git push)
+          git add public/data/budget.json public/data/budget-history.json
+          git diff --cached --quiet || (git commit -m "Federal budget data rebuilt from Treasury Fiscal Data" && git pull --rebase -q && git push)
