@@ -361,7 +361,7 @@ function History({ data, control }) {
   const all = data.years;
   const years = span ? all.slice(-span) : all;
   const key = { gdp: "surplus_gdp", dollars: "surplus", real: "surplus_const" }[unit];
-  const W = narrow ? 420 : 960, H = narrow ? 260 : 300, L = narrow ? 40 : 56, R = 6, Tp = 12, Bt = 24;
+  const W = narrow ? 420 : 960, H = narrow ? 260 : 300, L = narrow ? 58 : 72, R = 6, Tp = 12, Bt = 24;
   const vals = years.map((d) => d[key]);
   const hi = Math.max(0, ...vals), lo = Math.min(0, ...vals);
   // Round the scale to tidy steps.

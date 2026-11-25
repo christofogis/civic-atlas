@@ -693,7 +693,7 @@ header.site .site-inner { position: relative; flex-wrap: nowrap; gap: 8px 14px; 
 
 /* Budget bars that open in place to show what's inside */
 .hbar-label .swatch { display: inline-block; width: 0.7rem; height: 0.7rem; border-radius: 2px; margin-right: 0.4rem; vertical-align: -1px; }
-.hbar-open { border: 0; background: none; padding: 0; font: inherit; color: var(--link, var(--accent)); cursor: pointer; text-align: left; text-decoration: underline; text-underline-offset: 2px; }
+.hbar-open { white-space: normal; border: 0; background: none; padding: 0; font: inherit; color: var(--link, var(--accent)); cursor: pointer; text-align: left; text-decoration: underline; text-underline-offset: 2px; }
 .hbar-open::after { content: " ▸"; text-decoration: none; display: inline-block; margin-left: 0.2rem; }
 .hbar-open[aria-expanded="true"]::after { content: " ▾"; }
 .hbars li.has-sub { grid-template-rows: auto; }
