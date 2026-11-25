@@ -1,4 +1,4 @@
-import { Suspense, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { Link, NavLink, Outlet, useNavigate, useLocation } from "react-router-dom";
 import ReportError from "./ReportError.jsx";
 import { useLang } from "../lib/i18n.jsx";
@@ -9,6 +9,9 @@ export default function Layout() {
   const location = useLocation();
   const [q, setQ] = useState("");
   const { lang, setLang, t } = useLang();
+  // On phones the sections and search fold behind a Menu button; it closes on every page change.
+  const [menuOpen, setMenuOpen] = useState(false);
+  useEffect(() => setMenuOpen(false), [location.pathname, location.search]);
 
   function submit(e) {
     e.preventDefault();
@@ -21,13 +24,19 @@ export default function Layout() {
       <header className="site">
         <div className="site-inner">
           <Link to="/" className="brand">Civic Atlas</Link>
-          <nav>
+          <button type="button" className="menu-button" aria-expanded={menuOpen} aria-controls="site-menu" onClick={() => setMenuOpen(!menuOpen)}>
+            {menuOpen ? t("Close", "Cerrar") : t("Menu", "Menú")}
+          </button>
+          <div id="site-menu" className={`site-menu${menuOpen ? " open" : ""}`}>
+          <nav aria-label={t("Main", "Principal")}>
+            <NavLink to="/" end>{t("Find your officials", "Sus funcionarios")}</NavLink>
             <NavLink to="/week">{t("This week", "Esta semana")}</NavLink>
             <NavLink to="/map">{t("Map", "Mapa")}</NavLink>
             <NavLink to="/members">{t("Members", "Miembros")}</NavLink>
             <NavLink to="/topics">{t("Topics", "Temas")}</NavLink>
             <NavLink to="/bills">{t("Bills", "Proyectos de ley")}</NavLink>
             <NavLink to="/committees">{t("Committees", "Comités")}</NavLink>
+            <NavLink to="/government">{t("Three branches", "Los tres poderes")}</NavLink>
           </nav>
           {location.pathname !== "/search" && (
             <form onSubmit={submit} role="search" className="site-search">
@@ -36,6 +45,7 @@ export default function Layout() {
                 value={q} onChange={(e) => setQ(e.target.value)} />
             </form>
           )}
+          </div>
           <button type="button" className="link lang-switch" lang={lang === "es" ? "en" : "es"} onClick={() => setLang(lang === "es" ? "en" : "es")}>
             {lang === "es" ? "English" : "Español"}
           </button>

@@ -298,7 +298,7 @@ export default function Member() {
                 {c.title && <> · {c.title}</>}
                 {subsByParent(c.committee.committee_id).length > 0 && (
                   <ul>{subsByParent(c.committee.committee_id).map((s) => (
-                    <li key={s.committee.committee_id}><Link to={`/committee/${s.committee.committee_id}`}>{s.committee.name}</Link>{s.title && <> · {s.title}</>}</li>
+                    <li key={s.committee.committee_id}><Link to={`/committee/${s.committee.committee_id}`}>{s.committee.name.replace(/^the /, "The ")}</Link>{s.title && <> · {s.title}</>}</li>
                   ))}</ul>
                 )}
               </li>

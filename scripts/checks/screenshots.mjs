@@ -1,6 +1,10 @@
 // Takes screenshots of live pages and prints them (base64 JPEG) into the job log, for design
 // review where artifact downloads aren't available.
 //   node scripts/checks/screenshots.mjs [base-url] [path,path,...] [width]
+// A path "lookup:<address>" runs an address lookup on the home page and shoots the results. That
+// needs LOOKUP_CHECK_TOKEN: the token goes on the lookup request, and the bot-check widget is
+// replaced in this test browser only, since a headless browser can't complete it.
+// "fresh:" before a path shoots it as a first-time visitor (nothing remembered).
 import { chromium } from "playwright";
 
 const BASE = process.argv[2] ?? "https://civic-atlas-cub.pages.dev";
@@ -13,10 +17,32 @@ page.on("pageerror", (e) => console.log(`PAGEERROR ${e.message}`));
 // A returning visitor: representatives remembered from an earlier lookup (California).
 await page.goto(BASE);
 await page.evaluate(() => localStorage.setItem("civic-atlas:my-reps", JSON.stringify(["P000145", "S001150"])));
+const TOKEN = process.env.LOOKUP_CHECK_TOKEN;
+if (TOKEN) {
+  await page.route("**/api/lookup**", (route) => route.continue({ headers: { ...route.request().headers(), "x-check-token": TOKEN } }));
+  await page.route("https://challenges.cloudflare.com/**", (route) => route.fulfill({ contentType: "text/javascript",
+    body: "window.turnstile={render:(el,o)=>{setTimeout(()=>o.callback('test'),50);return 1},reset:()=>{},remove:()=>{}};" }));
+}
 for (const path of PATHS) {
-  await page.goto(BASE + path, { waitUntil: /^\/(\?|$)/.test(path) ? "load" : "networkidle" });
-  await page.waitForTimeout(1500);
-  const buf = await page.screenshot({ fullPage: true, type: "jpeg", quality: 55 });
+  if (path.startsWith("lookup:")) {
+    if (!TOKEN) { console.log("LOOKUP_CHECK_TOKEN not set; skipping", path); continue; }
+    await page.goto(BASE + "/", { waitUntil: "load" });
+    await page.fill("#address", path.slice(7));
+    await page.keyboard.press("Escape");
+    await page.click("form.lookup button[type=submit]");
+    await page.waitForSelector(".results", { timeout: 20000 }).catch(() => console.log("no results shown"));
+    await page.waitForTimeout(2500);
+  } else if (path.startsWith("fresh:")) {
+    await page.evaluate(() => localStorage.removeItem("civic-atlas:my-reps"));
+    await page.goto(BASE + path.slice(6), { waitUntil: "load" });
+    await page.waitForTimeout(1500);
+  } else {
+    await page.goto(BASE + path, { waitUntil: /^\/(\?|$)/.test(path) ? "load" : "networkidle" });
+    await page.waitForTimeout(1500);
+  }
+  // Very tall pages can't be captured whole; cap the height.
+  const height = await page.evaluate(() => document.documentElement.scrollHeight);
+  const buf = await page.screenshot({ fullPage: height <= 6000, clip: height > 6000 ? { x: 0, y: 0, width: WIDTH, height: 6000 } : undefined, type: "jpeg", quality: 55 });
   const b64 = buf.toString("base64");
   console.log(`SHOT-BEGIN ${path}`);
   for (let i = 0; i < b64.length; i += 8000) console.log(`SHOT ${b64.slice(i, i + 8000)}`);

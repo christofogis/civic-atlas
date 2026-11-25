@@ -357,3 +357,38 @@ label.check { display: inline-flex; align-items: center; gap: 6px; font-size: 0.
 .branch-links { display: flex; flex-wrap: wrap; gap: 6px 14px; font-size: 0.9rem; }
 .party-counts { display: inline-flex; flex-wrap: wrap; gap: 4px 12px; font-size: 0.88rem; }
 @media (max-width: 900px) { .branches { grid-template-columns: 1fr; } .branch-drawing { max-width: 200px; } }
+
+/* ---- Phone header: sections and search behind a Menu button ---------------------------------- */
+.menu-button { display: none; }
+.site-menu { display: contents; }
+@media (max-width: 640px) {
+  header.site .site-inner { flex-wrap: nowrap; }
+  .brand { margin-right: auto; }
+  .menu-button { display: inline-block; order: 3; background: none; border: 1px solid var(--border-strong); border-radius: 999px; padding: 6px 14px; font: inherit; font-size: 0.9rem; color: var(--text); cursor: pointer; }
+  .lang-switch { order: 2; }
+  .site-menu { display: none; }
+  .site-menu.open { display: block; position: absolute; left: 0; right: 0; top: 100%; background: var(--bg); border-bottom: 1px solid var(--border); padding: 8px 16px 16px; box-shadow: 0 8px 16px rgba(27, 36, 32, 0.08); }
+  .site-menu.open nav { display: flex; flex-direction: column; gap: 0; order: initial; width: auto; }
+  .site-menu.open nav a { padding: 12px 0; font-size: 1.05rem; border-bottom: 1px solid var(--border); color: var(--text); }
+  .site-menu.open nav a.active { border-bottom-color: var(--border); font-weight: 600; }
+  .site-menu.open .site-search { margin: 14px 0 0; }
+  .site-menu.open .site-search input { width: 100%; padding: 11px 14px; font-size: 1rem; }
+}
+@media (min-width: 641px) { header.site nav a[href="/"] { display: none; } }
+
+/* ---- Lookup results grouped by level of government ------------------------------------------- */
+.level { margin-top: 28px; }
+.level > h2 { margin-bottom: 2px; }
+.level-what { color: var(--muted); margin: 0 0 12px; max-width: var(--measure); }
+.level-jump { display: flex; flex-wrap: wrap; gap: 6px 8px; margin: 10px 0 4px; padding: 0; list-style: none; }
+.level-jump a { display: inline-block; padding: 5px 12px; border: 1px solid var(--border-strong); border-radius: 999px; text-decoration: none; font-size: 0.9rem; color: var(--text); }
+.level-jump a:hover { border-color: var(--accent); }
+.home-promise { font-size: 1.15rem; color: var(--muted); margin: 6px 0 0; max-width: 46ch; }
+.home-levels { display: flex; flex-wrap: wrap; gap: 4px 14px; list-style: none; padding: 0; margin: 12px 0 0; font-size: 0.92rem; color: var(--muted); }
+.home-levels li::before { content: "✓ "; color: var(--accent); }
+.turnstile:empty { margin-top: 0; }
+
+/* Tabs that scroll sideways on phones: fade the edge so it's clear there's more. */
+@media (max-width: 640px) {
+  .tabs { -webkit-mask-image: linear-gradient(to right, #000 85%, transparent); mask-image: linear-gradient(to right, #000 85%, transparent); }
+}

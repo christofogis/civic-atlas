@@ -70,27 +70,34 @@ export default function LocalOfficials({ local, approximate }) {
   return (
     <>
       {approximate && sup && <p className="notice">{tr("The supervisor district is based on the center of this location. A full street address gives an exact match.", "El distrito de supervisor se basa en el centro de este lugar. Una dirección completa da un resultado exacto.")}</p>}
-      {city && (
+      {(city || otherCity) && (
         <>
-          <h2>{tr(`City of ${city.name}`, `Ciudad de ${city.name}`)}</h2>
-          <ul className="cards">{member && <CouncilCard m={member} city={city} />}</ul>
+          <h2>{tr(`City: ${(city ?? otherCity).name}`, `Ciudad: ${(city ?? otherCity).name}`)}</h2>
+          <p className="level-what">{tr("The city council sets city laws and the city budget: police and fire, streets, parks, zoning and permits.", "El concejo municipal aprueba las leyes y el presupuesto de la ciudad: policía y bomberos, calles, parques, zonificación y permisos.")}</p>
+          {city && <ul className="cards">{member && <CouncilCard m={member} city={city} />}</ul>}
           <p className="fine">
-            <Link to={`/local/${local.id}#${city.id}`}>{tr(`Whole ${city.name} City Council`, `Todo el Concejo Municipal de ${city.name}`)}</Link>
+            {city && <Link to={`/local/${local.id}#${city.id}`}>{tr(`Whole ${city.name} City Council`, `Todo el Concejo Municipal de ${city.name}`)}</Link>}
+            {otherCity && (otherCity.council_district
+              ? tr(`This address is in City Council District ${otherCity.council_district}. ${otherCity.name}'s council members aren't listed on Civic Atlas yet.`, `Esta dirección está en el distrito ${otherCity.council_district} del concejo municipal. Los miembros del concejo de ${otherCity.name} aún no aparecen en Civic Atlas.`)
+              : tr(`${otherCity.name}'s council members aren't listed on Civic Atlas yet.`, `Los miembros del concejo de ${otherCity.name} aún no aparecen en Civic Atlas.`))}
           </p>
         </>
       )}
-      <h2 >{data.county}</h2>
+      {!city && !otherCity && place?.type === "unincorporated" && (
+        <>
+          <h2>{tr("No city government", "Sin gobierno municipal")}</h2>
+          <p className="level-what">{place.name
+            ? tr(`This address is in ${place.name}, an unincorporated community. It has no city council; the county Board of Supervisors makes local decisions here.`, `Esta dirección está en ${place.name}, una comunidad no incorporada. No tiene concejo municipal; la Junta de Supervisores del condado toma las decisiones locales aquí.`)
+            : tr("This address is in an unincorporated area. It has no city council; the county Board of Supervisors makes local decisions here.", "Esta dirección está en una zona no incorporada. No tiene concejo municipal; la Junta de Supervisores del condado toma las decisiones locales aquí.")}</p>
+        </>
+      )}
+      <h2>{tr(`County: ${data.county}`, `Condado: ${data.county}`)}</h2>
+      <p className="level-what">{tr("The Board of Supervisors sets the county budget and runs county services: public health, social services, jails, elections, and local services in unincorporated areas.", "La Junta de Supervisores aprueba el presupuesto del condado y administra sus servicios: salud pública, servicios sociales, cárceles, elecciones y servicios locales en zonas no incorporadas.")}</p>
       <ul className="cards">
         {sup && <SupervisorCard s={sup} county={data.county} />}
         {data.officers.map((o) => <OfficerCard key={o.office} o={o} county={data.county} />)}
       </ul>
       <p className="fine">
-        {!city && place?.type === "unincorporated" && (place.name
-          ? tr(`This address is in ${place.name}, an unincorporated community: it has no city council, and the Board of Supervisors governs local matters. `, `Esta dirección está en ${place.name}, una comunidad no incorporada: no tiene concejo municipal, y la Junta de Supervisores gobierna los asuntos locales. `)
-          : tr("This address is in an unincorporated area: it has no city council, and the Board of Supervisors governs local matters. ", "Esta dirección está en una zona no incorporada: no tiene concejo municipal, y la Junta de Supervisores gobierna los asuntos locales. "))}
-        {otherCity && (otherCity.council_district
-          ? tr(`This address is in ${otherCity.name} City Council District ${otherCity.council_district}. ${otherCity.name}'s council members aren't listed on Civic Atlas yet. `, `Esta dirección está en el distrito ${otherCity.council_district} del Concejo Municipal de ${otherCity.name}. Los miembros del concejo de ${otherCity.name} aún no aparecen en Civic Atlas. `)
-          : tr(`This address is in ${otherCity.name}. Its city council members aren't listed on Civic Atlas yet. `, `Esta dirección está en ${otherCity.name}. Los miembros de su concejo municipal aún no aparecen en Civic Atlas. `))}
         <Link to={`/local/${local.id}`}>{tr(`All ${data.county} officials`, `Todos los funcionarios del ${data.county}`)}</Link>
       </p>
     </>

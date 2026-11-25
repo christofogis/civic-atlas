@@ -1,6 +1,6 @@
 // Pages the site and accessibility checks open: [path, text that must appear].
 export const PAGES = [
-  ["/", ["Civic Atlas", "Look up"]],
+  ["/", ["Civic Atlas", "Who represents you?", "Find my officials"]],
   ["/member/P000145", ["Alex Padilla", "At a glance", "Contact", "next up for election", "Overview"]],
   ["/member/P000145#votes", ["Voting record", "Recent roll-call votes"]],
   ["/member/P000145/votes", ["Roll-call votes", "Issue"]],
@@ -19,7 +19,7 @@ export const PAGES = [
   ["/hearing/338900", ["export controls", "Senate committees post witness lists", "committee's website"]],
   ["/embed/member/P000145", ["Alex Padilla", "Recent roll-call votes", "Full record"]],
   // Spanish (the language choice is per browser, and each check opens a fresh one).
-  ["/?lang=es", ["Buscar", "English"]],
+  ["/?lang=es", ["¿Quién le representa?", "Buscar mis funcionarios", "English"]],
   ["/member/P000145?lang=es", ["En resumen", "Contacto", "Senado de EE. UU."]],
   ["/bills?lang=es", ["Proyectos de ley", "Última acción"]],
   ["/methods?lang=es", ["Cómo funciona este sitio", "Tasa de voto con el partido"]],

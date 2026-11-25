@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import LocalOfficials from "../components/LocalOfficials.jsx";
 import StateOfficialCard from "../components/StateOfficialCard.jsx";
@@ -33,9 +33,23 @@ export default function Home() {
   const [mine, setMine] = useState(() => myRepresentatives());
   const { t, lang, setLang } = useLang();
 
-  async function handleSubmit(e) {
+  // The bot check usually finishes in the background before anyone presses the button. If it
+  // hasn't yet, the lookup waits for it and then goes ahead on its own.
+  const [waiting, setWaiting] = useState(false);
+  const resultsRef = useRef(null);
+  useEffect(() => { if (waiting && token) { setWaiting(false); runLookup(); } }, [waiting, token]);
+  useEffect(() => {
+    if (status === "done") resultsRef.current?.scrollIntoView({ behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth", block: "start" });
+  }, [status]);
+
+  function handleSubmit(e) {
     e.preventDefault();
-    if (!address.trim() || (needsCheck && !token)) return;
+    if (!address.trim()) return;
+    if (needsCheck && !token) { setWaiting(true); setStatus("loading"); return; }
+    runLookup();
+  }
+
+  async function runLookup() {
     setStatus("loading");
     setError("");
     try {
@@ -63,24 +77,29 @@ export default function Home() {
       <div className="home-main">
       <header>
         <div className="home-title">
-          <h1>Civic Atlas</h1>
+          <h1>{t("Who represents you?", "¿Quién le representa?")}</h1>
           <div className="toggle home-lang" role="group" aria-label="Language / Idioma">
             <button type="button" lang="en" aria-pressed={lang === "en"} className={lang === "en" ? "on" : ""} onClick={() => setLang("en")}>English</button>
             <button type="button" lang="es" aria-pressed={lang === "es"} className={lang === "es" ? "on" : ""} onClick={() => setLang("es")}>Español</button>
           </div>
         </div>
-        <p className="lede">
-          {t("Enter an address to see who represents you in Congress, with their votes, bills, committees, and campaign finance, drawn from official sources.",
-            "Escriba una dirección para ver quién le representa en el Congreso, con sus votos, proyectos de ley, comités y finanzas de campaña, según fuentes oficiales.")}
+        <p className="home-promise">
+          {t("Enter your address to see every official elected to represent it, what each one does, and their record, from official sources.",
+            "Escriba su dirección para ver a cada funcionario elegido para representarla, qué hace cada uno y su historial, según fuentes oficiales.")}
         </p>
+        <ul className="home-levels">
+          <li>{t("U.S. Congress", "Congreso de EE. UU.")}</li>
+          <li>{t("State legislature and statewide offices", "Legislatura y cargos estatales")}</li>
+          <li>{t("County and city (Orange County, CA)", "Condado y ciudad (Condado de Orange, CA)")}</li>
+        </ul>
       </header>
 
       <form onSubmit={handleSubmit} className="lookup">
-        <label htmlFor="address">{mine.size > 0 ? t("Look up another address", "Buscar otra dirección") : t("Address", "Dirección")}</label>
+        <label htmlFor="address">{mine.size > 0 ? t("Look up another address", "Buscar otra dirección") : t("Your address", "Su dirección")}</label>
         <div className="row">
           <AddressInput id="address" placeholder={t("123 Main St, City, State", "123 Main St, ciudad, estado")} value={address} onChange={setAddress} />
-          <button type="submit" disabled={status === "loading" || (needsCheck && !token)}>
-            {status === "loading" ? t("Looking up…", "Buscando…") : t("Look up", "Buscar")}
+          <button type="submit" disabled={status === "loading"}>
+            {status === "loading" ? t("Looking up…", "Buscando…") : t("Find my officials", "Buscar mis funcionarios")}
           </button>
         </div>
         {needsCheck && <Turnstile siteKey={TURNSTILE_SITE_KEY} onToken={setToken} resetSignal={lookups} />}
@@ -93,31 +112,49 @@ export default function Home() {
       {status === "error" && <p className="notice">{error}</p>}
 
       {status === "done" && result && (
-        <section className="results">
-          <h2>
-            {t("Representing", "Representantes de")} {stateName(result.state)}
+        <section className="results" ref={resultsRef} aria-live="polite">
+          <h2 className="results-title">
+            {t("Your officials", "Sus funcionarios")}
+            <span className="fine"> · {stateName(result.state)}
             {result.districts.length === 1 && result.officials.some((o) => o.chamber === "house" && o.district !== 0)
-              ? t(`, District ${result.districts[0]}`, `, distrito ${result.districts[0]}`) : ""}
+              ? t(`, congressional district ${result.districts[0]}`, `, distrito del Congreso ${result.districts[0]}`) : ""}</span>
           </h2>
           {result.approximate && (
             <p className="notice">
               {t("This location may fall in more than one district. A full street address gives an exact match.", "Este lugar puede estar en más de un distrito. Una dirección completa da un resultado exacto.")}
             </p>
           )}
-          <ul className="cards">
-            {result.officials.map((o) => <OfficialCard key={`${o.chamber}-${o.bioguide_id}`} official={o} />)}
+          <ul className="level-jump" aria-label={t("Jump to", "Ir a")}>
+            <li><a href="#level-federal">{t("Federal", "Federal")}</a></li>
+            {result.state_officials?.length > 0 && <li><a href="#level-state">{t("State", "Estatal")}</a></li>}
+            {result.local?.covered && <li><a href="#level-local">{t("County and city", "Condado y ciudad")}</a></li>}
           </ul>
+
+          <section className="level" id="level-federal">
+            <h2>{t("Federal: U.S. Congress", "Federal: Congreso de EE. UU.")}</h2>
+            <p className="level-what">{t("Writes national laws, sets the federal budget and taxes, and oversees federal agencies. Every state has two senators; each House member represents one district.",
+              "Redacta las leyes nacionales, fija el presupuesto y los impuestos federales y supervisa a las agencias federales. Cada estado tiene dos senadores; cada miembro de la Cámara representa un distrito.")}</p>
+            <ul className="cards">
+              {result.officials.map((o) => <OfficialCard key={`${o.chamber}-${o.bioguide_id}`} official={o} />)}
+            </ul>
+          </section>
+
           {result.state_officials?.length > 0 && (
-            <>
-              <h2>{t(`State of ${stateName(result.state)}`, `Estado de ${stateName(result.state)}`)}</h2>
+            <section className="level" id="level-state">
+              <h2>{t(`State: ${stateName(result.state)}`, `Estatal: ${stateName(result.state)}`)}</h2>
+              <p className="level-what">{t("The state legislature writes state laws and the state budget (schools, roads, health care, criminal law). The governor and other statewide officials run state government.",
+                "La legislatura estatal redacta las leyes y el presupuesto del estado (escuelas, carreteras, salud, derecho penal). El gobernador y otros funcionarios estatales dirigen el gobierno del estado.")}</p>
               <ul className="cards">
                 {result.state_officials.map((o) => <StateOfficialCard key={`${o.type}-${o.id}`} official={o} state={result.state} />)}
               </ul>
               <p className="fine">{t("State legislators shown are for the districts that include this address. Statewide offices shown are the governor, lieutenant governor, attorney general and secretary of state as listed by Open States; a few states' offices aren't listed there yet, and other statewide offices (such as treasurer) aren't shown for any state.",
                 "Los legisladores estatales que se muestran son los de los distritos que incluyen esta dirección. Los cargos estatales que se muestran son gobernador, vicegobernador, fiscal general y secretario de estado según Open States; algunos estados aún no aparecen allí, y otros cargos estatales (como tesorero) no se muestran para ningún estado.")}</p>
-            </>
+            </section>
           )}
-          <LocalOfficials local={result.local} approximate={result.approximate} />
+
+          <section className="level" id="level-local">
+            <LocalOfficials local={result.local} approximate={result.approximate} />
+          </section>
           <p className="fine">{t("District", "Distrito")}: {result.sources.district}. {t("Officials", "Funcionarios")}: {result.sources.officials}{result.sources.state_officials ? `; ${result.sources.state_officials}` : ""}.</p>
         </section>
       )}

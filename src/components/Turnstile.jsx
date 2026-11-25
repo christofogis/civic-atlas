@@ -25,6 +25,8 @@ export default function Turnstile({ siteKey, onToken, resetSignal }) {
       if (cancelled || !box.current || widget.current != null) return;
       widget.current = window.turnstile.render(box.current, {
         sitekey: siteKey,
+        // Stay out of sight unless Cloudflare needs the visitor to do something.
+        appearance: "interaction-only",
         callback: (t) => onToken(t),
         "expired-callback": () => onToken(""),
         "error-callback": () => onToken(""),
