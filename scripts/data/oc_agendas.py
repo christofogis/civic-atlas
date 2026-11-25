@@ -45,7 +45,7 @@ def when(text):
 
 
 HEADER = re.compile(r"AGENDA - BOARD OF SUPERVISORS' MEETING.*PAGE \d+|Document Last Updated:.*")
-ITEM = re.compile(r"^\s{0,12}((?:S?\d+[A-Z]?)|(?:CS-\d+))\.\s+(.*)$")
+ITEM = re.compile(r"^\s{0,12}((?:S?CS-?\d+[A-Z]?)|(?:S?\d+[A-Z]?))\.\s+(.*)$")
 SECTION = re.compile(r"^\s*(CONSENT CALENDAR|DISCUSSION ITEMS|PUBLIC HEARINGS|CLOSED SESSION|PRESENTATIONS)\b")
 STOP = re.compile(r"^\s*(PUBLIC COMMENTS|BOARD COMMENTS|ADJOURNED|END OF CONSENT CALENDAR)\b")
 STATUS = re.compile(r"^(CONTINUED TO \d{1,2}/\d{1,2}/\d{2,4}(?:,? \d{1,2}:\d{2} [AP]\.M\.)?|DELETED|REVISED TITLE TO READ:|REVISED RECOMMENDED ACTIONS? TO READ:|REVISED RECOMMENDED ACTIONS?)\s*")
@@ -55,12 +55,26 @@ def parse_agenda(pdf_bytes):
     with tempfile.NamedTemporaryFile(suffix=".pdf", delete=False) as f:
         f.write(pdf_bytes)
     txt = subprocess.run(["pdftotext", "-layout", f.name, "-"], capture_output=True, text=True, check=True).stdout
+    # Each item's "(Click for Files)" link, matched by position: the item whose number is the last
+    # one above the link on the page (or on an earlier page, for an item that runs over).
+    files = {}
     try:
         import fitz
-        doc = fitz.open(f.name)
-        files = [l["uri"] for pg in doc for l in pg.get_links() if "meetingitemfiles" in (l.get("uri") or "")]
-    except Exception:
-        files = []
+        last = None
+        for pg in fitz.open(f.name):
+            starts = sorted((w[1], w[4][:-1]) for w in pg.get_text("words")
+                            if w[0] < 130 and re.fullmatch(r"(?:S?CS-?\d+[A-Z]?|S?\d+[A-Z]?)\.", w[4]))
+            for l in sorted(pg.get_links(), key=lambda l: l["from"].y0):
+                if "meetingitemfiles" not in (l.get("uri") or ""):
+                    continue
+                above = [n for y, n in starts if y <= l["from"].y1 + 1]
+                num = above[-1] if above else last
+                if num and num not in files:
+                    files[num] = l["uri"]
+            if starts:
+                last = starts[-1][1]
+    except Exception as e:
+        print("file links not read:", e)
     if "--debug" in sys.argv:
         i = txt.find("PUBLIC HEARINGS")
         print("TAIL", txt[i:i + 9000])
@@ -111,15 +125,12 @@ def parse_agenda(pdf_bytes):
             districts = "all" if dm.group(1) == "All Districts" else [int(x) for x in re.findall(r"\d", dm.group(1))]
         dept = text.split(" - ", 1)[0] if " - " in text else None
         out.append({**it, "status": status, "department": dept, "text": text, "districts": districts, "_files": has_files})
-    # Each "(Click for Files)" is a link to that item's files, in order.
     with_files = [x for x in out if x["_files"]]
-    if len(with_files) == len(files):
-        for x, u in zip(with_files, files):
-            x["files_url"] = u
     for x in out:
-        x.pop("_files")
+        if x.pop("_files") and x["number"] in files:
+            x["files_url"] = files[x["number"]]
     upd = f"{updated.group(3)}-{updated.group(1)}-{updated.group(2)}" if updated else None
-    return out, upd, len(with_files), len(files)
+    return out, upd, len(with_files), sum(1 for x in out if x.get("files_url"))
 
 
 meetings = []
@@ -139,7 +150,7 @@ for r in rows(get(UPCOMING).decode("utf-8", "replace")):
     if agenda:
         items, upd, nf, nl = parse_agenda(get(agenda))
         m["items"], m["agenda_updated"] = items, upd
-        print(f"{d} {m['title']}: {len(items)} items; file links {nl} for {nf} items")
+        print(f"{d} {m['title']}: {len(items)} items; file links found for {nl} of {nf} items that have files")
         if len(items) < 3:
             sys.exit(f"{d}: only {len(items)} items parsed; the agenda layout may have changed")
     meetings.append(m)
