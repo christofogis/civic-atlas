@@ -39,8 +39,16 @@ jobs:
             get /tmp/$f https://www2.census.gov/geo/tiger/TIGER2026/CD/$f && unzip -qo /tmp/$f -d $GEO_DIR/cd120
           done
           ls $GEO_DIR/cd120/*.shp | wc -l
+          # District facts (ACS 5-year, keyless summary files) and place locations (Gazetteer).
+          mkdir -p $GEO_DIR/acs $GEO_DIR/gazetteer
+          ACS=https://www2.census.gov/programs-surveys/acs/summary_file/2024/table-based-SF
+          get $GEO_DIR/acs/Geos20245YR.txt $ACS/documentation/Geos20245YR.txt
+          for t in b01003 b01002 b19013 b25077 b15003 b17001; do get $GEO_DIR/acs/acsdt5y2024-$t.dat $ACS/data/5YRData/acsdt5y2024-$t.dat; done
+          get /tmp/gaz.zip https://www2.census.gov/geo/docs/maps-data/data/gazetteer/2025_Gazetteer/2025_Gaz_place_national.zip && unzip -qo /tmp/gaz.zip -d $GEO_DIR/gazetteer
       - name: Build
         run: NODE_OPTIONS=--max-old-space-size=6144 node scripts/maps/build.mjs
+      - name: District facts
+        run: NODE_OPTIONS=--max-old-space-size=6144 node scripts/maps/facts.mjs
       - name: Commit
         if: inputs.commit
         run: |
