@@ -43,8 +43,8 @@ const hoursSince = (t) => (Date.now() - Date.parse(t)) / 36e5;
 const ago = (t) => {
   const h = hoursSince(t);
   if (h < 1) return tr(`${Math.max(1, Math.round(h * 60))} min ago`, `hace ${Math.max(1, Math.round(h * 60))} min`);
-  if (h < 48) return tr(`${Math.round(h)} hours ago`, `hace ${Math.round(h)} horas`);
-  return tr(`${Math.round(h / 24)} days ago`, `hace ${Math.round(h / 24)} días`);
+  const n = h < 48 ? Math.round(h) : Math.round(h / 24), unit = h < 48 ? ["hour", "hora"] : ["day", "día"];
+  return tr(`${n} ${unit[0]}${n === 1 ? "" : "s"} ago`, `hace ${n} ${unit[1]}${n === 1 ? "" : "s"}`);
 };
 
 function DataJobs() {

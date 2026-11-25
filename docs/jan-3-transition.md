@@ -19,8 +19,11 @@ What changes, what the site does on its own, and what to check. Rehearsed nightl
 **Before (December)**
 - [ ] Nightly site check green, including "Congress transition rehearsal".
 - [ ] Orange County supervisors (Districts 2, 4, 5; new terms Jan 4) and Los Alamitos Districts 4–5 and mayor (December) updated in `public/data/local/ca-orange.json`.
+- [ ] California statewide offices and Board of Equalization (new terms Jan 4) updated in `public/data/state/ca-statewide.json` from the Secretary of State's certified Statement of Vote (around Dec 11), then `seat_change_by` set to the next change.
 
 **Jan 3–4**
+- [ ] `public/data/us-control.json` (budget page, who held office): end the 119th Congress segments on 2027-01-03 and add the 120th's House and Senate majorities from the House Historian's and Senate's party division pages.
+- [ ] `/status`: no job marked late or stopped.
 - [ ] `ingest_runs`: members job succeeding hourly; count of House seats "updating" falling to near zero.
 - [ ] Look up 3191 Katella Ave, Los Alamitos: CA-41 and its new member.
 - [ ] Three freshman member pages load (photo, contact, committees may be empty).

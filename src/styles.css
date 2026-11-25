@@ -720,3 +720,4 @@ header.site .site-inner { position: relative; flex-wrap: nowrap; gap: 8px 14px; 
 .status-flag.ok { border-color: var(--chart-in); }
 .status-flag.warn { border-color: var(--chart-deficit); color: var(--chart-deficit); }
 .status-checks li { margin: 0.35rem 0; }
+.status-page section { margin: 2rem 0; }
