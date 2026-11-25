@@ -15,7 +15,8 @@ export default function LookupResults({ result, sectionRef, shared = false }) {
   const { t } = useLang();
   // Each level opens in place; its label lists who's in it. Federal starts open. Printing opens
   // every level first, so the printed list is complete.
-  const [open, setOpen] = useState(() => new Set(["level-federal"]));
+  // A saved or shared list (/officials) is for seeing everyone at once, so it starts fully open.
+  const [open, setOpen] = useState(() => new Set(shared ? ["level-federal", "level-state", "level-local"] : ["level-federal"]));
   const toggle = (id, isOpen) => setOpen((prev) => {
     if (prev.has(id) === isOpen) return prev;
     const next = new Set(prev); if (isOpen) next.add(id); else next.delete(id); return next;
@@ -30,12 +31,14 @@ export default function LookupResults({ result, sectionRef, shared = false }) {
     setOpen(new Set(["level-federal", "level-state", "level-local"]));
     setTimeout(() => window.print(), 150);
   };
-  const names = (list) => {
+  const names = (list, extra = 0) => {
     const n = list.filter(Boolean);
-    return n.length <= 3 ? n.join(", ") : t(`${n.slice(0, 3).join(", ")} and ${n.length - 3} more`, `${n.slice(0, 3).join(", ")} y ${n.length - 3} más`);
+    const more = n.length - 3 + extra;
+    return n.length <= 3 && !extra ? n.join(", ") : t(`${n.slice(0, 3).join(", ")} and ${more} more`, `${n.slice(0, 3).join(", ")} y ${more} más`);
   };
   const fedNames = names(result.officials.filter((o) => o.seat_status !== "pending_update").map((o) => o.name));
-  const stateNames = names((result.state_officials ?? []).filter((o) => !o.updating).map((o) => o.name));
+  // California's four extra statewide offices load separately (ExtraStatewideCards); count them.
+  const stateNames = names((result.state_officials ?? []).filter((o) => !o.updating).map((o) => o.name), result.state === "CA" ? 4 : 0);
   const notes = [
     { id: "federal", text: <>{t("Districts: ", "Distritos: ")}{result.sources.district}. {t("Members of Congress and their terms: ", "Miembros del Congreso y sus períodos: ")}<a href="https://github.com/unitedstates/congress-legislators" rel="noopener">unitedstates/congress-legislators</a>{t(", updated daily. Your address is used only to find the districts; it isn't stored.", ", actualizado a diario. Su dirección se usa solo para encontrar los distritos; no se guarda.")}</> },
     result.state_officials?.length > 0 && { id: "state", text: <>{t("State legislators and the governor, lieutenant governor, attorney general and secretary of state: ", "Legisladores estatales y gobernador, vicegobernador, fiscal general y secretario de estado: ")}<a href="https://github.com/openstates/people" rel="noopener">Open States</a>{t(", updated daily.", ", actualizado a diario.")}{result.state === "CA"
