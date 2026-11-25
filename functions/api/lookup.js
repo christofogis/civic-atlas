@@ -4,7 +4,7 @@
 // logged, or cached here. Only the district and the officials are returned.
 import { congressOn } from "../../lib/congress.js";
 import { districtsFromGeocodio } from "../../lib/geocodio.js";
-import { verifyTurnstile } from "../../lib/turnstile.js";
+import { isCheckRequest, verifyTurnstile } from "../../lib/turnstile.js";
 import { rest } from "../../lib/rest.js";
 import { districtKey, stateDistrictsFromGeocodio, STATEWIDE } from "../../lib/stateleg.js";
 
@@ -20,7 +20,8 @@ export async function onRequestGet({ request, env }) {
   if (!env.GEOCODIO_API_KEY) return json({ error: "Address lookup is not configured." }, 500);
   // Bot check before spending a Geocodio lookup. Enforced once TURNSTILE_SECRET_KEY is set.
   const token = request.headers.get("CF-Turnstile-Token");
-  if (!(await verifyTurnstile(token, env.TURNSTILE_SECRET_KEY, request.headers.get("CF-Connecting-IP")))) {
+  const automatedCheck = isCheckRequest(request.headers.get("X-Check-Token"), env.LOOKUP_CHECK_TOKEN);
+  if (!automatedCheck && !(await verifyTurnstile(token, env.TURNSTILE_SECRET_KEY, request.headers.get("CF-Connecting-IP")))) {
     return json({ error: "Please complete the verification and try again." }, 403);
   }
 

@@ -35,3 +35,8 @@ jobs:
       - name: Accessibility (axe, WCAG 2.1 AA)
         if: always()
         run: node scripts/checks/a11y.mjs "${{ inputs.base_url || 'https://civic-atlas-cub.pages.dev' }}" ${{ inputs.a11y_report && '--report' || '' }}
+      - name: Address lookups (federal and state officials)
+        if: always()
+        env:
+          LOOKUP_CHECK_TOKEN: ${{ secrets.LOOKUP_CHECK_TOKEN }}
+        run: node scripts/checks/lookup.mjs "${{ inputs.base_url || 'https://civic-atlas-cub.pages.dev' }}"
