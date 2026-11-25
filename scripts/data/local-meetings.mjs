@@ -13,6 +13,10 @@ if (probe) {
     for (const h of hits) console.log("  ", h);
     const scripts = [...body.matchAll(/<script[^>]*src="([^"]+)"/gi)].map((m) => m[1]);
     console.log("  scripts:", scripts.join(" "));
+    const up = body.search(/UPCOMING BOARD/i);
+    if (up >= 0) console.log("  upcoming:", body.slice(up, up + 6000).replace(/\s+/g, " "));
+    const settings = body.match(/drupal-settings-json">([\s\S]*?)<\/script>/);
+    if (settings) console.log("  settings:", settings[1].slice(0, 1500));
     const tbl = body.match(/<table[\s\S]{0,4000}/i);
     console.log("  table:", tbl ? tbl[0].replace(/\s+/g, " ").slice(0, 2500) : "(none)");
   }
