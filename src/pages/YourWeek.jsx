@@ -163,22 +163,22 @@ export default function YourWeek() {
           <h2>{tr("Coming up", "Próximamente")}<Ref id="sources" text={tr("Congress: committee and floor schedules from the House and Senate, matched to the committees your members of Congress sit on. California: the state constitution (the Legislature convenes the first Monday of December in even-numbered years) and the Secretary of State. County and city: the Board of Supervisors' adopted schedule and the city's meeting rule; special meetings and cancellations are posted on each agenda page. Times are local to where the meeting is held.", "Congreso: agendas de comités y del pleno de la Cámara y el Senado, según los comités en que están sus miembros del Congreso. California: la constitución estatal (la Legislatura se reúne el primer lunes de diciembre de los años pares) y el Secretario de Estado. Condado y ciudad: el calendario adoptado por la Junta de Supervisores y la regla de reuniones de la ciudad; las reuniones especiales y cancelaciones se publican en cada página de agenda. Las horas son las del lugar de la reunión.")} /></h2>
           {items === null ? <p>{tr("Loading…", "Cargando…")}</p> : items.length === 0 ? <p>{tr("Nothing on the calendar in the next 45 days.", "Nada en el calendario en los próximos 45 días.")}</p> : (
             <>
-              <ol className="plain agenda">
+              <ul className="agenda">
                 {[...byDay].map(([d, list]) => (
                   <li key={d}>
                     <h3 className="agenda-day">{date(d)}</h3>
-                    <ul className="plain">
+                    <ul>
                       {list.map((it) => (
                         <li key={it.key}>
                           <span className="level-tag">{tr(...LEVEL[it.level])}</span>{" "}
                           {it.time && <span className="fine">{showTime(it.time)}{it.tz === "America/New_York" ? tr(" Eastern", " (hora del Este)") : ""} · </span>}
-                          {it.to ? <Link to={it.to}>{it.text}</Link> : it.url ? <a href={it.url} rel="noopener">{it.text}</a> : it.text}
+                          {it.to ? <Link to={it.to} className="clamp2">{it.text}</Link> : it.url ? <a href={it.url} rel="noopener" className="clamp2">{it.text}</a> : it.text}
                         </li>
                       ))}
                     </ul>
                   </li>
                 ))}
-              </ol>
+              </ul>
               <p><button type="button" className="button-secondary" onClick={download}>{tr("Add these to your calendar", "Agregar a su calendario")}</button> <span className="fine">{tr("A calendar file (.ics) for your phone or computer, made on this device.", "Un archivo de calendario (.ics) para su teléfono o computadora, creado en este dispositivo.")}</span></p>
             </>
           )}

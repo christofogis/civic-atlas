@@ -77,7 +77,7 @@ export default function MyReps({ ids, onForget, embedded = false }) {
         <h2>{t("Your representatives", "Sus representantes")}</h2>
         <button type="button" className="button-secondary small" onClick={forget}>{t("Start over", "Empezar de nuevo")}</button>
       </div>}
-      <p className="fine">{t("From your last address lookup on this device. In the last 7 days:", "De su última búsqueda de dirección en este dispositivo. En los últimos 7 días:")}</p>
+      {!embedded && <p className="fine">{t("From your last address lookup on this device. In the last 7 days:", "De su última búsqueda de dirección en este dispositivo. En los últimos 7 días:")}</p>}
       <ul className="bare my-reps-list">
         {rows.people.map((p) => {
           const w = rows.summary[p.bioguide_id] ?? { votes: [], bills: [], missed: 0, heldMeetings: 0, nextMeetings: 0 };
