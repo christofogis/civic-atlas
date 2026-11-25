@@ -461,6 +461,6 @@ label.check { display: inline-flex; align-items: center; gap: 6px; font-size: 0.
   .hbars li { grid-template-columns: 1fr; }
 }
 .trend svg { width: 100%; max-width: 44rem; height: auto; display: block; }
-.trend .axis { font-size: 11px; fill: var(--muted); }
+.trend .axis { font-size: 13px; fill: var(--muted); }
 .legend .swatch { display: inline-block; width: 0.8rem; height: 0.8rem; border-radius: 2px; margin: 0 0.3rem 0 0.8rem; vertical-align: -1px; }
 .legend .swatch:first-child { margin-left: 0; }

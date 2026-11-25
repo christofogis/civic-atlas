@@ -44,8 +44,10 @@ const IN = "#00b894";   // receipts
 const OUT = "#f47230";  // outlays
 const BAR = "#0e5a4b";
 
-const T = (n) => `$${(n / 1e12).toFixed(2)} ${tr("trillion", "billones")}`;
-const B = (n) => (Math.abs(n) >= 1e12 ? T(n) : `$${Math.round(n / 1e9).toLocaleString()} ${tr("billion", "mil millones")}`);
+const sign = (n) => (n < 0 ? "−" : "");
+const T = (n) => `${sign(n)}$${(Math.abs(n) / 1e12).toFixed(2)} ${tr("trillion", "billones")}`;
+const B = (n) => (Math.abs(n) >= 1e12 ? T(n) : `${sign(n)}$${Math.round(Math.abs(n) / 1e9).toLocaleString()} ${tr("billion", "mil millones")}`);
+const per100 = (part, total) => { const v = (100 * part) / total; return v.toFixed(v < 1 ? 2 : v < 10 ? 1 : 0); };
 const fyRange = (fy) => tr(`Oct ${fy - 1} – Sep ${fy}`, `oct. ${fy - 1} – sep. ${fy}`);
 
 // Horizontal bars, one series, sorted largest first. Shares are of the positive total.
@@ -53,19 +55,18 @@ function Bars({ rows, perHundred, total }) {
   const pos = rows.filter((r) => r.amount > 0).sort((a, z) => z.amount - a.amount);
   const neg = rows.filter((r) => r.amount < 0);
   const max = pos[0]?.amount ?? 1;
-  const [open, setOpen] = useState(null);
   return (
     <>
       <ul className="hbars">
         {pos.map((r) => (
-          <li key={r.label} onMouseEnter={() => setOpen(r.label)} onMouseLeave={() => setOpen(null)}>
+          <li key={r.label}>
             <span className="hbar-label"><Label en={r.label} /></span>
             <span className="hbar-track"><span className="hbar" style={{ width: `${(100 * r.amount) / max}%`, background: BAR }} /></span>
             <span className="hbar-value">
               {B(r.amount)}
-              {perHundred && <span className="fine"> · {tr(`$${((100 * r.amount) / total).toFixed(r.amount / total < 0.01 ? 2 : 0)} of every $100`, `$${((100 * r.amount) / total).toFixed(r.amount / total < 0.01 ? 2 : 0)} de cada $100`)}</span>}
+              {perHundred && <span className="fine"> · {tr(`$${per100(r.amount, total)} of every $100`, `$${per100(r.amount, total)} de cada $100`)}</span>}
             </span>
-            {open === r.label && r.parts && (
+            {r.parts && (
               <span className="hbar-parts fine">{r.parts.map((p) => `${p.label}: ${B(p.amount)}`).join(" · ")}</span>
             )}
           </li>
@@ -84,7 +85,7 @@ function Bars({ rows, perHundred, total }) {
 // Receipts and outlays by fiscal year: two lines, one axis, crosshair tooltip.
 function Trend({ years }) {
   const [hover, setHover] = useState(null);
-  const W = 640, H = 260, L = 48, R = 70, Tp = 14, Bt = 28;
+  const W = 480, H = 240, L = 40, R = 64, Tp = 12, Bt = 26;
   const max = Math.ceil(Math.max(...years.map((y) => y.outlays_total)) / 1e12);
   const x = (i) => L + (i * (W - L - R)) / (years.length - 1);
   const y = (v) => Tp + (H - Tp - Bt) * (1 - v / (max * 1e12));
@@ -100,13 +101,13 @@ function Trend({ years }) {
           const px = ((e.clientX - r.left) / r.width) * W;
           setHover(Math.max(0, Math.min(years.length - 1, Math.round(((px - L) / (W - L - R)) * (years.length - 1)))));
         }}>
-        {Array.from({ length: max + 1 }, (_, t) => (
+        {Array.from({ length: max + 1 }, (_, t) => t % 2 === 0 && (
           <g key={t}>
             <line x1={L} x2={W - R} y1={y(t * 1e12)} y2={y(t * 1e12)} stroke="var(--border)" />
             <text x={L - 6} y={y(t * 1e12) + 4} textAnchor="end" className="axis">${t}T</text>
           </g>
         ))}
-        {years.map((d, i) => (i % 2 === years.length % 2 || i === years.length - 1) && (
+        {years.map((d, i) => ((years.length - 1 - i) % 3 === 0) && (
           <text key={d.fiscal_year} x={x(i)} y={H - 8} textAnchor="middle" className="axis">{d.fiscal_year}</text>
         ))}
         {h && <line x1={x(hover)} x2={x(hover)} y1={Tp} y2={H - Bt} stroke="var(--border-strong)" />}
@@ -140,13 +141,13 @@ export default function Budget() {
   }, []);
   const year = useMemo(() => data?.years.find((y) => y.fiscal_year === fy), [data, fy]);
 
-  if (err) return <p className="notice">{tr("Budget figures didn't load. Reload the page to try again.", "Las cifras del presupuesto no se cargaron. Vuelva a cargar la página para intentarlo de nuevo.")}</p>;
-  if (!data || !year) return <p>{tr("Loading…", "Cargando…")}</p>;
+  if (err) return <main className="page"><p className="notice">{tr("Budget figures didn't load. Reload the page to try again.", "Las cifras del presupuesto no se cargaron. Vuelva a cargar la página para intentarlo de nuevo.")}</p></main>;
+  if (!data || !year) return <main className="page"><p>{tr("Loading…", "Cargando…")}</p></main>;
   const { current, debt } = data;
   const debtFy = debt.fiscal_years.find((d) => d.fiscal_year === fy);
 
   return (
-    <div className="budget">
+    <main className="page budget">
       <h1>{tr("Federal budget", "Presupuesto federal")}</h1>
       <p className="lede">
         {tr("Congress sets taxes and approves spending; the Treasury reports what actually came in and went out. These figures are the Treasury's, for each fiscal year (October through September).",
@@ -176,7 +177,7 @@ export default function Budget() {
       <section>
         <h2>{tr("Where the money came from", "De dónde vino el dinero")}</h2>
         <Bars rows={year.receipts} perHundred total={year.receipts_total} />
-        <p className="fine">{tr("Social insurance and retirement receipts are mostly payroll taxes for Social Security and Medicare. Point at that row for its parts.", "Las contribuciones al seguro social y la jubilación son sobre todo impuestos sobre la nómina para el Seguro Social y Medicare. Señale esa fila para ver sus partes.")}</p>
+        <p className="fine">{tr("Social insurance and retirement receipts are mostly payroll taxes for Social Security and Medicare.", "Las contribuciones al seguro social y la jubilación son sobre todo impuestos sobre la nómina para el Seguro Social y Medicare.")}</p>
       </section>
 
       <section>
@@ -220,6 +221,6 @@ export default function Budget() {
       <p className="source fine">
         {tr("Sources: ", "Fuentes: ")}<a href={data.sources.mts}>{tr("Monthly Treasury Statement, Table 9", "Estado Mensual del Tesoro, Tabla 9")}</a>; <a href={data.sources.debt}>Debt to the Penny</a>{tr(", Bureau of the Fiscal Service. Updated ", ", Oficina del Servicio Fiscal. Actualizado el ")}{date(data.built_at.slice(0, 10))}. <Link to="/methods#budget">{tr("About this data", "Sobre estos datos")}</Link>.
       </p>
-    </div>
+    </main>
   );
 }
