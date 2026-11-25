@@ -62,12 +62,21 @@ function parse(f, tracked) {
   if (!f.filing_period || /^R/.test(f.filing_type) || !PERIODS.includes(f.filing_period)) { stats.skipped++; return null; }
   const congress = congressForYear(f.filing_year);
   const byBill = new Map();
+  const covered = new Map();
   for (const a of f.lobbying_activities ?? []) {
+    // Lobbyists on this activity who disclosed a former government position, as filed.
+    const former = (a.lobbyists ?? []).map((l) => ({
+      name: personName(l.lobbyist), position: String(l.covered_position ?? "").replace(/\s+/g, " ").trim(),
+    })).filter((l) => l.name && l.position && !NO_POSITION.test(l.position));
     for (const ref of extractBillRefs(a.description)) {
       const k = `${congress}|${ref.bill_type}|${ref.number}`;
       stats.refs++;
       if (!tracked.has(k)) { stats.untracked++; continue; }
       if (!byBill.has(k)) byBill.set(k, { filing_uuid: f.filing_uuid, congress, ...ref });
+      for (const l of former) {
+        const ck = `${k}|${l.name}`;
+        if (!covered.has(ck)) covered.set(ck, { filing_uuid: f.filing_uuid, congress, ...ref, lobbyist_name: l.name, covered_position: l.position.slice(0, 500) });
+      }
     }
   }
   return {
@@ -77,8 +86,14 @@ function parse(f, tracked) {
       client_id: f.client?.id, client_name: f.client?.name ?? "", dt_posted: f.dt_posted,
     },
     mentions: [...byBill.values()],
+    covered: [...covered.values()],
   };
 }
+
+// Covered-position answers that mean "none".
+const NO_POSITION = /^(n\/?a|none|no|not applicable|-+|\.)$/i;
+const personName = (p) => [p?.first_name, p?.middle_name, p?.last_name, p?.suffix]
+  .map((x) => String(x ?? "").trim()).filter(Boolean).join(" ");
 
 const stats = { refs: 0, untracked: 0, skipped: 0 };
 const keyOf = (r) => `${r.registrant_id}|${r.client_id}|${r.filing_year}|${r.filing_period}`;
@@ -118,7 +133,8 @@ async function apply(db, parsed, counts) {
     counts.rows_deleted += remove.length;
     for (const p of insert.slice(0, 3)) {
       console.log(`  ${p.filing.client_name} via ${p.filing.registrant_name}:`,
-        p.mentions.map((m) => `${m.bill_type}${m.number}`).join(" "));
+        p.mentions.map((m) => `${m.bill_type}${m.number}`).join(" "),
+        p.covered.length ? `| former positions: ${p.covered.slice(0, 2).map((c) => `${c.lobbyist_name} (${c.covered_position})`).join("; ")}` : "");
     }
     return;
   }
@@ -131,9 +147,13 @@ async function apply(db, parsed, counts) {
     const uuids = insert.map((p) => p.filing.filing_uuid);
     const { error: e2 } = await db.from("lobbying_bill_mentions").delete().in("filing_uuid", uuids);
     if (e2) throw new Error(`clear mentions: ${e2.message}`);
+    const { error: e3 } = await db.from("lobbying_covered_positions").delete().in("filing_uuid", uuids);
+    if (e3) throw new Error(`clear covered positions: ${e3.message}`);
     await upsertBatches(db, "lobbying_filings", insert.map((p) => p.filing), "filing_uuid");
     await upsertBatches(db, "lobbying_bill_mentions", insert.flatMap((p) => p.mentions),
       "filing_uuid,congress,bill_type,number");
+    await upsertBatches(db, "lobbying_covered_positions", insert.flatMap((p) => p.covered),
+      "filing_uuid,congress,bill_type,number,lobbyist_name");
     counts.rows_inserted += insert.length;
   }
 }
