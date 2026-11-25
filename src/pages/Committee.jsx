@@ -82,7 +82,7 @@ export default function Committee() {
   return (
     <main className="page wide">
       <p className="fine"><Link to="/committees">{tr("Committees", "Comités")}</Link>{c.parent && <> · <Link to={`/committee/${c.parent.committee_id}`}>{c.parent.name}</Link></>}</p>
-      <h1>{c.chamber === "joint" ? c.name : `${chamberName} ${c.name}`}</h1>
+      <h1>{c.chamber === "joint" || /^(house|senate)\b/i.test(c.name) ? c.name : `${chamberName} ${c.name}`}</h1>
       {c.url && <p className="fine"><a href={c.url}>{tr("Committee website", "Sitio web del comité (en inglés)")}</a></p>}
       <Follow calendar={`/api/calendar/committee/${c.committee_id}`} />
 
