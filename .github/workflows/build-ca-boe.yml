@@ -1,8 +1,8 @@
-name: Build California BOE district table
+name: Build California BOE district map
 
-# By hand, after a redistricting: which Board of Equalization district each state Senate district
-# is in, from the Citizens Redistricting Commission's final boundaries. Commits
-# public/data/state/ca-boe-districts.json. Fails if the Senate districts don't nest.
+# By hand, after a redistricting: the four Board of Equalization districts, simplified for the
+# address lookup, from the Citizens Redistricting Commission's final boundaries. Commits
+# public/maps/state/ca-boe.json.
 on:
   workflow_dispatch:
 
@@ -18,11 +18,12 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
+      - run: npm ci
       - name: Build
         run: node scripts/data/ca-boe.mjs
       - name: Commit
         run: |
           git config user.name "civic-atlas bot"
           git config user.email "christofogis@users.noreply.github.com"
-          git add public/data/state/ca-boe-districts.json
-          git diff --cached --quiet || (git commit -m "California BOE district table rebuilt from the Redistricting Commission's final maps" && git pull --rebase -q && git push)
+          git add public/maps/state/ca-boe.json
+          git diff --cached --quiet || (git commit -m "California BOE district map rebuilt from the Redistricting Commission's final maps" && git pull --rebase -q && git push)
