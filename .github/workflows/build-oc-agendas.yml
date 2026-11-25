@@ -4,11 +4,6 @@ name: Build Orange County agendas
 # Agendas post on Wednesdays two weeks before each Tuesday meeting, with changes the Friday before.
 on:
   workflow_dispatch:
-    inputs:
-      probe:
-        description: "Probe only (print what the page links to; write nothing)"
-        type: boolean
-        default: false
   schedule:
     - cron: "47 15 * * *"   # daily, 7:47am Pacific
     - cron: "47 3 * * *"    # and 7:47pm Pacific
@@ -23,14 +18,9 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - run: sudo apt-get install -y -qq poppler-utils >/dev/null && pip install --quiet pymupdf
-      - name: Probe
-        if: ${{ inputs.probe }}
-        run: python3 scripts/data/oc_agendas.py --probe
       - name: Build
-        if: ${{ !inputs.probe }}
         run: python3 scripts/data/oc_agendas.py
       - name: Commit
-        if: ${{ !inputs.probe }}
         run: |
           git config user.name "civic-atlas bot"
           git config user.email "christofogis@users.noreply.github.com"
