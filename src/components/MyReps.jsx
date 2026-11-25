@@ -16,6 +16,12 @@ const DAY = 86400000;
 const isMine = (m, mine) => (m.committee_ids ?? []).some((c) => mine.has(c) || mine.has(c.slice(0, 4)));
 
 export default function MyReps({ ids, onForget }) {
+  // Clears the remembered officials and districts and returns the home page to a blank start,
+  // with the cursor in the address box.
+  const forget = () => {
+    forgetRepresentatives(); forgetDistricts(); onForget();
+    requestAnimationFrame(() => { window.scrollTo({ top: 0 }); document.getElementById("address")?.focus(); });
+  };
   const [rows, setRows] = useState(null);
   const { t } = useLang();
 
@@ -67,8 +73,11 @@ export default function MyReps({ ids, onForget }) {
   if (rows.people.length === 0) return null;
   return (
     <section className="my-reps">
-      <h2>{t("Your representatives", "Sus representantes")}</h2>
-      <p className="fine">{t("In the last 7 days", "En los últimos 7 días")}</p>
+      <div className="my-reps-head">
+        <h2>{t("Your representatives", "Sus representantes")}</h2>
+        <button type="button" className="button-secondary small" onClick={forget}>{t("Start over", "Empezar de nuevo")}</button>
+      </div>
+      <p className="fine">{t("From your last address lookup on this device. In the last 7 days:", "De su última búsqueda de dirección en este dispositivo. En los últimos 7 días:")}</p>
       <ul className="bare my-reps-list">
         {rows.people.map((p) => {
           const w = rows.summary[p.bioguide_id] ?? { votes: [], bills: [], missed: 0, heldMeetings: 0, nextMeetings: 0 };
@@ -130,7 +139,7 @@ export default function MyReps({ ids, onForget }) {
       </p>
       <p className="fine">
         {t("Remembered on this device from your last lookup (officials and district numbers only, never your address).", "Guardado en este dispositivo desde su última búsqueda (solo funcionarios y números de distrito, nunca su dirección).")}{" "}
-        <button type="button" className="link fine" onClick={() => { forgetRepresentatives(); forgetDistricts(); onForget(); }}>{t("Forget them", "Olvidarlos")}</button>
+        <button type="button" className="link fine" onClick={forget}>{t("Forget them", "Olvidarlos")}</button>
       </p>
     </section>
   );

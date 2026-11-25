@@ -147,7 +147,7 @@ export default function Home() {
 
       </div>
       <div className="home-side">
-      {mine.size > 0 && status !== "done" && <MyReps ids={mine} onForget={() => setMine(new Set())} />}
+      {mine.size > 0 && status !== "done" && <MyReps ids={mine} onForget={() => { setMine(new Set()); setResult(null); setStatus("idle"); setAddress(""); }} />}
       <section className="home-links">
         <Link to="/quiz" className="home-card"><strong>{t("Do you vote like your representatives?", "¿Vota usted como sus representantes?")}</strong><span>{t("Answer 10 real bills Congress voted on and see who agrees with you.", "Responda sobre 10 proyectos reales que el Congreso votó y vea quién coincide con usted.")}</span></Link>
         <Link to="/map" className="home-card"><strong>{t("Explore the map", "Explore el mapa")}</strong><span>{t("States and congressional districts, down to your street. Tap one to see who represents it.", "Estados y distritos del Congreso, hasta su calle. Toque uno para ver quién lo representa.")}</span></Link>

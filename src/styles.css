@@ -645,3 +645,7 @@ label.check { display: inline-flex; align-items: center; gap: 6px; font-size: 0.
   .topics-table th, .topics-table td { padding-right: 6px; }
   .topics-table th:last-child, .topics-table td:last-child { padding-right: 0; }
 }
+
+.my-reps-head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+.my-reps-head h2 { margin-bottom: 0; }
+.button-secondary.small { padding: 5px 12px; font-size: 0.85rem; }
