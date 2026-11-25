@@ -496,3 +496,14 @@ label.check { display: inline-flex; align-items: center; gap: 6px; font-size: 0.
 .glance-bars > div { display: grid; grid-template-columns: 4.5rem 1fr auto; gap: 0.5rem; align-items: center; font-size: 0.9rem; }
 .glance-bars .gb { display: block; height: 0.7rem; }
 .glance-bars .gb span { display: block; height: 100%; border-radius: 0 3px 3px 0; }
+
+/* Budget on wide screens: trend lines under the figures, the two breakdowns side by side */
+.budget-figures .spark { width: 100%; max-width: 9rem; height: 1.8rem; margin-top: 0.4rem; }
+.spark-note { margin-top: -1.25rem; margin-bottom: 2rem; }
+.budget .lede, .budget > p, .budget .stack, .budget .trend { max-width: 72ch; }
+@media (min-width: 1000px) {
+  .budget-two { display: grid; grid-template-columns: 1fr 1fr; gap: 0 2.5rem; align-items: start; }
+  .budget-two .hbars li { grid-template-columns: minmax(7rem, 11rem) 1fr; }
+  .budget-two .hbar-value { grid-column: 1 / -1; margin-top: -0.2rem; }
+  .budget-figures { grid-template-columns: repeat(4, 1fr); }
+}

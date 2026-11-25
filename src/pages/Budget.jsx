@@ -175,6 +175,20 @@ function Stacked({ years }) {
   );
 }
 
+// A small trend line under a headline figure: one series, no judgment colors, the chosen year dotted.
+function Spark({ values, at, label }) {
+  const W = 120, H = 28, P = 3;
+  const lo = Math.min(0, ...values), hi = Math.max(...values);
+  const x = (i) => P + (i * (W - 2 * P)) / (values.length - 1);
+  const y = (v) => H - P - ((v - lo) / (hi - lo || 1)) * (H - 2 * P);
+  return (
+    <svg className="spark" viewBox={`0 0 ${W} ${H}`} role="img" aria-label={label}>
+      <path d={values.map((v, i) => `${i ? "L" : "M"}${x(i).toFixed(1)},${y(v).toFixed(1)}`).join("")} fill="none" stroke="var(--muted)" strokeWidth="1.5" />
+      {at >= 0 && <circle cx={x(at)} cy={y(values[at])} r="3" fill="var(--text)" />}
+    </svg>
+  );
+}
+
 // Receipts and outlays by fiscal year: two lines, one axis, crosshair tooltip.
 function Trend({ years }) {
   const [hover, setHover] = useState(null);
@@ -238,9 +252,11 @@ export default function Budget() {
   if (!data || !year) return <main className="page"><p>{tr("Loading…", "Cargando…")}</p></main>;
   const { current, debt } = data;
   const debtFy = debt.fiscal_years.find((d) => d.fiscal_year === fy);
+  const yi = data.years.findIndex((y) => y.fiscal_year === fy);
+  const sparkLabel = tr("Trend by fiscal year; the table under Year by year has the figures.", "Tendencia por año fiscal; la tabla en Año por año tiene las cifras.");
 
   return (
-    <main className="page budget">
+    <main className="page wide budget">
       <h1>{tr("Federal budget", "Presupuesto federal")}</h1>
       <p className="lede">
         {tr("Congress sets taxes and approves spending; the Treasury reports what actually came in and went out. These figures are the Treasury's, for each fiscal year (October through September).",
@@ -255,12 +271,14 @@ export default function Budget() {
       </label>
 
       <div className="budget-figures">
-        <div><span className="fig">{T(year.receipts_total)}</span><span>{tr("came in (receipts)", "entró (ingresos)")}</span></div>
-        <div><span className="fig">{T(year.outlays_total)}</span><span>{tr("went out (outlays)", "salió (gastos)")}</span></div>
-        <div><span className="fig">{T(Math.abs(year.deficit))}</span><span>{year.deficit >= 0 ? tr("more spent than collected (deficit)", "más gastado que recaudado (déficit)") : tr("more collected than spent (surplus)", "más recaudado que gastado (superávit)")}</span></div>
-        {debtFy && <div><span className="fig">{T(debtFy.total)}</span><span>{tr(`total debt on ${date(debtFy.record_date)}`, `deuda total al ${date(debtFy.record_date)}`)}</span></div>}
+        <div><span className="fig">{T(year.receipts_total)}</span><span>{tr("came in (receipts)", "entró (ingresos)")}</span><Spark values={data.years.map((y) => y.receipts_total)} at={yi} label={sparkLabel} /></div>
+        <div><span className="fig">{T(year.outlays_total)}</span><span>{tr("went out (outlays)", "salió (gastos)")}</span><Spark values={data.years.map((y) => y.outlays_total)} at={yi} label={sparkLabel} /></div>
+        <div><span className="fig">{T(Math.abs(year.deficit))}</span><span>{year.deficit >= 0 ? tr("more spent than collected (deficit)", "más gastado que recaudado (déficit)") : tr("more collected than spent (surplus)", "más recaudado que gastado (superávit)")}</span><Spark values={data.years.map((y) => y.deficit)} at={yi} label={sparkLabel} /></div>
+        {debtFy && <div><span className="fig">{T(debtFy.total)}</span><span>{tr(`total debt on ${date(debtFy.record_date)}`, `deuda total al ${date(debtFy.record_date)}`)}</span><Spark values={debt.fiscal_years.map((d) => d.total)} at={debt.fiscal_years.findIndex((d) => d.fiscal_year === fy)} label={sparkLabel} /></div>}
       </div>
+      <p className="fine spark-note">{tr(`Small lines: FY${data.years[0].fiscal_year} to FY${data.years.at(-1).fiscal_year}; the dot is the year chosen. "Year by year" below has the full chart.`, `Líneas pequeñas: AF${data.years[0].fiscal_year} a AF${data.years.at(-1).fiscal_year}; el punto es el año elegido. "Año por año", más abajo, tiene la gráfica completa.`)}</p>
 
+      <div className="budget-two">
       <section>
         <h2>{tr("Where the money went", "En qué se gastó")}</h2>
         <p className="fine">{tr("Outlays by budget function, the categories the government uses to group spending by purpose.", "Gastos por función presupuestaria, las categorías que el gobierno usa para agrupar el gasto según su propósito.")}</p>
@@ -272,6 +290,8 @@ export default function Budget() {
         <Bars rows={year.receipts} perHundred total={year.receipts_total} />
         <p className="fine">{tr("Social insurance and retirement receipts are mostly payroll taxes for Social Security and Medicare.", "Las contribuciones al seguro social y la jubilación son sobre todo impuestos sobre la nómina para el Seguro Social y Medicare.")}</p>
       </section>
+
+      </div>
 
       <section>
         <h2>{tr("Year by year", "Año por año")}</h2>
