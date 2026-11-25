@@ -48,10 +48,9 @@ for city, client in CITIES.items():
                 title = (it.get("EventItemTitle") or "").strip()
                 if not title:
                     continue
-                if not it.get("EventItemMatterFile") and not it.get("EventItemMatterAttachments"):
-                    # A section heading (CONSENT CALENDAR, PUBLIC HEARINGS) or a procedural line.
-                    if len(title) < 80 and title.upper() == title:
-                        heading = title.title()
+                if not it.get("EventItemMatterFile") and not it.get("EventItemMatterAttachments") and len(title) < 80 and title.upper() == title:
+                    # A section heading (CONSENT CALENDAR, PUBLIC HEARINGS) or a procedural line (ROLL CALL).
+                    heading = title.title()
                     continue
                 atts = [{"name": a.get("MatterAttachmentName"), "url": a.get("MatterAttachmentHyperlink")}
                         for a in (it.get("EventItemMatterAttachments") or []) if a.get("MatterAttachmentHyperlink")]
