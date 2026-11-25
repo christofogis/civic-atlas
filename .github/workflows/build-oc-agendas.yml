@@ -1,0 +1,38 @@
+name: Build Orange County agendas
+
+# Orange County Board of Supervisors agendas, item by item, from the Clerk of the Board.
+# Agendas post on Wednesdays two weeks before each Tuesday meeting, with changes the Friday before.
+on:
+  workflow_dispatch:
+    inputs:
+      probe:
+        description: "Probe only (print what the page links to; write nothing)"
+        type: boolean
+        default: false
+  schedule:
+    - cron: "47 15 * * *"   # daily, 7:47am Pacific
+    - cron: "47 3 * * *"    # and 7:47pm Pacific
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - run: sudo apt-get install -y -qq poppler-utils >/dev/null
+      - name: Probe
+        if: ${{ inputs.probe }}
+        run: python3 scripts/data/oc_agendas.py --probe
+      - name: Build
+        if: ${{ !inputs.probe }}
+        run: python3 scripts/data/oc_agendas.py
+      - name: Commit
+        if: ${{ !inputs.probe }}
+        run: |
+          git config user.name "civic-atlas bot"
+          git config user.email "christofogis@users.noreply.github.com"
+          git add public/data/local/ca-orange-agendas.json
+          git diff --cached --quiet || (git commit -m "Orange County agendas updated from the Clerk of the Board" && git pull --rebase -q && git push)
