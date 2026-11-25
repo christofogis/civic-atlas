@@ -1,0 +1,82 @@
+{
+ "built_at": "2026-11-25",
+ "source": "Each city's Legistar agenda system (webapi.legistar.com)",
+ "cities": {
+  "Costa Mesa": {
+   "source": "https://costamesa.legistar.com/Calendar.aspx",
+   "meetings": [
+    {
+     "body": "REGULAR CITY COUNCIL AND HOUSING AUTHORITY*",
+     "date": "2026-12-01",
+     "time": "6:00 PM",
+     "location": "City Council Chambers\r\n77 Fair Drive",
+     "agenda_url": null,
+     "meeting_url": "https://costamesa.legistar.com/MeetingDetail.aspx?LEGID=1446&GID=839&G=5247A5EF-DEC8-4683-BF5A-81EAA9A32B09",
+     "agenda_status": "Final",
+     "items": []
+    }
+   ]
+  },
+  "Fullerton": {
+   "source": "https://fullerton.legistar.com/Calendar.aspx",
+   "meetings": [
+    {
+     "body": "City Council - Successor Agency - Housing Authority",
+     "date": "2026-12-01",
+     "time": "5:30 PM",
+     "location": "Council Chambers",
+     "agenda_url": "https://fullerton.legistar1.com/fullerton/meetings/2026/12/2730_A_City_Council_-_Successor_Agency_-_Housing_Authority_26-12-01_Agenda.pdf",
+     "meeting_url": "https://fullerton.legistar.com/MeetingDetail.aspx?LEGID=2730&GID=546&G=AC149CF2-5213-4D0D-9EBE-C39B20F2FB40",
+     "agenda_status": "Final",
+     "items": [
+      {
+       "number": null,
+       "heading": "Closed Session Report",
+       "title": "PRESENTATION: Outgoing Council Member Ahmad Zahra Recognition",
+       "file": "26-0401",
+       "type": "Presentation",
+       "attachments": []
+      }
+     ]
+    },
+    {
+     "body": "City Council - Successor Agency - Housing Authority",
+     "date": "2027-01-05",
+     "time": "5:30 PM",
+     "location": "Council Chambers",
+     "agenda_url": null,
+     "meeting_url": "https://fullerton.legistar.com/MeetingDetail.aspx?LEGID=2870&GID=546&G=AC149CF2-5213-4D0D-9EBE-C39B20F2FB40",
+     "agenda_status": "Closed",
+     "items": []
+    }
+   ]
+  },
+  "Huntington Beach": {
+   "source": "https://huntingtonbeach.legistar.com/Calendar.aspx",
+   "meetings": []
+  },
+  "Newport Beach": {
+   "source": "https://newportbeach.legistar.com/Calendar.aspx",
+   "meetings": []
+  },
+  "Orange": {
+   "source": "https://cityoforange.legistar.com/Calendar.aspx",
+   "meetings": [
+    {
+     "body": "Orange City Council",
+     "date": "2026-12-08",
+     "time": "6:00 PM",
+     "location": "City Council Chamber\r\n300 E. Chapman Avenue\r\nOrange, CA 92866",
+     "agenda_url": null,
+     "meeting_url": "https://cityoforange.legistar.com/MeetingDetail.aspx?LEGID=1736&GID=789&G=33E5CC64-478F-44EE-9632-A74750EF2F41",
+     "agenda_status": "Closed",
+     "items": []
+    }
+   ]
+  },
+  "Westminster": {
+   "source": "https://westminsterca.legistar.com/Calendar.aspx",
+   "meetings": []
+  }
+ }
+}
