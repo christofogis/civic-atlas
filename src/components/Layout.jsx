@@ -22,7 +22,7 @@ const TITLES = {
   "/state": ["State official", "Funcionario estatal"], "/committees": ["Committees", "Comités"],
   "/committee": ["Committee", "Comité"], "/member": ["Member of Congress", "Miembro del Congreso"],
   "/bill": ["Bill", "Proyecto de ley"], "/methods": ["How this site works", "Cómo funciona este sitio"],
-  "/status": ["Site status", "Estado del sitio"],
+  "/status": ["Site status", "Estado del sitio"], "/your-week": ["Your week", "Su semana"],
 };
 
 export default function Layout() {
@@ -81,6 +81,7 @@ export default function Layout() {
           <div id="site-menu" className={`site-menu${menuOpen ? " open" : ""}`} ref={menuRef}>
           <nav aria-label={t("Main", "Principal")}>
             <NavLink to="/" end>{t("Find your officials", "Sus funcionarios")}</NavLink>
+            <NavLink to="/your-week">{t("Your week", "Su semana")}</NavLink>
             <NavLink to="/week">{t("This week in Congress", "Esta semana en el Congreso")}</NavLink>
             <NavLink to="/map">{t("Map", "Mapa")}</NavLink>
             <NavLink to="/members">{t("Members of Congress", "Miembros del Congreso")}</NavLink>

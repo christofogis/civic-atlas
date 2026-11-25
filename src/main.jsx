@@ -30,6 +30,7 @@ const Bill = lazy(() => import("./pages/Bill.jsx"));
 const MemberVotes = lazy(() => import("./pages/MemberVotes.jsx"));
 const Methods = lazy(() => import("./pages/Methods.jsx"));
 const Status = lazy(() => import("./pages/Status.jsx"));
+const YourWeek = lazy(() => import("./pages/YourWeek.jsx"));
 const Search = lazy(() => import("./pages/Search.jsx"));
 const Members = lazy(() => import("./pages/Members.jsx"));
 const Bills = lazy(() => import("./pages/Bills.jsx"));
@@ -93,6 +94,7 @@ createRoot(document.getElementById("root")).render(
         <Route path="/bill/:congress/:type/:number" element={<Bill />} />
         <Route path="/methods" element={<Methods />} />
         <Route path="/status" element={<Status />} />
+        <Route path="/your-week" element={<YourWeek />} />
         <Route path="*" element={<NotFound />} />
         </Route>
       </Routes>

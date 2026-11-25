@@ -15,7 +15,7 @@ import { PartyTag } from "./PartyTag.jsx";
 const DAY = 86400000;
 const isMine = (m, mine) => (m.committee_ids ?? []).some((c) => mine.has(c) || mine.has(c.slice(0, 4)));
 
-export default function MyReps({ ids, onForget }) {
+export default function MyReps({ ids, onForget, embedded = false }) {
   // Clears the remembered officials and districts and returns the home page to a blank start,
   // with the cursor in the address box.
   const forget = () => {
@@ -73,10 +73,10 @@ export default function MyReps({ ids, onForget }) {
   if (rows.people.length === 0) return null;
   return (
     <section className="my-reps">
-      <div className="my-reps-head">
+      {!embedded && <div className="my-reps-head">
         <h2>{t("Your representatives", "Sus representantes")}</h2>
         <button type="button" className="button-secondary small" onClick={forget}>{t("Start over", "Empezar de nuevo")}</button>
-      </div>
+      </div>}
       <p className="fine">{t("From your last address lookup on this device. In the last 7 days:", "De su última búsqueda de dirección en este dispositivo. En los últimos 7 días:")}</p>
       <ul className="bare my-reps-list">
         {rows.people.map((p) => {
@@ -130,9 +130,13 @@ export default function MyReps({ ids, onForget }) {
           );
         })}
       </ul>
-      {savedDistricts() && (
-        <p><Link to={`/officials?${savedDistricts()}`} className="my-rep-name">{t("All your officials: federal, state and local", "Todos sus funcionarios: federales, estatales y locales")}</Link></p>
+      {!embedded && savedDistricts() && (
+        <p>
+          <Link to="/your-week" className="my-rep-name">{t("Your week: what's coming up at every level", "Su semana: lo que viene en todos los niveles")}</Link>
+          {" · "}<Link to={`/officials?${savedDistricts()}`}>{t("All your officials", "Todos sus funcionarios")}</Link>
+        </p>
       )}
+      {!embedded && <>
       <p>
         <Link to="/week">{t("This week in Congress", "Esta semana en el Congreso")}</Link>
         {" · "}<Link to="/quiz">{t("Do you vote like them?", "¿Vota como ellos?")}</Link>
@@ -141,6 +145,7 @@ export default function MyReps({ ids, onForget }) {
         {t("Remembered on this device from your last lookup (officials and district numbers only, never your address).", "Guardado en este dispositivo desde su última búsqueda (solo funcionarios y números de distrito, nunca su dirección).")}{" "}
         <button type="button" className="link fine" onClick={forget}>{t("Forget them", "Olvidarlos")}</button>
       </p>
+      </>}
     </section>
   );
 }
