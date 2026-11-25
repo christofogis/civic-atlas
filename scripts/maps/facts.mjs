@@ -76,12 +76,14 @@ for (const [id, p] of pop) {
 // Largest cities and towns: places whose center point falls inside the district.
 const gazDir = join(GEO, "gazetteer");
 const gaz = readFileSync(join(gazDir, readdirSync(gazDir).find((n) => /place.*\.txt$/i.test(n))), "utf8").trim().split("\n");
-const gh = gaz[0].replace(/^\uFEFF/, "").split("\t").map((s) => s.trim());
+// The 2025 Gazetteer is pipe-separated; earlier years used tabs.
+const SEP = gaz[0].includes("|") ? "|" : "\t";
+const gh = gaz[0].replace(/^\uFEFF/, "").split(SEP).map((s) => s.trim());
 const gi = (n) => { const i = gh.findIndex((h) => h.toUpperCase() === n); if (i < 0) throw new Error(`Gazetteer column ${n} not in: ${gh.join(", ")}`); return i; };
 const [G_ID, G_NAME, G_LON, G_LAT] = ["GEOID", "NAME", "INTPTLONG", "INTPTLAT"].map(gi);
 const rows = ["geoid,name,lon,lat,population"];
 for (const line of gaz.slice(1)) {
-  const f = line.split("\t").map((s) => s.trim());
+  const f = line.split(SEP).map((s) => s.trim());
   const geoid = f[G_ID], p = ok(pop.get(`1600000US${geoid}`)?.B01003_E001);
   if (!p || p < 2500) continue;
   const name = (names.get(`1600000US${geoid}`) ?? f[G_NAME]).split(",")[0].replace(/ (city|town|village|borough|CDP|municipality|city and borough|urban county|consolidated government \(balance\)|metropolitan government \(balance\)|unified government \(balance\))$/i, "");
