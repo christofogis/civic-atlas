@@ -50,7 +50,7 @@ td p, td li { max-width: none; }
 .bill-title { font-size: 2rem; }
 
 /* ---- Page frame ------------------------------------------------------------------------------ */
-.page { max-width: 760px; margin: 0 auto; padding: 40px 24px 56px; }
+.page { max-width: 760px; margin: 0 auto; padding: 40px 24px 56px; min-height: 100vh; } /* keeps the footer below the fold while data loads, so it doesn't jump */
 .page.wide, .page.full { max-width: var(--wide); }
 .prose p, .prose li { max-width: 68ch; }
 .prose h2 { margin-top: 36px; }

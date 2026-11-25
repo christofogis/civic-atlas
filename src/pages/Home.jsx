@@ -31,6 +31,10 @@ export default function Home() {
   const [token, setToken] = useState("");
   const [lookups, setLookups] = useState(0);
   const needsCheck = Boolean(TURNSTILE_SITE_KEY);
+  // The bot check's script is heavy, so it loads only once someone starts using the form
+  // (focus, tap or typing), not with the page. A lookup waits for its token either way.
+  const [armed, setArmed] = useState(false);
+  const arm = () => { if (!armed) setArmed(true); };
   const [mine, setMine] = useState(() => myRepresentatives());
   const { t, lang, setLang } = useLang();
 
@@ -47,6 +51,7 @@ export default function Home() {
   const [point, setPoint] = useState(null);
   function start(nextPoint = null) {
     setPoint(nextPoint);
+    arm();
     if (needsCheck && !token) { setWaiting(true); setStatus("loading"); return; }
     runLookup(nextPoint);
   }
@@ -115,7 +120,7 @@ export default function Home() {
       {representativesOutdated() && status === "idle" && (
         <p className="notice">{t("A new Congress has begun, and some House districts changed. Look up your address again to see your current officials.", "Comenzó un nuevo Congreso y algunos distritos de la Cámara cambiaron. Busque su dirección de nuevo para ver a sus funcionarios actuales.")}</p>
       )}
-      <form onSubmit={handleSubmit} className="lookup">
+      <form onSubmit={handleSubmit} className="lookup" onFocusCapture={arm} onPointerDownCapture={arm} onKeyDownCapture={arm}>
         <label htmlFor="address">{mine.size > 0 ? t("Look up another address", "Buscar otra dirección") : t("Your address", "Su dirección")}</label>
         <div className="row">
           <AddressInput id="address" placeholder={t("123 Main St, City, State", "123 Main St, ciudad, estado")} value={address} onChange={setAddress} />
@@ -128,7 +133,7 @@ export default function Home() {
             <button type="button" className="link" onClick={lookUpMyLocation} disabled={status === "loading"}>{t("Use my current location instead", "Usar mi ubicación actual")}</button>
           </p>
         )}
-        {needsCheck && <Turnstile siteKey={TURNSTILE_SITE_KEY} onToken={setToken} resetSignal={lookups} />}
+        {needsCheck && armed && <Turnstile siteKey={TURNSTILE_SITE_KEY} onToken={setToken} resetSignal={lookups} />}
         <p className="fine">
           {t("Your address or location is used only to find your districts. We don't store it.", "Su dirección o ubicación se usa solo para encontrar sus distritos. No la guardamos.")}
           {GOOGLE_PLACES_KEY && t(" Suggestions as you type come from Google, which receives what you type in this box.", " Las sugerencias mientras escribe vienen de Google, que recibe lo que escribe en esta casilla.")}
