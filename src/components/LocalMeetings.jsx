@@ -52,7 +52,7 @@ export default function LocalMeetings({ data, city, count = 3, showBoard = true,
           source={<a href={rule.rule_source.url} rel="noopener">{rule.rule_source.label}</a>} />
       )}
       {board && (
-        <Body title={tr(`${data.county} Board of Supervisors`, `Junta de Supervisores del ${data.county}`)} rows={listedDates(board.dates, from, count)} time={board.time}
+        <Body title={tr(`${data.county} Board of Supervisors`, `Junta de Supervisores del Condado de ${data.county.replace(/ County$/, "")}`)} rows={listedDates(board.dates, from, count)} time={board.time}
           place={board.place} posted={board.agendas_posted} agendasUrl={data.meetings_url} notes={board.notes} count={count} noteId="schedule"
           source={board.sources.map((s, i) => <span key={s.url}>{i ? "; " : ""}<a href={s.url} rel="noopener">{s.label}</a></span>)} />
       )}

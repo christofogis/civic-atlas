@@ -107,7 +107,7 @@ export default function YourWeek() {
       // County and city: the next public meetings, and new terms for your seats.
       if (local) {
         const sd = result.local?.supervisor_district;
-        for (const m of listedDates(local.board_meetings?.dates ?? [], today, 6)) add(`bos-${m.date}`, m.date, local.board_meetings.time, "America/Los_Angeles", "county", tr(`${local.county} Board of Supervisors meeting`, `Reunión de la Junta de Supervisores del ${local.county}`), `/local/${local.id ?? params.get("co")}`, local.meetings_url);
+        for (const m of listedDates(local.board_meetings?.dates ?? [], today, 6)) add(`bos-${m.date}`, m.date, local.board_meetings.time, "America/Los_Angeles", "county", tr(`${local.county} Board of Supervisors meeting`, `Reunión de la Junta de Supervisores del Condado de ${local.county.replace(/ County$/, "")}`), `/local/${local.id ?? params.get("co")}`, local.meetings_url);
         const sup = (local.supervisors ?? []).find((s) => s.district === sd);
         if (sup?.term_end) add("sup-term", sup.term_end, null, "America/Los_Angeles", "county", tr(`New term begins for your supervisor's seat (District ${sd})`, `Comienza un nuevo período para el escaño de su supervisor (Distrito ${sd})`), null, null);
         const cityId = result.local?.city?.id;

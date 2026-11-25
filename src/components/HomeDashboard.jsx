@@ -77,7 +77,7 @@ function LocalTile({ params }) {
     <Tile title={tr("Your next local meetings", "Sus próximas reuniones locales")} to={`/local/${co}${city ? `#${city.id}` : ""}`} linkText={tr("Agendas and officials", "Agendas y funcionarios")}>
       <ul className="glance-figures">
         {council && <li><span className="fig">{day(council.date)}</span> {tr(`${city.name} City Council`, `Concejo Municipal de ${city.name}`)}</li>}
-        {board && <li><span className="fig">{day(board.date)}</span> {tr(`${data.county} Board of Supervisors`, `Junta de Supervisores del ${data.county}`)}</li>}
+        {board && <li><span className="fig">{day(board.date)}</span> {tr(`${data.county} Board of Supervisors`, `Junta de Supervisores del Condado de ${data.county.replace(/ County$/, "")}`)}</li>}
       </ul>
       <p className="fine">{tr("Open to the public, with time for public comment.", "Abiertas al público, con tiempo para comentarios.")}</p>
     </Tile>
