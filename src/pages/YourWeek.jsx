@@ -46,7 +46,7 @@ export default function YourWeek() {
       <main className="page">
         <h1>{tr("Your week", "Su semana")}</h1>
         <p className="lede">{tr("Look up your address once, and this page lists what's coming up for your officials at every level, from Congress to your city council, and what your members of Congress did in the last seven days.", "Busque su dirección una vez y esta página mostrará lo que viene para sus funcionarios en todos los niveles, del Congreso a su concejo municipal, y lo que hicieron sus miembros del Congreso en los últimos siete días.")}</p>
-        <p><Link className="button" to="/">{tr("Look up your address", "Buscar su dirección")}</Link></p>
+        <p><Link className="button-primary" to="/">{tr("Look up your address", "Buscar su dirección")}</Link></p>
         <p className="fine">{tr("Only your district numbers are kept, on this device. Your address is never stored.", "Solo se guardan los números de sus distritos, en este dispositivo. Su dirección nunca se guarda.")}</p>
       </main>
     );
@@ -98,12 +98,12 @@ export default function YourWeek() {
                 ))}
               </ul>
               <div className="subscribe">
-                <a className="button" href={`webcal://${feed}`}>{tr("Subscribe in your calendar", "Suscribirse en su calendario")}</a>
-                <p className="fine">
-                  {tr("Your phone's calendar keeps this list up to date on its own: new hearings, agendas and meetings appear as they're posted. Each event links back here. The link holds only your district numbers.", "El calendario de su teléfono mantiene esta lista al día por sí solo: las nuevas audiencias, agendas y reuniones aparecen cuando se publican. Cada evento enlaza aquí. El enlace solo contiene los números de sus distritos.")}
-                  {" "}<button type="button" className="link fine" onClick={() => { navigator.clipboard?.writeText(`https://${feed}`).then(() => setCopied(true)); }}>{copied ? tr("Link copied", "Enlace copiado") : tr("Copy the link (for Google Calendar: Other calendars, From URL)", "Copiar el enlace (para Google Calendar: Otros calendarios, Desde URL)")}</button>
-                  {" · "}<button type="button" className="link fine" onClick={download}>{tr("Download once instead", "Descargar una vez")}</button>
-                </p>
+                <a className="button-primary" href={`webcal://${feed}`}>{tr("Subscribe in your calendar", "Suscribirse en su calendario")}</a>
+                <p className="fine">{tr("Your phone's calendar keeps this list up to date on its own: new hearings, agendas and meetings appear as they're posted, and each event links back here. The link holds only your district numbers.", "El calendario de su teléfono mantiene esta lista al día por sí solo: las nuevas audiencias, agendas y reuniones aparecen cuando se publican, y cada evento enlaza aquí. El enlace solo contiene los números de sus distritos.")}</p>
+                <ul className="plain fine">
+                  <li><button type="button" className="link" onClick={() => { navigator.clipboard?.writeText(`https://${feed}`).then(() => setCopied(true)); }}>{copied ? tr("Link copied", "Enlace copiado") : tr("Copy the link", "Copiar el enlace")}</button> {tr("(for Google Calendar: Other calendars, then From URL)", "(para Google Calendar: Otros calendarios, luego Desde URL)")}</li>
+                  <li><button type="button" className="link" onClick={download}>{tr("Download once instead", "Descargar una vez")}</button></li>
+                </ul>
               </div>
             </>
           )}
