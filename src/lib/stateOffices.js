@@ -33,7 +33,8 @@ export function stateOfficeParts(role, st) {
   const name = EXEC[role.type];
   return name ? [tr(name[0], name[1]), stateName(st)] : [role.type, ""];
 }
-export const stateOfficeLabel = (role, st) => stateOfficeParts(role, st).filter(Boolean).join(", ");
+// Joined on one line, a district reads lowercase in Spanish after the comma ("Senado de California, distrito 39").
+export const stateOfficeLabel = (role, st) => stateOfficeParts(role, st).filter(Boolean).map((x, i) => (i ? x.replace(/^Distrito /, "distrito ") : x)).join(", ");
 
 // Party as published by the state ("Democratic-Farmer-Labor") -> badge letter and color class.
 export function stateParty(party) {
