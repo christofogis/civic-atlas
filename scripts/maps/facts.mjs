@@ -54,6 +54,7 @@ for (const [id, p] of pop) {
   const e = edu.get(id), v = pov.get(id);
   const ba = e && e.B15003_E001 ? (e.B15003_E022 + e.B15003_E023 + e.B15003_E024 + e.B15003_E025) / e.B15003_E001 : null;
   facts[key(st, cdOf(cd))] = {
+    geoid: st + cd,
     population: ok(p.B01003_E001),
     median_age: ok(age.get(id)?.B01002_E001),
     median_household_income: ok(income.get(id)?.B19013_E001),

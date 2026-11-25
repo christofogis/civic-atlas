@@ -24,6 +24,8 @@ export const PAGES = [
   ["/bills?lang=es", ["Proyectos de ley", "Última acción"]],
   ["/methods?lang=es", ["Cómo funciona este sitio", "Tasa de voto con el partido"]],
   ["/map?state=CA", ["Map", "Senators (whole state)", "Alex Padilla", "District 12"]],
+  ["/map?state=CA&district=12", ["About the district", "Median household income", "Oakland", "Alameda County"]],
+  ["/map?state=NY&district=12&lang=es", ["Sobre el distrito", "Parte de New York"]],
   ["/story", ["Look up a news story", "Article text"]],
   ["/topics", ["Topics", "Health"]],
   ["/elections?state=CA", ["who has filed", "Senate"]],

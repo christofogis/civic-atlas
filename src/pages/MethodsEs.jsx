@@ -130,6 +130,16 @@ export default function MethodsEs() {
         OpenStreetMap; no necesita cuenta y no le enviamos nada sobre usted, aunque, como cualquier sitio web, recibe
         las solicitudes de las imágenes del mapa que muestra su navegador.
       </p>
+      <p>
+        Las cifras de cada distrito (población, edad mediana, ingreso del hogar, valor de la vivienda, educación y
+        pobreza) son las estimaciones de 5 años de la Encuesta sobre la Comunidad Estadounidense de la Oficina del Censo.
+        Son estimaciones de encuesta, así que cada una tiene un margen de error, y describen los años encuestados, no el
+        presente. Los condados muestran cuántos residentes del distrito viven en cada uno. Las ciudades y pueblos se
+        incluyen cuando su punto central está dentro del distrito; un distrito que queda dentro de una ciudad grande
+        (como la mayor parte de Manhattan) muestra en cambio la ciudad que cubre la mayor parte de su territorio, marcada
+        como parte. La Oficina del Censo aún no ha publicado cifras para las nuevas líneas de los estados que
+        redibujaron sus distritos, así que esos distritos todavía no muestran ninguna.
+      </p>
 
       <h2 id="accuracy">Cómo verificamos la exactitud</h2>
       <p>

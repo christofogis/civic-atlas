@@ -136,6 +136,15 @@ export default function Methods() {
         OpenStreetMap data; it needs no account, and we don't send it anything about you, though like any website it
         sees requests for the map tiles your browser shows.
       </p>
+      <p>
+        District figures (population, median age, household income, home value, education and poverty) are the Census
+        Bureau's American Community Survey 5-year estimates for each district. They are survey estimates, so each has a
+        margin of error, and they describe the years surveyed rather than today. Counties show how many district
+        residents live in each. Cities and towns are listed when their center point falls inside the district; a
+        district that lies inside one big city (most of Manhattan, for example) instead shows the city that covers most
+        of its land, marked as part. The Census Bureau hasn't published figures for the new lines in states that
+        redrew, so those districts show none yet.
+      </p>
 
       <h2 id="accuracy">Checking our accuracy</h2>
       <p>

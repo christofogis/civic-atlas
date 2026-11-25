@@ -5,10 +5,12 @@ import "maplibre-gl/dist/maplibre-gl.css";
 import { feature } from "topojson-client";
 import { db } from "../lib/db.js";
 import { stateName, ordinal } from "../lib/format.js";
-import { tr } from "../lib/lang.js";
+import { locale, tr } from "../lib/lang.js";
 import { congressOn } from "../../lib/congress.js";
 import { myRepresentatives } from "../lib/myReps.js";
 import { PartyTag } from "../components/PartyTag.jsx";
+import { DistrictFacts, placeList } from "../components/DistrictFacts.jsx";
+import { partyTag } from "../lib/format.js";
 
 // Interactive map: states, congressional districts (current lines, or the lines that take effect
 // with the next Congress), zooming down to streets. Districts are drawn in one neutral color;
@@ -21,6 +23,13 @@ const AVAILABLE = [119, 120];
 const OTHER = AVAILABLE.includes(CURRENT + 1) ? CURRENT + 1 : AVAILABLE.includes(CURRENT - 1) ? CURRENT - 1 : null;
 const ACCENT = "#0e5a4b", MARK = "#f4d35e", LINE = "#1b2420";
 const AT_LARGE = new Set(["AK", "DE", "ND", "SD", "VT", "WY", "DC", "PR", "GU", "VI", "AS", "MP"]);
+
+const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
+const KIND = { Democrat: "d", Republican: "r" };
+// Census figures exist for the 119th Congress lines. For the next Congress they still apply
+// in states whose lines didn't change.
+const factsFor = (facts, meta, congress, st, cd) =>
+  facts && (congress === 119 || (congress === 120 && meta?.changed120 && !meta.changed120.includes(st))) ? facts.districts[`${st}-${cd ?? 0}`] : null;
 
 const loadTopo = async (url) => {
   const topo = await (await fetch(url)).json();
@@ -60,6 +69,11 @@ export default function MapPage() {
   const [people, setPeople] = useState([]);      // members for the selected state
   const mine = useMemo(() => myRepresentatives(), []);
   const [myDistrict, setMyDistrict] = useState(null);
+  const [facts, setFacts] = useState(null);
+  // Every serving House member, for the hover snapshot (about 440 rows).
+  const reps = useRef(new Map());
+  const live = useRef({});   // latest values for map event handlers
+  live.current = { facts, meta, congress, future: congress > CURRENT };
 
   // Districts of the visitor's own representative (remembered from a lookup on this device), highlighted.
   useEffect(() => {
@@ -69,6 +83,11 @@ export default function MapPage() {
   }, [mine]);
 
   useEffect(() => { fetch("/maps/meta.json").then((r) => r.json()).then(setMeta).catch(() => {}); }, []);
+  useEffect(() => { fetch("/maps/cd119/facts.json").then((r) => r.json()).then(setFacts).catch(() => {}); }, []);
+  useEffect(() => {
+    db.from("member_directory").select("bioguide_id,name,chamber,state,district,party").eq("chamber", "house").eq("serving", true)
+      .then(({ data }) => { reps.current = new Map((data ?? []).map((p) => [`${p.state}-${p.district ?? 0}`, p])); });
+  }, []);
 
   // Create the map once.
   useEffect(() => {
@@ -95,13 +114,39 @@ export default function MapPage() {
       setReady(true);
     });
     let hovered = null;
+    // Snapshot that follows the pointer on devices with a mouse; on touch screens a tap opens the panel below.
+    const tip = new maplibregl.Popup({ closeButton: false, closeOnClick: false, className: "map-tip", maxWidth: "260px", offset: 14 });
+    const fine = window.matchMedia?.("(hover: hover) and (pointer: fine)").matches;
+    const snapshot = (st, cd) => {
+      const { facts: fx, meta: mt, congress: c, future } = live.current;
+      const f = factsFor(fx, mt, c, st, cd);
+      const rep = future ? null : reps.current.get(`${st}-${cd ?? 0}`);
+      let html = `<strong>${esc(districtName(st, cd))}</strong>`;
+      if (rep) html += `<div class="map-tip-rep">${esc(rep.name)} <span class="party party-${KIND[rep.party] ?? "other"}">${esc(partyTag(rep))}</span></div>`;
+      else if (future) html += `<div class="map-tip-rep">${esc(tr("New lines; members take office Jan. 3", "Líneas nuevas; los miembros asumen el 3 de enero"))}</div>`;
+      if (f) {
+        html += `<div>${esc(tr("Population", "Población"))} ${esc(f.population?.toLocaleString(locale()) ?? "—")}</div>`;
+        if (f.places.length) html += `<div>${esc(placeList(f.places))}</div>`;
+      }
+      return html + `<div class="map-tip-hint">${esc(tr("Click for details", "Haga clic para ver detalles"))}</div>`;
+    };
     const hit = (e) => m.queryRenderedFeatures(e.point, { layers: ["detail-fill", "districts-fill"] })[0];
     m.on("mousemove", (e) => {
       const f = hit(e);
-      if (hovered) m.setFeatureState(hovered, { hover: false });
-      hovered = f ? { source: f.source, id: f.id } : null;
-      if (hovered) m.setFeatureState(hovered, { hover: true });
+      const same = f && hovered && f.source === hovered.source && f.id === hovered.id;
+      if (!same) {
+        if (hovered) m.setFeatureState(hovered, { hover: false });
+        hovered = f ? { source: f.source, id: f.id } : null;
+        if (hovered) m.setFeatureState(hovered, { hover: true });
+        if (f && fine) tip.setHTML(snapshot(f.properties.st, f.properties.cd));
+      }
       m.getCanvas().style.cursor = f ? "pointer" : "";
+      if (f && fine) tip.setLngLat(e.lngLat).addTo(m); else tip.remove();
+    });
+    m.getCanvas().addEventListener("mouseleave", () => {
+      tip.remove();
+      if (hovered) m.setFeatureState(hovered, { hover: false });
+      hovered = null;
     });
     m.on("click", (e) => {
       const f = hit(e);
@@ -150,6 +195,7 @@ export default function MapPage() {
   const house = people.filter((p) => p.chamber === "house");
   const future = congress > CURRENT;
   const past = congress < CURRENT;
+  const selFacts = sel?.st && sel.cd != null ? factsFor(facts, meta, congress, sel.st, sel.cd) : null;
 
   return (
     <main className="page wide map-page">
@@ -196,7 +242,13 @@ export default function MapPage() {
         <section className="section map-panel" aria-live="polite">
           <h2>{sel.cd != null ? districtName(sel.st, sel.cd) : stateName(sel.st)}</h2>
           {future ? (
-            <p>{tr(`Members elected in November take office on January 3. Their records appear here once they're sworn in.`, `Los miembros elegidos en noviembre asumen el cargo el 3 de enero. Sus registros aparecerán aquí cuando juren el cargo.`)}</p>
+            <>
+              <p>{tr(`Members elected in November take office on January 3. Their records appear here once they're sworn in.`, `Los miembros elegidos en noviembre asumen el cargo el 3 de enero. Sus registros aparecerán aquí cuando juren el cargo.`)}</p>
+              {selFacts && <DistrictFacts f={selFacts} years={facts.years} />}
+              {sel.cd != null && !selFacts && facts && future && (
+                <p className="fine">{tr("The Census Bureau hasn't published figures for this state's new lines yet.", "La Oficina del Censo aún no ha publicado cifras para las nuevas líneas de este estado.")}</p>
+              )}
+            </>
           ) : (
             <>
               {sel.cd != null && house.filter((p) => (p.district ?? 0) === sel.cd).map((p) => (
@@ -204,6 +256,7 @@ export default function MapPage() {
                   {tr("Represented in the House by", "Representado en la Cámara por")} <Link to={`/member/${p.bioguide_id}`}><strong>{p.name}</strong></Link> <PartyTag p={p} />
                 </p>
               ))}
+              {selFacts && <DistrictFacts f={selFacts} years={facts.years} />}
               {past && <p className="fine">{tr(`These are the ${ordinal(congress)} Congress's lines; the members listed are those serving now.`, `Estas son las líneas del ${ordinal(congress)} Congreso; los miembros que se muestran son los que están en el cargo ahora.`)}</p>}
               <h3 className="small">{tr("Senators (whole state)", "Senadores (todo el estado)")}</h3>
               <ul className="plain">{senators.map((p) => <li key={p.bioguide_id}><Link to={`/member/${p.bioguide_id}`}>{p.name}</Link> <PartyTag p={p} /></li>)}</ul>
