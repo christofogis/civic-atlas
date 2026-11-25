@@ -35,7 +35,7 @@ console.log(`supervisorial districts: ${out.features.map((f) => f.properties.dis
   const raw = JSON.parse(readFileSync("/tmp/rov-council.json", "utf8"));
   const bad = [];
   for (const f of raw.features) {
-    const m = /^(.+?) (?:Council District|District|Ward) (\d+)$/.exec(String(f.properties.District).trim());
+    const m = /^(.+?) (?:Council District|Ward Division|District|Ward) (\d+)$/.exec(String(f.properties.District).trim());
     if (!m) { bad.push(f.properties.District); continue; }
     f.properties = { city: m[1], district: Number(m[2]) };
   }
