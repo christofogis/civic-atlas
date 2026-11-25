@@ -6,6 +6,7 @@ name: Ingest stock trades
 on:
   schedule:
     - cron: "53 13 * * *"   # daily, 5:53am Pacific
+    - cron: "53 1 * * *"   # second daily run, 12 hours later: GitHub can start schedules hours late, and evening votes land sooner
   workflow_dispatch:
     inputs:
       dry_run:

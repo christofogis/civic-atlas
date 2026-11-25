@@ -3,6 +3,7 @@ name: Ingest votes
 on:
   schedule:
     - cron: "47 12 * * *"   # daily, 4:47am Pacific — after members and committees
+    - cron: "47 0 * * *"   # second daily run, 12 hours later: GitHub can start schedules hours late, and evening votes land sooner
   workflow_dispatch:
     inputs:
       dry_run:

@@ -4,6 +4,7 @@ name: Ingest schedule
 on:
   schedule:
     - cron: "29 14 * * *"   # daily, 6:29am Pacific
+    - cron: "29 2 * * *"   # second daily run, 12 hours later: GitHub can start schedules hours late, and evening votes land sooner
     - cron: "29 22 * * 1-5" # weekdays, 2:29pm Pacific, for same-day updates
   workflow_dispatch:
     inputs:

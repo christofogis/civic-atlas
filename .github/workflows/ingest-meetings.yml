@@ -4,6 +4,7 @@ name: Ingest committee meetings
 on:
   schedule:
     - cron: "41 14 * * *"   # daily, 6:41am Pacific, after the schedule job
+    - cron: "41 2 * * *"   # second daily run, 12 hours later: GitHub can start schedules hours late, and evening votes land sooner
   workflow_dispatch:
     inputs:
       limit:

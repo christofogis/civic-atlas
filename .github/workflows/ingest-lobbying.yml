@@ -6,6 +6,7 @@ name: Ingest lobbying reports
 on:
   schedule:
     - cron: "23 14 * * *"   # daily, 6:23am Pacific
+    - cron: "23 3 * * *"   # second daily run, 12 hours later: GitHub can start schedules hours late, and evening votes land sooner
   workflow_dispatch:
     inputs:
       quarters:
