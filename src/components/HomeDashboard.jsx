@@ -109,8 +109,8 @@ function BudgetTile() {
   return (
     <Tile title={tr(`Federal budget, FY${y.fiscal_year}`, `Presupuesto federal, AF${y.fiscal_year}`)} to="/budget" linkText={tr("Where the money went", "En qué se gastó")}>
       <div className="glance-bars" role="img" aria-label={tr(`Spent ${T(y.outlays_total)}, took in ${T(y.receipts_total)}`, `Gastó ${T(y.outlays_total)}, recaudó ${T(y.receipts_total)}`)}>
-        <div><span>{tr("Spent", "Gastó")}</span><span className="gb"><span style={{ width: "100%", background: "#f47230" }} /></span><span>{T(y.outlays_total)}</span></div>
-        <div><span>{tr("Took in", "Recaudó")}</span><span className="gb"><span style={{ width: `${(100 * y.receipts_total) / max}%`, background: "#00b894" }} /></span><span>{T(y.receipts_total)}</span></div>
+        <div><span>{tr("Spent", "Gastó")}</span><span className="gb"><span style={{ width: "100%", background: "var(--chart-out)" }} /></span><span>{T(y.outlays_total)}</span></div>
+        <div><span>{tr("Took in", "Recaudó")}</span><span className="gb"><span style={{ width: `${(100 * y.receipts_total) / max}%`, background: "var(--chart-in)" }} /></span><span>{T(y.receipts_total)}</span></div>
       </div>
       <p className="fine">{y.deficit >= 0 ? tr(`Deficit: ${T(y.deficit)}`, `Déficit: ${T(y.deficit)}`) : tr(`Surplus: ${T(-y.deficit)}`, `Superávit: ${T(-y.deficit)}`)}</p>
     </Tile>

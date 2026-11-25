@@ -7,6 +7,7 @@
 // "fresh:" before a path shoots it as a first-time visitor (nothing remembered).
 // "at:YYYY-MM-DD|<path>" shoots it with the browser's clock set to that date (noon Eastern),
 // to rehearse date-driven changes such as a new Congress.
+// "dark:" before a path shoots it with the device set to dark mode (the System theme).
 import { chromium } from "playwright";
 
 const BASE = process.argv[2] ?? "https://civic-atlas-cub.pages.dev";
@@ -31,8 +32,11 @@ for (let path of PATHS) {
     await page.clock.setFixedTime(new Date(`${at[1]}T17:00:00Z`));
     path = at[2];
   }
+  const dark = path.startsWith("dark:");
+  if (dark) path = path.slice(5);
   const print = path.startsWith("print:");
-  if (print) { path = path.slice(6); await page.emulateMedia({ media: "print" }); } else await page.emulateMedia({ media: "screen" });
+  if (print) { path = path.slice(6); await page.emulateMedia({ media: "print", colorScheme: "light" }); }
+  else await page.emulateMedia({ media: "screen", colorScheme: dark ? "dark" : "light" });
   if (path.startsWith("lookup:")) {
     if (!TOKEN) { console.log("LOOKUP_CHECK_TOKEN not set; skipping", path); continue; }
     await page.goto(BASE + "/", { waitUntil: "load" });

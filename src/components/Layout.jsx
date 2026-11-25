@@ -3,6 +3,7 @@ import { Link, NavLink, Outlet, useNavigate, useLocation } from "react-router-do
 import ReportError from "./ReportError.jsx";
 // Every page can cite a source with <Ref id text>; the page puts <NotesList /> at its end.
 import { NotesProvider } from "./Notes.jsx";
+import ThemeSwitch from "./ThemeSwitch.jsx";
 import { useLang } from "../lib/i18n.jsx";
 
 // Site header on every page: name, main sections, and a search box for members and bills.
@@ -71,6 +72,7 @@ export default function Layout() {
                 value={q} onChange={(e) => setQ(e.target.value)} />
             </form>
           )}
+          <div className="menu-theme"><ThemeSwitch /></div>
           </div>
           <button type="button" className="link lang-switch" lang={lang === "es" ? "en" : "es"} onClick={() => setLang(lang === "es" ? "en" : "es")}>
             {lang === "es" ? "English" : "Español"}
@@ -98,6 +100,7 @@ export default function Layout() {
           <Link to="/nominations">{t("Nominations", "Nominaciones")}</Link>
           <Link to="/story">{t("Look up a news story", "Buscar una noticia")}</Link>
           <ReportError />
+          <ThemeSwitch />
         </div>
       </footer>
     </>

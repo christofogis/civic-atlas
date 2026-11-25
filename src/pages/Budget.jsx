@@ -41,9 +41,9 @@ const ES = {
 };
 const Label = ({ en }) => <>{en}{ES[en] && tr("", <span className="fine"> ({ES[en]})</span>)}</>;
 
-const IN = "#00b894";   // receipts
-const OUT = "#f47230";  // outlays
-const BAR = "#0e5a4b";
+const IN = "var(--chart-in)";   // receipts; chart colors are CSS tokens with light and dark steps (styles.css)
+const OUT = "var(--chart-out)";  // outlays
+const BAR = "var(--accent)";   // follows the light or dark theme
 
 const sign = (n) => (n < 0 ? "−" : "");
 const T = (n) => `${sign(n)}$${(Math.abs(n) / 1e12).toFixed(2)} ${tr("trillion", "billones")}`;
@@ -87,14 +87,14 @@ function Bars({ rows, perHundred, total }) {
 // mark at what came in: the part of a bar above the mark is the deficit. Colors avoid the party
 // red and blue; the order was checked for color-blind separation (adjacent segments).
 const GROUPS = [
-  { key: "Social Security", color: "#00b894" },
-  { key: "Medicare", color: "#f47230" },
-  { key: "Health", color: "#6a4ce2" },
-  { key: "Net Interest", color: "#f2a600" },
-  { key: "Income Security", color: "#ee7fac" },
-  { key: "National Defense", color: "#008a17" },
+  { key: "Social Security", color: "var(--chart-1)" },
+  { key: "Medicare", color: "var(--chart-2)" },
+  { key: "Health", color: "var(--chart-3)" },
+  { key: "Net Interest", color: "var(--chart-4)" },
+  { key: "Income Security", color: "var(--chart-5)" },
+  { key: "National Defense", color: "var(--chart-6)" },
 ];
-const OTHER = "#b9c0bc";
+const OTHER = "var(--chart-other)";
 function grouped(y) {
   const parts = GROUPS.map((g) => ({ ...g, amount: y.outlays.find((o) => o.label === g.key)?.amount ?? 0 }));
   const rest = y.outlays_total - parts.reduce((a, p) => a + p.amount, 0);
@@ -140,7 +140,7 @@ function Stacked({ years }) {
                 const v = Math.max(0, p.amount) * scale;
                 const y0 = y(acc), y1 = y(acc + v);
                 acc += v;
-                return <rect key={p.key} x={x} y={y1} width={bw} height={Math.max(0, y0 - y1 - 2)} fill={p.color} />;
+                return <rect key={p.key} x={x} y={y1} width={bw} height={Math.max(0, y0 - y1 - 2)} style={{ fill: p.color }} />;
               })}
               <line x1={x - 3} x2={x + bw + 3} y1={y(rec)} y2={y(rec)} stroke="var(--bg)" strokeWidth="5" />
               <line x1={x - 3} x2={x + bw + 3} y1={y(rec)} y2={y(rec)} stroke="var(--text)" strokeWidth="2.5" />
@@ -218,10 +218,10 @@ function Trend({ years }) {
           <text key={d.fiscal_year} x={x(i)} y={H - 8} textAnchor="middle" className="axis">{d.fiscal_year}</text>
         ))}
         {h && <line x1={x(hover)} x2={x(hover)} y1={Tp} y2={H - Bt} stroke="var(--border-strong)" />}
-        <path d={line("receipts_total")} fill="none" stroke={IN} strokeWidth="2" />
-        <path d={line("outlays_total")} fill="none" stroke={OUT} strokeWidth="2" />
+        <path d={line("receipts_total")} fill="none" style={{ stroke: IN }} strokeWidth="2" />
+        <path d={line("outlays_total")} fill="none" style={{ stroke: OUT }} strokeWidth="2" />
         {h && [["receipts_total", IN], ["outlays_total", OUT]].map(([k, c]) => (
-          <circle key={k} cx={x(hover)} cy={y(h[k])} r="4" fill={c} stroke="var(--bg)" strokeWidth="2" />
+          <circle key={k} cx={x(hover)} cy={y(h[k])} r="4" style={{ fill: c, stroke: "var(--bg)" }} strokeWidth="2" />
         ))}
         <text x={W - R + 6} y={y(years.at(-1).outlays_total) + 4} className="axis">{tr("Outlays", "Gastos")}</text>
         <text x={W - R + 6} y={y(years.at(-1).receipts_total) + 4} className="axis">{tr("Receipts", "Ingresos")}</text>
