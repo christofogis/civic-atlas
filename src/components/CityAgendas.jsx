@@ -21,7 +21,7 @@ function Meeting({ m }) {
       </div>
       {m.items.length > 0 && (
         <details>
-          <summary>{tr(`${m.items.length} items`, `${m.items.length} asuntos`)}</summary>
+          <summary>{m.items.length === 1 ? tr("1 item", "1 asunto") : tr(`${m.items.length} items`, `${m.items.length} asuntos`)}</summary>
           {groups.map((g) => (
             <div key={g}>
               {g && <h4>{g}</h4>}

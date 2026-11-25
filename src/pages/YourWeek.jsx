@@ -128,7 +128,7 @@ export default function YourWeek() {
           const ca = await loadCityAgendas();
           for (const m of ca?.cities?.[cityName]?.meetings ?? []) {
             add(`cc-${m.date}`, m.date, clock(m.time) ? `${clock(m.time)[0]}:${String(clock(m.time)[1]).padStart(2, "0")}` : null, "America/Los_Angeles", "city",
-              tr(`${cityName} City Council meeting${m.items.length ? `: ${m.items.length} items on the agenda` : ""}`, `Reunión del Concejo Municipal de ${cityName}${m.items.length ? `: ${m.items.length} asuntos en la agenda` : ""}`),
+              tr(`${cityName} City Council meeting${m.items.length ? `: ${m.items.length} item${m.items.length === 1 ? "" : "s"} on the agenda` : ""}`, `Reunión del Concejo Municipal de ${cityName}${m.items.length ? `: ${m.items.length} asunto${m.items.length === 1 ? "" : "s"} en la agenda` : ""}`),
               `/local/${params.get("co")}#city-agendas`, m.meeting_url);
           }
         }
