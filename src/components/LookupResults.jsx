@@ -1,0 +1,60 @@
+import LocalOfficials from "./LocalOfficials.jsx";
+import StateOfficialCard from "./StateOfficialCard.jsx";
+import OfficialCard from "./OfficialCard.jsx";
+import ShareResults from "./ShareResults.jsx";
+import { stateName } from "../lib/format.js";
+import { useLang } from "../lib/i18n.jsx";
+
+// Everyone elected to represent a place, grouped by level of government. Used after an address
+// or location lookup on the home page, and on /officials for a saved or shared link.
+export default function LookupResults({ result, sectionRef, shared = false }) {
+  const { t } = useLang();
+  return (
+    <section className="results" ref={sectionRef} aria-live="polite">
+        <h2 className="results-title">
+          {t("Your officials", "Sus funcionarios")}
+          <span className="fine"> · {stateName(result.state)}
+          {result.districts.length === 1 && result.officials.some((o) => o.chamber === "house" && o.district !== 0)
+            ? t(`, congressional district ${result.districts[0]}`, `, distrito del Congreso ${result.districts[0]}`) : ""}</span>
+        </h2>
+        {result.approximate && (
+          <p className="notice">
+            {t("This location may fall in more than one district. A full street address gives an exact match.", "Este lugar puede estar en más de un distrito. Una dirección completa da un resultado exacto.")}
+          </p>
+        )}
+        <ul className="level-jump" aria-label={t("Jump to", "Ir a")}>
+          <li><a href="#level-federal">{t("Federal", "Federal")}</a></li>
+          {result.state_officials?.length > 0 && <li><a href="#level-state">{t("State", "Estatal")}</a></li>}
+          {result.local?.covered && <li><a href="#level-local">{t("County and city", "Condado y ciudad")}</a></li>}
+        </ul>
+
+        <section className="level" id="level-federal">
+          <h2>{t("Federal: U.S. Congress", "Federal: Congreso de EE. UU.")}</h2>
+          <p className="level-what">{t("Writes national laws, sets the federal budget and taxes, and oversees federal agencies. Every state has two senators; each House member represents one district.",
+            "Redacta las leyes nacionales, fija el presupuesto y los impuestos federales y supervisa a las agencias federales. Cada estado tiene dos senadores; cada miembro de la Cámara representa un distrito.")}</p>
+          <ul className="cards">
+            {result.officials.map((o) => <OfficialCard key={`${o.chamber}-${o.bioguide_id}`} official={o} />)}
+          </ul>
+        </section>
+
+        {result.state_officials?.length > 0 && (
+          <section className="level" id="level-state">
+            <h2>{t(`State: ${stateName(result.state)}`, `Estatal: ${stateName(result.state)}`)}</h2>
+            <p className="level-what">{t("The state legislature writes state laws and the state budget (schools, roads, health care, criminal law). The governor and other statewide officials run state government.",
+              "La legislatura estatal redacta las leyes y el presupuesto del estado (escuelas, carreteras, salud, derecho penal). El gobernador y otros funcionarios estatales dirigen el gobierno del estado.")}</p>
+            <ul className="cards">
+              {result.state_officials.map((o) => <StateOfficialCard key={`${o.type}-${o.id}`} official={o} state={result.state} />)}
+            </ul>
+            <p className="fine">{t("Statewide offices shown: governor, lieutenant governor, attorney general and secretary of state, where Open States lists them. Others, such as treasurer, aren't on Civic Atlas yet for any state.",
+              "Cargos estatales que se muestran: gobernador, vicegobernador, fiscal general y secretario de estado, donde Open States los incluye. Otros, como tesorero, aún no están en Civic Atlas para ningún estado.")}</p>
+          </section>
+        )}
+
+        <section className="level" id="level-local">
+          <LocalOfficials local={result.local} approximate={result.approximate} />
+        </section>
+        {!shared && <ShareResults result={result} />}
+        <p className="fine">{t("District", "Distrito")}: {result.sources.district}. {t("Officials", "Funcionarios")}: {result.sources.officials}{result.sources.state_officials ? `; ${result.sources.state_officials}` : ""}.</p>
+      </section>
+  );
+}

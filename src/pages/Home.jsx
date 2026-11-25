@@ -1,8 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
-import LocalOfficials from "../components/LocalOfficials.jsx";
-import StateOfficialCard from "../components/StateOfficialCard.jsx";
-import OfficialCard from "../components/OfficialCard.jsx";
+import LookupResults from "../components/LookupResults.jsx";
+import { saveDistricts } from "../lib/savedDistricts.js";
 import Turnstile from "../components/Turnstile.jsx";
 import { TURNSTILE_SITE_KEY, GOOGLE_PLACES_KEY } from "../lib/config.js";
 import { stateName } from "../lib/format.js";
@@ -20,6 +19,7 @@ const ERR_ES = {
   "The address service is unavailable. Try again shortly.": "El servicio de direcciones no está disponible. Inténtelo en un momento.",
   "Couldn't load officials right now. Try again shortly.": "No se pudieron cargar los funcionarios. Inténtelo en un momento.",
   "Lookup failed.": "La búsqueda falló.",
+  "That location couldn't be used.": "No se pudo usar esa ubicación.",
 };
 
 export default function Home() {
@@ -37,28 +37,45 @@ export default function Home() {
   // hasn't yet, the lookup waits for it and then goes ahead on its own.
   const [waiting, setWaiting] = useState(false);
   const resultsRef = useRef(null);
-  useEffect(() => { if (waiting && token) { setWaiting(false); runLookup(); } }, [waiting, token]);
+  useEffect(() => { if (waiting && token) { setWaiting(false); runLookup(point); } }, [waiting, token]);
   useEffect(() => {
     if (status === "done") resultsRef.current?.scrollIntoView({ behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth", block: "start" });
   }, [status]);
 
+  // A lookup is by address, or by the browser's location when the visitor asks for it.
+  const [point, setPoint] = useState(null);
+  function start(nextPoint = null) {
+    setPoint(nextPoint);
+    if (needsCheck && !token) { setWaiting(true); setStatus("loading"); return; }
+    runLookup(nextPoint);
+  }
   function handleSubmit(e) {
     e.preventDefault();
     if (!address.trim()) return;
-    if (needsCheck && !token) { setWaiting(true); setStatus("loading"); return; }
-    runLookup();
+    start(null);
+  }
+  function lookUpMyLocation() {
+    if (!navigator.geolocation) return;
+    setStatus("loading"); setError("");
+    navigator.geolocation.getCurrentPosition(
+      (pos) => start({ lat: pos.coords.latitude, lng: pos.coords.longitude }),
+      () => { setError(t("Your location isn't available. Check that location access is allowed for this site, or type an address.", "Su ubicación no está disponible. Revise que este sitio tenga permiso para usar la ubicación, o escriba una dirección.")); setStatus("error"); },
+      { enableHighAccuracy: false, timeout: 15000, maximumAge: 300000 },
+    );
   }
 
-  async function runLookup() {
+  async function runLookup(where = point) {
     setStatus("loading");
     setError("");
     try {
-      const res = await fetch(`/api/lookup?address=${encodeURIComponent(address.trim())}`, {
+      const q = where ? `lat=${where.lat.toFixed(5)}&lng=${where.lng.toFixed(5)}` : `address=${encodeURIComponent(address.trim())}`;
+      const res = await fetch(`/api/lookup?${q}`, {
         headers: needsCheck ? { "CF-Turnstile-Token": token } : {},
       });
       const body = await res.json();
       if (!res.ok) throw new Error(body.error ?? "Lookup failed.");
       setResult(body);
+      saveDistricts(body);
       const ids = body.officials.filter((o) => o.seat_status !== "pending_update").map((o) => o.bioguide_id);
       rememberRepresentatives(ids);
       setMine(new Set(ids));
@@ -102,62 +119,21 @@ export default function Home() {
             {status === "loading" ? t("Looking up…", "Buscando…") : t("Find my officials", "Buscar mis funcionarios")}
           </button>
         </div>
+        {typeof navigator !== "undefined" && "geolocation" in navigator && (
+          <p className="use-location">
+            <button type="button" className="link" onClick={lookUpMyLocation} disabled={status === "loading"}>{t("Use my current location instead", "Usar mi ubicación actual")}</button>
+          </p>
+        )}
         {needsCheck && <Turnstile siteKey={TURNSTILE_SITE_KEY} onToken={setToken} resetSignal={lookups} />}
         <p className="fine">
-          {t("Your address is used only to find your district. We don't store it.", "Su dirección se usa solo para encontrar su distrito. No la guardamos.")}
+          {t("Your address or location is used only to find your districts. We don't store it.", "Su dirección o ubicación se usa solo para encontrar sus distritos. No la guardamos.")}
           {GOOGLE_PLACES_KEY && t(" Suggestions as you type come from Google, which receives what you type in this box.", " Las sugerencias mientras escribe vienen de Google, que recibe lo que escribe en esta casilla.")}
         </p>
       </form>
 
       {status === "error" && <p className="notice">{error}</p>}
 
-      {status === "done" && result && (
-        <section className="results" ref={resultsRef} aria-live="polite">
-          <h2 className="results-title">
-            {t("Your officials", "Sus funcionarios")}
-            <span className="fine"> · {stateName(result.state)}
-            {result.districts.length === 1 && result.officials.some((o) => o.chamber === "house" && o.district !== 0)
-              ? t(`, congressional district ${result.districts[0]}`, `, distrito del Congreso ${result.districts[0]}`) : ""}</span>
-          </h2>
-          {result.approximate && (
-            <p className="notice">
-              {t("This location may fall in more than one district. A full street address gives an exact match.", "Este lugar puede estar en más de un distrito. Una dirección completa da un resultado exacto.")}
-            </p>
-          )}
-          <ul className="level-jump" aria-label={t("Jump to", "Ir a")}>
-            <li><a href="#level-federal">{t("Federal", "Federal")}</a></li>
-            {result.state_officials?.length > 0 && <li><a href="#level-state">{t("State", "Estatal")}</a></li>}
-            {result.local?.covered && <li><a href="#level-local">{t("County and city", "Condado y ciudad")}</a></li>}
-          </ul>
-
-          <section className="level" id="level-federal">
-            <h2>{t("Federal: U.S. Congress", "Federal: Congreso de EE. UU.")}</h2>
-            <p className="level-what">{t("Writes national laws, sets the federal budget and taxes, and oversees federal agencies. Every state has two senators; each House member represents one district.",
-              "Redacta las leyes nacionales, fija el presupuesto y los impuestos federales y supervisa a las agencias federales. Cada estado tiene dos senadores; cada miembro de la Cámara representa un distrito.")}</p>
-            <ul className="cards">
-              {result.officials.map((o) => <OfficialCard key={`${o.chamber}-${o.bioguide_id}`} official={o} />)}
-            </ul>
-          </section>
-
-          {result.state_officials?.length > 0 && (
-            <section className="level" id="level-state">
-              <h2>{t(`State: ${stateName(result.state)}`, `Estatal: ${stateName(result.state)}`)}</h2>
-              <p className="level-what">{t("The state legislature writes state laws and the state budget (schools, roads, health care, criminal law). The governor and other statewide officials run state government.",
-                "La legislatura estatal redacta las leyes y el presupuesto del estado (escuelas, carreteras, salud, derecho penal). El gobernador y otros funcionarios estatales dirigen el gobierno del estado.")}</p>
-              <ul className="cards">
-                {result.state_officials.map((o) => <StateOfficialCard key={`${o.type}-${o.id}`} official={o} state={result.state} />)}
-              </ul>
-              <p className="fine">{t("Statewide offices shown: governor, lieutenant governor, attorney general and secretary of state, where Open States lists them. Others, such as treasurer, aren't on Civic Atlas yet for any state.",
-                "Cargos estatales que se muestran: gobernador, vicegobernador, fiscal general y secretario de estado, donde Open States los incluye. Otros, como tesorero, aún no están en Civic Atlas para ningún estado.")}</p>
-            </section>
-          )}
-
-          <section className="level" id="level-local">
-            <LocalOfficials local={result.local} approximate={result.approximate} />
-          </section>
-          <p className="fine">{t("District", "Distrito")}: {result.sources.district}. {t("Officials", "Funcionarios")}: {result.sources.officials}{result.sources.state_officials ? `; ${result.sources.state_officials}` : ""}.</p>
-        </section>
-      )}
+      {status === "done" && result && <LookupResults result={result} sectionRef={resultsRef} />}
 
       </div>
       <div className="home-side">

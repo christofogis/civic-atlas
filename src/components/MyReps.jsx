@@ -4,6 +4,7 @@ import { db } from "../lib/db.js";
 import { partyTag, date } from "../lib/format.js";
 import { useLang } from "../lib/i18n.jsx";
 import { forgetRepresentatives } from "../lib/myReps.js";
+import { forgetDistricts, savedDistricts } from "../lib/savedDistricts.js";
 import { KindLabel } from "./Explain.jsx";
 import { PartyTag } from "./PartyTag.jsx";
 
@@ -58,14 +59,17 @@ export default function MyReps({ ids, onForget }) {
           );
         })}
       </ul>
+      {savedDistricts() && (
+        <p><Link to={`/officials?${savedDistricts()}`} className="my-rep-name">{t("All your officials: federal, state and local", "Todos sus funcionarios: federales, estatales y locales")}</Link></p>
+      )}
       <p>
         <Link to="/week">{t("This week in Congress", "Esta semana en el Congreso")}</Link>
         {rows.hearings > 0 && <> · {t(`their committees have ${rows.hearings} hearing${rows.hearings === 1 ? "" : "s"} or markup${rows.hearings === 1 ? "" : "s"} coming up`, `sus comités tienen ${rows.hearings} audiencia${rows.hearings === 1 ? "" : "s"} o sesi${rows.hearings === 1 ? "ón" : "ones"} de enmiendas próximas`)}</>}
         {" · "}<Link to="/quiz">{t("Do you vote like them?", "¿Vota como ellos?")}</Link>
       </p>
       <p className="fine">
-        {t("Remembered on this device from your last lookup (member IDs only, never your address).", "Guardado en este dispositivo desde su última búsqueda (solo los identificadores de los miembros, nunca su dirección).")}{" "}
-        <button type="button" className="link fine" onClick={() => { forgetRepresentatives(); onForget(); }}>{t("Forget them", "Olvidarlos")}</button>
+        {t("Remembered on this device from your last lookup (officials and district numbers only, never your address).", "Guardado en este dispositivo desde su última búsqueda (solo funcionarios y números de distrito, nunca su dirección).")}{" "}
+        <button type="button" className="link fine" onClick={() => { forgetRepresentatives(); forgetDistricts(); onForget(); }}>{t("Forget them", "Olvidarlos")}</button>
       </p>
     </section>
   );

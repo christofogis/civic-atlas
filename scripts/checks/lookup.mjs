@@ -15,12 +15,14 @@ const CASES = [
   ["Orange County Hall of Administration", "400 W Civic Center Dr, Santa Ana, CA 92701", { upper: 1, lower: 1 }, { supervisor: 2, city: "santa-ana" }],
   ["Rossmoor (unincorporated)", "3001 Blume Dr, Rossmoor, CA 90720", { upper: 1, lower: 1 }, { supervisor: 1, unincorporated: "Rossmoor" }],
   ["Anaheim City Hall", "200 S Anaheim Blvd, Anaheim, CA 92805", { upper: 1, lower: 1 }, { city: "anaheim" }],
+  ["Los Alamitos City Hall, by location", { lat: 33.80337, lng: -118.07240 }, { upper: 1, lower: 1 }, { supervisor: 1, city: "los-alamitos" }],
   ["Los Alamitos City Hall", "3191 Katella Ave, Los Alamitos, CA 90720", { upper: 1, lower: 1 }, { supervisor: 1, city: "los-alamitos" }],
 ];
 
 let failed = 0;
 for (const [label, address, want, local] of CASES) {
-  const res = await fetch(`${base}/api/lookup?address=${encodeURIComponent(address)}`, { headers: { "X-Check-Token": token } });
+  const q = typeof address === "string" ? `address=${encodeURIComponent(address)}` : `lat=${address.lat}&lng=${address.lng}`;
+  const res = await fetch(`${base}/api/lookup?${q}`, { headers: { "X-Check-Token": token } });
   const body = await res.json().catch(() => ({}));
   const problems = [];
   if (!res.ok) problems.push(`HTTP ${res.status}: ${body.error ?? ""}`);

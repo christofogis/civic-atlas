@@ -1,68 +1,27 @@
-// GET /api/lookup?address=...  ->  the senators and House member(s) for that address.
+// GET /api/lookup?address=...      the officials for an address
+// GET /api/lookup?lat=..&lng=..     the officials for a location (the browser's, with permission)
 //
-// Privacy: the address is sent to Geocodio to find the district and is never stored,
-// logged, or cached here. Only the district and the officials are returned.
+// Privacy: the address or location is sent to Geocodio to find the districts and is never
+// stored, logged, or cached here. Only the districts and the officials are returned.
 import { congressOn } from "../../lib/congress.js";
 import { districtsFromGeocodio } from "../../lib/geocodio.js";
 import { isCheckRequest, verifyTurnstile } from "../../lib/turnstile.js";
-import { rest } from "../../lib/rest.js";
-import { districtKey, stateDistrictsFromGeocodio, STATEWIDE } from "../../lib/stateleg.js";
-import { containing } from "../../lib/geo.js";
-
-// Counties with local officials on the site (pilot: Orange County, CA). The district map is a
-// static file built from the county's own GIS layer; the officials are in public/data/local/.
-const LOCAL = { "CA|Orange County": {
-  id: "ca-orange", map: "/maps/local/ca-orange-supervisors.json", places: "/maps/local/ca-orange-places.json",
-  // The county's layer marks unincorporated communities (Rossmoor, Ladera Ranch) as "City" too,
-  // so incorporation comes from this list of Orange County's 34 cities.
-  incorporated: new Set(["Aliso Viejo", "Anaheim", "Brea", "Buena Park", "Costa Mesa", "Cypress", "Dana Point", "Fountain Valley",
-    "Fullerton", "Garden Grove", "Huntington Beach", "Irvine", "La Habra", "La Palma", "Laguna Beach", "Laguna Hills", "Laguna Niguel",
-    "Laguna Woods", "Lake Forest", "Los Alamitos", "Mission Viejo", "Newport Beach", "Orange", "Placentia", "Rancho Santa Margarita",
-    "San Clemente", "San Juan Capistrano", "Santa Ana", "Seal Beach", "Stanton", "Tustin", "Villa Park", "Westminster", "Yorba Linda"]),
-  // Council district maps, one file per city that elects by district (built from the Registrar's file).
-  councilMap: (city) => `/maps/local/ca-orange-council/${city.toLowerCase().replace(/[^a-z]+/g, "-")}.json`,
-} };
-
-async function localFor(geoJson, request, env) {
-  const r = geoJson?.results?.[0];
-  const ac = r?.address_components ?? {};
-  const st = ac.state_province ?? ac.state;
-  const county = ac.county;
-  const conf = LOCAL[`${st}|${county}`];
-  if (!conf) return { covered: false, county: county ?? null };
-  const out = { covered: true, id: conf.id, county, supervisor_district: null, place: null, city: null };
-  const { lat, lng } = r.location ?? {};
-  if (lat == null || lng == null || !env.ASSETS) return out;
-  const load = async (path) => (await env.ASSETS.fetch(new URL(path, request.url))).json();
-  try {
-    const map = await load(conf.map);
-    out.supervisor_district = containing(map.features ?? [], lng, lat)?.properties?.district ?? null;
-    // Which city (or unincorporated community) the point is in, from the county's boundaries.
-    const place = containing((await load(conf.places)).features ?? [], lng, lat)?.properties;
-    if (place) {
-      const city = conf.incorporated.has(place.name);
-      // Unincorporated land outside a named community comes back as "Supervisory District N".
-      out.place = { name: city || place.type === "City" ? place.name : null, type: city ? "city" : "unincorporated" };
-    }
-    if (out.place?.type === "city") {
-      out.city = { id: out.place.name.toLowerCase().replace(/[^a-z]+/g, "-"), name: out.place.name, council_district: null };
-      try {
-        // Cities that elect at large have no file; Pages may answer with the site's HTML, which won't parse.
-        const council = await load(conf.councilMap(out.place.name));
-        out.city.council_district = containing(council.features ?? [], lng, lat)?.properties?.district ?? null;
-      } catch { /* at-large city, or map unavailable */ }
-    }
-  } catch { /* districts stay unknown; countywide officials still show */ }
-  return out;
-}
+import { stateDistrictsFromGeocodio } from "../../lib/stateleg.js";
+import { localFor, officialsFor } from "../../lib/officials.js";
 
 const json = (body, status = 200) =>
   Response.json(body, { status, headers: { "Cache-Control": "no-store" } });
 
-
 export async function onRequestGet({ request, env }) {
-  const address = new URL(request.url).searchParams.get("address")?.trim() ?? "";
-  if (address.length < 5 || address.length > 200) {
+  const params = new URL(request.url).searchParams;
+  const address = params.get("address")?.trim() ?? "";
+  const lat = Number(params.get("lat")), lng = Number(params.get("lng"));
+  const byPoint = params.has("lat") && params.has("lng");
+  if (byPoint) {
+    if (!Number.isFinite(lat) || !Number.isFinite(lng) || Math.abs(lat) > 90 || Math.abs(lng) > 180) {
+      return json({ error: "That location couldn't be used." }, 400);
+    }
+  } else if (address.length < 5 || address.length > 200) {
     return json({ error: "Enter a street address, city and state, or a ZIP code." }, 400);
   }
   if (!env.GEOCODIO_API_KEY) return json({ error: "Address lookup is not configured." }, 500);
@@ -73,79 +32,28 @@ export async function onRequestGet({ request, env }) {
     return json({ error: "Please complete the verification and try again." }, 403);
   }
 
-  const geo = await fetch(
-    // Ask for the districts of the Congress in session by date (cd119, then cd120 from Jan 3,
-    // 2027) rather than Geocodio's default, so the map can't switch ahead of or behind our data.
-    `https://api.geocod.io/v2.1/geocode?q=${encodeURIComponent(address)}&fields=cd${congressOn()},stateleg&limit=1&api_key=${env.GEOCODIO_API_KEY}`
-  );
-  if (geo.status === 422) return json({ error: "That address couldn't be found." }, 404);
+  // Ask for the districts of the Congress in session by date (cd119, then cd120 from Jan 3,
+  // 2027) rather than Geocodio's default, so the map can't switch ahead of or behind our data.
+  const fields = `fields=cd${congressOn()},stateleg&limit=1&api_key=${env.GEOCODIO_API_KEY}`;
+  // Five decimal places is about a meter: plenty for districts, and no more precise than needed.
+  const geo = await fetch(byPoint
+    ? `https://api.geocod.io/v2.1/reverse?q=${lat.toFixed(5)},${lng.toFixed(5)}&${fields}`
+    : `https://api.geocod.io/v2.1/geocode?q=${encodeURIComponent(address)}&${fields}`);
+  if (geo.status === 422) return json({ error: byPoint ? "That location couldn't be used." : "That address couldn't be found." }, 404);
   if (!geo.ok) return json({ error: "The address service is unavailable. Try again shortly." }, 502);
 
   const geoJson = await geo.json();
   const place = districtsFromGeocodio(geoJson);
-  const stateDistricts = stateDistrictsFromGeocodio(geoJson);
-  const local = await localFor(geoJson, request, env);
-  if (!place?.state) return json({ error: "That address couldn't be found." }, 404);
+  if (!place?.state) return json({ error: byPoint ? "That location couldn't be used." : "That address couldn't be found." }, 404);
+  const load = env.ASSETS ? async (path) => (await env.ASSETS.fetch(new URL(path, request.url))).json() : null;
+  const local = await localFor(geoJson, byPoint ? { lat, lng } : null, load);
 
   try {
-    const state = encodeURIComponent(place.state);
-    const seats = await rest(
-      `seat_holders?state=eq.${state}&select=bioguide_id,chamber,state,district,state_rank,party,start_date,end_date,seat_status,url`
-    );
-    const house = seats.filter((s) => s.chamber === "house");
-    // A single-seat state is at-large however Geocodio numbers it (0, or 98 for D.C.).
-    // When a location spans districts, list them by how much of it each covers.
-    const houseSeats = house.length === 1 ? house : house.filter((s) => place.districts.includes(s.district))
-      .sort((a, b) => place.districts.indexOf(a.district) - place.districts.indexOf(b.district));
-    const senate = seats.filter((s) => s.chamber === "senate")
-      .sort((a, b) => (a.state_rank === "senior" ? -1 : 1) - (b.state_rank === "senior" ? -1 : 1));
-    const picked = [...senate, ...houseSeats];
-
-    const ids = picked.map((s) => s.bioguide_id).join(",");
-    const people = ids
-      ? await rest(`members?bioguide_id=in.(${ids})&select=bioguide_id,first_name,last_name,nickname,official_full_name`)
-      : [];
-    const byId = new Map(people.map((p) => [p.bioguide_id, p]));
-
-    // State officials: statewide offices, then the state senator(s) and representative(s) for the
-    // address. Nebraska's one chamber ("legislature") is matched against Geocodio's senate district.
-    const inList = (keys) => keys.map((k) => `"${k}"`).join(",");
-    const filters = [`type.in.(${STATEWIDE.map((t) => `"${t}"`).join(",")})`];
-    if (stateDistricts.upper.length) filters.push(`and(type.in.(upper,legislature),district_key.in.(${inList(stateDistricts.upper)}))`);
-    if (stateDistricts.lower.length) filters.push(`and(type.eq.lower,district_key.in.(${inList(stateDistricts.lower)}))`);
-    let stateOfficials = [];
-    try {
-      stateOfficials = await rest(`state_officeholders?state=eq.${state}&or=(${filters.join(",")})&select=id,name,party,type,district,start_date`);
-    } catch { /* state officials are optional; federal results still show */ }
-    // The address's own legislators first, then statewide offices.
-    const order = (o) => (o.type === "upper" || o.type === "legislature" ? 0 : o.type === "lower" ? 1 : 10 + STATEWIDE.indexOf(o.type));
-    const distOrder = (o) => {
-      const list = o.type === "lower" ? stateDistricts.lower : stateDistricts.upper;
-      return list.indexOf(districtKey(o.district));
-    };
-    stateOfficials.sort((a, b) => order(a) - order(b) || distOrder(a) - distOrder(b) || a.name.localeCompare(b.name));
-
-    return json({
-      state: place.state,
-      districts: place.districts,
-      congress: place.congress,
+    return json(await officialsFor({
+      state: place.state, districts: place.districts, congress: place.congress,
+      stateDistricts: stateDistrictsFromGeocodio(geoJson), local,
       approximate: place.districts.length > 1 || !["rooftop", "range_interpolation", "point"].includes(place.accuracy_type),
-      officials: picked.map((s) => {
-        const p = byId.get(s.bioguide_id) ?? {};
-        return {
-          ...s,
-          name: p.official_full_name ?? [p.nickname ?? p.first_name, p.last_name].filter(Boolean).join(" "),
-        };
-      }),
-      state_districts: stateDistricts,
-      local,
-      state_officials: stateOfficials,
-      sources: {
-        district: "Geocodio (U.S. Census Bureau district boundaries)",
-        officials: "unitedstates/congress-legislators",
-        state_officials: "Open States (openstates/people)",
-      },
-    });
+    }));
   } catch {
     return json({ error: "Couldn't load officials right now. Try again shortly." }, 502);
   }
