@@ -5,6 +5,7 @@ import { tr } from "../lib/lang.js";
 import { loadLocal } from "../lib/local.js";
 import { CouncilCard, OfficerCard, SupervisorCard } from "../components/LocalOfficials.jsx";
 import LocalMeetings from "../components/LocalMeetings.jsx";
+import { NotesList, NotesProvider, Ref } from "../components/Notes.jsx";
 
 // A county's elected officials (pilot: Orange County, CA). Data: a small file kept from the
 // county's own pages, checked weekly against them; districts from the county's GIS layer.
@@ -17,10 +18,19 @@ export default function County() {
   }, [id]);
   if (data === undefined) return <main className="page"><p className="fine">{tr("Loading…", "Cargando…")}</p></main>;
   if (data === null) return <main className="page"><h1>{tr("Not found", "No encontrado")}</h1><p><Link to="/">{tr("Look up your address", "Busque su dirección")}</Link></p></main>;
+  const notes = [
+    { id: "sources", text: <>{tr(`Officials and terms are kept by hand from the county's own pages and checked against them weekly; last checked ${date(data.checked)}. Sources: `, `Los funcionarios y sus períodos se toman a mano de las páginas del condado y se comparan con ellas cada semana; última verificación: ${date(data.checked)}. Fuentes: `)}
+      {data.sources.map((s, i) => <span key={s.url}>{i ? "; " : ""}<a href={s.url} rel="noopener">{s.label}</a></span>)}.</> },
+    data.board_meetings && { id: "schedule", text: <>{tr("Board meeting dates come from the county's approved yearly schedules: ", "Las fechas de reunión de la Junta vienen de los calendarios anuales aprobados por el condado: ")}
+      {data.board_meetings.sources.map((s, i) => <span key={s.url}>{i ? "; " : ""}<a href={s.url} rel="noopener">{s.label}</a></span>)}.</> },
+    ...(data.cities ?? []).filter((c) => c.meeting_rule).map((c) => ({ id: `rule-${c.id}`, text: <>{tr(`${c.name} City Council meeting dates follow its regular-meeting rule (third Monday; on a holiday, the next business day): `, `Las fechas de reunión del Concejo Municipal de ${c.name} siguen su regla de reuniones ordinarias (tercer lunes; si es feriado, el siguiente día hábil): `)}<a href={c.meeting_rule.rule_source.url} rel="noopener">{c.meeting_rule.rule_source.label}</a>.</> })),
+    data.city_websites && { id: "cities", text: <>{tr("City list and websites: ", "Lista de ciudades y sitios web: ")}<a href={data.city_websites.source.url} rel="noopener">{data.city_websites.source.label}</a>{tr(". Cities marked citywide have no council districts in the Registrar of Voters' city district file.", ". Las ciudades marcadas como en toda la ciudad no tienen distritos de concejo en el archivo de distritos municipales del Registro de Votantes.")}</> },
+  ];
   return (
+    <NotesProvider notes={notes}>
     <main className="page wide">
       <p className="fine"><Link to="/">{tr("Home", "Inicio")}</Link> / California</p>
-      <h1>{data.county}</h1>
+      <h1>{data.county}<Ref id="sources" /></h1>
       <p className="lede">
         {tr("A five-member Board of Supervisors, each elected by one district, sets the county budget and policy and runs county services, including in unincorporated areas. Six more officials are elected countywide. All county offices in California are nonpartisan.",
           "Una Junta de Supervisores de cinco miembros, cada uno elegido por un distrito, aprueba el presupuesto y las políticas del condado y administra sus servicios, incluso en las zonas no incorporadas. Otros seis funcionarios se eligen en todo el condado. En California, todos los cargos de condado son no partidistas.")}
@@ -51,21 +61,18 @@ export default function County() {
       ))}
       {data.city_websites && (
         <section id="all-cities">
-          <h3>{tr("All 34 cities", "Las 34 ciudades")}</h3>
+          <h3>{tr("All 34 cities", "Las 34 ciudades")}<Ref id="cities" /></h3>
           <p className="fine">{tr("Each city's own website lists its council members, agendas and meetings. Cities marked citywide elect their councils at large rather than by district.", "El sitio web de cada ciudad tiene los miembros de su concejo, agendas y reuniones. Las ciudades marcadas como en toda la ciudad eligen su concejo en general, no por distrito.")}</p>
           <ul className="city-list">
             {Object.entries(data.city_websites.cities).map(([name, url]) => (
               <li key={name}><a href={url} rel="noopener">{name}</a>{data.city_websites.at_large.includes(name) && <span className="fine"> · {tr("citywide", "en toda la ciudad")}</span>}</li>
             ))}
           </ul>
-          <p className="fine">{tr("List: ", "Lista: ")}<a href={data.city_websites.source.url} rel="noopener">{data.city_websites.source.label}</a>.</p>
         </section>
       )}
       <p className="notice">{tr("Votes and campaign money for county and city officials aren't on Civic Atlas yet.", "Los votos y los fondos de campaña de los funcionarios del condado y de la ciudad aún no están en Civic Atlas.")}</p>
-      <p className="fine">
-        {tr(`Sources (checked ${date(data.checked)}): `, `Fuentes (verificadas el ${date(data.checked)}): `)}
-        {data.sources.map((s, i) => <span key={s.url}>{i ? "; " : ""}<a href={s.url} rel="noopener">{s.label}</a></span>)}.
-      </p>
+      <NotesList />
     </main>
+    </NotesProvider>
   );
 }

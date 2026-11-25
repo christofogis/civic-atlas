@@ -17,6 +17,13 @@ export function NotesProvider({ notes, children }) {
   return <Ctx.Provider value={list}>{children}</Ctx.Provider>;
 }
 
+// Whether the page's notes include this id (so a shared component can cite it instead of
+// printing its own source line).
+export function useHasNote(id) {
+  const notes = useContext(Ctx);
+  return Boolean(notes?.some((n) => n.id === id));
+}
+
 export function Ref({ id }) {
   const notes = useContext(Ctx);
   const [open, setOpen] = useState(false);

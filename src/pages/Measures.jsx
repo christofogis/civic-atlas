@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import { NotesList, NotesProvider, Ref } from "../components/Notes.jsx";
 import { date } from "../lib/format.js";
 import { tr } from "../lib/lang.js";
 
@@ -91,10 +92,16 @@ export default function Measures() {
     document.title = tr("California ballot measures, 2028 · Civic Atlas", "Medidas en la boleta de California, 2028 · Civic Atlas");
     fetch("/data/measures/ca-2028.json").then((r) => r.json()).then(setData).catch(() => setData(false));
   }, []);
+  const notes = data ? [
+    { id: "sources", text: <>{tr(`Sources: California Secretary of State (qualified and eligible measures), Attorney General, Legislative Analyst's Office. Checked against the Secretary of State's lists weekly; last built ${date(data.built)}. `,
+      `Fuentes: Secretaría de Estado de California (medidas calificadas y elegibles), Procurador General, Oficina del Analista Legislativo. Se comparan con las listas de la Secretaría de Estado cada semana; última actualización: ${date(data.built)}. `)}
+      <a href={data.sources.qualified} rel="noopener">{tr("Qualified measures", "Medidas calificadas")}</a>; <a href={data.sources.eligible} rel="noopener">{tr("Eligible measures", "Medidas elegibles")}</a>.</> },
+  ] : [];
   return (
+    <NotesProvider notes={notes}>
     <main className="page wide">
       <p className="fine"><Link to="/">{tr("Home", "Inicio")}</Link> / California</p>
-      <h1>{tr("California ballot measures, November 7, 2028", "Medidas en la boleta de California, 7 de noviembre de 2028")}</h1>
+      <h1>{tr("California ballot measures, November 7, 2028", "Medidas en la boleta de California, 7 de noviembre de 2028")}<Ref id="sources" /></h1>
       <p className="lede">
         {tr("Statewide measures that voters will decide, so far. Descriptions are the official documents' own words; Civic Atlas doesn't summarize or rate measures. Proposition numbers are assigned in summer 2028.",
           "Medidas estatales que decidirán los votantes, hasta ahora. Las descripciones son las palabras de los documentos oficiales; Civic Atlas no resume ni califica las medidas. Los números de proposición se asignan en el verano de 2028.")}
@@ -102,13 +109,8 @@ export default function Measures() {
       <p className="fine">{tr("Official text is shown in English, as published. The Secretary of State publishes the voter guide in Spanish and other languages before the election.", "El texto oficial se muestra en inglés, tal como se publicó. La Secretaría de Estado publica la guía para el votante en español y otros idiomas antes de la elección.")}</p>
       {data === false && <p className="notice">{tr("Couldn't load the measures. Try again shortly.", "No se pudieron cargar las medidas. Inténtelo en un momento.")}</p>}
       {data && data.measures.map((m) => <Measure key={m.id} m={m} />)}
-      {data && (
-        <p className="fine">
-          {tr(`Sources: California Secretary of State (qualified and eligible measures), Attorney General, Legislative Analyst's Office. Checked against the Secretary of State's lists weekly; last built ${date(data.built)}. `,
-            `Fuentes: Secretaría de Estado de California (medidas calificadas y elegibles), Procurador General, Oficina del Analista Legislativo. Se comparan con las listas de la Secretaría de Estado cada semana; última actualización: ${date(data.built)}. `)}
-          <a href={data.sources.qualified} rel="noopener">{tr("Qualified measures", "Medidas calificadas")}</a> · <a href={data.sources.eligible} rel="noopener">{tr("Eligible measures", "Medidas elegibles")}</a>
-        </p>
-      )}
+      <NotesList />
     </main>
+    </NotesProvider>
   );
 }
