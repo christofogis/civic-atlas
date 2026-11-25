@@ -178,6 +178,20 @@ export default function MethodsEs() {
       </ul>
       <p>Aquí no se nombra a ningún donante individual, y las reglas de la FEC prohíben usar los nombres de donantes para pedir contribuciones o con fines comerciales.</p>
 
+      <h2 id="budget">Presupuesto federal</h2>
+      <p>
+        La página del presupuesto usa el Estado Mensual del Tesoro, Tabla 9 ("Resumen de ingresos por fuente y gastos por
+        función"). Las cifras de cada año fiscal son los totales acumulados del estado de septiembre; el año en curso muestra
+        el mes más reciente. Los gastos son el dinero realmente pagado, que difiere de lo que el Congreso asigna en un año dado.
+        Las categorías y sus nombres son del Tesoro; algunas, como los ingresos compensatorios no distribuidos, se registran
+        como montos negativos y reducen el total. "De cada $100" divide cada categoría entre el gasto total (o los ingresos).
+      </p>
+      <p>
+        Las cifras de deuda vienen de Debt to the Penny: la deuda pública total, dividida en deuda en manos del público y
+        tenencias intragubernamentales, el último día hábil de cada año fiscal y el día más reciente publicado. Ambos
+        conjuntos de datos vienen de la API Fiscal Data de la Oficina del Servicio Fiscal y se reconstruyen cada mes, después
+        de que se publica el estado.
+      </p>
       <h2 id="lobbying">Cabildeo sobre proyectos</h2>
       <p>
         Según la Ley de Divulgación de Cabildeo, las firmas de cabildeo y las organizaciones que hacen cabildeo para sí mismas

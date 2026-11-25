@@ -444,3 +444,23 @@ label.check { display: inline-flex; align-items: center; gap: 6px; font-size: 0.
 
 .former-officials { margin: 1rem 0; }
 .former-officials summary { cursor: pointer; font-weight: 600; }
+
+/* Federal budget page */
+.budget .fy-pick { display: inline-flex; gap: 0.5rem; align-items: center; margin: 0.5rem 0 1rem; }
+.budget-figures { display: grid; grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr)); gap: 1rem; margin: 0 0 2rem; }
+.budget-figures > div { display: flex; flex-direction: column; gap: 0.2rem; border-top: 2px solid var(--text); padding-top: 0.5rem; }
+.budget-figures .fig { font-size: 1.6rem; font-weight: 700; font-variant-numeric: tabular-nums; }
+.budget section { margin: 2rem 0; }
+.hbars { list-style: none; padding: 0; margin: 0.5rem 0; }
+.hbars li { display: grid; grid-template-columns: minmax(10rem, 16rem) 1fr minmax(9rem, auto); gap: 0.25rem 0.75rem; align-items: center; padding: 0.3rem 0; border-bottom: 1px solid var(--border); }
+.hbar-track { display: block; height: 0.9rem; }
+.hbar { display: block; height: 100%; border-radius: 0 4px 4px 0; min-width: 2px; }
+.hbar-value { font-variant-numeric: tabular-nums; }
+.hbar-parts { grid-column: 1 / -1; }
+@media (max-width: 640px) {
+  .hbars li { grid-template-columns: 1fr; }
+}
+.trend svg { width: 100%; max-width: 44rem; height: auto; display: block; }
+.trend .axis { font-size: 11px; fill: var(--muted); }
+.legend .swatch { display: inline-block; width: 0.8rem; height: 0.8rem; border-radius: 2px; margin: 0 0.3rem 0 0.8rem; vertical-align: -1px; }
+.legend .swatch:first-child { margin-left: 0; }

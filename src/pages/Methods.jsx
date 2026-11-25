@@ -183,6 +183,21 @@ export default function Methods() {
       </ul>
       <p>No individual donor is named here, and FEC rules bar using donor names for soliciting contributions or commercial purposes.</p>
 
+      <h2 id="budget">Federal budget</h2>
+      <p>
+        The budget page uses the Treasury's Monthly Treasury Statement, Table 9 ("Summary of Receipts by
+        Source, and Outlays by Function"). Each fiscal year's figures are the September statement's
+        year-to-date totals; the current year shows the latest month. Outlays are money actually paid
+        out, which differs from what Congress appropriates in a given year. Categories and their names
+        are Treasury's; some, such as undistributed offsetting receipts, are recorded as negative amounts
+        and reduce the total. "Of every $100" divides each category by total outlays (or receipts).
+      </p>
+      <p>
+        Debt figures come from Debt to the Penny: total public debt outstanding, split into debt held by
+        the public and intragovernmental holdings, on the last business day of each fiscal year and the
+        latest day published. Both datasets come from the Bureau of the Fiscal Service's Fiscal Data API
+        and are rebuilt monthly, after the statement is released.
+      </p>
       <h2 id="lobbying">Lobbying on bills</h2>
       <p>
         Under the Lobbying Disclosure Act, lobbying firms and organizations that lobby for themselves file a
