@@ -630,3 +630,10 @@ label.check { display: inline-flex; align-items: center; gap: 6px; font-size: 0.
   text-align: left; padding: 9px 10px; border-radius: 6px; cursor: pointer; }
 .theme-menu button:hover { background: var(--surface); }
 .theme-menu button.on { font-weight: 600; background: var(--accent-soft); }
+
+/* Topics: comparison and total rows above the topic list */
+.topics-table td:not(:first-child), .topics-table th:not(:first-child) { text-align: right; font-variant-numeric: tabular-nums; }
+.topics-table tbody.topics-totals th[scope="row"] { text-align: left; font-weight: 600; }
+.topics-table .prior-row th, .topics-table .prior-row td { color: var(--muted); font-weight: 400; }
+.topics-table .prior-row th { font-weight: 400; }
+.topics-table .total-row th, .topics-table .total-row td { font-weight: 600; border-bottom: 2px solid var(--text); }
