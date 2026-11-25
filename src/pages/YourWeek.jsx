@@ -1,14 +1,11 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
-import { db } from "../lib/db.js";
 import { date, stateName } from "../lib/format.js";
 import { tr } from "../lib/lang.js";
 import { savedDistricts } from "../lib/savedDistricts.js";
-import { loadLocal } from "../lib/local.js";
-import { listedDates, ruleDates } from "../../lib/localMeetings.js";
+import { rest } from "../../lib/rest.js";
+import { clock, weekIcs, weekItems } from "../../lib/yourWeek.js";
 import MyReps from "../components/MyReps.jsx";
-import { loadAgendas, onlyDistrict } from "../components/CountyAgenda.jsx";
-import { loadCityAgendas } from "../components/CityAgendas.jsx";
 import { NotesList, Ref } from "../components/Notes.jsx";
 
 // "Your week": everything coming up for the officials from the visitor's last lookup, at every
@@ -16,39 +13,7 @@ import { NotesList, Ref } from "../components/Notes.jsx";
 // the last seven days. Built from the districts remembered on this device; never an address.
 // Every visitor gets the same template: the same kinds of items, worded the same way.
 
-const DAY = 864e5;
-const iso = (d) => d.toISOString().slice(0, 10);
-const todayLA = () => new Intl.DateTimeFormat("en-CA", { timeZone: "America/Los_Angeles" }).format(new Date());
-const firstMondayOfDecember = (y) => { const d = new Date(Date.UTC(y, 11, 1)); d.setUTCDate(1 + ((8 - d.getUTCDay()) % 7)); return iso(d); };
-const isMine = (committeeId, mine) => committeeId && (mine.has(committeeId) || mine.has(committeeId.slice(0, 4)));
-
-// "2:00 PM" or "18:00" -> [18, 0]
-function clock(t) {
-  const m = /^(\d{1,2}):(\d{2})\s*([AP])M/i.exec(t ?? "");
-  if (m) return [(+m[1] % 12) + (/p/i.test(m[3]) ? 12 : 0), +m[2]];
-  const h = /^(\d{1,2}):(\d{2})$/.exec(t ?? "");
-  return h ? [+h[1], +h[2]] : null;
-}
 const showTime = (t) => { const c = clock(t); if (!c) return ""; const [h, m] = c; return `${((h + 11) % 12) + 1}:${String(m).padStart(2, "0")} ${h < 12 ? "a.m." : "p.m."}`; };
-
-// A calendar file (.ics) of the list, made in the browser: nothing is sent anywhere.
-function icsFile(items) {
-  const esc = (s) => String(s).replace(/[\\;,]/g, (c) => `\\${c}`).replace(/\n/g, "\\n");
-  const stamp = new Date().toISOString().replace(/[-:]/g, "").replace(/\.\d+Z$/, "Z");
-  const lines = ["BEGIN:VCALENDAR", "VERSION:2.0", "PRODID:-//Civic Atlas//Your week//EN", "CALSCALE:GREGORIAN"];
-  for (const it of items) {
-    const d = it.date.replace(/-/g, "");
-    const c = clock(it.time);
-    lines.push("BEGIN:VEVENT", `UID:${it.key.replace(/[^a-z0-9-]/gi, "")}-${d}@civic-atlas`, `DTSTAMP:${stamp}`);
-    if (c) lines.push(`DTSTART;TZID=${it.tz}:${d}T${String(c[0]).padStart(2, "0")}${String(c[1]).padStart(2, "0")}00`);
-    else lines.push(`DTSTART;VALUE=DATE:${d}`);
-    lines.push(`SUMMARY:${esc(it.text)}`);
-    if (it.url) lines.push(`URL:${it.url}`);
-    lines.push("END:VEVENT");
-  }
-  lines.push("END:VCALENDAR");
-  return lines.join("\r\n");
-}
 
 export default function YourWeek() {
   // Districts from the link (shareable, bookmarkable) or else from this device's last lookup.
@@ -58,87 +23,18 @@ export default function YourWeek() {
   const params = useMemo(() => new URLSearchParams(saved ?? ""), [saved]);
   const [result, setResult] = useState(null);
   const [items, setItems] = useState(null);
-  const [local, setLocal] = useState(null);
+  const [copied, setCopied] = useState(false);
 
   useEffect(() => {
     if (!saved) return;
     fetch(`/api/officials?${saved}`).then((r) => (r.ok ? r.json() : Promise.reject())).then(setResult).catch(() => setResult(false));
-    const co = params.get("co");
-    if (co) loadLocal(co).then(setLocal).catch(() => setLocal(false)); else setLocal(false);
-  }, [saved, params]);
+  }, [saved]);
 
   useEffect(() => {
-    if (!result || local === null) return;
-    const today = todayLA(), until = iso(new Date(Date.now() + 45 * DAY));
-    const ids = result.officials.map((o) => o.bioguide_id);
-    (async () => {
-      const list = [];
-      const add = (key, d, time, tz, level, text, to, url) => { if (d >= today && d <= until) list.push({ key, date: d, time, tz, level, text, to, url }); };
-      // Congress: hearings and meetings of your members' committees, the House floor week, and
-      // when each chamber next meets.
-      const [{ data: cm }, { data: ev }] = await Promise.all([
-        db.from("committee_memberships").select("bioguide_id,committee_id,congress").in("bioguide_id", ids),
-        db.from("upcoming_events").select("event_id,kind,event_date,event_time,chamber,committee_id,committee_name,title,source_url").gte("event_date", today).order("event_date").limit(400),
-      ]);
-      const top = Math.max(0, ...(cm ?? []).map((c) => c.congress));
-      const mine = new Set((cm ?? []).filter((c) => c.congress === top).map((c) => c.committee_id));
-      for (const e of ev ?? []) {
-        if (["hearing", "markup", "meeting"].includes(e.kind) && isMine(e.committee_id, mine)) {
-          const what = { hearing: ["Hearing", "Audiencia"], markup: ["Markup", "Sesión de enmiendas"], meeting: ["Meeting", "Reunión"] }[e.kind];
-          add(`ev-${e.event_id}`, e.event_date, e.event_time, "America/New_York", "congress", `${tr(...what)}: ${e.committee_name}${e.title ? `: ${e.title}` : ""}`, e.event_id ? `/hearing/${e.event_id}` : null, e.source_url);
-        }
-      }
-      const floorWeek = (ev ?? []).find((e) => e.kind === "floor");
-      if (floorWeek && result.officials.some((o) => o.chamber === "house")) {
-        const n = (ev ?? []).filter((e) => e.kind === "floor" && e.event_date === floorWeek.event_date).length;
-        add("floor", floorWeek.event_date, null, "America/New_York", "congress", tr(`House floor schedule for the week: ${n} item${n === 1 ? "" : "s"}`, `Agenda del pleno de la Cámara para la semana: ${n} asunto${n === 1 ? "" : "s"}`), "/week#floor", "https://docs.house.gov/floor/");
-      }
-      for (const e of (ev ?? []).filter((x) => x.kind === "convene")) {
-        add(`convene-${e.chamber}`, e.event_date, e.event_time, "America/New_York", "congress", e.chamber === "senate" ? tr("The Senate meets", "El Senado se reúne") : tr("The House meets", "La Cámara se reúne"), "/week", e.source_url);
-      }
-      add("c120", "2027-01-03", null, "America/New_York", "congress", tr("The 120th Congress begins; new terms for House members and a third of senators", "Comienza el 120.º Congreso; nuevos períodos para los miembros de la Cámara y un tercio de los senadores"), "/week", null);
-
-      // State (California): the Legislature's session start and new terms for statewide offices.
-      if (result.state === "CA") {
-        const y = +today.slice(0, 4);
-        for (const yr of [y, y + 1]) if (yr % 2 === 0) add(`leg-${yr}`, firstMondayOfDecember(yr), "12:00", "America/Los_Angeles", "state", tr(`The California Legislature begins its ${yr + 1}–${String(yr + 2).slice(2)} session`, `La Legislatura de California comienza su sesión ${yr + 1}–${String(yr + 2).slice(2)}`), null, "https://law.justia.com/constitution/california/article-iv/section-3/");
-        const st = await fetch("/data/state/ca-statewide.json").then((r) => r.json()).catch(() => null);
-        if (st?.seat_change_by) add("ca-terms", st.seat_change_by, null, "America/Los_Angeles", "state", tr("New terms begin for California's statewide offices and Board of Equalization", "Comienzan nuevos períodos para los cargos estatales de California y la Junta de Igualación"), null, null);
-      }
-
-      // County and city: the next public meetings, and new terms for your seats.
-      if (local) {
-        const sd = result.local?.supervisor_district;
-        const agendas = params.get("co") === "ca-orange" ? await loadAgendas() : null;
-        for (const m of listedDates(local.board_meetings?.dates ?? [], today, 6)) {
-          // When the agenda is out, say how many items, and how many name your district.
-          const ag = agendas?.meetings.find((x) => x.date === m.date && x.items.length);
-          const own = ag && sd ? onlyDistrict(ag.items, sd).length : 0;
-          const extra = ag ? tr(`: ${ag.items.length} items on the agenda${sd ? `, ${own} naming District ${sd}` : ""}`, `: ${ag.items.length} asuntos en la agenda${sd ? `, ${own} mencionan el Distrito ${sd}` : ""}`) : "";
-          add(`bos-${m.date}`, m.date, local.board_meetings.time, "America/Los_Angeles", "county", tr(`${local.county} Board of Supervisors meeting`, `Reunión de la Junta de Supervisores del Condado de ${local.county.replace(/ County$/, "")}`) + extra, `/local/${params.get("co")}${ag ? "#agenda" : ""}`, local.meetings_url);
-        }
-        const sup = (local.supervisors ?? []).find((s) => s.district === sd);
-        if (sup?.term_end) add("sup-term", sup.term_end, null, "America/Los_Angeles", "county", tr(`New term begins for your supervisor's seat (District ${sd})`, `Comienza un nuevo período para el escaño de su supervisor (Distrito ${sd})`), null, null);
-        const cityId = result.local?.city?.id;
-        const city = (local.cities ?? []).find((c) => c.id === cityId);
-        if (city?.meeting_rule) for (const m of ruleDates(city.meeting_rule, today, 3)) add(`cc-${m.date}`, m.date, city.meeting_rule.time, "America/Los_Angeles", "city", tr(`${city.name} City Council meeting`, `Reunión del Concejo Municipal de ${city.name}`), `/local/${params.get("co")}#${city.id}`, city.agendas_url);
-        // Cities that publish through Legistar: their posted council meetings and item counts.
-        const cityName = result.local?.city?.name;
-        if (cityName && !city?.meeting_rule) {
-          const ca = await loadCityAgendas();
-          for (const m of ca?.cities?.[cityName]?.meetings ?? []) {
-            add(`cc-${m.date}`, m.date, clock(m.time) ? `${clock(m.time)[0]}:${String(clock(m.time)[1]).padStart(2, "0")}` : null, "America/Los_Angeles", "city",
-              tr(`${cityName} City Council meeting${m.items.length ? `: ${m.items.length} item${m.items.length === 1 ? "" : "s"} on the agenda` : ""}`, `Reunión del Concejo Municipal de ${cityName}${m.items.length ? `: ${m.items.length} asunto${m.items.length === 1 ? "" : "s"} en la agenda` : ""}`),
-              `/local/${params.get("co")}#city-agendas`, m.meeting_url);
-          }
-        }
-        const seat = (city?.members ?? []).find((m) => m.district === result.local?.city?.council_district && m.seat_change_by);
-        if (seat) add("cc-seat", seat.seat_change_by, null, "America/Los_Angeles", "city", tr(`${city.name} City Council seats newly elected in November are filled; a new mayor is chosen`, `Se ocupan los escaños del Concejo Municipal de ${city.name} elegidos en noviembre; se elige nueva alcaldía`), null, null);
-      }
-      list.sort((a, z) => a.date.localeCompare(z.date) || (clock(a.time)?.[0] ?? 99) - (clock(z.time)?.[0] ?? 99));
-      setItems(list);
-    })().catch(() => setItems([]));
-  }, [result, local, params]);
+    if (!result) return;
+    const json = (path) => fetch(path).then((r) => (r.ok ? r.json() : Promise.reject(new Error(path))));
+    weekItems({ result, params, deps: { rest, json, tr } }).then(setItems).catch(() => setItems([]));
+  }, [result, params]);
 
   const [election, setElection] = useState(null);
   useEffect(() => {
@@ -160,10 +56,13 @@ export default function YourWeek() {
   const LEVEL = { congress: ["Congress", "Congreso"], state: ["State", "Estado"], county: ["County", "Condado"], city: ["City", "Ciudad"] };
   const byDay = (items ?? []).reduce((m, it) => m.set(it.date, [...(m.get(it.date) ?? []), it]), new Map());
   const download = () => {
-    const blob = new Blob([icsFile(items)], { type: "text/calendar" });
+    const blob = new Blob([weekIcs({ items, origin: window.location.origin, name: tr("Your officials' calendar (Civic Atlas)", "Calendario de sus funcionarios (Civic Atlas)") })], { type: "text/calendar" });
     const a = Object.assign(document.createElement("a"), { href: URL.createObjectURL(blob), download: "civic-atlas-your-week.ics" });
     a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 1000);
   };
+  // A calendar subscription: the phone re-reads the feed every few hours, so new hearings and
+  // agendas appear on their own. webcal:// opens the calendar app's subscribe screen.
+  const feed = `${window.location.host}/api/calendar/week?${saved}${tr("", "&lang=es") }`;
   const ids = result ? result.officials.map((o) => o.bioguide_id) : [];
   const legislators = result ? (result.state_officials ?? []).filter((o) => ["upper", "lower", "legislature"].includes(o.type) && !o.updating) : [];
 
@@ -198,7 +97,14 @@ export default function YourWeek() {
                   </li>
                 ))}
               </ul>
-              <p><button type="button" className="button-secondary" onClick={download}>{tr("Add these to your calendar", "Agregar a su calendario")}</button> <span className="fine">{tr("A calendar file (.ics) for your phone or computer, made on this device.", "Un archivo de calendario (.ics) para su teléfono o computadora, creado en este dispositivo.")}</span></p>
+              <div className="subscribe">
+                <a className="button" href={`webcal://${feed}`}>{tr("Subscribe in your calendar", "Suscribirse en su calendario")}</a>
+                <p className="fine">
+                  {tr("Your phone's calendar keeps this list up to date on its own: new hearings, agendas and meetings appear as they're posted. Each event links back here. The link holds only your district numbers.", "El calendario de su teléfono mantiene esta lista al día por sí solo: las nuevas audiencias, agendas y reuniones aparecen cuando se publican. Cada evento enlaza aquí. El enlace solo contiene los números de sus distritos.")}
+                  {" "}<button type="button" className="link fine" onClick={() => { navigator.clipboard?.writeText(`https://${feed}`).then(() => setCopied(true)); }}>{copied ? tr("Link copied", "Enlace copiado") : tr("Copy the link (for Google Calendar: Other calendars, From URL)", "Copiar el enlace (para Google Calendar: Otros calendarios, Desde URL)")}</button>
+                  {" · "}<button type="button" className="link fine" onClick={download}>{tr("Download once instead", "Descargar una vez")}</button>
+                </p>
+              </div>
             </>
           )}
           {election && <p>{tr("Next statewide election:", "Próxima elección estatal:")} <strong>{date(election)}</strong> · <Link to="/measures">{tr("Ballot measures so far", "Medidas en la boleta hasta ahora")}</Link></p>}
