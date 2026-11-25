@@ -343,3 +343,6 @@ ul.items li.item { padding: 10px 0; border-bottom: 1px solid var(--border); max-
 .map-tip-rep { margin-bottom: 2px; }
 .map-tip-hint { color: var(--faint); font-size: 0.74rem; margin-top: 3px; }
 .district-facts { margin-bottom: 8px; }
+.map-legend { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 6px; }
+.map-legend .swatch { display: inline-block; width: 12px; height: 12px; border-radius: 3px; margin-left: 6px; vertical-align: -1px; }
+label.check { display: inline-flex; align-items: center; gap: 6px; font-size: 0.9rem; }

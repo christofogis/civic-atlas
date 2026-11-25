@@ -23,7 +23,9 @@ yes-man: flag weak ideas, scope creep, and shortcuts that will cost later.
   Analyst's Office), each side's official arguments unedited, and who is funding each side — never our
   own reading of a measure's effect. Don't start a new level until the federal work it depends on is done.
 - Party is shown as a letter badge (D blue, R red, independents and others neutral grey), always with
-  the letter, on names only — never as page or section color.
+  the letter, on names only — never as page or section color. One exception (Chris, Nov 24, 2026): the
+  map may color districts by the party of the current representative, opt-in and off by default, with a
+  legend that gives the letters and says it shows who holds each seat, not vote margins.
 
 ## Stack
 - Frontend: React + Vite, hosted on Cloudflare Pages (free plan; static assets unlimited).

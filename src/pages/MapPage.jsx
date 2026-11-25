@@ -22,6 +22,8 @@ const CURRENT = congressOn();
 const AVAILABLE = [119, 120];
 const OTHER = AVAILABLE.includes(CURRENT + 1) ? CURRENT + 1 : AVAILABLE.includes(CURRENT - 1) ? CURRENT - 1 : null;
 const ACCENT = "#0e5a4b", MARK = "#f4d35e", LINE = "#1b2420";
+// Same colors as the party badges: D blue, R red, independents and others neutral grey; vacant seats pale.
+const PARTY_FILL = { d: "#1f4e9c", r: "#b42318", other: "#5b6470", vacant: "#d9dedb" };
 const AT_LARGE = new Set(["AK", "DE", "ND", "SD", "VT", "WY", "DC", "PR", "GU", "VI", "AS", "MP"]);
 
 const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
@@ -64,12 +66,15 @@ export default function MapPage() {
   });
   const setSel = (v) => {
     setSelState(v);
-    setParams(v?.st ? { state: v.st, ...(v.cd != null ? { district: String(v.cd) } : {}) } : {}, { replace: true });
+    setParams({ ...(v?.st ? { state: v.st, ...(v.cd != null ? { district: String(v.cd) } : {}) } : {}), ...(byParty ? { color: "party" } : {}) }, { replace: true });
   };
   const [people, setPeople] = useState([]);      // members for the selected state
   const mine = useMemo(() => myRepresentatives(), []);
   const [myDistrict, setMyDistrict] = useState(null);
   const [facts, setFacts] = useState(null);
+  // Opt-in: color each district by the party of its current representative. Off by default.
+  const [byParty, setByParty] = useState(() => params.get("color") === "party");
+  const [repsLoaded, setRepsLoaded] = useState(false);
   // Every serving House member, for the hover snapshot (about 440 rows).
   const reps = useRef(new Map());
   const live = useRef({});   // latest values for map event handlers
@@ -86,7 +91,7 @@ export default function MapPage() {
   useEffect(() => { fetch("/maps/cd119/facts.json").then((r) => r.json()).then(setFacts).catch(() => {}); }, []);
   useEffect(() => {
     db.from("member_directory").select("bioguide_id,name,chamber,state,district,party").eq("chamber", "house").eq("serving", true)
-      .then(({ data }) => { reps.current = new Map((data ?? []).map((p) => [`${p.state}-${p.district ?? 0}`, p])); });
+      .then(({ data }) => { reps.current = new Map((data ?? []).map((p) => [`${p.state}-${p.district ?? 0}`, p])); setRepsLoaded(true); });
   }, []);
 
   // Create the map once.
@@ -105,8 +110,12 @@ export default function MapPage() {
       m.addSource("districts", { type: "geojson", data: { type: "FeatureCollection", features: [] }, generateId: true });
       m.addSource("detail", { type: "geojson", data: { type: "FeatureCollection", features: [] }, generateId: true });
       for (const src of ["districts", "detail"]) {
-        m.addLayer({ id: `${src}-fill`, type: "fill", source: src, paint: { "fill-color": ACCENT,
-          "fill-opacity": ["case", ["boolean", ["feature-state", "selected"], false], 0.28, ["boolean", ["feature-state", "hover"], false], 0.14, ["boolean", ["feature-state", "mine"], false], 0.0, 0.03] } });
+        const party = ["coalesce", ["feature-state", "party"], ""];
+        m.addLayer({ id: `${src}-fill`, type: "fill", source: src, paint: {
+          "fill-color": ["match", party, "d", PARTY_FILL.d, "r", PARTY_FILL.r, "other", PARTY_FILL.other, "vacant", PARTY_FILL.vacant, ACCENT],
+          "fill-opacity": ["case", ["!=", party, ""],
+            ["case", ["boolean", ["feature-state", "selected"], false], 0.95, ["boolean", ["feature-state", "hover"], false], 0.85, 0.62],
+            ["case", ["boolean", ["feature-state", "selected"], false], 0.28, ["boolean", ["feature-state", "hover"], false], 0.14, ["boolean", ["feature-state", "mine"], false], 0.0, 0.03]] } });
         m.addLayer({ id: `${src}-mine`, type: "line", source: src, paint: { "line-color": MARK, "line-width": ["case", ["boolean", ["feature-state", "mine"], false], 4, 0] } });
         m.addLayer({ id: `${src}-line`, type: "line", source: src, paint: { "line-color": LINE, "line-opacity": 0.55, "line-width": ["interpolate", ["linear"], ["zoom"], 3, 0.4, 8, 1.2] } });
       }
@@ -155,14 +164,35 @@ export default function MapPage() {
     return () => m.remove();
   }, []);
 
+  // Party coloring: set or clear each district's party feature-state.
+  const paintParty = (source, features) => {
+    const on = byParty && congress <= CURRENT && repsLoaded;
+    features.forEach((f, i) => {
+      const rep = reps.current.get(`${f.properties.st}-${f.properties.cd ?? 0}`);
+      map.current.setFeatureState({ source, id: i }, { party: on ? (rep ? KIND[rep.party] ?? "other" : "vacant") : "" });
+    });
+  };
+  const loaded = useRef({ districts: [], detail: [] });
+  useEffect(() => {
+    if (!ready) return;
+    paintParty("districts", loaded.current.districts);
+    paintParty("detail", loaded.current.detail);
+    map.current.setPaintProperty("districts-line", "line-color", byParty && congress <= CURRENT ? "#ffffff" : LINE);
+    map.current.setPaintProperty("detail-line", "line-color", byParty && congress <= CURRENT ? "#ffffff" : LINE);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [ready, byParty, repsLoaded, congress]);
+
   // District lines for the chosen Congress.
   useEffect(() => {
     if (!ready) return;
     loadTopo(`/maps/cd${congress}/us.json`).then((g) => {
       map.current.getSource("districts").setData(g);
+      loaded.current.districts = g.features;
+      paintParty("districts", g.features);
       if (myDistrict) g.features.forEach((f, i) => f.properties.st === myDistrict.st && f.properties.cd === myDistrict.cd
         && map.current.setFeatureState({ source: "districts", id: i }, { mine: true }));
     }).catch(() => setFailed(true));
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [ready, congress, myDistrict]);
 
   // Selecting a state: zoom to it, swap in its detailed lines, load its members.
@@ -171,6 +201,8 @@ export default function MapPage() {
     const m = map.current;
     loadTopo(`/maps/cd${congress}/${sel.st}.json`).then((g) => {
       m.getSource("detail").setData(g);
+      loaded.current.detail = g.features;
+      paintParty("detail", g.features);
       m.setFilter("districts-fill", ["!=", ["get", "st"], sel.st]);
       m.setFilter("districts-line", ["!=", ["get", "st"], sel.st]);
       m.setFilter("districts-mine", ["!=", ["get", "st"], sel.st]);
@@ -183,6 +215,7 @@ export default function MapPage() {
         if (target && (target.features?.length ?? 1)) m.fitBounds(bbox(target), { padding: 30, maxZoom: 11 });
       }
     }).catch(() => {});
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [ready, sel, congress, myDistrict]);
 
   useEffect(() => {
@@ -223,7 +256,27 @@ export default function MapPage() {
               .map((st) => <option key={st} value={st}>{stateName(st)}</option>)}
           </select>
         </label>
+        <label className="check">
+          <input type="checkbox" checked={byParty && !future} disabled={future}
+            onChange={(e) => {
+              setByParty(e.target.checked);
+              const next = new URLSearchParams(params);
+              if (e.target.checked) next.set("color", "party"); else next.delete("color");
+              setParams(next, { replace: true });
+            }} />{" "}
+          {tr("Color districts by party of the current representative", "Colorear los distritos según el partido del representante actual")}
+        </label>
       </div>
+      {byParty && !future && (
+        <p className="fine map-legend">
+          <span className="swatch" style={{ background: PARTY_FILL.d }} aria-hidden="true" /> {tr("D: Democrat", "D: Demócrata")}{"  "}
+          <span className="swatch" style={{ background: PARTY_FILL.r }} aria-hidden="true" /> {tr("R: Republican", "R: Republicano")}{"  "}
+          <span className="swatch" style={{ background: PARTY_FILL.other }} aria-hidden="true" /> {tr("Independent or other", "Independiente u otro")}{"  "}
+          <span className="swatch" style={{ background: PARTY_FILL.vacant }} aria-hidden="true" /> {tr("Vacant", "Vacante")}
+          {" — "}{tr("Shows who holds each seat today, not vote margins. Hover or tap a district for its representative's name and party letter.",
+            "Muestra quién ocupa cada escaño hoy, no márgenes de votación. Pase el cursor o toque un distrito para ver el nombre y la letra del partido de su representante.")}
+        </p>
+      )}
       {future && meta?.changed120 && (
         <p className="notice">
           {tr(`These lines take effect when the ${ordinal(CURRENT + 1)} Congress begins on January 3, ${CURRENT === 119 ? 2027 : ""}. States with new lines: `,
