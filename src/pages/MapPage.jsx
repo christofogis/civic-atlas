@@ -268,14 +268,13 @@ export default function MapPage() {
         </label>
       </div>
       {byParty && !future && (
-        <p className="fine map-legend">
-          <span className="swatch" style={{ background: PARTY_FILL.d }} aria-hidden="true" /> {tr("D: Democrat", "D: Demócrata")}{"  "}
-          <span className="swatch" style={{ background: PARTY_FILL.r }} aria-hidden="true" /> {tr("R: Republican", "R: Republicano")}{"  "}
-          <span className="swatch" style={{ background: PARTY_FILL.other }} aria-hidden="true" /> {tr("Independent or other", "Independiente u otro")}{"  "}
-          <span className="swatch" style={{ background: PARTY_FILL.vacant }} aria-hidden="true" /> {tr("Vacant", "Vacante")}
-          {" — "}{tr("Shows who holds each seat today, not vote margins. Hover or tap a district for its representative's name and party letter.",
-            "Muestra quién ocupa cada escaño hoy, no márgenes de votación. Pase el cursor o toque un distrito para ver el nombre y la letra del partido de su representante.")}
-        </p>
+        <div className="fine map-legend">
+          {[["d", tr("D: Democrat", "D: Demócrata")], ["r", tr("R: Republican", "R: Republicano")], ["other", tr("Independent or other", "Independiente u otro")], ["vacant", tr("Vacant", "Vacante")]].map(([k, label]) => (
+            <span key={k} className="map-legend-item"><span className="swatch" style={{ background: PARTY_FILL[k] }} aria-hidden="true" />{label}</span>
+          ))}
+          <p className="fine">{tr("Shows who holds each seat today, not vote margins. Hover or tap a district for its representative's name and party letter.",
+            "Muestra quién ocupa cada escaño hoy, no márgenes de votación. Pase el cursor o toque un distrito para ver el nombre y la letra del partido de su representante.")}</p>
+        </div>
       )}
       {future && meta?.changed120 && (
         <p className="notice">
