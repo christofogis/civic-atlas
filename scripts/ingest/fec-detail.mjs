@@ -4,6 +4,7 @@
 //   - top employers of individual donors          /schedules/schedule_a/by_employer/
 //   - largest contributions from committees (PACs) /schedules/schedule_a/?is_individual=false
 //   - outside spending for or against             /schedules/schedule_e/by_candidate/
+//   - itemized individual contributions by state  /schedules/schedule_a/by_state/by_candidate/
 // Needs DATA_GOV_API_KEY. Paced under OpenFEC's ~1,000 calls/hour; runs weekly.
 //
 //   node scripts/ingest/fec-detail.mjs                    # serving members, latest cycle with money
@@ -98,7 +99,18 @@ async function detail(candId, cycle, bioguide, key, probe) {
       support_oppose: r.support_oppose_indicator === "S" ? "support" : "oppose", total: money(r.total),
     }));
 
-  return { committee, bySize, employers, committeesIn, outside };
+  const st = await getJson("/schedules/schedule_a/by_state/by_candidate/", { candidate_id: candId, cycle, election_full: false, per_page: 100 }, key);
+  show("by state", st);
+  const byStateMap = new Map();
+  for (const r of st?.results ?? []) {
+    const s = String(r.state ?? "").trim().toUpperCase() || "(none)";
+    const cur = byStateMap.get(s) ?? { total: 0, n: 0 };
+    cur.total += Number(r.total ?? 0); cur.n += Number(r.count ?? 0);
+    byStateMap.set(s, cur);
+  }
+  const byState = [...byStateMap].map(([state, v]) => ({ fec_candidate_id: candId, cycle, bioguide_id: bioguide, state, total: v.total, contributions: v.n }));
+
+  return { committee, bySize, employers, committeesIn, outside, byState };
 }
 
 async function main() {
@@ -125,7 +137,7 @@ async function main() {
     if (!work.length) throw new Error(`no FEC totals on file for ${probe}`);
     const d = await detail(work[0].fec_candidate_id, work[0].cycle, probe, key, true);
     console.log("\nmapped:", JSON.stringify({ committee: d.committee, bySize: d.bySize.length, employers: d.employers.slice(0, 3),
-      committeesIn: d.committeesIn.slice(0, 3), outside: d.outside.slice(0, 3) }, null, 1));
+      committeesIn: d.committeesIn.slice(0, 3), outside: d.outside.slice(0, 3), byState: d.byState.sort((a, z) => z.total - a.total).slice(0, 5) }, null, 1));
     return;
   }
 
@@ -141,7 +153,7 @@ async function main() {
     const one = async (w) => {
       const d = await detail(w.fec_candidate_id, w.cycle, w.bioguide_id, key, false);
       // Replace this candidate-cycle's rows: rankings change from week to week.
-      for (const t of ["finance_by_size", "finance_top_employers", "finance_committee_contributions", "outside_spending"]) {
+      for (const t of ["finance_by_size", "finance_top_employers", "finance_committee_contributions", "outside_spending", "finance_by_state"]) {
         const { error } = await db.from(t).delete().eq("fec_candidate_id", w.fec_candidate_id).eq("cycle", w.cycle);
         if (error) throw new Error(`clear ${t}: ${error.message}`);
       }
@@ -149,7 +161,8 @@ async function main() {
       await upsertBatches(db, "finance_top_employers", d.employers, "fec_candidate_id,cycle,rank");
       await upsertBatches(db, "finance_committee_contributions", d.committeesIn, "fec_candidate_id,cycle,rank");
       await upsertBatches(db, "outside_spending", d.outside, "fec_candidate_id,cycle,committee_id,support_oppose");
-      rows += d.bySize.length + d.employers.length + d.committeesIn.length + d.outside.length;
+      await upsertBatches(db, "finance_by_state", d.byState, "fec_candidate_id,cycle,state");
+      rows += d.bySize.length + d.employers.length + d.committeesIn.length + d.outside.length + d.byState.length;
       if (++n % 50 === 0) console.log(`  ${n}/${work.length}`);
     };
     await Promise.all(Array.from({ length: 3 }, async () => { while (i < work.length) await one(work[i++]); }));
