@@ -3,7 +3,7 @@
 import { rest } from "../lib/rest.js";
 
 const PAGES = ["/", "/members", "/bills", "/week", "/map", "/government", "/budget", "/measures", "/committees",
-  "/topics", "/elections", "/glossary", "/methods", "/corrections", "/quiz", "/local/ca-orange"];
+  "/topics", "/elections", "/glossary", "/methods", "/status", "/corrections", "/quiz", "/local/ca-orange"];
 
 export async function onRequestGet({ request }) {
   const origin = new URL(request.url).origin;

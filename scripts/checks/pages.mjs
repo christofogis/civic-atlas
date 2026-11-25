@@ -51,4 +51,6 @@ export const PAGES = [
   ["/topic/health", ["Became law", "Recent roll-call votes"]],
   ["/quiz", ["Do you vote like your representatives?", "Would you have voted for it?"]],
   ["/methods", ["Votes by issue"]],
+  ["/status", ["Site status", "Data updates", "Roll-call votes, 119th Congress", "Automated checks", "Coming up", "120th Congress begins"]],
+  ["/status?lang=es", ["Estado del sitio", "Actualizaciones de datos"]],
 ];

@@ -713,3 +713,10 @@ header.site .site-inner { position: relative; flex-wrap: nowrap; gap: 8px 14px; 
 .control-rows .seg.alt { fill: var(--border); }
 .control-rows .seg-name { font-size: 12px; fill: var(--text); }
 .control-rows .badge-text { font-size: 10px; font-weight: 700; fill: #fff; }
+
+/* Site status */
+.status-table td, .status-table th { vertical-align: top; }
+.status-flag { display: inline-block; font-size: 0.8rem; font-weight: 600; padding: 0.05rem 0.45rem; border-radius: 999px; border: 1px solid var(--border-strong); }
+.status-flag.ok { border-color: var(--chart-in); }
+.status-flag.warn { border-color: var(--chart-deficit); color: var(--chart-deficit); }
+.status-checks li { margin: 0.35rem 0; }

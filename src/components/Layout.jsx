@@ -22,6 +22,7 @@ const TITLES = {
   "/state": ["State official", "Funcionario estatal"], "/committees": ["Committees", "Comités"],
   "/committee": ["Committee", "Comité"], "/member": ["Member of Congress", "Miembro del Congreso"],
   "/bill": ["Bill", "Proyecto de ley"], "/methods": ["How this site works", "Cómo funciona este sitio"],
+  "/status": ["Site status", "Estado del sitio"],
 };
 
 export default function Layout() {
@@ -92,6 +93,7 @@ export default function Layout() {
             <NavLink to="/elections">{t("2028 candidates", "Candidatos 2028")}</NavLink>
             <NavLink to="/quiz">{t("Quiz: do you vote like them?", "Cuestionario: ¿vota como ellos?")}</NavLink>
             <NavLink to="/methods">{t("How this site works", "Cómo funciona este sitio")}</NavLink>
+            <NavLink to="/status">{t("Site status", "Estado del sitio")}</NavLink>
           </nav>
           {location.pathname !== "/search" && (
             <form onSubmit={submit} role="search" className="site-search menu-search">
@@ -117,6 +119,7 @@ export default function Layout() {
       <footer className="site-footer">
         <div className="site-inner">
           <Link to="/methods">{t("How this site works", "Cómo funciona este sitio")}</Link>
+          <Link to="/status">{t("Site status", "Estado del sitio")}</Link>
           <Link to="/government">{t("Three branches", "Los tres poderes")}</Link>
           <Link to="/budget">{t("Federal budget", "Presupuesto federal")}</Link>
           <Link to="/glossary">{t("Glossary", "Glosario")}</Link>
