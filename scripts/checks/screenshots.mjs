@@ -44,12 +44,14 @@ for (let path of PATHS) {
     await page.goto(BASE + path.slice(6), { waitUntil: "load" });
     await page.waitForTimeout(1500);
   } else {
-    await page.goto(BASE + path, { waitUntil: /^\/(\?|$)/.test(path) ? "load" : "networkidle" });
+    await page.goto(BASE + path.split(">>")[0], { waitUntil: /^\/(\?|$)/.test(path) ? "load" : "networkidle" });
     await page.waitForTimeout(1500);
   }
+  // "path>>selector": start the shot at that element (for sections far down a long page).
+  const start = path.includes(">>") ? await page.locator(path.split(">>")[1]).first().boundingBox().catch(() => null) : null;
   // Very tall pages can't be captured whole; cap the height.
   const height = await page.evaluate(() => document.documentElement.scrollHeight);
-  const buf = await page.screenshot({ fullPage: height <= 6000, clip: height > 6000 ? { x: 0, y: 0, width: WIDTH, height: 6000 } : undefined, type: "jpeg", quality: 55 });
+  const buf = await page.screenshot({ fullPage: true, clip: start ? { x: 0, y: Math.max(0, start.y - 20), width: WIDTH, height: Math.min(2400, height - start.y + 20) } : height > 6000 ? { x: 0, y: 0, width: WIDTH, height: 6000 } : undefined, type: "jpeg", quality: 55 });
   const b64 = buf.toString("base64");
   console.log(`SHOT-BEGIN ${path}`);
   for (let i = 0; i < b64.length; i += 8000) console.log(`SHOT ${b64.slice(i, i + 8000)}`);
