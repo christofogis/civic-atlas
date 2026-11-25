@@ -195,6 +195,13 @@ export default function MethodsEs() {
         conjuntos de datos vienen de la API Fiscal Data de la Oficina del Servicio Fiscal y se reconstruyen cada mes, después
         de que se publica el estado.
       </p>
+      <p>
+        El superávit o déficit desde 1940 viene de las Tablas Históricas de la Oficina de Administración y Presupuesto (OMB),
+        Tabla 1.3: ingresos, gastos y superávit o déficit en dólares de cada año, en dólares ajustados por inflación y como
+        parte del producto interno bruto, tal como los publica la OMB. Solo se usan años reales; se omiten las estimaciones de
+        la tabla para años posteriores. La OMB actualiza las tablas con cada presupuesto del presidente, así que su último año
+        real puede ir detrás de las cifras del Tesoro de arriba.
+      </p>
       <h2 id="lobbying">Cabildeo sobre proyectos</h2>
       <p>
         Según la Ley de Divulgación de Cabildeo, las firmas de cabildeo y las organizaciones que hacen cabildeo para sí mismas

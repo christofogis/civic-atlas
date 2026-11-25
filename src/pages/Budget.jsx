@@ -52,7 +52,7 @@ const per100 = (part, total) => { const v = (100 * part) / total; return v.toFix
 const fyRange = (fy) => tr(`Oct ${fy - 1} – Sep ${fy}`, `oct. ${fy - 1} – sep. ${fy}`);
 
 // Horizontal bars, one series, sorted largest first. Shares are of the positive total.
-function Bars({ rows, perHundred, total }) {
+function Bars({ rows, perHundred, total, color = BAR }) {
   const pos = rows.filter((r) => r.amount > 0).sort((a, z) => z.amount - a.amount);
   const neg = rows.filter((r) => r.amount < 0);
   const max = pos[0]?.amount ?? 1;
@@ -62,7 +62,7 @@ function Bars({ rows, perHundred, total }) {
         {pos.map((r) => (
           <li key={r.label}>
             <span className="hbar-label"><Label en={r.label} /></span>
-            <span className="hbar-track"><span className="hbar" style={{ width: `${(100 * r.amount) / max}%`, background: BAR }} /></span>
+            <span className="hbar-track"><span className="hbar" style={{ width: `${(100 * r.amount) / max}%`, background: color }} /></span>
             <span className="hbar-value">
               {B(r.amount)}
               {perHundred && <span className="fine"> · {tr(`$${per100(r.amount, total)} of every $100`, `$${per100(r.amount, total)} de cada $100`)}</span>}
@@ -239,10 +239,101 @@ function Trend({ years }) {
   );
 }
 
+// Surplus or deficit by fiscal year since 1940 (OMB Historical Tables, Table 1.3), one bar a year
+// from a zero line: below it, more went out than came in (deficit); above it, a surplus. Shown as
+// a share of the economy (GDP), in dollars of the day, or adjusted for inflation; and over the
+// last 20 or 40 years, or every year since 1940.
+function History({ data }) {
+  const [unit, setUnit] = useState("gdp");
+  const [span, setSpan] = useState(40);
+  const [hover, setHover] = useState(null);
+  const all = data.years;
+  const years = span ? all.slice(-span) : all;
+  const key = { gdp: "surplus_gdp", dollars: "surplus", real: "surplus_const" }[unit];
+  const W = 960, H = 300, L = 56, R = 8, Tp = 12, Bt = 26;
+  const vals = years.map((d) => d[key]);
+  const hi = Math.max(0, ...vals), lo = Math.min(0, ...vals);
+  // Round the scale to tidy steps.
+  const step = unit === "gdp" ? (lo < -15 ? 10 : lo < -6 ? 4 : 2) : (lo < -2000 ? 1000 : lo < -800 ? 500 : 200);
+  const top = Math.ceil(hi / step) * step, bot = Math.floor(lo / step) * step;
+  const y = (v) => Tp + ((top - v) / (top - bot || 1)) * (H - Tp - Bt);
+  const slot = (W - L - R) / years.length;
+  const bw = Math.max(2, slot - (slot > 10 ? 3 : 1));
+  const ticks = []; for (let t = bot; t <= top + 1e-9; t += step) ticks.push(t);
+  const every = years.length > 60 ? 10 : years.length > 30 ? 5 : 2;
+  const h = hover != null ? years[hover] : null;
+  const unitLabel = { gdp: tr("Share of the economy (GDP)", "Parte de la economía (PIB)"), dollars: tr("Dollars", "Dólares"), real: tr(`Inflation-adjusted (${data.constant_year} dollars)`, `Ajustado por inflación (dólares de ${data.constant_year})`) };
+  return (
+    <div className="history">
+      <div className="history-controls">
+        <div className="seg-toggle" role="group" aria-label={tr("Show as", "Mostrar como")}>
+          {["gdp", "dollars", "real"].map((u) => <button key={u} type="button" aria-pressed={unit === u} onClick={() => setUnit(u)}>{unitLabel[u]}</button>)}
+        </div>
+        <div className="seg-toggle" role="group" aria-label={tr("Years", "Años")}>
+          {[[20, tr("20 years", "20 años")], [40, tr("40 years", "40 años")], [0, tr(`Since ${all[0].fiscal_year}`, `Desde ${all[0].fiscal_year}`)]].map(([n, label]) => (
+            <button key={n} type="button" aria-pressed={span === n} onClick={() => { setSpan(n); setHover(null); }}>{label}</button>
+          ))}
+        </div>
+      </div>
+      <svg viewBox={`0 0 ${W} ${H}`} role="img"
+        aria-label={tr("Surplus or deficit by fiscal year; bars below the zero line are deficits. The table below has the figures.", "Superávit o déficit por año fiscal; las barras debajo de la línea cero son déficits. La tabla de abajo tiene las cifras.")}
+        onMouseLeave={() => setHover(null)}
+        onMouseMove={(e) => {
+          const r = e.currentTarget.getBoundingClientRect();
+          const px = ((e.clientX - r.left) / r.width) * W;
+          setHover(Math.max(0, Math.min(years.length - 1, Math.floor((px - L) / slot))));
+        }}>
+        {ticks.map((t) => (
+          <g key={t}>
+            <line x1={L} x2={W - R} y1={y(t)} y2={y(t)} stroke={t === 0 ? "var(--text)" : "var(--border)"} />
+            <text x={L - 6} y={y(t) + 4} textAnchor="end" className="axis">{unit === "gdp" ? `${t}%` : Math.abs(t) >= 1000 ? `${t / 1000}T` : `${t}B`}</text>
+          </g>
+        ))}
+        {years.map((d, i) => {
+          const v = d[key], x = L + i * slot + (slot - bw) / 2;
+          return (
+            <g key={d.fiscal_year}>
+              <rect x={x} width={bw} y={Math.min(y(v), y(0))} height={Math.max(1, Math.abs(y(v) - y(0)))}
+                style={{ fill: v < 0 ? OUT : IN, opacity: hover == null || hover === i ? 1 : 0.55 }} rx={bw > 6 ? 2 : 0} />
+              {d.fiscal_year % every === 0 && <text x={x + bw / 2} y={H - 8} textAnchor="middle" className="axis">{d.fiscal_year}</text>}
+            </g>
+          );
+        })}
+      </svg>
+      <p className="legend fine">
+        <span className="swatch" style={{ background: OUT }} /> {tr("Deficit: more went out than came in (below the line)", "Déficit: salió más de lo que entró (debajo de la línea)")}
+        <span className="swatch" style={{ background: IN }} /> {tr("Surplus (above the line)", "Superávit (encima de la línea)")}
+      </p>
+      <p className="trend-tip fine" aria-live="polite">
+        {h ? tr(`FY${h.fiscal_year}: ${h.surplus < 0 ? "deficit" : "surplus"} of ${B(Math.abs(h.surplus) * 1e9)}, ${Math.abs(h.surplus_gdp).toFixed(1)}% of GDP (${B(Math.abs(h.surplus_const) * 1e9)} in ${data.constant_year} dollars). Receipts ${B(h.receipts * 1e9)}, outlays ${B(h.outlays * 1e9)}.`,
+          `AF${h.fiscal_year}: ${h.surplus < 0 ? "déficit" : "superávit"} de ${B(Math.abs(h.surplus) * 1e9)}, ${Math.abs(h.surplus_gdp).toFixed(1)}% del PIB (${B(Math.abs(h.surplus_const) * 1e9)} en dólares de ${data.constant_year}). Ingresos ${B(h.receipts * 1e9)}, gastos ${B(h.outlays * 1e9)}.`)
+          : tr("Point at a year to see its figures.", "Señale un año para ver sus cifras.")}
+      </p>
+      <details>
+        <summary>{tr("Show as a table", "Ver como tabla")}</summary>
+        <div className="table-scroll">
+          <table>
+            <thead><tr><th>{tr("Fiscal year", "Año fiscal")}</th><th>{tr("Receipts", "Ingresos")}</th><th>{tr("Outlays", "Gastos")}</th><th>{tr("Surplus or deficit (−)", "Superávit o déficit (−)")}</th><th>{tr("% of GDP", "% del PIB")}</th><th>{tr(`In ${data.constant_year} dollars`, `En dólares de ${data.constant_year}`)}</th></tr></thead>
+            <tbody>
+              {[...all].reverse().map((d) => (
+                <tr key={d.fiscal_year}><td>{d.fiscal_year}</td><td>{B(d.receipts * 1e9)}</td><td>{B(d.outlays * 1e9)}</td><td>{B(d.surplus * 1e9)}</td><td>{d.surplus_gdp.toFixed(1)}%</td><td>{B(d.surplus_const * 1e9)}</td></tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </details>
+    </div>
+  );
+}
+
 export default function Budget() {
   const [data, setData] = useState(null);
   const [err, setErr] = useState(false);
   const [fy, setFy] = useState(null);
+  const [history, setHistory] = useState(null);
+  useEffect(() => {
+    fetch("/data/budget-history.json").then((r) => (r.ok ? r.json() : null)).then(setHistory).catch(() => {});
+  }, []);
   useEffect(() => {
     fetch("/data/budget.json").then((r) => (r.ok ? r.json() : Promise.reject())).then((d) => { setData(d); setFy(d.years.at(-1).fiscal_year); }).catch(() => setErr(true));
   }, []);
@@ -260,6 +351,7 @@ export default function Budget() {
     { id: "debt", text: <>{tr("Debt: ", "Deuda: ")}<a href={data.sources.debt}>Debt to the Penny</a>{tr(", Bureau of the Fiscal Service: total public debt outstanding on the last business day of each fiscal year, and on the latest day published. Debt held by the public is owed to investors, including foreign governments and the Federal Reserve; intragovernmental holdings are owed to government accounts such as the Social Security trust funds.", ", Oficina del Servicio Fiscal: deuda pública total el último día hábil de cada año fiscal y el día más reciente publicado. La deuda en manos del público se debe a inversionistas, incluidos gobiernos extranjeros y la Reserva Federal; las tenencias intragubernamentales se deben a cuentas del gobierno como los fondos fiduciarios del Seguro Social.")}</> },
     { id: "functions", text: tr("Outlays are grouped by budget function, the categories the government uses to group spending by purpose. Category names are the Treasury's own. Outlays are money actually paid out, which differs from what Congress appropriates in a given year.", "Los gastos se agrupan por función presupuestaria, las categorías que el gobierno usa para agrupar el gasto según su propósito. Los nombres de las categorías son del Tesoro. Los gastos son el dinero realmente pagado, que difiere de lo que el Congreso asigna en un año dado.") },
     { id: "payroll", text: tr("Social insurance and retirement receipts are mostly payroll taxes for Social Security and Medicare; their parts are listed under that row.", "Las contribuciones al seguro social y la jubilación son sobre todo impuestos sobre la nómina para el Seguro Social y Medicare; sus partes aparecen bajo esa fila.") },
+    history && { id: "omb", text: <>{tr("Since 1940: ", "Desde 1940: ")}<a href={history.source_url}>{tr("Office of Management and Budget, Historical Tables, Table 1.3", "Oficina de Administración y Presupuesto, Tablas Históricas, Tabla 1.3")}</a>{tr(`, actual years only (OMB's estimates for later years are left out). Inflation-adjusted figures are OMB's, in ${history.constant_year} dollars. OMB's totals can differ slightly from the Treasury figures above, which are updated monthly; FY${history.years.at(-1).fiscal_year + 1} is added here when OMB publishes its actual figure.`, `, solo años reales (se omiten las estimaciones de la OMB para años posteriores). Las cifras ajustadas por inflación son de la OMB, en dólares de ${history.constant_year}. Los totales de la OMB pueden diferir un poco de las cifras del Tesoro de arriba, que se actualizan cada mes; el AF${history.years.at(-1).fiscal_year + 1} se agregará aquí cuando la OMB publique su cifra real.`)}</> },
     { id: "grouping", text: <>{tr("The chart groups spending into the six budget functions that were largest in most years since 2015, and everything else: the other 13 functions, net of offsetting receipts, such as veterans' benefits, transportation and education. The line marks total receipts. ", "La gráfica agrupa el gasto en las seis funciones presupuestarias más grandes en la mayoría de los años desde 2015, y todo lo demás: las otras 13 funciones, descontando los ingresos compensatorios, como beneficios para veteranos, transporte y educación. La línea marca los ingresos totales. ")}<Link to="/methods#budget">{tr("How this page is built", "Cómo se construye esta página")}</Link>.</> },
   ];
   const sparkLabel = tr("Trend by fiscal year; the table under Year by year has the figures.", "Tendencia por año fiscal; la tabla en Año por año tiene las cifras.");
@@ -290,21 +382,28 @@ export default function Budget() {
       <div className="budget-two">
       <section>
         <h2>{tr("Where the money went", "En qué se gastó")}<Ref id="functions" /></h2>
-        <Bars rows={year.outlays} perHundred total={year.outlays_total} />
+        <Bars rows={year.outlays} perHundred total={year.outlays_total} color={OUT} />
       </section>
 
       <section>
         <h2>{tr("Where the money came from", "De dónde vino el dinero")}<Ref id="payroll" /></h2>
-        <Bars rows={year.receipts} perHundred total={year.receipts_total} />
+        <Bars rows={year.receipts} perHundred total={year.receipts_total} color={IN} />
       </section>
 
       </div>
 
       <section>
         <h2>{tr("Year by year", "Año por año")}</h2>
-        <Stacked years={data.years} />
-        <h3>{tr("Receipts and spending", "Ingresos y gasto")}</h3>
-        <Trend years={data.years} />
+        <div className="budget-two">
+          <div>
+            <h3>{tr("Spending by category", "Gasto por categoría")}</h3>
+            <Stacked years={data.years} />
+          </div>
+          <div>
+            <h3>{tr("Receipts and spending", "Ingresos y gasto")}</h3>
+            <Trend years={data.years} />
+          </div>
+        </div>
         <details>
           <summary>{tr("Show as a table", "Ver como tabla")}</summary>
           <table>
@@ -319,6 +418,14 @@ export default function Budget() {
         </details>
       </section>
 
+      {history && (
+        <section>
+          <h2>{tr(`Surplus or deficit since ${history.years[0].fiscal_year}`, `Superávit o déficit desde ${history.years[0].fiscal_year}`)}<Ref id="omb" /></h2>
+          <History data={history} />
+        </section>
+      )}
+
+      <div className="budget-two">
       <section>
         <h2>{tr("Debt", "Deuda")}</h2>
         <p>
@@ -339,6 +446,7 @@ export default function Budget() {
           <p className="fine">{tr("Monthly figures swing with tax deadlines and payment timing, so part of a year doesn't predict the whole year.", "Las cifras mensuales varían según las fechas de impuestos y de pagos, así que una parte del año no predice el año completo.")}</p>
         </section>
       )}
+      </div>
 
       <NotesList />
     </main>

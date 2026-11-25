@@ -201,6 +201,13 @@ export default function Methods() {
         latest day published. Both datasets come from the Bureau of the Fiscal Service's Fiscal Data API
         and are rebuilt monthly, after the statement is released.
       </p>
+      <p>
+        The surplus or deficit since 1940 comes from the Office of Management and Budget's Historical
+        Tables, Table 1.3: receipts, outlays and the surplus or deficit in dollars of each year, in
+        inflation-adjusted dollars, and as a share of gross domestic product, all as OMB publishes them.
+        Only actual years are used; the table's estimates for later years are left out. OMB updates the
+        tables with each President's Budget, so its latest actual year can trail the Treasury figures above.
+      </p>
       <h2 id="lobbying">Lobbying on bills</h2>
       <p>
         Under the Lobbying Disclosure Act, lobbying firms and organizations that lobby for themselves file a
