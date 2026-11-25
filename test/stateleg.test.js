@@ -9,6 +9,10 @@ test("district keys match between Open States names and OCD IDs", () => {
   assert.equal(districtKey("Hillsborough 12"), districtKey("hillsborough_12"));
   assert.notEqual(districtKey("1"), districtKey("10"));
   assert.equal(districtKey(null), null);
+  assert.equal(districtKey("Third Suffolk"), districtKey("3rd_suffolk"));
+  assert.equal(districtKey("First Suffolk and Middlesex"), districtKey("1st_suffolk_and_middlesex"));
+  assert.equal(districtKey("Eleventh Essex"), districtKey("11th Essex"));
+  assert.equal(districtKey("Twelfth Worcester"), "12thworcester");
 });
 
 test("Geocodio stateleg field: current districts, largest overlap first", () => {
