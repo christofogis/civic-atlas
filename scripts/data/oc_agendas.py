@@ -30,6 +30,21 @@ if probe:
         for m in sorted(set(re.findall(pat, html, re.I)))[:15]: print("FOUND", pat[:12], m[:200])
     for m in re.finditer(r"ocagendaext", html):
         print("CTX", re.sub(r"\s+", " ", html[max(0, m.start() - 300):m.start() + 300]))
+    for src in ["https://ocagendaext.oc.gov/bosmeetingc", "https://ocagendaext.oc.gov/bosmeetingd"]:
+        body, ct = get(src)
+        body = body.decode("utf-8", "replace")
+        print("SRC", src, ct, len(body))
+        print("BODY", re.sub(r"\s+", " ", body)[:2500])
+    up = get("https://ocagendaext.oc.gov/bosmeetingc")[0].decode("utf-8", "replace")
+    doc = re.search(r'href="([^"]*ExtDocViewer[^"]*)"', up)
+    if doc:
+        u = doc.group(1) if doc.group(1).startswith("http") else "https://ocagendaext.oc.gov" + doc.group(1)
+        raw, ct = get(u)
+        print("DOC", u, ct, len(raw), raw[:8])
+        with tempfile.NamedTemporaryFile(suffix=".pdf", delete=False) as f: f.write(raw)
+        txt = subprocess.run(["pdftotext", "-layout", f.name, "-"], capture_output=True, text=True).stdout
+        print("TEXT", txt[:6000])
+    sys.exit(0)
     # Context around the first agenda link
     m = re.search(r"ExtDocViewer", html)
     if m: print("CONTEXT", re.sub(r"\s+", " ", html[max(0, m.start() - 1500):m.start() + 500]))
