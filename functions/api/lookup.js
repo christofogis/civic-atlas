@@ -32,9 +32,14 @@ export async function onRequestGet({ request, env }) {
     return json({ error: "Please complete the verification and try again." }, 403);
   }
 
+  // Automated checks may rehearse a future date (?as_of=2027-01-03): districts and seat holders as
+  // they would be that day. Ignored for everyone else.
+  const asOfParam = params.get("as_of");
+  const asOf = automatedCheck && /^\d{4}-\d{2}-\d{2}$/.test(asOfParam ?? "") ? asOfParam : null;
+
   // Ask for the districts of the Congress in session by date (cd119, then cd120 from Jan 3,
   // 2027) rather than Geocodio's default, so the map can't switch ahead of or behind our data.
-  const fields = `fields=cd${congressOn()},stateleg&limit=1&api_key=${env.GEOCODIO_API_KEY}`;
+  const fields = `fields=cd${congressOn(asOf ?? new Date())},stateleg&limit=1&api_key=${env.GEOCODIO_API_KEY}`;
   // Five decimal places is about a meter: plenty for districts, and no more precise than needed.
   const geo = await fetch(byPoint
     ? `https://api.geocod.io/v2.1/reverse?q=${lat.toFixed(5)},${lng.toFixed(5)}&${fields}`
@@ -52,6 +57,7 @@ export async function onRequestGet({ request, env }) {
     return json(await officialsFor({
       state: place.state, districts: place.districts, congress: place.congress,
       stateDistricts: stateDistrictsFromGeocodio(geoJson), local,
+      asOf,
       approximate: place.districts.length > 1 || !["rooftop", "range_interpolation", "point"].includes(place.accuracy_type),
     }));
   } catch {
