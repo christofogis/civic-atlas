@@ -65,6 +65,7 @@ export default function Layout() {
           <Link to="/compare">{t("Compare two members", "Comparar dos miembros")}</Link>
           <Link to="/quiz">{t("Quiz", "Cuestionario")}</Link>
           <Link to="/elections">{t("2028 candidates", "Candidatos 2028")}</Link>
+          <Link to="/measures">{t("2028 ballot measures (CA)", "Medidas en la boleta 2028 (CA)")}</Link>
           <Link to="/nominations">{t("Nominations", "Nominaciones")}</Link>
           <Link to="/story">{t("Look up a news story", "Buscar una noticia")}</Link>
           <ReportError />

@@ -30,6 +30,8 @@ export const PAGES = [
   ["/officials?st=CA&cd=45&su=36&sl=70&co=ca-orange&sd=1&pl=Rossmoor&pt=u&lang=es", ["Funcionarios electos", "Sin gobierno municipal"]],
   ["/local/ca-orange", ["Orange County", "Board of Supervisors", "District 5", "Sheriff-Coroner", "Nonpartisan office", "Los Alamitos City Council", "Tanya Doby", "Agendas and minutes"]],
   ["/local/ca-orange?lang=es", ["Junta de Supervisores", "Cargo no partidista"]],
+  ["/measures", ["California ballot measures", "Government preferences", "Legislative Counsel's Digest", "REQUIRES UNIVERSITY OF CALIFORNIA", "Costs to the University of California", "Arguments for and against"]],
+  ["/measures?lang=es", ["Medidas en la boleta de California", "Argumentos a favor y en contra"]],
   ["/government", ["Three branches of government", "Legislative branch", "Executive Order", "Chief Justice", "Ketanji Brown Jackson"]],
   ["/government?lang=es", ["Los tres poderes del gobierno", "Poder judicial", "Orden Ejecutiva"]],
   ["/map?state=CA&district=12", ["About the district", "Median household income", "Oakland", "Alameda County"]],

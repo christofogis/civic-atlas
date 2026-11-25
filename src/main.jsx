@@ -39,6 +39,7 @@ const Nominations = lazy(() => import("./pages/Nominations.jsx"));
 const ExplainStory = lazy(() => import("./pages/ExplainStory.jsx"));
 const Hearing = lazy(() => import("./pages/Hearing.jsx"));
 const Government = lazy(() => import("./pages/Government.jsx"));
+const Measures = lazy(() => import("./pages/Measures.jsx"));
 const Officials = lazy(() => import("./pages/Officials.jsx"));
 const County = lazy(() => import("./pages/County.jsx"));
 const StatePerson = lazy(() => import("./pages/StatePerson.jsx"));
@@ -71,6 +72,7 @@ createRoot(document.getElementById("root")).render(
         <Route path="/hearing/:id" element={<Hearing />} />
         <Route path="/map" element={<MapPage />} />
         <Route path="/government" element={<Government />} />
+        <Route path="/measures" element={<Measures />} />
         <Route path="/officials" element={<Officials />} />
         <Route path="/local/:id" element={<County />} />
         <Route path="/state/person/:id" element={<StatePerson />} />
