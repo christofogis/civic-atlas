@@ -24,6 +24,20 @@ const mondayOf = (day) => { const d = new Date(`${day}T12:00:00Z`); return addDa
 const dayLabel = (day, opts) => new Date(`${day}T12:00:00Z`).toLocaleDateString(locale(), { timeZone: "UTC", ...opts });
 const timeLabel = (min) => new Date(Date.UTC(2000, 0, 1, Math.floor(min / 60), min % 60)).toLocaleTimeString(locale(), { timeZone: "UTC", hour: "numeric", minute: "2-digit" });
 
+const VIEW_KEY = "civic-atlas:calendar-view";
+
+// The first day after `after` with a committee meeting on record, for pointing past an empty week.
+function useNextMeetingDay(after, enabled) {
+  const [day, setDay] = useState(null);
+  useEffect(() => {
+    setDay(null);
+    if (!enabled) return;
+    db.from("committee_meetings").select("meeting_at").gt("meeting_at", `${after}T23:59:59Z`).order("meeting_at").limit(1)
+      .then(({ data }) => setDay(data?.[0] ? et(data[0].meeting_at).day : null));
+  }, [after, enabled]);
+  return day;
+}
+
 function useMeetings(from, to) {
   const [rows, setRows] = useState(null);
   useEffect(() => {
@@ -50,10 +64,11 @@ const committeeOf = (m, names) => names[m.committee_ids?.[0]?.slice(0, 4)] ?? ""
 const isMine = (m, mine) => (m.committee_ids ?? []).some((c) => mine.has(c) || mine.has(c.slice(0, 4)));
 const heading = (m) => meetingHeading(m.title, m.meeting_type, itemsLabel).heading;
 
-function WeekGrid({ start, mine }) {
+function WeekGrid({ start, mine, onGoTo }) {
   const names = useCommitteeNames();
   const end = addDays(start, 6);
   const rows = useMeetings(start, end);
+  const next = useNextMeetingDay(end, rows?.length === 0);
   const today = todayEt();
   if (!rows) return <p>{tr("Loading…", "Cargando…")}</p>;
   const weekend = rows.some((m) => [5, 6].includes((new Date(`${m.day}T12:00:00Z`).getUTCDay() + 6) % 7));
@@ -92,8 +107,18 @@ function WeekGrid({ start, mine }) {
   return (
     <>
       <p className="fine cal-key"><span className="cal-swatch house" /> {tr("House", "Cámara")} <span className="cal-swatch senate" /> {tr("Senate", "Senado")}{mine.size > 0 && <> <span className="cal-swatch mine" /> {tr("your representatives' committees", "comités de sus representantes")}</>}</p>
-      {rows.length === 0 && <p className="fine">{tr("No committee meetings on record for this week.", "No hay reuniones de comités registradas para esta semana.")}</p>}
-      <div className="cal-week" style={{ "--days": days.length }}>
+      {rows.length === 0 && (
+        <p className="cal-empty">
+          {tr(`No committee meetings are on record for ${dayLabel(start, { month: "short", day: "numeric" })} – ${dayLabel(end, { month: "short", day: "numeric" })}.`,
+            `No hay reuniones de comités registradas del ${dayLabel(start, { day: "numeric", month: "short" })} al ${dayLabel(end, { day: "numeric", month: "short" })}.`)}{" "}
+          {next && (
+            <button type="button" className="link" onClick={() => onGoTo(mondayOf(next))}>
+              {tr(`Next meetings: week of ${dayLabel(mondayOf(next), { month: "short", day: "numeric" })}`, `Próximas reuniones: semana del ${dayLabel(mondayOf(next), { day: "numeric", month: "short" })}`)}
+            </button>
+          )}
+        </p>
+      )}
+      {rows.length > 0 && <div className="cal-week" style={{ "--days": days.length }}>
         <div className="cal-corner" />
         {days.map((d) => (
           <div key={d} className={`cal-dayhead${d === today ? " today" : ""}`}>
@@ -117,7 +142,7 @@ function WeekGrid({ start, mine }) {
             ))}
           </div>
         ))}
-      </div>
+      </div>}
       {/* Phones: the same week as a day-by-day list (a time grid is unreadable that narrow). */}
       <div className="cal-week-mobile">
         {days.filter((d) => rows.some((m) => m.day === d)).map((d) => (
@@ -194,8 +219,10 @@ function MonthGrid({ month, mine }) {
 
 export default function CommitteeCalendar({ mine = new Set() }) {
   const [params, setParams] = useSearchParams();
-  const wide = typeof window !== "undefined" && window.matchMedia?.("(min-width: 900px)").matches;
-  const view = ["week", "month", "list"].includes(params.get("view")) ? params.get("view") : wide ? "week" : "list";
+  // Week view by default on every screen (phones get it as a day-by-day list); the visitor's last
+  // choice is remembered on this device.
+  const saved = (() => { try { return localStorage.getItem(VIEW_KEY); } catch { return null; } })();
+  const view = ["week", "month", "list"].includes(params.get("view")) ? params.get("view") : ["week", "month", "list"].includes(saved) ? saved : "week";
   const thisWeek = mondayOf(todayEt());
   const week = /^\d{4}-\d{2}-\d{2}$/.test(params.get("week") ?? "") ? mondayOf(params.get("week")) : thisWeek;
   const month = /^\d{4}-\d{2}$/.test(params.get("month") ?? "") ? params.get("month") : todayEt().slice(0, 7);
@@ -207,7 +234,7 @@ export default function CommitteeCalendar({ mine = new Set() }) {
       <div className="cal-bar">
         <div className="toggle" role="group" aria-label={tr("Calendar view", "Vista del calendario")}>
           {[["week", tr("Week", "Semana")], ["month", tr("Month", "Mes")], ["list", tr("List", "Lista")]].map(([k, label]) => (
-            <button key={k} type="button" aria-pressed={view === k} className={view === k ? "on" : ""} onClick={() => set("view", k)}>{label}</button>
+            <button key={k} type="button" aria-pressed={view === k} className={view === k ? "on" : ""} onClick={() => { try { localStorage.setItem(VIEW_KEY, k); } catch { /* storage unavailable */ } set("view", k); }}>{label}</button>
           ))}
         </div>
         {view === "week" && (
@@ -228,7 +255,7 @@ export default function CommitteeCalendar({ mine = new Set() }) {
           </div>
         )}
       </div>
-      {view === "week" && <WeekGrid start={week} mine={mine} />}
+      {view === "week" && <WeekGrid start={week} mine={mine} onGoTo={(d) => set("week", d)} />}
       {view === "month" && <MonthGrid month={month} mine={mine} />}
       {view === "list" && <ComingUp myCommittees={mine} floor={false} />}
       {view !== "list" && (

@@ -64,19 +64,24 @@ export default function Week() {
   return (
     <main className="page wide">
       <h1>{tr("This week in Congress", "Esta semana en el Congreso")}</h1>
-      <section className="section">
+      <ul className="level-jump" aria-label={tr("Jump to", "Ir a")}>
+        <li><a href="#floor">{tr("Floor schedule", "Agenda del pleno")}</a></li>
+        <li><a href="#committees">{tr("Committee calendar", "Calendario de comités")}</a></li>
+        <li><a href="#last-week">{tr("Last week's votes", "Votos de la semana pasada")}</a></li>
+      </ul>
+      <section className="section" id="floor">
         <h2>{tr("Coming up", "Próximamente")}</h2>
         <ComingUp myCommittees={myCommittees} committees={false} />
       </section>
 
-      <section className="section">
+      <section className="section" id="committees">
         <h2>{tr("Committee hearings and markups", "Audiencias y sesiones de comités")}</h2>
         <CommitteeCalendar mine={myCommittees} />
       </section>
 
       {votes.length === 0 ? <p>{tr("No votes on record yet.", "Todavía no hay votos registrados.")}</p> : (
         <>
-          <h2 className="week-head">{tr("Last week with votes", "Última semana con votaciones")}: {date(state.from)} {tr("to", "al")} {date(state.to)}</h2>
+          <h2 className="week-head" id="last-week">{tr("Last week with votes", "Última semana con votaciones")}: {date(state.from)} {tr("to", "al")} {date(state.to)}</h2>
 
           <section className="section">
             <h2>{tr("Became law", "Se convirtieron en ley")}</h2>

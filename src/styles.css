@@ -409,3 +409,5 @@ label.check { display: inline-flex; align-items: center; gap: 6px; font-size: 0.
 .measure-status.on { border-color: var(--accent); color: var(--accent); }
 .official { border-left: 3px solid var(--border-strong); padding-left: 12px; margin: 6px 0; }
 .measure-dates li.future { color: var(--muted); }
+.cal-empty { margin: 8px 0 14px; padding: 12px 14px; border: 1px dashed var(--border-strong); border-radius: 8px; }
+#floor, #committees, #last-week { scroll-margin-top: 72px; }
