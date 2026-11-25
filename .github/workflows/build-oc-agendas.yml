@@ -1,6 +1,7 @@
 name: Build Orange County agendas
 
-# Orange County Board of Supervisors agendas, item by item, from the Clerk of the Board.
+# Orange County Board of Supervisors agendas, item by item, from the Clerk of the Board, and city
+# council agendas from cities that publish through Legistar's public data feed.
 # Agendas post on Wednesdays two weeks before each Tuesday meeting, with changes the Friday before.
 on:
   workflow_dispatch:
@@ -25,9 +26,11 @@ jobs:
       - run: sudo apt-get install -y -qq poppler-utils >/dev/null && pip install --quiet pymupdf
       - name: Build
         run: python3 scripts/data/oc_agendas.py ${{ inputs.debug && '--debug' || '' }}
+      - name: City councils (Legistar)
+        run: python3 scripts/data/city_agendas.py
       - name: Commit
         run: |
           git config user.name "civic-atlas bot"
           git config user.email "christofogis@users.noreply.github.com"
-          git add public/data/local/ca-orange-agendas.json
+          git add public/data/local/ca-orange-agendas.json public/data/local/ca-orange-city-agendas.json
           git diff --cached --quiet || (git commit -m "Orange County agendas updated from the Clerk of the Board" && git pull --rebase -q && git push)
