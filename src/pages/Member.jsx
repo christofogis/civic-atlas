@@ -183,7 +183,6 @@ function Contact({ term, member }) {
   if (!term?.phone && !term?.contact_form && !term?.address && accounts.length === 0) return null;
   return (
     <section className="contact">
-      <h2>{tr("Contact", "Contacto")}<Ref id="src-contact" text={tr("Source: unitedstates/congress-legislators.", "Fuente: unitedstates/congress-legislators.")} /></h2>
       {term.phone && <p>{tr("Washington office", "Oficina en Washington")}: <a href={`tel:+1-${term.phone}`}>{term.phone}</a></p>}
       {term.address && <p className="fine">{term.address}</p>}
       <p>
@@ -196,19 +195,34 @@ function Contact({ term, member }) {
           <span key={k}>{i ? " · " : ""}<a href={link(member[k])} rel="noopener noreferrer">{label}</a></span>
         ))}</p>
       )}
-      <p className="fine">{tr("Offices usually ask for your address to confirm you're a constituent.", "Las oficinas suelen pedir su dirección para confirmar que vive en su distrito o estado.")}</p>
+      <p className="fine">{tr("Offices usually ask for your address to confirm you're a constituent.", "Las oficinas suelen pedir su dirección para confirmar que vive en su distrito o estado.")}<Ref id="src-contact" text={tr("Source: unitedstates/congress-legislators.", "Fuente: unitedstates/congress-legislators.")} /></p>
     </section>
   );
 }
 
-const TABS = [["overview", "Overview", "Resumen"], ["votes", "Votes", "Votos"], ["bills", "Bills", "Proyectos"], ["money", "Money", "Dinero"], ["trades", "Stock trades", "Acciones"]];
+// The page shows a plain summary first, then one section per topic that opens in place. Each
+// section's label carries a one-line summary of what's inside, so a reader can decide whether
+// to open it. Contents render only when open (faster, and the notes list matches what's shown).
+// #votes, #bills, #money and #trades open that section (old tab links keep working).
+const FOLDS = ["contact", "service", "committees", "votes", "bills", "money", "trades", "follow"];
+function Fold({ id, title, summary, open, onToggle, children }) {
+  return (
+    <details className="fold" id={id} open={open} onToggle={(e) => onToggle(id, e.currentTarget.open)}>
+      <summary>
+        <h2>{title}</h2>
+        {summary && <span className="fold-summary">{summary}</span>}
+      </summary>
+      {open && <div className="fold-body">{children}</div>}
+    </details>
+  );
+}
 
 // A section's source goes in the page's notes, cited from its heading.
 const slug = (s) => String(s).toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
 function Section({ title, source, children }) {
   return (
     <section className="section">
-      <h2>{title}{source && <Ref id={`src-${slug(title)}`} text={<>{tr("Source", "Fuente")}: {source}</>} />}</h2>
+      <h3>{title}{source && <Ref id={`src-${slug(title)}`} text={<>{tr("Source", "Fuente")}: {source}</>} />}</h3>
       {children}
     </section>
   );
@@ -221,16 +235,20 @@ export default function Member() {
   const [pickedCycle, setPickedCycle] = useState(null);
   const { hash } = useLocation();
   const navigate = useNavigate();
-  const tabKeys = (e) => {
-    const i = TABS.findIndex(([id]) => id === tab);
-    const next = { ArrowRight: i + 1, ArrowLeft: i - 1, Home: 0, End: TABS.length - 1 }[e.key];
-    if (next === undefined) return;
-    e.preventDefault();
-    const id = TABS[(next + TABS.length) % TABS.length][0];
-    navigate({ hash: id === "overview" ? "" : id }, { replace: true });
-    requestAnimationFrame(() => document.getElementById(`tab-${id}`)?.focus());
-  };
-  const tab = TABS.some(([id]) => `#${id}` === hash) ? hash.slice(1) : "overview";
+  const [open, setOpen] = useState(() => new Set());
+  const toggle = (id, isOpen) => setOpen((prev) => {
+    if (prev.has(id) === isOpen) return prev;
+    const next = new Set(prev);
+    if (isOpen) next.add(id); else next.delete(id);
+    return next;
+  });
+  // A link to #votes (etc.) opens that section and brings it into view once the page has loaded.
+  const target = FOLDS.includes(hash.slice(1)) ? hash.slice(1) : null;
+  useEffect(() => {
+    if (!target || state.status !== "done") return;
+    toggle(target, true);
+    requestAnimationFrame(() => document.getElementById(target)?.scrollIntoView({ block: "start" }));
+  }, [target, state.status]);
 
   useEffect(() => {
     if (!BIOGUIDE.test(bioguide ?? "")) { setState({ status: "missing" }); return; }
@@ -265,6 +283,34 @@ export default function Member() {
   const updated = (job) => (fresh[job] ? tr(` Updated ${date(fresh[job])}.`, ` Actualizado el ${date(fresh[job])}.`) : "");
   const voteJob = Object.keys(fresh).find((j) => j.startsWith("votes-"));
 
+  // One-line summaries for each section's label: same wording for every member, from the records.
+  const pctOf = (n, d) => `${Math.round((100 * n) / d)}%`;
+  const vs = voteStats[0];
+  const billCongress = billStats[0]?.congress;
+  const introduced = billCongress ? billStats.filter((b) => b.congress === billCongress).reduce((n, b) => n + b.sponsored, 0) : 0;
+  const enacted = billCongress ? laws.filter((l) => l.congress === billCongress).length : 0;
+  const raised = finance.find((x) => Number(x.receipts) > 0);
+  const firstYear = terms.length ? terms.reduce((a, t) => (t.start_date < a ? t.start_date : a), terms[0].start_date).slice(0, 4) : null;
+  const upIn = seat?.seat_status === "serving" ? seatNextUp(seat.chamber, seat.senate_class) : null;
+  const sum = {
+    votes: vs && vs.roll_calls > 0
+      ? tr(`Voted on ${pctOf(vs.roll_calls - vs.missed, vs.roll_calls)} of roll calls in the ${ordinal(vs.congress)} Congress`, `Votó en el ${pctOf(vs.roll_calls - vs.missed, vs.roll_calls)} de las votaciones nominales del ${ordinal(vs.congress)} Congreso`)
+      : tr("No roll-call votes on record since 2023", "No hay votaciones nominales registradas desde 2023"),
+    bills: billCongress
+      ? tr(`Introduced ${introduced.toLocaleString()} in the ${ordinal(billCongress)} Congress; ${enacted.toLocaleString()} became law`, `Presentó ${introduced.toLocaleString()} en el ${ordinal(billCongress)} Congreso; ${enacted.toLocaleString()} se convirtieron en ley`)
+      : tr("No bills on record since 2023", "No hay proyectos registrados desde 2023"),
+    committees: fullCommittees.length
+      ? tr(`Serves on ${fullCommittees.length} committee${fullCommittees.length === 1 ? "" : "s"}`, `Forma parte de ${fullCommittees.length} comité${fullCommittees.length === 1 ? "" : "s"}`)
+      : tr("No committee assignments on record", "No hay asignaciones a comités registradas"),
+    money: raised
+      ? tr(`Raised ${money(Number(raised.receipts))} for the ${raised.cycle} election`, `Recaudó ${money(Number(raised.receipts))} para la elección de ${raised.cycle}`)
+      : tr("No FEC filings on record", "No hay declaraciones ante la FEC registradas"),
+    trades: ts
+      ? tr(`${ts.trades.toLocaleString()} transaction${ts.trades === 1 ? "" : "s"} reported since 2025`, `${ts.trades.toLocaleString()} transacci${ts.trades === 1 ? "ón informada" : "ones informadas"} desde 2025`)
+      : tr("No reports on file since 2025", "No hay informes desde 2025"),
+    service: [firstYear && tr(`In Congress since ${firstYear}`, `En el Congreso desde ${firstYear}`), upIn && tr(`seat next up for election in ${upIn}`, `escaño en elección en ${upIn}`)].filter(Boolean).join(tr("; ", "; ")),
+  };
+
   return (
     <NotesProvider>
     <main className="page full">
@@ -278,73 +324,19 @@ export default function Member() {
         )}
       </header>
 
-      {/* Arrow keys, Home and End move between tabs (the standard tab pattern); Tab moves into the panel. */}
-      <nav className="tabs" role="tablist" aria-label={tr("Sections of this page", "Secciones de esta página")}>
-        {TABS.map(([id, label, labelEs]) => (
-          <button key={id} type="button" role="tab" id={`tab-${id}`} aria-selected={tab === id} aria-controls={`panel-${id}`}
-            tabIndex={tab === id ? 0 : -1} onKeyDown={tabKeys}
-            className={tab === id ? "on" : ""} onClick={() => navigate({ hash: id === "overview" ? "" : id }, { replace: true })}>
-            {tr(label, labelEs)}
-          </button>
-        ))}
-      </nav>
-
-      <div role="tabpanel" id={`panel-${tab}`} aria-labelledby={`tab-${tab}`}>
-      {tab === "overview" && <div className="split">
-      <aside className="split-aside">
-      {seat?.seat_status === "serving" && <Contact term={terms[0]} member={m} />}
-      <Follow feed={`/api/feed/member/${m.bioguide_id}`} calendar={`/api/calendar/member/${m.bioguide_id}`}
-        calendarLabel={tr("Add their committees' hearings to your calendar", "Agregar a su calendario las audiencias de sus comités")} />
-      <EmbedCode path={`/embed/member/${m.bioguide_id}`} title={`${name} · Civic Atlas`} />
-
-      </aside>
-      <div className="split-main">
       <AtAGlance terms={terms} voteStats={voteStats} medians={medians} billStats={billStats} laws={laws}
         finance={finance} bySize={bySize} tradeSummary={ts} delegate={delegate(latest)} />
 
-      <Section title={tr("Service in Congress", "Servicio en el Congreso")} source={<>unitedstates/congress-legislators.{updated("members")} {tr("Biography", "Biografía")}: <a href={m.source_url}>Biographical Directory of the U.S. Congress</a>.</>}>
-        {seat?.seat_status === "serving" && (() => {
-          const upIn = seatNextUp(seat.chamber, seat.senate_class);
-          const filed = candidacies.find((c) => c.election_year === upIn);
-          return upIn && (
-            <p>
-              {tr(`This seat is next up for election in ${upIn}.`, `Este escaño se elige de nuevo en ${upIn}.`)}
-              {upIn === nextElectionYear() && (filed
-                ? <> {tr(`Has filed with the FEC to run in ${upIn}`, `Se inscribió ante la FEC para postularse en ${upIn}`)}{filed.office === "S" ? tr(" for the Senate", " al Senado") : tr(` for the House${filed.district ? `, District ${filed.district}` : ""}`, ` a la Cámara${filed.district ? `, distrito ${filed.district}` : ""}`)} (<a href={`https://www.fec.gov/data/candidate/${filed.fec_candidate_id}/`}>FEC</a>).</>
-                : <> {tr(`Hasn't filed with the FEC for ${upIn} yet.`, `Todavía no se ha inscrito ante la FEC para ${upIn}.`)}</>)}
-              {" "}<Link to={`/elections?state=${seat.state}`}>{tr("Who has filed in", "Quién se ha inscrito en")} {stateName(seat.state)}</Link>
-            </p>
-          );
-        })()}
-        <ul className="plain">
-          {terms.map((t) => (
-            <li key={`${t.chamber}-${t.start_date}`}>{seatLabel(t)} <PartyName party={t.party} /> · {date(t.start_date)} – {date(t.end_date)}</li>
-          ))}
-        </ul>
-      </Section>
+      <p className="fold-hint">{tr("Tap a topic to see the details and records.", "Toque un tema para ver los detalles y registros.")}</p>
+      <div className="folds">
+      {seat?.seat_status === "serving" && (
+        <Fold id="contact" title={tr("Contact", "Contacto")} open={open.has("contact")} onToggle={toggle}
+          summary={terms[0]?.phone ? tr(`Washington office: ${terms[0].phone}`, `Oficina en Washington: ${terms[0].phone}`) : tr("Office, email form and website", "Oficina, formulario de correo y sitio web")}>
+          <Contact term={terms[0]} member={m} />
+        </Fold>
+      )}
+      <Fold id="votes" title={tr("Votes", "Votos")} open={open.has("votes")} onToggle={toggle} summary={sum.votes}>
 
-      <Section title={currentCongress ? tr(`Committees (${ordinal(currentCongress)} Congress)`, `Comités (${ordinal(currentCongress)} Congreso)`) : tr("Committees", "Comités")} source={`unitedstates/congress-legislators.${updated("committees")}`}>
-        {fullCommittees.length === 0 ? <p>{tr("No committee assignments on record.", "No hay asignaciones a comités registradas.")}</p> : (
-          <ul className="plain">
-            {fullCommittees.map((c) => (
-              <li key={c.committee.committee_id}>
-                <Link to={`/committee/${c.committee.committee_id}`}>{c.committee.name}</Link>
-                {c.title && <> · {c.title}</>}
-                {subsByParent(c.committee.committee_id).length > 0 && (
-                  <ul>{subsByParent(c.committee.committee_id).map((s) => (
-                    <li key={s.committee.committee_id}><Link to={`/committee/${s.committee.committee_id}`}>{s.committee.name.replace(/^the /, "The ")}</Link>{s.title && <> · {s.title}</>}</li>
-                  ))}</ul>
-                )}
-              </li>
-            ))}
-          </ul>
-        )}
-      </Section>
-
-      </div>
-      </div>}
-
-      {tab === "votes" && <>
       <Section title={tr("Voting record", "Historial de votos")} source={<>{tr("Calculated from House Clerk and Senate.gov roll-call records.", "Calculado a partir de los registros de votaciones nominales del Secretario de la Cámara y de Senate.gov.")} <Link to="/methods">{tr("How these are calculated", "Cómo se calculan")}</Link>.</>}>
         {voteStats.length === 0 ? <p>{tr("No roll-call votes on record since 2023.", "No hay votaciones nominales registradas desde 2023.")}</p> : (
           <>
@@ -394,9 +386,9 @@ export default function Member() {
         )}
       </Section>
 
-      </>}
+      </Fold>
+      <Fold id="bills" title={tr("Bills", "Proyectos de ley")} open={open.has("bills")} onToggle={toggle} summary={sum.bills}>
 
-      {tab === "bills" && <>
       <Section title={tr("Legislation", "Legislación")} source={tr(`GovInfo Bill Status (Library of Congress), 118th Congress on.${updated("bills")}`, `GovInfo Bill Status (Biblioteca del Congreso), desde el 118.º Congreso.${updated("bills")}`)}>
         <p>{tr("Sponsored", "Patrocinados")}: {sponsoredCount ?? 0} · {tr("Cosponsored", "Copatrocinados")}: {cosponsoredCount ?? 0}</p>
         {billStats.map((b) => {
@@ -432,9 +424,58 @@ export default function Member() {
         )}
       </Section>
 
-      </>}
+      </Fold>
+      <Fold id="committees" title={tr("Committees", "Comités")} open={open.has("committees")} onToggle={toggle} summary={sum.committees}>
+      <Section title={currentCongress ? tr(`Committees (${ordinal(currentCongress)} Congress)`, `Comités (${ordinal(currentCongress)} Congreso)`) : tr("Committees", "Comités")} source={`unitedstates/congress-legislators.${updated("committees")}`}>
+        {fullCommittees.length === 0 ? <p>{tr("No committee assignments on record.", "No hay asignaciones a comités registradas.")}</p> : (
+          <ul className="plain">
+            {fullCommittees.map((c) => (
+              <li key={c.committee.committee_id}>
+                <Link to={`/committee/${c.committee.committee_id}`}>{c.committee.name}</Link>
+                {c.title && <> · {c.title}</>}
+                {subsByParent(c.committee.committee_id).length > 0 && (
+                  <ul>{subsByParent(c.committee.committee_id).map((s) => (
+                    <li key={s.committee.committee_id}><Link to={`/committee/${s.committee.committee_id}`}>{s.committee.name.replace(/^the /, "The ")}</Link>{s.title && <> · {s.title}</>}</li>
+                  ))}</ul>
+                )}
+              </li>
+            ))}
+          </ul>
+        )}
+      </Section>
 
-      {tab === "trades" && <>
+      </Fold>
+      <Fold id="money" title={tr("Campaign money", "Dinero de campaña")} open={open.has("money")} onToggle={toggle} summary={sum.money}>
+
+      <Section title={tr("Campaign finance", "Finanzas de campaña")} source={<>{tr("Federal Election Commission (OpenFEC).", "Comisión Federal de Elecciones (OpenFEC).")}{updated("fec-summaries")} <Link to="/methods#money">{tr("About this data", "Sobre estos datos")}</Link>.</>}>
+        {finance.length === 0 ? <p>{tr("No FEC filings on record for this member.", "No hay declaraciones ante la FEC registradas para este miembro.")}</p> : (
+          <table>
+            <thead><tr><th>{tr("Cycle", "Ciclo")}</th><th>{tr("Raised", "Recaudado")}</th><th>{tr("Spent", "Gastado")}</th><th>{tr("Cash on hand", "Efectivo disponible")}</th><th>{tr("Individuals", "Personas")}</th><th>PAC</th><th>{tr("Through", "Hasta")}</th></tr></thead>
+            <tbody>
+              {finance.map((f) => (
+                <tr key={`${f.fec_candidate_id}-${f.cycle}`}>
+                  <td><a href={f.source_url}>{f.cycle}</a></td>
+                  <td>{money(f.receipts)}</td>
+                  <td>{money(f.disbursements)}</td>
+                  <td>{money(f.cash_on_hand)}</td>
+                  <td>{money(f.individual_contributions)}</td>
+                  <td>{money(f.pac_contributions)}</td>
+                  <td>{date(f.coverage_end_date)}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
+        {detailCycles.length > 1 && (
+          <div className="toggle" role="group" aria-label={tr("Election cycle to show in detail", "Ciclo electoral a mostrar en detalle")}>
+            {detailCycles.map((c) => <button key={c} type="button" aria-pressed={c === detailCycle} className={c === detailCycle ? "on" : ""} onClick={() => setPickedCycle(c)}>{tr(`${c} cycle`, `Ciclo ${c}`)}</button>)}
+          </div>
+        )}
+        {detailCycle > 0 && <FinanceDetail cycle={detailCycle} bySize={inCycle(bySize)} byState={inCycle(byState)} home={latest?.state} employers={inCycle(employers)} pacs={inCycle(pacs)} outside={inCycle(outside)} fecId={finance.find((f) => f.cycle === detailCycle)?.fec_candidate_id} />}
+      </Section>
+      </Fold>
+      <Fold id="trades" title={tr("Stock trades", "Compraventa de acciones")} open={open.has("trades")} onToggle={toggle} summary={sum.trades}>
+
       <Section title={tr("Stock trades", "Compraventa de acciones")} source={<>{tr("Periodic Transaction Reports filed under the STOCK Act with the House Clerk and Senate, 2025 on.", "Informes periódicos de transacciones presentados según la Ley STOCK ante el Secretario de la Cámara y el Senado, desde 2025.")}{updated("trades")} <Link to="/methods#trades">{tr("About this data", "Sobre estos datos")}</Link>.</>}>
         {!ts ? <p>{tr("No periodic transaction reports on record since 2025.", "No hay informes periódicos de transacciones registrados desde 2025.")}</p> : (
           <>
@@ -474,36 +515,38 @@ export default function Member() {
         )}
       </Section>
 
-      </>}
-
-      {tab === "money" && <>
-      <Section title={tr("Campaign finance", "Finanzas de campaña")} source={<>{tr("Federal Election Commission (OpenFEC).", "Comisión Federal de Elecciones (OpenFEC).")}{updated("fec-summaries")} <Link to="/methods#money">{tr("About this data", "Sobre estos datos")}</Link>.</>}>
-        {finance.length === 0 ? <p>{tr("No FEC filings on record for this member.", "No hay declaraciones ante la FEC registradas para este miembro.")}</p> : (
-          <table>
-            <thead><tr><th>{tr("Cycle", "Ciclo")}</th><th>{tr("Raised", "Recaudado")}</th><th>{tr("Spent", "Gastado")}</th><th>{tr("Cash on hand", "Efectivo disponible")}</th><th>{tr("Individuals", "Personas")}</th><th>PAC</th><th>{tr("Through", "Hasta")}</th></tr></thead>
-            <tbody>
-              {finance.map((f) => (
-                <tr key={`${f.fec_candidate_id}-${f.cycle}`}>
-                  <td><a href={f.source_url}>{f.cycle}</a></td>
-                  <td>{money(f.receipts)}</td>
-                  <td>{money(f.disbursements)}</td>
-                  <td>{money(f.cash_on_hand)}</td>
-                  <td>{money(f.individual_contributions)}</td>
-                  <td>{money(f.pac_contributions)}</td>
-                  <td>{date(f.coverage_end_date)}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        )}
-        {detailCycles.length > 1 && (
-          <div className="toggle" role="group" aria-label={tr("Election cycle to show in detail", "Ciclo electoral a mostrar en detalle")}>
-            {detailCycles.map((c) => <button key={c} type="button" aria-pressed={c === detailCycle} className={c === detailCycle ? "on" : ""} onClick={() => setPickedCycle(c)}>{tr(`${c} cycle`, `Ciclo ${c}`)}</button>)}
-          </div>
-        )}
-        {detailCycle > 0 && <FinanceDetail cycle={detailCycle} bySize={inCycle(bySize)} byState={inCycle(byState)} home={latest?.state} employers={inCycle(employers)} pacs={inCycle(pacs)} outside={inCycle(outside)} fecId={finance.find((f) => f.cycle === detailCycle)?.fec_candidate_id} />}
+      </Fold>
+      <Fold id="service" title={tr("Time in office", "Tiempo en el cargo")} open={open.has("service")} onToggle={toggle} summary={sum.service}>
+      <Section title={tr("Service in Congress", "Servicio en el Congreso")} source={<>unitedstates/congress-legislators.{updated("members")} {tr("Biography", "Biografía")}: <a href={m.source_url}>Biographical Directory of the U.S. Congress</a>.</>}>
+        {seat?.seat_status === "serving" && (() => {
+          const upIn = seatNextUp(seat.chamber, seat.senate_class);
+          const filed = candidacies.find((c) => c.election_year === upIn);
+          return upIn && (
+            <p>
+              {tr(`This seat is next up for election in ${upIn}.`, `Este escaño se elige de nuevo en ${upIn}.`)}
+              {upIn === nextElectionYear() && (filed
+                ? <> {tr(`Has filed with the FEC to run in ${upIn}`, `Se inscribió ante la FEC para postularse en ${upIn}`)}{filed.office === "S" ? tr(" for the Senate", " al Senado") : tr(` for the House${filed.district ? `, District ${filed.district}` : ""}`, ` a la Cámara${filed.district ? `, distrito ${filed.district}` : ""}`)} (<a href={`https://www.fec.gov/data/candidate/${filed.fec_candidate_id}/`}>FEC</a>).</>
+                : <> {tr(`Hasn't filed with the FEC for ${upIn} yet.`, `Todavía no se ha inscrito ante la FEC para ${upIn}.`)}</>)}
+              {" "}<Link to={`/elections?state=${seat.state}`}>{tr("Who has filed in", "Quién se ha inscrito en")} {stateName(seat.state)}</Link>
+            </p>
+          );
+        })()}
+        <ul className="plain">
+          {terms.map((t) => (
+            <li key={`${t.chamber}-${t.start_date}`}>{seatLabel(t)} <PartyName party={t.party} /> · {date(t.start_date)} – {date(t.end_date)}</li>
+          ))}
+        </ul>
       </Section>
-      </>}
+
+
+      </Fold>
+      <Fold id="follow" title={tr("Follow and share", "Seguir y compartir")} open={open.has("follow")} onToggle={toggle}
+        summary={tr("News feed, calendar of their committees' hearings, and a box for your own site", "Noticias, calendario de audiencias de sus comités y un recuadro para su sitio")}>
+      <Follow feed={`/api/feed/member/${m.bioguide_id}`} calendar={`/api/calendar/member/${m.bioguide_id}`}
+        calendarLabel={tr("Add their committees' hearings to your calendar", "Agregar a su calendario las audiencias de sus comités")} />
+      <EmbedCode path={`/embed/member/${m.bioguide_id}`} title={`${name} · Civic Atlas`} />
+
+      </Fold>
       </div>
       <NotesList />
     </main>

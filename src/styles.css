@@ -529,3 +529,21 @@ label.check { display: inline-flex; align-items: center; gap: 6px; font-size: 0.
 @media (max-width: 640px) {
   .ref-pop { position: fixed; left: 0.75rem; right: 0.75rem; bottom: 0.75rem; top: auto; transform: none; width: auto; font-size: 0.9rem; }
 }
+
+/* Member page: topics that open in place, each labeled with a one-line summary */
+.fold-hint { color: var(--muted); font-size: 0.9rem; margin: 1.5rem 0 0.5rem; }
+.folds { border-top: 1px solid var(--border); }
+.fold { border-bottom: 1px solid var(--border); }
+.fold > summary { list-style: none; cursor: pointer; padding: 0.9rem 2rem 0.9rem 0; position: relative; display: block; }
+.fold > summary::-webkit-details-marker { display: none; }
+.fold > summary::after { content: ""; position: absolute; right: 0.5rem; top: 1.3rem; width: 0.55rem; height: 0.55rem;
+  border-right: 2px solid var(--muted); border-bottom: 2px solid var(--muted); transform: rotate(45deg); transition: transform 0.15s; }
+.fold[open] > summary::after { transform: rotate(225deg); top: 1.55rem; }
+.fold > summary h2 { display: inline; font-size: 1.15rem; margin: 0; }
+.fold-summary { display: block; color: var(--muted); font-size: 0.95rem; margin-top: 0.2rem; }
+.fold > summary:hover h2 { text-decoration: underline; }
+.fold > summary:focus-visible { outline: 2px solid var(--accent, #0e5a4b); outline-offset: 2px; }
+.fold-body { padding: 0 0 1.25rem; }
+.fold-body .section:first-child h3 { margin-top: 0.25rem; }
+@media (prefers-reduced-motion: reduce) { .fold > summary::after { transition: none; } }
+@media print { .fold > summary::after { display: none; } }
