@@ -10,6 +10,7 @@ import Follow from "../components/Follow.jsx";
 import { KindLabel, Position } from "../components/Explain.jsx";
 import { seatLabel, date, money, billLabel, ordinal, stateName, partyName } from "../lib/format.js";
 import { tr } from "../lib/lang.js";
+import { NotesList, NotesProvider, Ref } from "../components/Notes.jsx";
 import { PartyName } from "../components/PartyTag.jsx";
 
 const BIOGUIDE = /^[A-Z][0-9]{6}$/;
@@ -182,7 +183,7 @@ function Contact({ term, member }) {
   if (!term?.phone && !term?.contact_form && !term?.address && accounts.length === 0) return null;
   return (
     <section className="contact">
-      <h2>{tr("Contact", "Contacto")}</h2>
+      <h2>{tr("Contact", "Contacto")}<Ref id="src-contact" text={tr("Source: unitedstates/congress-legislators.", "Fuente: unitedstates/congress-legislators.")} /></h2>
       {term.phone && <p>{tr("Washington office", "Oficina en Washington")}: <a href={`tel:+1-${term.phone}`}>{term.phone}</a></p>}
       {term.address && <p className="fine">{term.address}</p>}
       <p>
@@ -195,19 +196,20 @@ function Contact({ term, member }) {
           <span key={k}>{i ? " · " : ""}<a href={link(member[k])} rel="noopener noreferrer">{label}</a></span>
         ))}</p>
       )}
-      <p className="fine">{tr("Source", "Fuente")}: unitedstates/congress-legislators. {tr("Offices usually ask for your address to confirm you're a constituent.", "Las oficinas suelen pedir su dirección para confirmar que vive en su distrito o estado.")}</p>
+      <p className="fine">{tr("Offices usually ask for your address to confirm you're a constituent.", "Las oficinas suelen pedir su dirección para confirmar que vive en su distrito o estado.")}</p>
     </section>
   );
 }
 
 const TABS = [["overview", "Overview", "Resumen"], ["votes", "Votes", "Votos"], ["bills", "Bills", "Proyectos"], ["money", "Money", "Dinero"], ["trades", "Stock trades", "Acciones"]];
 
+// A section's source goes in the page's notes, cited from its heading.
+const slug = (s) => String(s).toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
 function Section({ title, source, children }) {
   return (
     <section className="section">
-      <h2>{title}</h2>
+      <h2>{title}{source && <Ref id={`src-${slug(title)}`} text={<>{tr("Source", "Fuente")}: {source}</>} />}</h2>
       {children}
-      {source && <p className="fine">{tr("Source", "Fuente")}: {source}</p>}
     </section>
   );
 }
@@ -264,9 +266,10 @@ export default function Member() {
   const voteJob = Object.keys(fresh).find((j) => j.startsWith("votes-"));
 
   return (
+    <NotesProvider>
     <main className="page full">
       <header className="page-head member-head">
-        <img className="member-photo" src={`https://unitedstates.github.io/images/congress/225x275/${m.bioguide_id}.jpg`} alt={name} width="90" height="110" loading="lazy" onError={(e) => { e.currentTarget.style.display = "none"; }} />
+        <img className="member-photo" src={`https://unitedstates.github.io/images/congress/225x275/${m.bioguide_id}.jpg`} alt={name} width="90" height="110" fetchpriority="high" onError={(e) => { e.currentTarget.style.display = "none"; }} />
         <h1>{name}</h1>
         {seat?.seat_status === "serving" ? (
           <p className="lede">{seatLabel(seat)} <PartyName party={seat.party} /> · {tr("Current term", "Período actual")} {date(seat.start_date)} – {date(seat.end_date)}</p>
@@ -502,6 +505,8 @@ export default function Member() {
       </Section>
       </>}
       </div>
+      <NotesList />
     </main>
+    </NotesProvider>
   );
 }
