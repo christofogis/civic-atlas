@@ -41,12 +41,20 @@ console.log(`supervisorial districts: ${out.features.map((f) => f.properties.dis
   }
   if (bad.length) throw new Error(`unparsed council district names: ${bad.join("; ")}`);
   writeFileSync("/tmp/rov-council.json", JSON.stringify(raw));
-  const out = "public/maps/local/ca-orange-council.json";
-  await mapshaper.runCommands(`-i /tmp/rov-council.json -simplify 20% keep-shapes -o precision=0.000001 format=geojson ${out}`);
-  const g = JSON.parse(readFileSync(out, "utf8"));
-  writeFileSync(out, JSON.stringify({ source: "Orange County Registrar of Voters, City Subdistrict shapefile", source_url: url, ...g }));
+  // One small file per city, so the lookup reads only the city an address is in.
+  const all = "/tmp/rov-council-simplified.json";
+  await mapshaper.runCommands(`-i /tmp/rov-council.json -simplify 20% keep-shapes -o precision=0.000001 format=geojson ${all}`);
+  const g = JSON.parse(readFileSync(all, "utf8"));
+  const slug = (c) => c.toLowerCase().replace(/[^a-z]+/g, "-");
+  mkdirSync("public/maps/local/ca-orange-council", { recursive: true });
   const cities = [...new Set(g.features.map((f) => f.properties.city))];
-  console.log(`council districts: ${g.features.length} in ${cities.length} cities (${cities.join(", ")}); ${readFileSync(out).length} bytes`);
+  for (const c of cities) {
+    writeFileSync(`public/maps/local/ca-orange-council/${slug(c)}.json`, JSON.stringify({
+      source: "Orange County Registrar of Voters, City Subdistrict shapefile", source_url: url, city: c,
+      type: "FeatureCollection", features: g.features.filter((f) => f.properties.city === c),
+    }));
+  }
+  console.log(`council districts: ${g.features.length} in ${cities.length} cities (${cities.join(", ")})`);
 }
 
 // Cities and unincorporated communities (Census places) in Orange County, from the county's
