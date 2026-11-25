@@ -29,3 +29,6 @@ jobs:
       - name: Database size
         if: always()
         run: node scripts/checks/db-size.mjs
+      - name: Supreme Court justices still current
+        if: always()
+        run: node scripts/checks/justices.mjs

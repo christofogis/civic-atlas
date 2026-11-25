@@ -348,3 +348,12 @@ ul.items li.item { padding: 10px 0; border-bottom: 1px solid var(--border); max-
 .map-legend-item { display: inline-flex; align-items: center; gap: 6px; }
 .map-legend .swatch { display: inline-block; width: 12px; height: 12px; border-radius: 3px; }
 label.check { display: inline-flex; align-items: center; gap: 6px; font-size: 0.9rem; }
+
+/* Three branches */
+.branches { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 32px; margin-top: 8px; }
+.branch { border-top: 1px solid var(--border); padding-top: 16px; }
+.branch h2 { margin-top: 6px; }
+.branch-drawing { width: 100%; max-width: 240px; height: auto; color: var(--text); opacity: 0.8; display: block; }
+.branch-links { display: flex; flex-wrap: wrap; gap: 6px 14px; font-size: 0.9rem; }
+.party-counts { display: inline-flex; flex-wrap: wrap; gap: 4px 12px; font-size: 0.88rem; }
+@media (max-width: 900px) { .branches { grid-template-columns: 1fr; } .branch-drawing { max-width: 200px; } }

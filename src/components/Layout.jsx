@@ -49,6 +49,7 @@ export default function Layout() {
       <footer className="site-footer">
         <div className="site-inner">
           <Link to="/methods">{t("How this site works", "Cómo funciona este sitio")}</Link>
+          <Link to="/government">{t("Three branches", "Los tres poderes")}</Link>
           <Link to="/glossary">{t("Glossary", "Glosario")}</Link>
           <Link to="/corrections">{t("Corrections", "Correcciones")}</Link>
           <Link to="/compare">{t("Compare two members", "Comparar dos miembros")}</Link>

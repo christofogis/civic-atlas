@@ -26,6 +26,8 @@ export const PAGES = [
   ["/map?state=CA", ["Map", "Senators (whole state)", "Alex Padilla", "District 12"]],
   ["/state/person/6c2a35d5-c04c-44d0-8bd9-92a625e2b525", ["Akilah Weber Pierson", "California State Senate, District 39", "Capitol office", "Open States"]],
   ["/state/person/6c2a35d5-c04c-44d0-8bd9-92a625e2b525?lang=es", ["Senado de California, distrito 39", "Cargos anteriores"]],
+  ["/government", ["Three branches of government", "Legislative branch", "Executive Order", "Chief Justice", "Ketanji Brown Jackson"]],
+  ["/government?lang=es", ["Los tres poderes del gobierno", "Poder judicial", "Orden Ejecutiva"]],
   ["/map?state=CA&district=12", ["About the district", "Median household income", "Oakland", "Alameda County"]],
   ["/map?state=NY&district=12&lang=es", ["Sobre el distrito", "Parte de New York"]],
   ["/story", ["Look up a news story", "Article text"]],
