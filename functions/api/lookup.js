@@ -11,7 +11,10 @@ import { containing } from "../../lib/geo.js";
 
 // Counties with local officials on the site (pilot: Orange County, CA). The district map is a
 // static file built from the county's own GIS layer; the officials are in public/data/local/.
-const LOCAL = { "CA|Orange County": { id: "ca-orange", map: "/maps/local/ca-orange-supervisors.json" } };
+const LOCAL = { "CA|Orange County": {
+  id: "ca-orange", map: "/maps/local/ca-orange-supervisors.json", places: "/maps/local/ca-orange-places.json",
+  cities: { "Los Alamitos": { id: "los-alamitos", map: "/maps/local/ca-orange-los-alamitos-council.json" } },
+} };
 
 async function localFor(geoJson, request, env) {
   const r = geoJson?.results?.[0];
@@ -20,13 +23,22 @@ async function localFor(geoJson, request, env) {
   const county = ac.county;
   const conf = LOCAL[`${st}|${county}`];
   if (!conf) return { covered: false, county: county ?? null };
-  const out = { covered: true, id: conf.id, county, supervisor_district: null };
+  const out = { covered: true, id: conf.id, county, supervisor_district: null, place: null, city: null };
   const { lat, lng } = r.location ?? {};
   if (lat == null || lng == null || !env.ASSETS) return out;
+  const load = async (path) => (await env.ASSETS.fetch(new URL(path, request.url))).json();
   try {
-    const map = await (await env.ASSETS.fetch(new URL(conf.map, request.url))).json();
+    const map = await load(conf.map);
     out.supervisor_district = containing(map.features ?? [], lng, lat)?.properties?.district ?? null;
-  } catch { /* district stays unknown; countywide officials still show */ }
+    // Which city (or unincorporated community) the point is in, from the county's boundaries.
+    const place = containing((await load(conf.places)).features ?? [], lng, lat)?.properties;
+    if (place) out.place = { name: place.name, type: place.type };
+    const city = place && conf.cities[place.name];
+    if (city) {
+      const council = containing((await load(city.map)).features ?? [], lng, lat)?.properties?.district ?? null;
+      out.city = { id: city.id, name: place.name, council_district: council };
+    }
+  } catch { /* districts stay unknown; countywide officials still show */ }
   return out;
 }
 

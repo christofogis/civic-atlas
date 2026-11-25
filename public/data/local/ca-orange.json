@@ -3,25 +3,146 @@
   "state": "CA",
   "checked": "2026-11-24",
   "sources": [
-    { "label": "Board of Supervisors", "url": "https://board.oc.gov/about-board" },
-    { "label": "Countywide elected officials", "url": "https://www.ocgov.com/residents/gov/elected" },
-    { "label": "Supervisorial districts (County of Orange GIS)", "url": "https://services.arcgis.com/UXmFoWC7yDHcDN5Q/ArcGIS/rest/services/OC_Supervisory_Districts/FeatureServer/31" }
+    {
+      "label": "Board of Supervisors",
+      "url": "https://board.oc.gov/about-board"
+    },
+    {
+      "label": "Countywide elected officials",
+      "url": "https://www.ocgov.com/residents/gov/elected"
+    },
+    {
+      "label": "Supervisorial districts (County of Orange GIS)",
+      "url": "https://services.arcgis.com/UXmFoWC7yDHcDN5Q/ArcGIS/rest/services/OC_Supervisory_Districts/FeatureServer/31"
+    },
+    {
+      "label": "Los Alamitos City Council",
+      "url": "https://cityoflosalamitos.org/165/City-Council"
+    }
   ],
   "meetings_url": "https://board.oc.gov/meetings-agendas",
   "results_url": "https://ocvote.gov/results",
   "supervisors": [
-    { "district": 1, "name": "Janet Nguyen", "term_start": "2024-12-04", "term_end": "2029-01-01", "website": "https://bos1.oc.gov/", "phone": "(714) 834-3110" },
-    { "district": 2, "name": "Vicente Sarmiento", "term_start": "2023-01-02", "term_end": "2027-01-04", "website": "https://bos2.oc.gov/", "phone": "(714) 834-3220" },
-    { "district": 3, "name": "Donald P. Wagner", "term_start": "2025-01-06", "term_end": "2029-01-01", "website": "https://bos3.oc.gov/", "phone": "(714) 834-3330" },
-    { "district": 4, "name": "Doug Chaffee", "role": "chair", "term_start": "2023-01-02", "term_end": "2027-01-04", "website": "https://bos4.oc.gov/", "phone": "(714) 834-3440" },
-    { "district": 5, "name": "Katrina Foley", "role": "vice_chair", "term_start": "2023-01-03", "term_end": "2027-01-04", "website": "https://bos5.oc.gov/", "phone": "(714) 834-3550" }
+    {
+      "district": 1,
+      "name": "Janet Nguyen",
+      "term_start": "2024-12-04",
+      "term_end": "2029-01-01",
+      "website": "https://bos1.oc.gov/",
+      "phone": "(714) 834-3110"
+    },
+    {
+      "district": 2,
+      "name": "Vicente Sarmiento",
+      "term_start": "2023-01-02",
+      "term_end": "2027-01-04",
+      "website": "https://bos2.oc.gov/",
+      "phone": "(714) 834-3220"
+    },
+    {
+      "district": 3,
+      "name": "Donald P. Wagner",
+      "term_start": "2025-01-06",
+      "term_end": "2029-01-01",
+      "website": "https://bos3.oc.gov/",
+      "phone": "(714) 834-3330"
+    },
+    {
+      "district": 4,
+      "name": "Doug Chaffee",
+      "role": "chair",
+      "term_start": "2023-01-02",
+      "term_end": "2027-01-04",
+      "website": "https://bos4.oc.gov/",
+      "phone": "(714) 834-3440"
+    },
+    {
+      "district": 5,
+      "name": "Katrina Foley",
+      "role": "vice_chair",
+      "term_start": "2023-01-03",
+      "term_end": "2027-01-04",
+      "website": "https://bos5.oc.gov/",
+      "phone": "(714) 834-3550"
+    }
   ],
   "officers": [
-    { "office": "assessor", "name": "Claude Parrish" },
-    { "office": "auditor_controller", "name": "Andrew Hamilton" },
-    { "office": "clerk_recorder", "name": "Hugh Nguyen" },
-    { "office": "district_attorney", "name": "Todd Spitzer" },
-    { "office": "sheriff_coroner", "name": "Don Barnes" },
-    { "office": "treasurer_tax_collector", "name": "Shari Freidenrich" }
-  ]
+    {
+      "office": "assessor",
+      "name": "Claude Parrish"
+    },
+    {
+      "office": "auditor_controller",
+      "name": "Andrew Hamilton"
+    },
+    {
+      "office": "clerk_recorder",
+      "name": "Hugh Nguyen"
+    },
+    {
+      "office": "district_attorney",
+      "name": "Todd Spitzer"
+    },
+    {
+      "office": "sheriff_coroner",
+      "name": "Don Barnes"
+    },
+    {
+      "office": "treasurer_tax_collector",
+      "name": "Shari Freidenrich"
+    }
+  ],
+  "cities": [
+    {
+      "id": "los-alamitos",
+      "name": "Los Alamitos",
+      "elected": "by_district",
+      "website": "https://cityoflosalamitos.org/165/City-Council",
+      "agendas_url": "https://www.cityoflosalamitos.org/129/Agendas-Minutes",
+      "meetings": {
+        "en": "Third Monday of each month, 6:00 p.m., City Hall Council Chamber, 3191 Katella Avenue",
+        "es": "Tercer lunes de cada mes, 6:00 p. m., Sala del Concejo en el Ayuntamiento, 3191 Katella Avenue"
+      },
+      "council_map": "/maps/local/ca-orange-los-alamitos-council.json",
+      "map_source": {
+        "label": "Adopted council districts (2022–2031)",
+        "url": "https://experience.arcgis.com/experience/118312376df140dbb9f5dff642f7e309"
+      },
+      "roles_until": "2026-12-07",
+      "members": [
+        {
+          "district": 1,
+          "name": "Tanya Doby",
+          "role": "mayor",
+          "term_end_label": "November 2028"
+        },
+        {
+          "district": 2,
+          "name": "Gary Loe",
+          "term_end_label": "November 2028"
+        },
+        {
+          "district": 3,
+          "name": "Jordan Nefulda",
+          "role": "mayor_pro_tem",
+          "term_end_label": "November 2028"
+        },
+        {
+          "district": 4,
+          "name": "Shelley Hasselbrink",
+          "term_end_label": "November 2026",
+          "on_ballot": "2026-11-03",
+          "seat_change_by": "2026-12-07"
+        },
+        {
+          "district": 5,
+          "name": "Emily Hibard",
+          "term_end_label": "November 2026",
+          "on_ballot": "2026-11-03",
+          "seat_change_by": "2026-12-07"
+        }
+      ]
+    }
+  ],
+  "places_map": "/maps/local/ca-orange-places.json"
 }

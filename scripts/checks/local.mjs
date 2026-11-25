@@ -22,7 +22,19 @@ else {
   for (const o of file.officers) if (!text.includes(o.name.split(" ").pop())) problems.push(`${o.office}: "${o.name}" not found on ocgov.com`);
 }
 
+// City councils: each member's name still on the city's council page.
+for (const c of file.cities ?? []) {
+  const html = await fetch(c.website, { headers: UA }).then((r) => (r.ok ? r.text() : null)).catch(() => null);
+  if (!html) { console.log(`${c.name} council page unavailable; not checked`); continue; }
+  const text = html.replace(/<[^>]+>/g, " ");
+  for (const m of c.members) if (!text.includes(m.name)) problems.push(`${c.name} District ${m.district}: "${m.name}" not on ${c.website}`);
+}
+
 const today = new Date().toISOString().slice(0, 10);
+for (const c of file.cities ?? []) {
+  if (c.roles_until && c.roles_until < today) problems.push(`${c.name}: mayor and mayor pro tem chosen each December; update roles (roles_until ${c.roles_until})`);
+  for (const m of c.members) if (m.seat_change_by && m.seat_change_by < today) problems.push(`${c.name} District ${m.district}: on the ${m.on_ballot} ballot; update the seat`);
+}
 for (const s of file.supervisors) if (s.term_end < today) problems.push(`District ${s.district}: term ended ${s.term_end}; update the file with the new term`);
 
 if (problems.length) { console.log(problems.join("\n")); process.exit(1); }

@@ -22,3 +22,11 @@ export function loadLocal(id) {
   cache[id] ??= fetch(`/data/local/${id}.json`).then((r) => r.json());
   return cache[id];
 }
+
+export const councilRole = (r) => (r === "mayor" ? tr("Mayor", "Alcalde(sa)") : r === "mayor_pro_tem" ? tr("Mayor Pro Tem", "Alcalde(sa) Pro Tem") : null);
+export const councilSeat = (city, d) => tr(`${city} City Council, District ${d}`, `Concejo Municipal de ${city}, distrito ${d}`);
+const today = () => new Date().toISOString().slice(0, 10);
+// A seat on the ballot: once its change-over date passes with no update, it shows as updating.
+export const seatUpdating = (m) => Boolean(m.on_ballot && m.seat_change_by && m.seat_change_by < today());
+// The council picks its mayor each December; past roles_until, titles aren't shown until updated.
+export const rolesCurrent = (city) => !city.roles_until || city.roles_until >= today();
