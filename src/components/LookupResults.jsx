@@ -12,7 +12,7 @@ export default function LookupResults({ result, sectionRef, shared = false }) {
   return (
     <section className="results" ref={sectionRef} aria-live="polite">
         <h2 className="results-title">
-          {t("Your officials", "Sus funcionarios")}
+          {shared ? t("Districts", "Distritos") : t("Your officials", "Sus funcionarios")}
           <span className="fine"> · {stateName(result.state)}
           {result.districts.length === 1 && result.officials.some((o) => o.chamber === "house" && o.district !== 0)
             ? t(`, congressional district ${result.districts[0]}`, `, distrito del Congreso ${result.districts[0]}`) : ""}</span>
