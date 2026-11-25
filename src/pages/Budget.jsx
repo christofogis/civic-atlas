@@ -141,6 +141,7 @@ function Stacked({ years }) {
                 acc += v;
                 return <rect key={p.key} x={x} y={y1} width={bw} height={Math.max(0, y0 - y1 - 2)} fill={p.color} />;
               })}
+              <line x1={x - 3} x2={x + bw + 3} y1={y(rec)} y2={y(rec)} stroke="var(--bg)" strokeWidth="5" />
               <line x1={x - 3} x2={x + bw + 3} y1={y(rec)} y2={y(rec)} stroke="var(--text)" strokeWidth="2.5" />
               {((years.length - 1 - i) % 3 === 0) && <text x={x + bw / 2} y={H - 8} textAnchor="middle" className="axis">{yr.fiscal_year}</text>}
             </g>
