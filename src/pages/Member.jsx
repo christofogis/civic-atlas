@@ -1,3 +1,4 @@
+import { memberPage } from "../lib/memberPage.js";
 import { useEffect, useState } from "react";
 import { voteKind, isFinal } from "../lib/voteKind.js";
 import { Link, useParams, useLocation, useNavigate } from "react-router-dom";
@@ -52,26 +53,11 @@ function VoteStats({ s, median, delegate, independent }) {
 
 const one = (q) => q.then(({ data, error }) => { if (error) throw error; return data; });
 
-// What the top of the page needs: the summary, each section's one-line label, contact and time
-// in office. The rest loads when its section is opened (SECTION_DATA), so a phone isn't waiting
-// on records nobody has asked for yet.
+// What the top of the page needs (the summary, each section's one-line label, contact and time
+// in office) comes in one request, from the database function member_page. The rest loads when
+// its section is opened (SECTION_DATA), so a phone isn't waiting on records nobody has asked for.
 async function loadMember(id) {
-  const [member, terms, seat, memberships, finance, freshness, voteStats, medians, billStats, tradeSummary, bySize, laws, candidacies] = await Promise.all([
-    one(db.from("members").select("*").eq("bioguide_id", id).maybeSingle()),
-    one(db.from("terms").select("chamber,state,district,party,start_date,end_date,phone,address,contact_form,url").eq("bioguide_id", id).order("start_date", { ascending: false })),
-    one(db.from("seat_holders").select("*").eq("bioguide_id", id).maybeSingle()),
-    one(db.from("committee_memberships").select("congress,title,side,rank,committee:committees(committee_id,name,parent_id,url)").eq("bioguide_id", id)),
-    one(db.from("finance_summaries").select("*").eq("bioguide_id", id).order("cycle", { ascending: false })),
-    one(db.from("data_freshness").select("*")),
-    one(db.from("member_vote_stats").select("*").eq("bioguide_id", id).order("congress", { ascending: false })),
-    one(db.from("chamber_vote_medians").select("*")),
-    one(db.from("member_bill_stats").select("*").eq("bioguide_id", id).order("congress", { ascending: false })),
-    one(db.from("member_trade_summary").select("*").eq("bioguide_id", id).maybeSingle()),
-    one(db.from("finance_by_size").select("*").eq("bioguide_id", id)),
-    one(db.from("bills").select("congress,bill_type,number").eq("sponsor_bioguide_id", id).not("became_law_date", "is", null)),
-    one(db.from("candidates").select("fec_candidate_id,election_year,office,state,district").eq("bioguide_id", id)),
-  ]);
-  return { member, terms, seat, memberships, finance, freshness, voteStats, medians, billStats, tradeSummary, bySize, laws, candidacies };
+  return memberPage(id);
 }
 
 const SECTION_DATA = {

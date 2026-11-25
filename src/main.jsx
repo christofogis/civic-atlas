@@ -9,6 +9,13 @@ import "@fontsource/public-sans/500.css";
 import "@fontsource/public-sans/600.css";
 import "@fontsource/public-sans/700.css";
 import "./styles.css";
+import { memberPage } from "./lib/memberPage.js";
+
+// On a member page, start fetching its data now, while the page's own code is still downloading.
+{
+  const m = /^\/member\/([A-Z]\d{6})\/?$/.exec(window.location.pathname);
+  if (m) memberPage(m[1]).catch(() => {});
+}
 
 // Each page loads its own code when first visited, so phones download less up front. If a
 // page's code can't be fetched (usually because a new version was just deployed), reload once
