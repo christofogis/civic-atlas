@@ -6,6 +6,7 @@ import { congressOn } from "../../lib/congress.js";
 import { districtsFromGeocodio } from "../../lib/geocodio.js";
 import { verifyTurnstile } from "../../lib/turnstile.js";
 import { rest } from "../../lib/rest.js";
+import { districtKey, stateDistrictsFromGeocodio, STATEWIDE } from "../../lib/stateleg.js";
 
 const json = (body, status = 200) =>
   Response.json(body, { status, headers: { "Cache-Control": "no-store" } });
@@ -26,12 +27,14 @@ export async function onRequestGet({ request, env }) {
   const geo = await fetch(
     // Ask for the districts of the Congress in session by date (cd119, then cd120 from Jan 3,
     // 2027) rather than Geocodio's default, so the map can't switch ahead of or behind our data.
-    `https://api.geocod.io/v2.1/geocode?q=${encodeURIComponent(address)}&fields=cd${congressOn()}&limit=1&api_key=${env.GEOCODIO_API_KEY}`
+    `https://api.geocod.io/v2.1/geocode?q=${encodeURIComponent(address)}&fields=cd${congressOn()},stateleg&limit=1&api_key=${env.GEOCODIO_API_KEY}`
   );
   if (geo.status === 422) return json({ error: "That address couldn't be found." }, 404);
   if (!geo.ok) return json({ error: "The address service is unavailable. Try again shortly." }, 502);
 
-  const place = districtsFromGeocodio(await geo.json());
+  const geoJson = await geo.json();
+  const place = districtsFromGeocodio(geoJson);
+  const stateDistricts = stateDistrictsFromGeocodio(geoJson);
   if (!place?.state) return json({ error: "That address couldn't be found." }, 404);
 
   try {
@@ -54,6 +57,23 @@ export async function onRequestGet({ request, env }) {
       : [];
     const byId = new Map(people.map((p) => [p.bioguide_id, p]));
 
+    // State officials: statewide offices, then the state senator(s) and representative(s) for the
+    // address. Nebraska's one chamber ("legislature") is matched against Geocodio's senate district.
+    const inList = (keys) => keys.map((k) => `"${k}"`).join(",");
+    const filters = [`type.in.(${STATEWIDE.map((t) => `"${t}"`).join(",")})`];
+    if (stateDistricts.upper.length) filters.push(`and(type.in.(upper,legislature),district_key.in.(${inList(stateDistricts.upper)}))`);
+    if (stateDistricts.lower.length) filters.push(`and(type.eq.lower,district_key.in.(${inList(stateDistricts.lower)}))`);
+    let stateOfficials = [];
+    try {
+      stateOfficials = await rest(`state_officeholders?state=eq.${state}&or=(${filters.join(",")})&select=id,name,party,type,district,start_date`);
+    } catch { /* state officials are optional; federal results still show */ }
+    const order = (o) => (o.type === "upper" || o.type === "legislature" ? 100 : o.type === "lower" ? 200 : STATEWIDE.indexOf(o.type));
+    const distOrder = (o) => {
+      const list = o.type === "lower" ? stateDistricts.lower : stateDistricts.upper;
+      return list.indexOf(districtKey(o.district));
+    };
+    stateOfficials.sort((a, b) => order(a) - order(b) || distOrder(a) - distOrder(b) || a.name.localeCompare(b.name));
+
     return json({
       state: place.state,
       districts: place.districts,
@@ -66,9 +86,12 @@ export async function onRequestGet({ request, env }) {
           name: p.official_full_name ?? [p.nickname ?? p.first_name, p.last_name].filter(Boolean).join(" "),
         };
       }),
+      state_districts: stateDistricts,
+      state_officials: stateOfficials,
       sources: {
         district: "Geocodio (U.S. Census Bureau district boundaries)",
         officials: "unitedstates/congress-legislators",
+        state_officials: "Open States (openstates/people)",
       },
     });
   } catch {

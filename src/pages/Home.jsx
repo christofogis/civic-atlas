@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
+import StateOfficialCard from "../components/StateOfficialCard.jsx";
 import OfficialCard from "../components/OfficialCard.jsx";
 import Turnstile from "../components/Turnstile.jsx";
 import { TURNSTILE_SITE_KEY, GOOGLE_PLACES_KEY } from "../lib/config.js";
@@ -105,7 +106,17 @@ export default function Home() {
           <ul className="cards">
             {result.officials.map((o) => <OfficialCard key={`${o.chamber}-${o.bioguide_id}`} official={o} />)}
           </ul>
-          <p className="fine">{t("District", "Distrito")}: {result.sources.district}. {t("Officials", "Funcionarios")}: {result.sources.officials}.</p>
+          {result.state_officials?.length > 0 && (
+            <>
+              <h2>{t(`State of ${stateName(result.state)}`, `Estado de ${stateName(result.state)}`)}</h2>
+              <ul className="cards">
+                {result.state_officials.map((o) => <StateOfficialCard key={`${o.type}-${o.id}`} official={o} state={result.state} />)}
+              </ul>
+              <p className="fine">{t("State legislators shown are for the districts that include this address. Statewide offices shown are the governor, lieutenant governor, attorney general and secretary of state as listed by Open States; a few states' offices aren't listed there yet, and other statewide offices (such as treasurer) aren't shown for any state.",
+                "Los legisladores estatales que se muestran son los de los distritos que incluyen esta dirección. Los cargos estatales que se muestran son gobernador, vicegobernador, fiscal general y secretario de estado según Open States; algunos estados aún no aparecen allí, y otros cargos estatales (como tesorero) no se muestran para ningún estado.")}</p>
+            </>
+          )}
+          <p className="fine">{t("District", "Distrito")}: {result.sources.district}. {t("Officials", "Funcionarios")}: {result.sources.officials}{result.sources.state_officials ? `; ${result.sources.state_officials}` : ""}.</p>
         </section>
       )}
 
