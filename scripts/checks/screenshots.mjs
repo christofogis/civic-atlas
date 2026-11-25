@@ -47,6 +47,7 @@ for (let path of PATHS) {
     await page.goto(BASE + path.split(">>")[0], { waitUntil: /^\/(\?|$)/.test(path) ? "load" : "networkidle" });
     await page.waitForTimeout(1500);
   }
+  await page.waitForFunction(() => !/Loading|Cargando/.test(document.body.innerText), null, { timeout: 20000 }).catch(() => {});
   // "path>>selector": start the shot at that element (for sections far down a long page).
   const start = path.includes(">>") ? await page.locator(path.split(">>")[1]).first().boundingBox().catch(() => null) : null;
   // Very tall pages can't be captured whole; cap the height.
