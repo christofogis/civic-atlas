@@ -31,6 +31,8 @@ for (let path of PATHS) {
     await page.clock.setFixedTime(new Date(`${at[1]}T17:00:00Z`));
     path = at[2];
   }
+  const print = path.startsWith("print:");
+  if (print) { path = path.slice(6); await page.emulateMedia({ media: "print" }); } else await page.emulateMedia({ media: "screen" });
   if (path.startsWith("lookup:")) {
     if (!TOKEN) { console.log("LOOKUP_CHECK_TOKEN not set; skipping", path); continue; }
     await page.goto(BASE + "/", { waitUntil: "load" });

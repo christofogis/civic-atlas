@@ -21,6 +21,7 @@ export default function StateOfficialCard({ official, state }) {
         <StatePartyTag party={official.party} /> {official.party}
         {official.start_date && <> · {tr("In this office since", "En este cargo desde el")} {date(official.start_date)}</>}
       </p>
+      {official.phone && <p className="fine card-phone"><a href={`tel:${official.phone.replace(/[^\d+]/g, "")}`}>{official.phone}</a></p>}
     </li>
   );
 }

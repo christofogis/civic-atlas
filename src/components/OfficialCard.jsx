@@ -20,6 +20,7 @@ export default function OfficialCard({ official }) {
       <img className="member-photo small" src={`https://unitedstates.github.io/images/congress/225x275/${official.bioguide_id}.jpg`} alt={official.name} width="60" height="73" loading="lazy" onError={(e) => { e.currentTarget.style.display = "none"; }} />
       <h3><Link to={`/member/${official.bioguide_id}`}>{official.name}</Link></h3>
       <p className="meta"><PartyName party={official.party} /> · {t("Serving since", "En el cargo desde el")} {date(official.start_date)}</p>
+      {official.phone && <p className="fine card-phone"><a href={`tel:${official.phone.replace(/[^\d+]/g, "")}`}>{official.phone}</a> <span className="print-only">· {official.url}</span></p>}
     </li>
   );
 }

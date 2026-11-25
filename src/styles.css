@@ -417,3 +417,23 @@ label.check { display: inline-flex; align-items: center; gap: 6px; font-size: 0.
 .week-facts > li { margin: 6px 0; }
 .week-facts { list-style: none; padding-left: 0; }
 .week-facts > li { padding-left: 0; }
+
+/* ---- Print: the officials list as one or two plain pages ---------------------------------------- */
+.print-only { display: none; }
+@media print {
+  header.site, .site-footer, .skip-link, .home-side, .lookup, .home-promise, .home-levels, .home-title .toggle,
+  .level-jump, .share-results, .no-print, .member-photo, .notice, .use-location { display: none !important; }
+  .print-only { display: inline; }
+  body { font-size: 10.5pt; color: #000; }
+  .page { padding: 0; }
+  .home-grid { display: block; padding: 0; }
+  .cards { grid-template-columns: repeat(2, 1fr); gap: 6px; }
+  .card { padding: 6px 8px; break-inside: avoid; border-color: #999; }
+  .card h3 { font-size: 11pt; margin: 2px 0; }
+  .card .seat, .card .meta, .card .fine { font-size: 9pt; }
+  .level { margin-top: 10px; break-inside: auto; }
+  .level-what { font-size: 9pt; margin-bottom: 4px; }
+  a { color: #000; text-decoration: none; }
+  h1 { font-size: 16pt; }
+  h2 { font-size: 12.5pt; margin: 8px 0 2px; }
+}
