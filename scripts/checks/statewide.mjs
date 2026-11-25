@@ -16,4 +16,16 @@ for (const o of file.offices) {
   if (!text.includes(o.check_name)) problems.push(`${o.title[0]}: "${o.check_name}" not found on ${o.website}`);
   else console.log(`${o.title[0]}: ${o.name} found on ${o.website}`);
 }
+// Board of Equalization: each member's name on the board's own website.
+if (file.boe) {
+  const res = await fetch(file.boe.website, { headers: { "User-Agent": "civic-atlas accuracy check (github.com/christofogis/civic-atlas)" } }).catch(() => null);
+  if (!res?.ok) console.log(`${file.boe.website}: ${res?.status ?? "no response"}; skipped`);
+  else {
+    const text = (await res.text()).replace(/<[^>]+>/g, " ");
+    for (const m of file.boe.members) {
+      if (!text.includes(m.check_name)) problems.push(`BOE District ${m.district}: "${m.check_name}" not found on ${file.boe.website}`);
+      else console.log(`BOE District ${m.district}: ${m.name} found on ${file.boe.website}`);
+    }
+  }
+}
 if (problems.length) { console.log(problems.join("\n")); process.exit(1); }

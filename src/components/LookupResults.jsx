@@ -37,12 +37,13 @@ export default function LookupResults({ result, sectionRef, shared = false }) {
     return n.length <= 3 && !extra ? n.join(", ") : t(`${n.slice(0, 3).join(", ")} and ${more} more`, `${n.slice(0, 3).join(", ")} y ${more} más`);
   };
   const fedNames = names(result.officials.filter((o) => o.seat_status !== "pending_update").map((o) => o.name));
-  // California's four extra statewide offices load separately (ExtraStatewideCards); count them.
-  const stateNames = names((result.state_officials ?? []).filter((o) => !o.updating).map((o) => o.name), result.state === "CA" ? 4 : 0);
+  // California's four extra statewide offices and its Board of Equalization member load separately
+  // (ExtraStatewideCards); count them.
+  const stateNames = names((result.state_officials ?? []).filter((o) => !o.updating).map((o) => o.name), result.state === "CA" ? 4 + (result.state_districts?.boe?.length ?? 0) : 0);
   const notes = [
     { id: "federal", text: <>{t("Districts: ", "Distritos: ")}{result.sources.district}. {t("Members of Congress and their terms: ", "Miembros del Congreso y sus períodos: ")}<a href="https://github.com/unitedstates/congress-legislators" rel="noopener">unitedstates/congress-legislators</a>{t(", updated daily. Your address is used only to find the districts; it isn't stored.", ", actualizado a diario. Su dirección se usa solo para encontrar los distritos; no se guarda.")}</> },
     result.state_officials?.length > 0 && { id: "state", text: <>{t("State legislators and the governor, lieutenant governor, attorney general and secretary of state: ", "Legisladores estatales y gobernador, vicegobernador, fiscal general y secretario de estado: ")}<a href="https://github.com/openstates/people" rel="noopener">Open States</a>{t(", updated daily.", ", actualizado a diario.")}{result.state === "CA"
-      ? t(" California's treasurer, controller, insurance commissioner and superintendent of public instruction come from each office's own website, checked weekly. Board of Equalization districts aren't on Civic Atlas yet.", " El tesorero, el contralor, el comisionado de seguros y el superintendente de instrucción pública de California vienen del sitio web de cada oficina, verificado cada semana. Los distritos de la Junta de Igualación aún no están en Civic Atlas.")
+      ? t(" California's treasurer, controller, insurance commissioner and superintendent of public instruction come from each office's own website, checked weekly. The Board of Equalization member comes from the board's website; the district, from the Citizens Redistricting Commission's 2021 map.", " El tesorero, el contralor, el comisionado de seguros y el superintendente de instrucción pública de California vienen del sitio web de cada oficina, verificado cada semana. El miembro de la Junta de Igualación viene del sitio web de la junta; el distrito, del mapa de 2021 de la Comisión Ciudadana de Redistritación.")
       : t(" Other statewide offices, such as treasurer, are on Civic Atlas for California only so far.", " Otros cargos estatales, como tesorero, por ahora solo están en Civic Atlas para California.")}</> },
   ];
   return (
@@ -81,7 +82,7 @@ export default function LookupResults({ result, sectionRef, shared = false }) {
               "La legislatura estatal redacta las leyes y el presupuesto del estado (escuelas, carreteras, salud, derecho penal). El gobernador y otros funcionarios estatales dirigen el gobierno del estado.")}<Ref id="state" /></p>
             <ul className="cards">
               {result.state_officials.map((o) => <StateOfficialCard key={`${o.type}-${o.id}`} official={o} state={result.state} />)}
-              <ExtraStatewideCards state={result.state} />
+              <ExtraStatewideCards state={result.state} boe={result.state_districts?.boe ?? []} />
             </ul>
           </Fold>
         )}

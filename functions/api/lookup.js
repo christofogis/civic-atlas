@@ -7,7 +7,7 @@ import { congressOn } from "../../lib/congress.js";
 import { districtsFromGeocodio } from "../../lib/geocodio.js";
 import { isCheckRequest, verifyTurnstile } from "../../lib/turnstile.js";
 import { stateDistrictsFromGeocodio } from "../../lib/stateleg.js";
-import { localFor, officialsFor } from "../../lib/officials.js";
+import { boeFor, localFor, officialsFor } from "../../lib/officials.js";
 
 const json = (body, status = 200) =>
   Response.json(body, { status, headers: { "Cache-Control": "no-store" } });
@@ -52,11 +52,13 @@ export async function onRequestGet({ request, env }) {
   if (!place?.state) return json({ error: byPoint ? "That location couldn't be used." : "That address couldn't be found." }, 404);
   const load = env.ASSETS ? async (path) => (await env.ASSETS.fetch(new URL(path, request.url))).json() : null;
   const local = await localFor(geoJson, byPoint ? { lat, lng } : null, load);
+  const stateDistricts = stateDistrictsFromGeocodio(geoJson);
+  stateDistricts.boe = await boeFor(place.state, byPoint ? { lat, lng } : geoJson.results?.[0]?.location, load);
 
   try {
     return json(await officialsFor({
       state: place.state, districts: place.districts, congress: place.congress,
-      stateDistricts: stateDistrictsFromGeocodio(geoJson), local,
+      stateDistricts, local,
       asOf,
       approximate: place.districts.length > 1 || !["rooftop", "range_interpolation", "point"].includes(place.accuracy_type),
     }));

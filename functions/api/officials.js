@@ -1,4 +1,4 @@
-// GET /api/officials?st=CA&cd=45&su=36&sl=70&co=ca-orange&sd=1&pl=Los%20Alamitos&pt=c&cc=1
+// GET /api/officials?st=CA&cd=45&su=36&sl=70&bo=4&co=ca-orange&sd=1&pl=Los%20Alamitos&pt=c&cc=1
 // The officials for a saved or shared set of districts. No address, no location, no Geocodio
 // call (so no bot check): the link holds only district numbers and names.
 import { LOCAL, localFromSaved, officialsFor } from "../../lib/officials.js";
@@ -19,7 +19,8 @@ export async function onRequestGet({ request }) {
   const linkCongress = /^\d{3}$/.test(p.get("cg") ?? "") ? Number(p.get("cg")) : 119;
   const stale = linkCongress !== current;
   const districts = stale ? [] : list(p.get("cd"), /^\d{1,2}$/).map(Number);
-  const stateDistricts = { upper: list(p.get("su"), /^[a-z0-9]{1,40}$/), lower: list(p.get("sl"), /^[a-z0-9]{1,40}$/) };
+  const stateDistricts = { upper: list(p.get("su"), /^[a-z0-9]{1,40}$/), lower: list(p.get("sl"), /^[a-z0-9]{1,40}$/),
+    boe: st === "CA" ? list(p.get("bo"), /^[1-4]$/).map(Number) : [] };
   const int = (k) => (/^\d{1,2}$/.test(p.get(k) ?? "") ? Number(p.get(k)) : null);
   const co = p.get("co");
   const pl = (p.get("pl") ?? "").slice(0, 60);

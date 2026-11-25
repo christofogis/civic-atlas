@@ -37,7 +37,7 @@ export default function StateOfficialCard({ official, state }) {
 
 // California statewide offices that Open States doesn't list, from /data/state/ca-statewide.json.
 // Same card layout; the name links to the office's own website (there's no person page).
-export function ExtraStatewideCards({ state }) {
+export function ExtraStatewideCards({ state, boe = [] }) {
   const [data, setData] = useState(null);
   useEffect(() => {
     if (state !== "CA") return;
@@ -46,7 +46,25 @@ export function ExtraStatewideCards({ state }) {
   if (!data) return null;
   const today = new Date().toISOString().slice(0, 10);
   const updating = data.seat_change_by && data.seat_change_by <= today;
-  return data.offices.map((o) => (
+  const boeCards = (data.boe?.members ?? []).filter((m) => boe.includes(m.district)).map((m) => {
+    const seat = tr(`${stateName(state)} ${data.boe.title[0]}, District ${m.district}`, `${data.boe.title[1]} de ${stateName(state)}, Distrito ${m.district}`);
+    return updating ? (
+      <li key={`boe-${m.district}`} className="card pending">
+        <p className="seat">{seat}</p>
+        <p>{tr(`A new term began on ${date(data.seat_change_by)}. Information for this office is being updated.`, `Un nuevo período comenzó el ${date(data.seat_change_by)}. La información de este cargo se está actualizando.`)}</p>
+      </li>
+    ) : (
+      <li key={`boe-${m.district}`} className="card">
+        <p className="seat">{seat}</p>
+        <h3><a href={data.boe.website} rel="noopener">{m.name}</a></h3>
+        <p className="meta">
+          <StatePartyTag party={m.party} /> {m.party}
+          {m.start_date && <> · {tr("In this office since", "En este cargo desde el")} {date(m.start_date)}</>}
+        </p>
+      </li>
+    );
+  });
+  return [...data.offices.map((o) => (
     updating ? (
       <li key={o.office} className="card pending">
         <p className="seat">{tr(`${stateName(state)} ${o.title[0]}`, `${o.title[1]} de ${stateName(state)}`)}</p>
@@ -62,5 +80,5 @@ export function ExtraStatewideCards({ state }) {
         </p>
       </li>
     )
-  ));
+  )), ...boeCards];
 }

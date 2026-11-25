@@ -1,12 +1,96 @@
 {
-  "state": "CA",
-  "note": "California statewide offices that Open States doesn't list. All were on the Nov 3, 2026 ballot; new terms begin Jan 4, 2027. Update from the Secretary of State's certified Statement of Vote.",
-  "seat_change_by": "2027-01-04",
-  "results_url": "https://www.sos.ca.gov/elections/prior-elections/statewide-election-results",
-  "offices": [
-    { "office": "treasurer", "title": ["Treasurer", "Tesorero(a)"], "name": "Fiona Ma", "check_name": "Fiona Ma", "party": "Democratic", "start_date": "2019-01-07", "website": "https://www.treasurer.ca.gov/" },
-    { "office": "controller", "title": ["Controller", "Contralor(a)"], "name": "Malia M. Cohen", "check_name": "Cohen", "party": "Democratic", "start_date": "2023-01-02", "website": "https://www.sco.ca.gov/" },
-    { "office": "insurance_commissioner", "title": ["Insurance Commissioner", "Comisionado(a) de Seguros"], "name": "Ricardo Lara", "check_name": "Lara", "party": "Democratic", "start_date": "2019-01-07", "website": "https://www.insurance.ca.gov/" },
-    { "office": "superintendent", "title": ["Superintendent of Public Instruction", "Superintendente de Instrucción Pública"], "name": "Tony Thurmond", "check_name": "Thurmond", "party": null, "nonpartisan": true, "start_date": "2019-01-07", "website": "https://www.cde.ca.gov/" }
+ "state": "CA",
+ "note": "California statewide offices that Open States doesn't list, and the four elected members of the Board of Equalization (the controller is the fifth member). All were on the Nov 3, 2026 ballot; new terms begin Jan 4, 2027. Update from the Secretary of State's certified Statement of Vote.",
+ "seat_change_by": "2027-01-04",
+ "results_url": "https://www.sos.ca.gov/elections/prior-elections/statewide-election-results",
+ "offices": [
+  {
+   "office": "treasurer",
+   "title": [
+    "Treasurer",
+    "Tesorero(a)"
+   ],
+   "name": "Fiona Ma",
+   "check_name": "Fiona Ma",
+   "party": "Democratic",
+   "start_date": "2019-01-07",
+   "website": "https://www.treasurer.ca.gov/"
+  },
+  {
+   "office": "controller",
+   "title": [
+    "Controller",
+    "Contralor(a)"
+   ],
+   "name": "Malia M. Cohen",
+   "check_name": "Cohen",
+   "party": "Democratic",
+   "start_date": "2023-01-02",
+   "website": "https://www.sco.ca.gov/"
+  },
+  {
+   "office": "insurance_commissioner",
+   "title": [
+    "Insurance Commissioner",
+    "Comisionado(a) de Seguros"
+   ],
+   "name": "Ricardo Lara",
+   "check_name": "Lara",
+   "party": "Democratic",
+   "start_date": "2019-01-07",
+   "website": "https://www.insurance.ca.gov/"
+  },
+  {
+   "office": "superintendent",
+   "title": [
+    "Superintendent of Public Instruction",
+    "Superintendente de Instrucción Pública"
+   ],
+   "name": "Tony Thurmond",
+   "check_name": "Thurmond",
+   "party": null,
+   "nonpartisan": true,
+   "start_date": "2019-01-07",
+   "website": "https://www.cde.ca.gov/"
+  }
+ ],
+ "boe": {
+  "title": [
+   "Board of Equalization",
+   "Junta de Igualación"
+  ],
+  "website": "https://www.boe.ca.gov/",
+  "map_source": "California Citizens Redistricting Commission final maps (2021)",
+  "map_source_url": "https://wedrawthelines.ca.gov/final-maps/",
+  "members": [
+   {
+    "district": 1,
+    "name": "Ted Gaines",
+    "check_name": "Gaines",
+    "party": "Republican",
+    "start_date": "2019-01-07"
+   },
+   {
+    "district": 2,
+    "name": "Sally Lieber",
+    "check_name": "Lieber",
+    "party": "Democratic",
+    "start_date": "2023-01-02"
+   },
+   {
+    "district": 3,
+    "name": "Tony Vazquez",
+    "check_name": "Vazquez",
+    "party": "Democratic",
+    "start_date": "2019-01-07"
+   },
+   {
+    "district": 4,
+    "name": "Mike Schaefer",
+    "check_name": "Schaefer",
+    "party": "Democratic",
+    "start_date": "2019-01-07"
+   }
   ]
+ }
 }

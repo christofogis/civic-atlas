@@ -39,8 +39,12 @@ for (const [label, address, want, local] of CASES) {
     if (local?.unincorporated && (body.local?.place?.type !== "unincorporated" || body.local.place.name !== local.unincorporated)) problems.push(`expected unincorporated ${local.unincorporated}, got ${JSON.stringify(body.local?.place)}`);
     if (local && !local.city && body.local?.city) problems.push(`unexpected city ${JSON.stringify(body.local.city)}`);
     if (!local && body.local?.covered) problems.push("local officials shown outside Orange County");
+    // California addresses get one Board of Equalization district (1-4); other states none.
+    const boe = body.state_districts?.boe ?? [];
+    if (body.state === "CA" ? !(boe.length === 1 && boe[0] >= 1 && boe[0] <= 4) : boe.length) problems.push(`unexpected BOE districts ${JSON.stringify(boe)}`);
+    if (local && boe[0] !== 4) problems.push(`Orange County is in BOE district 4, got ${JSON.stringify(boe)}`);
     const names = st.filter((o) => ["upper", "lower", "legislature"].includes(o.type)).map((o) => `${o.type} ${o.district}: ${o.name}`);
-    console.log(`${problems.length ? "FAIL" : "ok  "} ${label} — ${names.join("; ") || "no legislators"}`);
+    console.log(`${problems.length ? "FAIL" : "ok  "} ${label} — ${names.join("; ") || "no legislators"}${boe.length ? `; BOE ${boe.join(",")}` : ""}`);
   }
   if (problems.length) { failed++; console.log(`     ${label}: ${problems.join(", ")}`); }
 }

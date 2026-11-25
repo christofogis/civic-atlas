@@ -1,5 +1,5 @@
 // A lookup's districts as link parameters: state, congressional district(s), state legislative
-// districts, and (Orange County) supervisor district, city or community, and council district.
+// districts, California Board of Equalization district, and (Orange County) supervisor district, city or community, and council district.
 // No address and no coordinates, so a saved or shared link says no more than a district map does.
 const KEY = "civic-atlas:my-districts";
 
@@ -9,6 +9,7 @@ export function districtParams(r) {
   if (r.districts?.length) p.set("cd", r.districts.join(","));
   if (r.state_districts?.upper?.length) p.set("su", r.state_districts.upper.join(","));
   if (r.state_districts?.lower?.length) p.set("sl", r.state_districts.lower.join(","));
+  if (r.state_districts?.boe?.length) p.set("bo", r.state_districts.boe.join(","));
   const l = r.local;
   if (l?.covered) {
     p.set("co", l.id);
