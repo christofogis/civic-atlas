@@ -50,42 +50,66 @@ function VoteStats({ s, median, delegate, independent }) {
   );
 }
 
+const one = (q) => q.then(({ data, error }) => { if (error) throw error; return data; });
+
+// What the top of the page needs: the summary, each section's one-line label, contact and time
+// in office. The rest loads when its section is opened (SECTION_DATA), so a phone isn't waiting
+// on records nobody has asked for yet.
 async function loadMember(id) {
-  const one = (q) => q.then(({ data, error }) => { if (error) throw error; return data; });
-  const [member, terms, seat, memberships, votes, bills, sponsoredCount, cosponsoredCount, finance, freshness, voteStats, medians, billStats, billMedians, trades, filings, tradeSummary, bySize, byState, employers, pacs, outside, laws, candidacies] = await Promise.all([
+  const [member, terms, seat, memberships, finance, freshness, voteStats, medians, billStats, tradeSummary, bySize, laws, candidacies] = await Promise.all([
     one(db.from("members").select("*").eq("bioguide_id", id).maybeSingle()),
     one(db.from("terms").select("chamber,state,district,party,start_date,end_date,phone,address,contact_form,url").eq("bioguide_id", id).order("start_date", { ascending: false })),
     one(db.from("seat_holders").select("*").eq("bioguide_id", id).maybeSingle()),
     one(db.from("committee_memberships").select("congress,title,side,rank,committee:committees(committee_id,name,parent_id,url)").eq("bioguide_id", id)),
-    // member_votes starts from the member's positions (indexed), so this stays fast.
-    one(db.from("member_votes")
-      .select("vote_id,chamber,question,result,voted_at,description,document_name,source_url,position")
-      .eq("bioguide_id", id).order("voted_at", { ascending: false }).limit(120))
-      .then((rows) => rows.map((v) => ({ ...v, vote_positions: [{ position: v.position }] }))),
-    one(db.from("bills").select("congress,bill_type,number,title,short_title,introduced_date,latest_action_date,latest_action_text,source_url,law_number")
-      .eq("sponsor_bioguide_id", id).order("introduced_date", { ascending: false }).limit(10)),
-    db.from("bills").select("*", { count: "exact", head: true }).eq("sponsor_bioguide_id", id).then((r) => r.count),
-    db.from("bill_cosponsors").select("*", { count: "exact", head: true }).eq("bioguide_id", id).is("withdrawn_date", null).then((r) => r.count),
     one(db.from("finance_summaries").select("*").eq("bioguide_id", id).order("cycle", { ascending: false })),
     one(db.from("data_freshness").select("*")),
     one(db.from("member_vote_stats").select("*").eq("bioguide_id", id).order("congress", { ascending: false })),
     one(db.from("chamber_vote_medians").select("*")),
     one(db.from("member_bill_stats").select("*").eq("bioguide_id", id).order("congress", { ascending: false })),
-    one(db.from("chamber_bill_medians").select("*")),
-    one(db.from("stock_trades_dedup").select("filing_id,row_num,owner,asset_name,ticker,transaction_type,transaction_date,amount_text,filed_date,days_to_file,is_amendment,source_url")
-      .eq("bioguide_id", id).order("transaction_date", { ascending: false }).limit(25)),
-    one(db.from("ptr_filings").select("filing_id,filed_date,format,source_url").eq("bioguide_id", id).eq("format", "scanned").order("filed_date", { ascending: false })),
     one(db.from("member_trade_summary").select("*").eq("bioguide_id", id).maybeSingle()),
     one(db.from("finance_by_size").select("*").eq("bioguide_id", id)),
-    one(db.from("finance_by_state").select("cycle,state,total,contributions").eq("bioguide_id", id)),
-    one(db.from("finance_top_employers").select("*").eq("bioguide_id", id).order("rank")),
-    one(db.from("finance_committee_contributions").select("*").eq("bioguide_id", id).order("rank")),
-    one(db.from("outside_spending").select("*").eq("bioguide_id", id).order("total", { ascending: false })),
     one(db.from("bills").select("congress,bill_type,number").eq("sponsor_bioguide_id", id).not("became_law_date", "is", null)),
     one(db.from("candidates").select("fec_candidate_id,election_year,office,state,district").eq("bioguide_id", id)),
   ]);
-  return { member, terms, seat, memberships, votes, bills, sponsoredCount, cosponsoredCount, finance, freshness, voteStats, medians, billStats, billMedians, trades, filings, tradeSummary, bySize, byState, employers, pacs, outside, laws, candidacies };
+  return { member, terms, seat, memberships, finance, freshness, voteStats, medians, billStats, tradeSummary, bySize, laws, candidacies };
 }
+
+const SECTION_DATA = {
+  votes: async (id) => ({
+    // member_votes starts from the member's positions (indexed), so this stays fast.
+    votes: await one(db.from("member_votes")
+      .select("vote_id,chamber,question,result,voted_at,description,document_name,source_url,position")
+      .eq("bioguide_id", id).order("voted_at", { ascending: false }).limit(120))
+      .then((rows) => rows.map((v) => ({ ...v, vote_positions: [{ position: v.position }] }))),
+  }),
+  bills: async (id) => {
+    const [bills, sponsoredCount, cosponsoredCount, billMedians] = await Promise.all([
+      one(db.from("bills").select("congress,bill_type,number,title,short_title,introduced_date,latest_action_date,latest_action_text,source_url,law_number")
+        .eq("sponsor_bioguide_id", id).order("introduced_date", { ascending: false }).limit(10)),
+      db.from("bills").select("*", { count: "exact", head: true }).eq("sponsor_bioguide_id", id).then((r) => r.count),
+      db.from("bill_cosponsors").select("*", { count: "exact", head: true }).eq("bioguide_id", id).is("withdrawn_date", null).then((r) => r.count),
+      one(db.from("chamber_bill_medians").select("*")),
+    ]);
+    return { bills, sponsoredCount, cosponsoredCount, billMedians };
+  },
+  money: async (id) => {
+    const [byState, employers, pacs, outside] = await Promise.all([
+      one(db.from("finance_by_state").select("cycle,state,total,contributions").eq("bioguide_id", id)),
+      one(db.from("finance_top_employers").select("*").eq("bioguide_id", id).order("rank")),
+      one(db.from("finance_committee_contributions").select("*").eq("bioguide_id", id).order("rank")),
+      one(db.from("outside_spending").select("*").eq("bioguide_id", id).order("total", { ascending: false })),
+    ]);
+    return { byState, employers, pacs, outside };
+  },
+  trades: async (id) => {
+    const [trades, filings] = await Promise.all([
+      one(db.from("stock_trades_dedup").select("filing_id,row_num,owner,asset_name,ticker,transaction_type,transaction_date,amount_text,filed_date,days_to_file,is_amendment,source_url")
+        .eq("bioguide_id", id).order("transaction_date", { ascending: false }).limit(25)),
+      one(db.from("ptr_filings").select("filing_id,filed_date,format,source_url").eq("bioguide_id", id).eq("format", "scanned").order("filed_date", { ascending: false })),
+    ]);
+    return { trades, filings };
+  },
+};
 
 const SIZE_LABEL = () => ({ 0: tr("Under $200", "Menos de $200"), 200: "$200–$499", 500: "$500–$999", 1000: "$1,000–$1,999", 2000: tr("$2,000 and over", "$2,000 o más") });
 
@@ -205,14 +229,18 @@ function Contact({ term, member }) {
 // to open it. Contents render only when open (faster, and the notes list matches what's shown).
 // #votes, #bills, #money and #trades open that section (old tab links keep working).
 const FOLDS = ["contact", "service", "committees", "votes", "bills", "money", "trades", "follow"];
-function Fold({ id, title, summary, open, onToggle, children }) {
+function Fold({ id, title, summary, open, onToggle, status, children }) {
   return (
     <details className="fold" id={id} open={open} onToggle={(e) => onToggle(id, e.currentTarget.open)}>
       <summary>
         <h2>{title}</h2>
         {summary && <span className="fold-summary">{summary}</span>}
       </summary>
-      {open && <div className="fold-body">{children}</div>}
+      {open && <div className="fold-body">
+        {status === "loading" ? <p className="fine">{tr("Loading…", "Cargando…")}</p>
+          : status === "error" ? <p className="notice">{tr("Couldn't load this section. Close and open it to try again.", "No se pudo cargar esta sección. Ciérrela y ábrala para intentarlo de nuevo.")}</p>
+          : children}
+      </div>}
     </details>
   );
 }
@@ -236,6 +264,19 @@ export default function Member() {
   const { hash } = useLocation();
   const navigate = useNavigate();
   const [open, setOpen] = useState(() => new Set());
+  // Records for sections that have been opened: { votes: {...} | "loading" | "error", ... }
+  const [more, setMore] = useState({});
+  useEffect(() => { setMore({}); setOpen(new Set()); }, [bioguide]);
+  useEffect(() => {
+    if (state.status !== "done") return;
+    for (const id of open) {
+      if (!SECTION_DATA[id] || (more[id] && more[id] !== "error")) continue;
+      setMore((m) => ({ ...m, [id]: "loading" }));
+      SECTION_DATA[id](bioguide)
+        .then((d) => setMore((m) => ({ ...m, [id]: d })))
+        .catch(() => setMore((m) => ({ ...m, [id]: "error" })));
+    }
+  }, [open, state.status, bioguide]);
   const toggle = (id, isOpen) => setOpen((prev) => {
     if (prev.has(id) === isOpen) return prev;
     const next = new Set(prev);
@@ -266,7 +307,9 @@ export default function Member() {
   if (state.status === "missing") return <main className="page"><h1>{tr("Member not found", "Miembro no encontrado")}</h1><p><Link to="/">{tr("Back to search", "Volver a la búsqueda")}</Link></p></main>;
   if (state.status === "error") return <main className="page"><p className="notice">{tr("Couldn't load this page right now. Try again shortly.", "No se pudo cargar esta página. Inténtelo de nuevo en un momento.")}</p></main>;
 
-  const { member: m, terms, seat, memberships, votes, bills, sponsoredCount, cosponsoredCount, finance, freshness, voteStats, medians, billStats, billMedians, trades, filings: scannedFilings, tradeSummary: ts, bySize, byState, employers, pacs, outside, laws, candidacies } = state.data;
+  const loaded = Object.assign({}, ...Object.values(more).filter((v) => typeof v === "object"));
+  const { member: m, terms, seat, memberships, votes = [], bills = [], sponsoredCount = 0, cosponsoredCount = 0, finance, freshness, voteStats, medians, billStats, billMedians = [], trades = [], filings: scannedFilings = [], tradeSummary: ts, bySize, byState = [], employers = [], pacs = [], outside = [], laws, candidacies } = { ...state.data, ...loaded };
+  const sectionStatus = (id) => (typeof more[id] === "string" ? more[id] : more[id] ? undefined : "loading");
   // Finance detail is shown for the most recent cycle with detail on file.
   // Cycles with detail on file, newest first; the visitor can switch between them.
   const detailCycles = [...new Set([...bySize, ...employers, ...pacs, ...outside].map((r) => r.cycle))].sort((a, z) => z - a);
@@ -335,7 +378,7 @@ export default function Member() {
           <Contact term={terms[0]} member={m} />
         </Fold>
       )}
-      <Fold id="votes" title={tr("Votes", "Votos")} open={open.has("votes")} onToggle={toggle} summary={sum.votes}>
+      <Fold id="votes" title={tr("Votes", "Votos")} open={open.has("votes")} onToggle={toggle} status={sectionStatus("votes")} summary={sum.votes}>
 
       <Section title={tr("Voting record", "Historial de votos")} source={<>{tr("Calculated from House Clerk and Senate.gov roll-call records.", "Calculado a partir de los registros de votaciones nominales del Secretario de la Cámara y de Senate.gov.")} <Link to="/methods">{tr("How these are calculated", "Cómo se calculan")}</Link>.</>}>
         {voteStats.length === 0 ? <p>{tr("No roll-call votes on record since 2023.", "No hay votaciones nominales registradas desde 2023.")}</p> : (
@@ -387,7 +430,7 @@ export default function Member() {
       </Section>
 
       </Fold>
-      <Fold id="bills" title={tr("Bills", "Proyectos de ley")} open={open.has("bills")} onToggle={toggle} summary={sum.bills}>
+      <Fold id="bills" title={tr("Bills", "Proyectos de ley")} open={open.has("bills")} onToggle={toggle} status={sectionStatus("bills")} summary={sum.bills}>
 
       <Section title={tr("Legislation", "Legislación")} source={tr(`GovInfo Bill Status (Library of Congress), 118th Congress on.${updated("bills")}`, `GovInfo Bill Status (Biblioteca del Congreso), desde el 118.º Congreso.${updated("bills")}`)}>
         <p>{tr("Sponsored", "Patrocinados")}: {sponsoredCount ?? 0} · {tr("Cosponsored", "Copatrocinados")}: {cosponsoredCount ?? 0}</p>
@@ -445,7 +488,7 @@ export default function Member() {
       </Section>
 
       </Fold>
-      <Fold id="money" title={tr("Campaign money", "Dinero de campaña")} open={open.has("money")} onToggle={toggle} summary={sum.money}>
+      <Fold id="money" title={tr("Campaign money", "Dinero de campaña")} open={open.has("money")} onToggle={toggle} status={sectionStatus("money")} summary={sum.money}>
 
       <Section title={tr("Campaign finance", "Finanzas de campaña")} source={<>{tr("Federal Election Commission (OpenFEC).", "Comisión Federal de Elecciones (OpenFEC).")}{updated("fec-summaries")} <Link to="/methods#money">{tr("About this data", "Sobre estos datos")}</Link>.</>}>
         {finance.length === 0 ? <p>{tr("No FEC filings on record for this member.", "No hay declaraciones ante la FEC registradas para este miembro.")}</p> : (
@@ -474,7 +517,7 @@ export default function Member() {
         {detailCycle > 0 && <FinanceDetail cycle={detailCycle} bySize={inCycle(bySize)} byState={inCycle(byState)} home={latest?.state} employers={inCycle(employers)} pacs={inCycle(pacs)} outside={inCycle(outside)} fecId={finance.find((f) => f.cycle === detailCycle)?.fec_candidate_id} />}
       </Section>
       </Fold>
-      <Fold id="trades" title={tr("Stock trades", "Compraventa de acciones")} open={open.has("trades")} onToggle={toggle} summary={sum.trades}>
+      <Fold id="trades" title={tr("Stock trades", "Compraventa de acciones")} open={open.has("trades")} onToggle={toggle} status={sectionStatus("trades")} summary={sum.trades}>
 
       <Section title={tr("Stock trades", "Compraventa de acciones")} source={<>{tr("Periodic Transaction Reports filed under the STOCK Act with the House Clerk and Senate, 2025 on.", "Informes periódicos de transacciones presentados según la Ley STOCK ante el Secretario de la Cámara y el Senado, desde 2025.")}{updated("trades")} <Link to="/methods#trades">{tr("About this data", "Sobre estos datos")}</Link>.</>}>
         {!ts ? <p>{tr("No periodic transaction reports on record since 2025.", "No hay informes periódicos de transacciones registrados desde 2025.")}</p> : (
