@@ -637,3 +637,11 @@ label.check { display: inline-flex; align-items: center; gap: 6px; font-size: 0.
 .topics-table .prior-row th, .topics-table .prior-row td { color: var(--muted); font-weight: 400; }
 .topics-table .prior-row th { font-weight: 400; }
 .topics-table .total-row th, .topics-table .total-row td { font-weight: 600; border-bottom: 2px solid var(--text); }
+.topics-table tbody.topics-totals th[scope="row"] { font-size: 0.95rem; letter-spacing: normal; text-transform: none; color: var(--text); }
+.topics-table .prior-row th[scope="row"] { color: var(--muted); }
+.table-scroll { overflow-x: auto; }
+@media (max-width: 640px) {
+  .topics-table { font-size: 0.88rem; }
+  .topics-table th, .topics-table td { padding-right: 6px; }
+  .topics-table th:last-child, .topics-table td:last-child { padding-right: 0; }
+}

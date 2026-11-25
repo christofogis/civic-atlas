@@ -44,6 +44,7 @@ export default function Topics() {
       </div>
       {!rows ? <p>{tr("Loading…", "Cargando…")}</p> : (
         <>
+        <div className="table-scroll">
         <table className="topics-table">
           <thead><tr><th>{tr("Topic", "Tema")}</th><th>{tr("Bills introduced", "Proyectos presentados")}</th><th>{tr("Passed a chamber", "Aprobados por una cámara")}</th><th>{tr("Became law", "Se convirtieron en ley")}</th><th>{tr("% became law", "% se convirtió en ley")}<Ref id="pct" text={tr("Bills and resolutions that became law, divided by all bills and resolutions introduced on that topic. Many resolutions (such as simple resolutions of one chamber) can't become law, so this share is lower than the share of bills alone.", "Proyectos y resoluciones que se convirtieron en ley, divididos entre todos los presentados sobre ese tema. Muchas resoluciones (como las resoluciones simples de una cámara) no pueden convertirse en ley, así que esta proporción es menor que la de los proyectos solos.")} /></th></tr></thead>
           <tbody className="topics-totals">
@@ -72,6 +73,7 @@ export default function Topics() {
             ))}
           </tbody>
         </table>
+        </div>
         {inSession && prev && <p className="fine">{tr(`The ${ordinal(congress)} Congress runs through January 3, ${endYear}, so its counts are still growing; the ${ordinal(prev)} Congress's are final. Bills often pass and become law late in a Congress.`, `El ${ordinal(congress)} Congreso dura hasta el 3 de enero de ${endYear}, así que sus cifras siguen creciendo; las del ${ordinal(prev)} Congreso son definitivas. Los proyectos a menudo se aprueban y se convierten en ley al final de un Congreso.`)}</p>}
         </>
       )}
