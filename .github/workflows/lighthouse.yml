@@ -32,5 +32,11 @@ jobs:
               for (const k of ["first-contentful-paint","largest-contentful-paint","total-blocking-time","cumulative-layout-shift","speed-index"]) console.log(`  ${a[k].title}: ${a[k].displayValue}`);
               const fails = Object.values(a).filter((x) => x.score !== null && x.score < 0.9 && x.scoreDisplayMode !== "informative" && x.scoreDisplayMode !== "notApplicable").map((x) => `  - ${x.title}${x.displayValue ? ` (${x.displayValue})` : ""}`);
               console.log(fails.slice(0, 12).join("\n"));
+              const lcp = a["largest-contentful-paint-element"]?.details?.items?.[0]?.items?.[0]?.node;
+              if (lcp) console.log(`  LCP element: ${lcp.snippet}`);
+              const phases = a["largest-contentful-paint-element"]?.details?.items?.[1]?.items;
+              if (phases) console.log("  LCP phases: " + phases.map((x) => `${x.phase} ${Math.round(x.timing)}ms`).join(", "));
+              const reqs = (a["network-requests"]?.details?.items ?? []).filter((x) => x.url.includes("supabase")).map((x) => Math.round(x.networkEndTime)).sort((p, q) => q - p);
+              if (reqs.length) console.log(`  database requests: ${reqs.length}, last finished at ${reqs[0]}ms`);
             ' "$p"
           done
