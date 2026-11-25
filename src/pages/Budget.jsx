@@ -275,10 +275,18 @@ function History({ data }) {
   const [unit, setUnit] = useState("gdp");
   const [span, setSpan] = useState(40);
   const [hover, setHover] = useState(null);
+  // A narrower drawing on phones, so the axis text stays readable when the chart is scaled down.
+  const [narrow, setNarrow] = useState(() => typeof window !== "undefined" && window.matchMedia("(max-width: 640px)").matches);
+  useEffect(() => {
+    const m = window.matchMedia("(max-width: 640px)");
+    const on = () => setNarrow(m.matches);
+    m.addEventListener("change", on);
+    return () => m.removeEventListener("change", on);
+  }, []);
   const all = data.years;
   const years = span ? all.slice(-span) : all;
   const key = { gdp: "surplus_gdp", dollars: "surplus", real: "surplus_const" }[unit];
-  const W = 960, H = 300, L = 56, R = 8, Tp = 12, Bt = 26;
+  const W = narrow ? 420 : 960, H = narrow ? 260 : 300, L = narrow ? 40 : 56, R = 6, Tp = 12, Bt = 24;
   const vals = years.map((d) => d[key]);
   const hi = Math.max(0, ...vals), lo = Math.min(0, ...vals);
   // Round the scale to tidy steps.
@@ -288,9 +296,9 @@ function History({ data }) {
   const slot = (W - L - R) / years.length;
   const bw = Math.max(2, slot - (slot > 10 ? 3 : 1));
   const ticks = []; for (let t = bot; t <= top + 1e-9; t += step) ticks.push(t);
-  const every = years.length > 60 ? 10 : years.length > 30 ? 5 : 2;
+  const every = years.length > 60 ? (narrow ? 20 : 10) : years.length > 30 ? (narrow ? 10 : 5) : (narrow ? 5 : 2);
   const h = hover != null ? years[hover] : null;
-  const unitLabel = { gdp: tr("Share of the economy (GDP)", "Parte de la economía (PIB)"), dollars: tr("Dollars", "Dólares"), real: tr(`Inflation-adjusted (${data.constant_year} dollars)`, `Ajustado por inflación (dólares de ${data.constant_year})`) };
+  const unitLabel = { gdp: narrow ? tr("% of GDP", "% del PIB") : tr("Share of the economy (GDP)", "Parte de la economía (PIB)"), dollars: tr("Dollars", "Dólares"), real: narrow ? tr("Inflation-adjusted", "Ajustado") : tr(`Inflation-adjusted (${data.constant_year} dollars)`, `Ajustado por inflación (dólares de ${data.constant_year})`) };
   return (
     <div className="history">
       <div className="history-controls">
@@ -298,7 +306,7 @@ function History({ data }) {
           {["gdp", "dollars", "real"].map((u) => <button key={u} type="button" aria-pressed={unit === u} onClick={() => setUnit(u)}>{unitLabel[u]}</button>)}
         </div>
         <div className="seg-toggle" role="group" aria-label={tr("Years", "Años")}>
-          {[[20, tr("20 years", "20 años")], [40, tr("40 years", "40 años")], [0, tr(`Since ${all[0].fiscal_year}`, `Desde ${all[0].fiscal_year}`)]].map(([n, label]) => (
+          {[[20, tr("20 years", "20 años")], [40, tr("40 years", "40 años")], [0, narrow ? tr("All", "Todos") : tr(`Since ${all[0].fiscal_year}`, `Desde ${all[0].fiscal_year}`)]].map(([n, label]) => (
             <button key={n} type="button" aria-pressed={span === n} onClick={() => { setSpan(n); setHover(null); }}>{label}</button>
           ))}
         </div>
