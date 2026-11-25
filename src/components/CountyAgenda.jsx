@@ -66,7 +66,7 @@ export default function CountyAgenda({ district }) {
                 <li key={i.number} lang="en">
                   <span className="item-no">{i.number}</span>
                   <div>
-                    {i.status && <span className="status-flag">{i.status}</span>} {i.text}
+                    {i.status && <><span className="status-flag">{i.status}</span> </>}{i.department && i.text.startsWith(`${i.department} - `) ? <><strong>{i.department}</strong>{i.text.slice(i.department.length)}</> : i.text}
                     <div className="fine">
                       {districtsLabel(i.districts)}
                       {i.files_url && <>{i.districts ? " · " : ""}<a href={i.files_url} rel="noopener">{tr("Staff report and documents", "Informe y documentos")}</a></>}
