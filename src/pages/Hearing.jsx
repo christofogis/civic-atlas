@@ -5,6 +5,7 @@ import { billLabel, ordinal } from "../lib/format.js";
 import { statementFor, meetingHeading } from "../../lib/meetings.js";
 import { itemsLabel } from "../lib/meetingLabels.js";
 import { meetingTime } from "../components/MeetingList.jsx";
+import CommitteeRoster from "../components/CommitteeRoster.jsx";
 import { tr } from "../lib/lang.js";
 
 const videoLabel = (url) => /youtube\.com|youtu\.be/.test(url) ? "Video (YouTube)"
@@ -116,6 +117,9 @@ export default function Hearing() {
           </ul>
         </section>
       )}
+
+      {/* The subcommittee's roster for a subcommittee meeting, otherwise the full committee's. */}
+      <CommitteeRoster committeeIds={[...m.committee_ids.filter((c) => c.length > 4), ...m.committee_ids.filter((c) => c.length === 4)]} congress={m.congress} />
 
       {m.documents.length > 0 && (
         <section className="section">

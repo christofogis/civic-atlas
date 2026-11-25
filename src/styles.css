@@ -332,3 +332,7 @@ h2.week-head { font-size: 1.4rem; margin-top: 44px; }
 ul.items li.item { padding: 10px 0; border-bottom: 1px solid var(--border); max-width: none; }
 .item-head { display: block; }
 .item-head .fine { margin: 0; display: inline; }
+/* Committee roster on hearing pages */
+.roster { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 4px 40px; }
+.roster li { padding: 5px 0; border-bottom: 1px solid var(--border); }
+.mine-note { padding: 6px 10px; background: var(--mark); display: inline-block; border-radius: 4px; }
