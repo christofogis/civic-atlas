@@ -87,6 +87,11 @@ export default function Methods() {
         <li><strong>Procedural:</strong> how the chamber proceeds, such as taking up a bill, setting it aside (tabling), sending it back to committee, waiving a budget rule, or adopting a House "rule" that sets the terms of debate for another bill.</li>
       </ul>
       <p>"Final votes only" on a member page shows final passage, veto overrides and confirmations.</p>
+      <p>
+        Next to each recorded position, a short phrase says what that position meant on that kind of vote,
+        such as "Nay · against ending debate" or "Yea · to send it back to committee". It describes the
+        procedure only, from the vote type, never what the vote would have done or why a member voted that way.
+      </p>
 
       <h2 id="vote-issues">Votes by issue</h2>
       <p>

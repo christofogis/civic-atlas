@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { db } from "../lib/db.js";
 import { billLabel, date } from "../lib/format.js";
 import { isFinal } from "../lib/voteKind.js";
-import { KindLabel } from "../components/Explain.jsx";
+import { KindLabel, Position } from "../components/Explain.jsx";
 import { myRepresentatives } from "../lib/myReps.js";
 import ComingUp from "../components/ComingUp.jsx";
 import CommitteeCalendar from "../components/CommitteeCalendar.jsx";
@@ -118,7 +118,7 @@ export default function Week() {
                         <div className="fine">{v.bill_type ? billLink({ congress: v.bill_congress, bill_type: v.bill_type, number: v.bill_number }) : v.description}</div>
                       </td>
                       <td>{v.result}<div className="fine">{v.yea_total}–{v.nay_total}</div></td>
-                      {mine.size > 0 && <td className="fine">{positions.filter((p) => p.vote_id === v.vote_id).map((p) => <div key={p.bioguide_id}><Link to={`/member/${p.bioguide_id}`}>{p.name}</Link>: {p.position}</div>)}</td>}
+                      {mine.size > 0 && <td className="fine">{positions.filter((p) => p.vote_id === v.vote_id).map((p) => <div key={p.bioguide_id}><Link to={`/member/${p.bioguide_id}`}>{p.name}</Link>: <Position v={v} position={p.position} /></div>)}</td>}
                     </tr>
                   ))}
                 </tbody>

@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { GLOSSARY } from "../lib/glossary.js";
-import { voteKind } from "../lib/voteKind.js";
+import { voteKind, positionMeaning } from "../lib/voteKind.js";
 import { useLang } from "../lib/i18n.jsx";
 
 // A term with a tap-to-open explanation. Works on phones, where hover tooltips don't.
@@ -29,4 +29,10 @@ export function KindLabel({ v }) {
       {open && <span className="explain-text" role="note">{k.explain}</span>}
     </>
   );
+}
+
+// A recorded position with what it meant on this kind of vote: "Yea — to pass it".
+export function Position({ v, position }) {
+  const meaning = positionMeaning(v, position);
+  return <><strong>{position}</strong>{meaning && <span className="position-meaning"> · {meaning}</span>}</>;
 }

@@ -3,6 +3,7 @@ export const PAGES = [
   ["/", ["Civic Atlas", "Who represents you?", "Find my officials"]],
   ["/member/P000145", ["Alex Padilla", "At a glance", "Contact", "next up for election", "Overview"]],
   ["/member/P000145#votes", ["Voting record", "Recent roll-call votes"]],
+  ["/member/P000145/votes", ["to pass it"]],
   ["/member/P000145/votes", ["Roll-call votes", "Issue"]],
   ["/bill/119/hr/1", ["Became law", "Cosponsors", "Roll-call votes", "Lobbying reports naming this bill", "Text versions", "Engrossed in House"]],
   ["/bills", ["Bills", "Latest action"]],

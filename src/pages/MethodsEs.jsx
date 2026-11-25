@@ -77,6 +77,11 @@ export default function MethodsEs() {
         <li><strong>De procedimiento:</strong> cómo procede la cámara, por ejemplo considerar un proyecto, dejarlo de lado (aplazarlo), devolverlo al comité, dejar sin efecto una regla presupuestaria o adoptar una "regla" de la Cámara que fija las condiciones del debate de otro proyecto.</li>
       </ul>
       <p>"Solo votos finales" en la página de un miembro muestra aprobaciones finales, anulaciones de veto y confirmaciones.</p>
+      <p>
+        Junto a cada voto registrado, una frase breve dice qué significó ese voto en ese tipo de votación, por
+        ejemplo "Nay · en contra de terminar el debate" o "Yea · devolverlo al comité". Describe solo el
+        procedimiento, según el tipo de votación; nunca lo que la votación habría hecho ni por qué un miembro votó así.
+      </p>
 
       <h2 id="vote-issues">Votos por tema</h2>
       <p>

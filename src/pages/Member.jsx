@@ -7,7 +7,7 @@ import AtAGlance from "../components/AtAGlance.jsx";
 import EmbedCode from "../components/EmbedCode.jsx";
 import Scale from "../components/Scale.jsx";
 import Follow from "../components/Follow.jsx";
-import { KindLabel } from "../components/Explain.jsx";
+import { KindLabel, Position } from "../components/Explain.jsx";
 import { seatLabel, date, money, billLabel, ordinal, stateName, partyName } from "../lib/format.js";
 import { tr } from "../lib/lang.js";
 import { PartyName } from "../components/PartyTag.jsx";
@@ -348,7 +348,7 @@ export default function Member() {
                     <a href={v.source_url}>{v.question}</a>
                     {(v.document_name || v.description) && <div className="fine">{[v.document_name, v.description].filter(Boolean).join(" · ")}</div>}
                   </td>
-                  <td>{v.vote_positions[0]?.position}</td>
+                  <td><Position v={v} position={v.vote_positions[0]?.position} /></td>
                   <td>{v.result}</td>
                 </tr>
               ))}

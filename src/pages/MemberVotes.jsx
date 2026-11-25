@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Link, useParams, useSearchParams } from "react-router-dom";
 import { db } from "../lib/db.js";
 import DownloadCsv from "../components/DownloadCsv.jsx";
-import { KindLabel } from "../components/Explain.jsx";
+import { KindLabel, Position } from "../components/Explain.jsx";
 import { date, billLabel, ordinal } from "../lib/format.js";
 import { voteKind, isFinal } from "../lib/voteKind.js";
 import { areaName } from "../lib/policyAreas.js";
@@ -148,7 +148,7 @@ export default function MemberVotes() {
                             : v.description}
                         </div>
                       </td>
-                      <td>{v.position}</td>
+                      <td><Position v={v} position={v.position} /></td>
                       <td>{v.result}</td>
                     </tr>
                   );

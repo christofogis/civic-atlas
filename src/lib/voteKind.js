@@ -62,3 +62,38 @@ export function voteKind(v) {
 }
 
 export const isFinal = (v) => ["passage", "nomination"].includes(voteKind(v).kind);
+
+// What a Yea or a Nay meant on this kind of vote: the procedural meaning only, never its effect.
+// Keyed by the English label above. [yes, no] in English and Spanish.
+const MEANING = {
+  "Veto override": [["to override the veto", "to sustain the veto"], ["anular el veto", "mantener el veto"]],
+  "Final passage (two-thirds)": [["to pass it under expedited rules", "against passing it"], ["aprobarlo con reglas abreviadas", "en contra de aprobarlo"]],
+  "Final passage": [["to pass it", "against passing it"], ["aprobarlo", "en contra de aprobarlo"]],
+  "Confirmation": [["to confirm the nominee", "against confirming the nominee"], ["confirmar a la persona nominada", "en contra de confirmarla"]],
+  "Cloture (to start debate)": [["to end debate on taking it up", "against ending that debate"], ["terminar el debate sobre considerarlo", "en contra de terminar ese debate"]],
+  "Cloture": [["to end debate and move toward a final vote", "against ending debate"], ["terminar el debate y avanzar a una votación final", "en contra de terminar el debate"]],
+  "Amendment": [["to adopt the amendment", "against adopting the amendment"], ["adoptar la enmienda", "en contra de adoptar la enmienda"]],
+  "Procedural: previous question": [["to end debate on the rule and vote on it", "against ending debate on the rule"], ["terminar el debate sobre la regla y votarla", "en contra de terminar el debate sobre la regla"]],
+  "Procedural: recommit": [["to send it back to committee", "against sending it back to committee"], ["devolverlo al comité", "en contra de devolverlo al comité"]],
+  "Procedural: table": [["to set the motion aside", "against setting it aside"], ["dejar de lado la moción", "en contra de dejarla de lado"]],
+  "Procedural: take up": [["to begin considering it", "against beginning to consider it"], ["comenzar a considerarlo", "en contra de comenzar a considerarlo"]],
+  "Procedural: budget waiver": [["to waive the budget rule", "against waiving it"], ["eximir la regla presupuestaria", "en contra de eximirla"]],
+  "Procedural: discharge": [["to bring it out of committee", "against bringing it out of committee"], ["sacarlo del comité", "en contra de sacarlo del comité"]],
+};
+const RULE_MEANING = [["to adopt the terms for debating another bill", "against those terms"], ["adoptar las condiciones para debatir otro proyecto", "en contra de esas condiciones"]];
+
+// "voted Yea: to pass it", "voted Nay: against ending debate". Null when there's no yes/no meaning
+// (Speaker elections record names; "Present" and "Not Voting" are said as they are).
+export function positionMeaning(v, position) {
+  const p = String(position ?? "");
+  if (/^Not Voting$/i.test(p)) return tr("didn't vote", "no votó");
+  if (/^Present$/i.test(p)) return tr("voted \u201cpresent\u201d (neither yes nor no)", "votó \u201cpresente\u201d (ni sí ni no)");
+  const yes = /^(Yea|Aye|Yes|Guilty)$/i.test(p), no = /^(Nay|No|Not Guilty)$/i.test(p);
+  if (!yes && !no) return null;
+  const q = String(v.question ?? "");
+  const isRule = v.chamber === "house" && /^On (Agreeing to|Consideration of) the Resolution/i.test(q) && HOUSE_RULE.test(v.description ?? "");
+  const rule = isRule ? RULE_MEANING : MEANING[RULES.find(([re]) => re.test(q))?.[2]];
+  if (!rule) return null;
+  const [en, es] = rule;
+  return tr(en[yes ? 0 : 1], es[yes ? 0 : 1]);
+}

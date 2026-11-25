@@ -411,3 +411,7 @@ label.check { display: inline-flex; align-items: center; gap: 6px; font-size: 0.
 .measure-dates li.future { color: var(--muted); }
 .cal-empty { margin: 8px 0 14px; padding: 12px 14px; border: 1px dashed var(--border-strong); border-radius: 8px; }
 #floor, #committees, #last-week { scroll-margin-top: 72px; }
+.position-meaning { color: var(--muted); font-size: 0.9em; }
+.my-reps-list > li { padding: 12px 0; border-bottom: 1px solid var(--border); }
+.week-facts { margin: 6px 0 0; }
+.week-facts > li { margin: 6px 0; }
