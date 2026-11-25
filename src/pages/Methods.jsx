@@ -272,6 +272,22 @@ export default function Methods() {
         soliciting money.
       </p>
 
+      <h2 id="local-agendas">Orange County agendas and "Your week"</h2>
+      <p>
+        The Board of Supervisors' agenda is read twice a day from the Clerk of the Board's agenda system.
+        Each item is shown as printed, in English: its number, department, description, the districts it
+        names, any change the Clerk noted (continued, deleted, revised title) and a link to its staff report
+        and documents. Nothing is summarized. "Naming your district" counts items that list your supervisor
+        district by number; items for all districts are counted separately.
+      </p>
+      <p>
+        "Your week" lists what's coming up for the officials at the address you looked up, using the same
+        kinds of items and the same wording for everyone: hearings of the committees your members of Congress
+        sit on, the House floor schedule, state and county dates, and city council meetings. It is built from
+        district numbers saved on your device or carried in the page's link, never from an address. The
+        calendar file is made in your browser.
+      </p>
+
       <h2>Where the data comes from</h2>
       <ul className="plain">
         <li><strong>Members, terms, committees:</strong> the public-domain congress-legislators dataset.</li>

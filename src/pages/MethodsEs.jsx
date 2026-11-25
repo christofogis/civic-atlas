@@ -266,6 +266,22 @@ export default function MethodsEs() {
         para informar al público, ni para determinar la calificación crediticia de alguien, ni para pedir dinero.
       </p>
 
+      <h2 id="local-agendas">Agendas del Condado de Orange y "Su semana"</h2>
+      <p>
+        La agenda de la Junta de Supervisores se lee dos veces al día del sistema de agendas de la Secretaría de la Junta.
+        Cada asunto se muestra como fue publicado, en inglés: su número, departamento, descripción, los distritos que
+        menciona, cualquier cambio que anotó la Secretaría (aplazado, eliminado, título revisado) y un enlace a su informe
+        y documentos. No se resume nada. "Mencionan su distrito" cuenta los asuntos que nombran su distrito de supervisor
+        por número; los asuntos para todos los distritos se cuentan aparte.
+      </p>
+      <p>
+        "Su semana" muestra lo que viene para los funcionarios de la dirección que buscó, con los mismos tipos de asuntos
+        y la misma redacción para todos: audiencias de los comités en que están sus miembros del Congreso, la agenda del
+        pleno de la Cámara, fechas estatales y del condado, y reuniones del concejo municipal. Se arma con los números de
+        distrito guardados en su dispositivo o incluidos en el enlace de la página, nunca con una dirección. El archivo de
+        calendario se crea en su navegador.
+      </p>
+
       <h2>De dónde vienen los datos</h2>
       <ul className="plain">
         <li><strong>Miembros, períodos, comités:</strong> el conjunto de datos de dominio público congress-legislators.</li>

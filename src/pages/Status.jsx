@@ -37,6 +37,7 @@ const CHECKS = [
   ["Site check", ["Site check: every page loads and reads right", "Verificación del sitio: cada página carga y se lee bien"]],
   ["Accuracy check", ["Accuracy check: facts against their sources", "Verificación de exactitud: datos contra sus fuentes"]],
   ["Build federal budget data", ["Budget figures rebuilt", "Cifras del presupuesto reconstruidas"]],
+  ["Build Orange County agendas", ["Orange County Board of Supervisors agenda read", "Agenda de la Junta de Supervisores del Condado de Orange leída"]],
 ];
 
 const hoursSince = (t) => (Date.now() - Date.parse(t)) / 36e5;

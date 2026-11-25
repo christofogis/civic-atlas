@@ -75,6 +75,8 @@ yes-man: flag weak ideas, scope creep, and shortcuts that will cost later.
 - Earmarks (deferred): House Appropriations posts a consolidated CPF requests .xlsx per fiscal
   year; appropriations.senate.gov returns "Access Denied" to automated requests. Don't work
   around the block; House-only coverage would break equal treatment of members.
+- Orange County agendas: ocagendaext.oc.gov (bosmeetingc upcoming, bosmeetingd past; agenda PDFs) via
+  `scripts/data/oc_agendas.py`, twice daily, to `public/data/local/ca-orange-agendas.json`. Items as printed; never summarized.
 - Address → district: Geocodio `cd` field (free tier 2,500 lookups/day). Results may be stored.
 - Do not use: ProPublica Congress API (no new keys issued). Prefer the official sources above
   over third-party aggregators.

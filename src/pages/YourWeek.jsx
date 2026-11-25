@@ -7,6 +7,7 @@ import { savedDistricts } from "../lib/savedDistricts.js";
 import { loadLocal } from "../lib/local.js";
 import { listedDates, ruleDates } from "../../lib/localMeetings.js";
 import MyReps from "../components/MyReps.jsx";
+import { loadAgendas, onlyDistrict } from "../components/CountyAgenda.jsx";
 import { NotesList, Ref } from "../components/Notes.jsx";
 
 // "Your week": everything coming up for the officials from the visitor's last lookup, at every
@@ -107,7 +108,14 @@ export default function YourWeek() {
       // County and city: the next public meetings, and new terms for your seats.
       if (local) {
         const sd = result.local?.supervisor_district;
-        for (const m of listedDates(local.board_meetings?.dates ?? [], today, 6)) add(`bos-${m.date}`, m.date, local.board_meetings.time, "America/Los_Angeles", "county", tr(`${local.county} Board of Supervisors meeting`, `Reunión de la Junta de Supervisores del Condado de ${local.county.replace(/ County$/, "")}`), `/local/${local.id ?? params.get("co")}`, local.meetings_url);
+        const agendas = params.get("co") === "ca-orange" ? await loadAgendas() : null;
+        for (const m of listedDates(local.board_meetings?.dates ?? [], today, 6)) {
+          // When the agenda is out, say how many items, and how many name your district.
+          const ag = agendas?.meetings.find((x) => x.date === m.date && x.items.length);
+          const own = ag && sd ? onlyDistrict(ag.items, sd).length : 0;
+          const extra = ag ? tr(`: ${ag.items.length} items on the agenda${sd ? `, ${own} naming District ${sd}` : ""}`, `: ${ag.items.length} asuntos en la agenda${sd ? `, ${own} mencionan el Distrito ${sd}` : ""}`) : "";
+          add(`bos-${m.date}`, m.date, local.board_meetings.time, "America/Los_Angeles", "county", tr(`${local.county} Board of Supervisors meeting`, `Reunión de la Junta de Supervisores del Condado de ${local.county.replace(/ County$/, "")}`) + extra, `/local/${params.get("co")}${ag ? "#agenda" : ""}`, local.meetings_url);
+        }
         const sup = (local.supervisors ?? []).find((s) => s.district === sd);
         if (sup?.term_end) add("sup-term", sup.term_end, null, "America/Los_Angeles", "county", tr(`New term begins for your supervisor's seat (District ${sd})`, `Comienza un nuevo período para el escaño de su supervisor (Distrito ${sd})`), null, null);
         const cityId = result.local?.city?.id;

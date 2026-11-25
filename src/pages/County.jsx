@@ -5,6 +5,8 @@ import { tr } from "../lib/lang.js";
 import { loadLocal } from "../lib/local.js";
 import { CouncilCard, OfficerCard, SupervisorCard } from "../components/LocalOfficials.jsx";
 import LocalMeetings from "../components/LocalMeetings.jsx";
+import CountyAgenda from "../components/CountyAgenda.jsx";
+import { savedDistricts } from "../lib/savedDistricts.js";
 import { NotesList, NotesProvider, Ref } from "../components/Notes.jsx";
 
 // A county's elected officials (pilot: Orange County, CA). Data: a small file kept from the
@@ -42,6 +44,7 @@ export default function County() {
         <a href={data.results_url} rel="noopener">{tr("Election results (Registrar of Voters)", "Resultados electorales (Registro de Votantes)")}</a>
       </p>
       <LocalMeetings data={data} />
+      {id === "ca-orange" && <CountyAgenda district={(() => { const p = new URLSearchParams(savedDistricts() ?? ""); return p.get("co") === id ? Number(p.get("sd")) || null : null; })()} />}
       <h2>{tr("Countywide elected officials", "Funcionarios elegidos en todo el condado")}</h2>
       <ul className="cards">{data.officers.map((o) => <OfficerCard key={o.office} o={o} county={data.county} />)}</ul>
       <h2>{tr("City councils", "Concejos municipales")}</h2>
