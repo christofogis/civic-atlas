@@ -1,3 +1,4 @@
+import { NotesList, Ref } from "../components/Notes.jsx";
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { db } from "../lib/db.js";
@@ -53,7 +54,8 @@ export default function Government() {
 
   return (
     <main className="page wide government">
-      <h1>{tr("Three branches of government", "Los tres poderes del gobierno")}</h1>
+      <h1>{tr("Three branches of government", "Los tres poderes del gobierno")}<Ref id="src" text={<>{tr("Sources: members of Congress, the President and Vice President from unitedstates/congress-legislators; executive orders from the Federal Register; justices from the Supreme Court's website. Party letters: D Democrat, R Republican, I Independent.",
+          "Fuentes: miembros del Congreso, el Presidente y el Vicepresidente de unitedstates/congress-legislators; órdenes ejecutivas del Registro Federal; magistrados del sitio web de la Corte Suprema. Letras de partido: D Demócrata, R Republicano, I Independiente.")}</>} /></h1>
       <p className="lede">
         {tr("The Constitution divides the federal government into three branches. Congress writes the laws, the President carries them out, and the courts decide what they mean. Each branch has powers that check the others.",
           "La Constitución divide el gobierno federal en tres poderes. El Congreso redacta las leyes, el Presidente las ejecuta y los tribunales deciden qué significan. Cada poder tiene facultades que limitan a los otros.")}
@@ -135,10 +137,7 @@ export default function Government() {
         </section>
       </div>
 
-      <p className="fine">
-        {tr("Sources: members of Congress, the President and Vice President from unitedstates/congress-legislators; executive orders from the Federal Register; justices from the Supreme Court's website. Party letters: D Democrat, R Republican, I Independent.",
-          "Fuentes: miembros del Congreso, el Presidente y el Vicepresidente de unitedstates/congress-legislators; órdenes ejecutivas del Registro Federal; magistrados del sitio web de la Corte Suprema. Letras de partido: D Demócrata, R Republicano, I Independiente.")}
-      </p>
+      <NotesList />
     </main>
   );
 }

@@ -1,3 +1,4 @@
+import { NotesList, Ref } from "../components/Notes.jsx";
 import { useEffect, useMemo, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { db } from "../lib/db.js";
@@ -37,7 +38,7 @@ export default function Members() {
 
   return (
     <main className="page wide">
-      <h1>{tr("Members of Congress", "Miembros del Congreso")}</h1>
+      <h1>{tr("Members of Congress", "Miembros del Congreso")}<Ref id="src" text={tr("Source: unitedstates/congress-legislators, updated daily.", "Fuente: unitedstates/congress-legislators, actualizado a diario.")} /></h1>
       <div className="filters">
         <label>{tr("State", "Estado")}{" "}
           <select value={state} onChange={(e) => set("state", e.target.value)}>
@@ -56,7 +57,7 @@ export default function Members() {
       </div>
       {error && <p className="notice">{tr("Couldn't load members right now.", "No se pudieron cargar los miembros en este momento.")}</p>}
       {!rows && !error && <p>{tr("Loading…", "Cargando…")}</p>}
-      {rows && <p className="fine">{tr(`${count} member${count === 1 ? "" : "s"}. Source: unitedstates/congress-legislators.`, `${count} miembro${count === 1 ? "" : "s"}. Fuente: unitedstates/congress-legislators.`)}</p>}
+      {rows && <p className="fine">{tr(`${count} member${count === 1 ? "" : "s"}.`, `${count} miembro${count === 1 ? "" : "s"}.`)}</p>}
       <DownloadCsv rows={groups.flatMap(([, list]) => list)} filename="members" columns={[
         ["Name", (m) => m.name], ["Party", (m) => m.party], ["Chamber", (m) => m.chamber], ["State", (m) => m.state],
         ["District", (m) => (m.chamber === "house" ? m.district : "")], ["Serving", (m) => (m.serving ? "yes" : "no")],
@@ -74,6 +75,7 @@ export default function Members() {
           </ul>
         </section>
       ))}
+      <NotesList />
     </main>
   );
 }

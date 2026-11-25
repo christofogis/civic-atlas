@@ -1,3 +1,4 @@
+import { NotesList, Ref } from "../components/Notes.jsx";
 import { useEffect, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { db } from "../lib/db.js";
@@ -21,7 +22,7 @@ export default function Topics() {
 
   return (
     <main className="page wide">
-      <h1>{tr("Topics", "Temas")}</h1>
+      <h1>{tr("Topics", "Temas")}<Ref id="src" text={<>{tr('Source: GovInfo Bill Status (Library of Congress). Bills and resolutions; "passed a chamber" includes resolutions agreed to.', 'Fuente: GovInfo Bill Status (Biblioteca del Congreso). Proyectos y resoluciones; "aprobados por una cámara" incluye resoluciones adoptadas.')}</>} /></h1>
       <p className="lede">{tr("What Congress has worked on, by subject. Each bill has one ", "En qué ha trabajado el Congreso, por tema. Cada proyecto tiene un ")}<Explain id="policy-area">{tr("policy area", "área de política")}</Explain>.</p>
       <div className="filters">
         <label>{tr("Congress", "Congreso")}{" "}
@@ -45,7 +46,7 @@ export default function Topics() {
           </tbody>
         </table>
       )}
-      <p className="fine">{tr('Source: GovInfo Bill Status (Library of Congress). Bills and resolutions; "passed a chamber" includes resolutions agreed to.', 'Fuente: GovInfo Bill Status (Biblioteca del Congreso). Proyectos y resoluciones; "aprobados por una cámara" incluye resoluciones adoptadas.')}</p>
+      <NotesList />
     </main>
   );
 }

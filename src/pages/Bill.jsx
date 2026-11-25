@@ -8,6 +8,7 @@ import MeetingList from "../components/MeetingList.jsx";
 import DownloadCsv from "../components/DownloadCsv.jsx";
 import { date, billLabel, ordinal, partyTag, partyName } from "../lib/format.js";
 import { tr } from "../lib/lang.js";
+import { NotesList, NotesProvider, Ref } from "../components/Notes.jsx";
 import VoteBreakdown from "../components/VoteBreakdown.jsx";
 import StatusBar from "../components/StatusBar.jsx";
 import Follow from "../components/Follow.jsx";
@@ -43,12 +44,13 @@ async function loadBill(congress, type, number) {
   return { bill, sponsor, cosponsors, votes, lobbying, lobbyTotal: lobbyCount?.clients ?? lobbying?.length ?? 0, freshness, scheduled, meetings, former };
 }
 
+// A section's source goes in the page's notes, cited from its heading.
+const slug = (s) => String(s).toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
 function Section({ title, source, children }) {
   return (
     <section className="section">
-      <h2>{title}</h2>
+      <h2>{title}{source && <Ref id={`src-${slug(title)}`} text={<>{tr("Source", "Fuente")}: {source}</>} />}</h2>
       {children}
-      {source && <p className="fine">{tr("Source", "Fuente")}: {source}</p>}
     </section>
   );
 }
@@ -116,6 +118,7 @@ export default function Bill() {
   );
 
   return (
+    <NotesProvider>
     <main className="page full">
       <header className="page-head">
         <p className="fine">{billLabel(b)} · {ordinal(b.congress)} {tr("Congress", "Congreso")} · <Explain id="bill-types">{tr(`What's an ${billLabel(b).replace(/\s*\d+$/, "")}?`, `¿Qué es un ${billLabel(b).replace(/\s*\d+$/, "")}?`)}</Explain></p>
@@ -256,6 +259,8 @@ export default function Bill() {
       </Section>
       </div>
       </div>
+      <NotesList />
     </main>
+    </NotesProvider>
   );
 }

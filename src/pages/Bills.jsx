@@ -1,3 +1,4 @@
+import { NotesList, Ref } from "../components/Notes.jsx";
 import { useEffect, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { db } from "../lib/db.js";
@@ -47,7 +48,9 @@ export default function Bills() {
 
   return (
     <main className="page wide">
-      <h1>{tr("Bills", "Proyectos de ley")}</h1>
+      <h1>{tr("Bills", "Proyectos de ley")}<Ref id="src" text={<>{tr(`Source: GovInfo Bill Status (Library of Congress); ${ordinal(congress)} Congress. Lobbying counts are organizations whose LD-2 reports name the bill`,
+          `Fuente: GovInfo Bill Status (Biblioteca del Congreso); ${ordinal(congress)} Congreso. Los conteos de cabildeo son organizaciones cuyos informes LD-2 mencionan el proyecto`)}{" "}
+        (<Link to="/methods#lobbying">{tr("how they're counted", "cómo se cuentan")}</Link>).</>} /></h1>
       <div className="filters">
         <label>{tr("Congress", "Congreso")}{" "}
           <select value={congress} onChange={(e) => set("congress", e.target.value)}>
@@ -100,11 +103,7 @@ export default function Bills() {
         {page > 0 && <button className="link" onClick={() => set("page", String(page - 1))}>{tr("← Previous", "← Anterior")}</button>}
         {state.rows.length === PAGE && <button className="link" onClick={() => set("page", String(page + 1))}>{tr("Next →", "Siguiente →")}</button>}
       </p>
-      <p className="fine">
-        {tr(`Source: GovInfo Bill Status (Library of Congress); ${ordinal(congress)} Congress. Lobbying counts are organizations whose LD-2 reports name the bill`,
-          `Fuente: GovInfo Bill Status (Biblioteca del Congreso); ${ordinal(congress)} Congreso. Los conteos de cabildeo son organizaciones cuyos informes LD-2 mencionan el proyecto`)}{" "}
-        (<Link to="/methods#lobbying">{tr("how they're counted", "cómo se cuentan")}</Link>).
-      </p>
+      <NotesList />
     </main>
   );
 }

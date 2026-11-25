@@ -1,3 +1,4 @@
+import { Ref } from "./Notes.jsx";
 import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { db } from "../lib/db.js";
@@ -72,7 +73,7 @@ export default function CommitteeRoster({ committeeIds = [], congress }) {
       <p className="fine">
         {tr("Everyone who sits on the committee, in committee rank order. The meeting record doesn't say who attended; the video does.",
           "Todos los que forman parte del comité, en el orden de rango del comité. El registro de la reunión no dice quién asistió; el video sí.")}
-        {" "}{tr("Source: unitedstates/congress-legislators.", "Fuente: unitedstates/congress-legislators.")}
+        <Ref id="src-roster" text={tr("Source: unitedstates/congress-legislators.", "Fuente: unitedstates/congress-legislators.")} />
       </p>
     </section>
   );

@@ -1,3 +1,4 @@
+import { NotesList, Ref } from "../components/Notes.jsx";
 import { useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { db } from "../lib/db.js";
@@ -35,7 +36,8 @@ export default function Nominations() {
 
   return (
     <main className="page wide">
-      <h1>{tr("Nominations", "Nominaciones")}</h1>
+      <h1>{tr("Nominations", "Nominaciones")}<Ref id="src" text={<>{tr("Source: Senate roll-call votes (senate.gov). Nominations confirmed by voice vote, by unanimous consent or together in one resolution have no individual roll call and aren't listed. Breakdown shows the confirmation vote, or the cloture vote when there was no confirmation vote.",
+          "Fuente: votaciones nominales del Senado (senate.gov). Las nominaciones confirmadas a viva voz, por consentimiento unánime o en conjunto en una sola resolución no tienen votación nominal individual y no se listan. El desglose muestra la votación de confirmación, o la de cloture cuando no hubo confirmación.")}</>} /></h1>
       <p className="lede">
         {tr("Senate votes on people the President nominated: judges, cabinet members, ambassadors and other officials. Most get a ", "Votaciones del Senado sobre las personas que nominó el Presidente: jueces, miembros del gabinete, embajadores y otros funcionarios. La mayoría tiene una votación de ")}<Explain id="cloture">{tr("cloture", "cloture (cierre del debate)")}</Explain>{tr(" vote to end debate, then a confirmation vote.", " para terminar el debate y luego una votación de confirmación.")}
       </p>
@@ -85,10 +87,7 @@ export default function Nominations() {
           {filtered.length > shown && <p><button className="link" onClick={() => setShown(shown + PAGE)}>{tr("Show more", "Mostrar más")}</button></p>}
         </>
       )}
-      <p className="fine">
-        {tr("Source: Senate roll-call votes (senate.gov). Nominations confirmed by voice vote, by unanimous consent or together in one resolution have no individual roll call and aren't listed. Breakdown shows the confirmation vote, or the cloture vote when there was no confirmation vote.",
-          "Fuente: votaciones nominales del Senado (senate.gov). Las nominaciones confirmadas a viva voz, por consentimiento unánime o en conjunto en una sola resolución no tienen votación nominal individual y no se listan. El desglose muestra la votación de confirmación, o la de cloture cuando no hubo confirmación.")}
-      </p>
+      <NotesList />
     </main>
   );
 }

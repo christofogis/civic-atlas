@@ -1,3 +1,4 @@
+import { NotesList, Ref } from "../components/Notes.jsx";
 import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { db } from "../lib/db.js";
@@ -53,7 +54,7 @@ export default function Hearing() {
       <p className="fine">
         {tr(`${chamberName} committee ${typeLower}`, `${TYPE_ES[typeLower] ?? typeLower} de comité del ${m.chamber === "house" ? "la Cámara" : "Senado"}`.replace(/^./, (c) => c.toUpperCase()))} · {ordinal(m.congress)} {tr("Congress", "Congreso")}
       </p>
-      <h1>{heading}</h1>
+      <h1>{heading}<Ref id="src" text={<>{tr("Source", "Fuente")}: <a href={m.source_url}>{tr("Congress.gov committee meeting record", "registro de reunión de comité en Congress.gov")}</a>. {tr("Times are Eastern.", "Horas en la zona del Este.")} <Link to="/methods#hearings">{tr("About this data", "Sobre estos datos")}</Link>.</>} /></h1>
       {agenda && <ul className="plain agenda">{agenda.map((l, i) => <li key={i}>{l}</li>)}</ul>}
       <p>
         {meetingTime(m)}{m.location && <> · {m.location}</>}
@@ -134,7 +135,7 @@ export default function Hearing() {
 
       {m.has_transcript && <p>{tr("A printed transcript has been published; it's linked from the", "Se publicó una transcripción impresa; está enlazada desde la")} <a href={m.source_url}>{tr("Congress.gov page", "página de Congress.gov")}</a>.</p>}
 
-      <p className="fine">{tr("Source", "Fuente")}: <a href={m.source_url}>{tr("Congress.gov committee meeting record", "registro de reunión de comité en Congress.gov")}</a>. {tr("Times are Eastern.", "Horas en la zona del Este.")} <Link to="/methods#hearings">{tr("About this data", "Sobre estos datos")}</Link>.</p>
+      <NotesList />
     </main>
   );
 }

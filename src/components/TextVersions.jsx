@@ -1,3 +1,4 @@
+import { Ref } from "./Notes.jsx";
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { db } from "../lib/db.js";
@@ -75,9 +76,9 @@ export default function TextVersions({ congress, type, number }) {
         })}
       </ol>
       <p className="fine">
-        {tr("Source", "Fuente")}: GovInfo ({tr("Government Publishing Office", "Oficina de Publicaciones del Gobierno")}). <Link to="/methods#text-versions">{tr("How the comparison works", "Cómo funciona la comparación")}</Link>.{" "}
         {tr("Comparisons are computed automatically by matching section headings: they show where the text changed, not what a change does, so read the text for that. A renamed section counts as one removed and one added; renumbering alone isn't counted.",
           "Las comparaciones se calculan automáticamente emparejando los títulos de las secciones: muestran dónde cambió el texto, no qué efecto tiene un cambio; para eso, lea el texto. Una sección con nuevo título cuenta como una eliminada y una agregada; un simple cambio de numeración no cuenta.")}
+        <Ref id="src-text" text={<>{tr("Source", "Fuente")}: GovInfo ({tr("Government Publishing Office", "Oficina de Publicaciones del Gobierno")}). <Link to="/methods#text-versions">{tr("How the comparison works", "Cómo funciona la comparación")}</Link>.{" "}</>} />
       </p>
     </section>
   );

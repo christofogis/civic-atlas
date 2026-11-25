@@ -1,3 +1,4 @@
+import { NotesList, Ref } from "../components/Notes.jsx";
 import { useEffect, useMemo, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { db } from "../lib/db.js";
@@ -55,7 +56,7 @@ export default function Elections() {
 
   return (
     <main className="page wide">
-      <h1>{year ? tr(`${year} elections: who has filed`, `Elecciones ${year}: quién se ha inscrito`) : tr("Upcoming elections: who has filed", "Próximas elecciones: quién se ha inscrito")}</h1>
+      <h1>{year ? tr(`${year} elections: who has filed`, `Elecciones ${year}: quién se ha inscrito`) : tr("Upcoming elections: who has filed", "Próximas elecciones: quién se ha inscrito")}<Ref id="src" text={<>{tr("Source: Federal Election Commission (OpenFEC), updated weekly.", "Fuente: Comisión Federal de Elecciones (OpenFEC), actualizada cada semana.")}</>} /></h1>
       <p className="lede">{tr("Candidates for Congress who have registered with the Federal Election Commission.", "Candidatos al Congreso que se han inscrito ante la Comisión Federal de Elecciones.")}</p>
       <p className="fine">
         {tr(`Anyone can file, and filing doesn't mean a campaign is active; money raised shows which campaigns are reporting activity. Listed alphabetically. House districts are as filed; ${year} House races use the district maps adopted for 2026.`,
@@ -91,7 +92,7 @@ export default function Elections() {
           )}
         </>
       )}
-      <p className="fine">{tr("Source: Federal Election Commission (OpenFEC), updated weekly.", "Fuente: Comisión Federal de Elecciones (OpenFEC), actualizada cada semana.")}</p>
+      <NotesList />
     </main>
   );
 }

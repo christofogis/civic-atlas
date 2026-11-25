@@ -1,6 +1,8 @@
 import { Suspense, useEffect, useState } from "react";
 import { Link, NavLink, Outlet, useNavigate, useLocation } from "react-router-dom";
 import ReportError from "./ReportError.jsx";
+// Every page can cite a source with <Ref id text>; the page puts <NotesList /> at its end.
+import { NotesProvider } from "./Notes.jsx";
 import { useLang } from "../lib/i18n.jsx";
 
 // Site header on every page: name, main sections, and a search box for members and bills.
@@ -77,7 +79,9 @@ export default function Layout() {
       </header>
       <div id="main" tabIndex={-1}>
         <Suspense fallback={<main className="page"><p>{t("Loading…", "Cargando…")}</p></main>}>
-          <Outlet />
+          <NotesProvider key={location.pathname}>
+            <Outlet />
+          </NotesProvider>
         </Suspense>
       </div>
       <footer className="site-footer">

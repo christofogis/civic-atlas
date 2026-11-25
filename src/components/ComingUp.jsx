@@ -1,3 +1,4 @@
+import { Ref } from "./Notes.jsx";
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { db } from "../lib/db.js";
@@ -53,7 +54,7 @@ export default function ComingUp({ myCommittees = new Set(), floor: showFloor = 
   return (
     <>
       {showFloor && <>
-      <h3 className="small">{tr("House floor", "Pleno de la Cámara")}</h3>
+      <h3 className="small">{tr("House floor", "Pleno de la Cámara")}<Ref id="src-house-floor" text={<>{tr("Source", "Fuente")}: <a href="https://docs.house.gov/floor/">{tr("House Majority Leader's floor schedule", "agenda del pleno del Líder de la Mayoría de la Cámara")}</a> (docs.house.gov).</>} /></h3>
       {weeks.length === 0
         ? <p>{tr("The House hasn't published a floor schedule for this week or next. It usually comes out the Friday before.", "La Cámara no ha publicado la agenda del pleno para esta semana ni la próxima. Suele publicarse el viernes anterior.")}</p>
         : weeks.map((wk) => (
@@ -74,15 +75,13 @@ export default function ComingUp({ myCommittees = new Set(), floor: showFloor = 
             })}
           </div>
         ))}
-      <p className="fine">{tr("Source", "Fuente")}: <a href="https://docs.house.gov/floor/">{tr("House Majority Leader's floor schedule", "agenda del pleno del Líder de la Mayoría de la Cámara")}</a> (docs.house.gov).</p>
 
-      <h3 className="small">{tr("Senate floor", "Pleno del Senado")}</h3>
+      <h3 className="small">{tr("Senate floor", "Pleno del Senado")}<Ref id="src-senate-floor" text={<>{tr("Source", "Fuente")}: <a href="https://www.senate.gov/legislative/schedule/floor_schedule.htm">{tr("Senate floor schedule", "agenda del pleno del Senado")}</a>.</>} /></h3>
       <p>{convene ? <>{tr("The Senate next meets", "El Senado se reúne de nuevo el")} {date(convene.event_date)} {tr("at", "a las")} {convene.event_time}.</> : tr("The Senate hasn't announced when it next meets.", "El Senado no ha anunciado cuándo se reúne de nuevo.")}</p>
-      <p className="fine">{tr("Source", "Fuente")}: <a href="https://www.senate.gov/legislative/schedule/floor_schedule.htm">{tr("Senate floor schedule", "agenda del pleno del Senado")}</a>.</p>
 
       </>}
       {showCommittees && <>
-      <h3 className="small">{tr("Committee hearings and markups", "Audiencias y sesiones de comités")}</h3>
+      <h3 className="small">{tr("Committee hearings and markups", "Audiencias y sesiones de comités")}<Ref id="src-committee-schedule" text={<>{tr("Sources: senate.gov hearings schedule; House committee meeting notices (docs.house.gov).", "Fuentes: agenda de audiencias de senate.gov; avisos de reuniones de comités de la Cámara (docs.house.gov).")}</>} /></h3>
       {byDay.size === 0 ? <p>{tr("None scheduled yet.", "Nada programado todavía.")}</p> : [...byDay].map(([day, list]) => (
         <div key={day}>
           <p><strong>{new Date(`${day}T12:00:00Z`).toLocaleDateString(locale(), { weekday: "long", month: "short", day: "numeric", timeZone: "UTC" })}</strong></p>
@@ -104,7 +103,7 @@ export default function ComingUp({ myCommittees = new Set(), floor: showFloor = 
           </ul>
         </div>
       ))}
-      <p className="fine">{tr("Sources: senate.gov hearings schedule; House committee meeting notices (docs.house.gov). Times are Eastern.", "Fuentes: agenda de audiencias de senate.gov; avisos de reuniones de comités de la Cámara (docs.house.gov). Horas en la zona del Este.")}</p>
+      <p className="fine">{tr("Times are Eastern.", "Horas en la zona del Este.")}</p>
       </>}
     </>
   );

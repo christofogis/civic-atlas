@@ -1,3 +1,4 @@
+import { NotesList, Ref } from "../components/Notes.jsx";
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { db } from "../lib/db.js";
@@ -14,7 +15,7 @@ export default function Committees() {
 
   return (
     <main className="page">
-      <h1>{tr("Committees", "Comités")}</h1>
+      <h1>{tr("Committees", "Comités")}<Ref id="src" text={<>{tr("Source", "Fuente")}: unitedstates/congress-legislators.</>} /></h1>
       {error && <p className="notice">{tr("Couldn't load committees right now.", "No se pudieron cargar los comités en este momento.")}</p>}
       {!rows && !error && <p>{tr("Loading…", "Cargando…")}</p>}
       {rows && ["senate", "house", "joint"].map((ch) => {
@@ -26,7 +27,7 @@ export default function Committees() {
           </section>
         );
       })}
-      <p className="fine">{tr("Source", "Fuente")}: unitedstates/congress-legislators.</p>
+      <NotesList />
     </main>
   );
 }

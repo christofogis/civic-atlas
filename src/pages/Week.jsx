@@ -1,3 +1,4 @@
+import { NotesList, Ref } from "../components/Notes.jsx";
 import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { db } from "../lib/db.js";
@@ -81,7 +82,7 @@ export default function Week() {
 
       {votes.length === 0 ? <p>{tr("No votes on record yet.", "Todavía no hay votos registrados.")}</p> : (
         <>
-          <h2 className="week-head" id="last-week">{tr("Last week with votes", "Última semana con votaciones")}: {date(state.from)} {tr("to", "al")} {date(state.to)}</h2>
+          <h2 className="week-head" id="last-week">{tr("Last week with votes", "Última semana con votaciones")}: {date(state.from)} {tr("to", "al")} {date(state.to)}<Ref id="src" text={<>{tr("Sources: House Clerk and Senate.gov roll-call records; GovInfo Bill Status (Library of Congress).", "Fuentes: registros de votaciones del Secretario de la Cámara y de Senate.gov; GovInfo Bill Status (Biblioteca del Congreso).")}</>} /></h2>
 
           <section className="section">
             <h2>{tr("Became law", "Se convirtieron en ley")}</h2>
@@ -125,9 +126,9 @@ export default function Week() {
               </table>
             )}
           </section>
-          <p className="fine">{tr("Sources: House Clerk and Senate.gov roll-call records; GovInfo Bill Status (Library of Congress).", "Fuentes: registros de votaciones del Secretario de la Cámara y de Senate.gov; GovInfo Bill Status (Biblioteca del Congreso).")}</p>
         </>
       )}
+      <NotesList />
     </main>
   );
 }

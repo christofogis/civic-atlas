@@ -1,3 +1,4 @@
+import { NotesList, Ref } from "../components/Notes.jsx";
 import { useEffect, useMemo, useState } from "react";
 import { Link, useParams, useSearchParams } from "react-router-dom";
 import { db } from "../lib/db.js";
@@ -96,7 +97,7 @@ export default function MemberVotes() {
   return (
     <main className="page wide">
       <p><Link to={`/member/${bioguide}`}>← {name || tr("Member", "Miembro")}</Link></p>
-      <h1>{tr("Roll-call votes", "Votaciones nominales")}{name && <>: {name}</>}</h1>
+      <h1>{tr("Roll-call votes", "Votaciones nominales")}{name && <>: {name}</>}<Ref id="src" text={<>{tr("Source: House Clerk and Senate.gov roll-call records; positions as recorded. Policy areas: Library of Congress, via GovInfo Bill Status.", "Fuente: registros de votaciones del Secretario de la Cámara y de Senate.gov; votos tal como se registraron (Yea = sí, Nay = no). Áreas de política: Biblioteca del Congreso, vía GovInfo Bill Status.")}</>} /></h1>
       <p className="fine">
         {tr("Issue is the policy area the Library of Congress assigns to the bill a vote was on. Votes on amendments and procedural motions count under their bill.", "El tema es el área de política que la Biblioteca del Congreso asigna al proyecto votado. Las votaciones sobre enmiendas y mociones de procedimiento cuentan bajo su proyecto.")}{" "}
         <Link to="/methods#vote-issues">{tr("How votes are grouped", "Cómo se agrupan los votos")}</Link>.
@@ -164,9 +165,9 @@ export default function MemberVotes() {
           {filtered.length > shown && (
             <p><button className="link" onClick={() => setShown(shown + PAGE)}>{tr(`Show ${Math.min(PAGE, filtered.length - shown)} more`, `Mostrar ${Math.min(PAGE, filtered.length - shown)} más`)}</button></p>
           )}
-          <p className="fine">{tr("Source: House Clerk and Senate.gov roll-call records; positions as recorded. Policy areas: Library of Congress, via GovInfo Bill Status.", "Fuente: registros de votaciones del Secretario de la Cámara y de Senate.gov; votos tal como se registraron (Yea = sí, Nay = no). Áreas de política: Biblioteca del Congreso, vía GovInfo Bill Status.")}</p>
         </>
       )}
+      <NotesList />
     </main>
   );
 }

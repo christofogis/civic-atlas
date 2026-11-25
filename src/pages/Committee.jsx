@@ -1,3 +1,4 @@
+import { NotesList, Ref } from "../components/Notes.jsx";
 import { useEffect, useState } from "react";
 import { Link, useParams, useSearchParams } from "react-router-dom";
 import { db } from "../lib/db.js";
@@ -98,9 +99,8 @@ export default function Committee() {
 
       {meetings.length > 0 && (
         <section className="section">
-          <h2>{tr("Recent hearings and meetings", "Audiencias y reuniones recientes")}</h2>
+          <h2>{tr("Recent hearings and meetings", "Audiencias y reuniones recientes")}<Ref id="src-meetings" text={<>{tr("Source: Congress.gov committee meeting records. The 25 most recent are listed; each links to video, documents and, for House hearings, witnesses.", "Fuente: registros de reuniones de comités de Congress.gov. Se listan las 25 más recientes; cada una enlaza a video, documentos y, en audiencias de la Cámara, testigos.")}</>} /></h2>
           <MeetingList meetings={meetings} showCommittee committees={{ [c.committee_id]: tr("Full committee", "Comité en pleno"), ...subNames }} />
-          <p className="fine">{tr("Source: Congress.gov committee meeting records. The 25 most recent are listed; each links to video, documents and, for House hearings, witnesses.", "Fuente: registros de reuniones de comités de Congress.gov. Se listan las 25 más recientes; cada una enlaza a video, documentos y, en audiencias de la Cámara, testigos.")}</p>
         </section>
       )}
 
@@ -112,7 +112,7 @@ export default function Committee() {
       )}
 
       <section className="section">
-        <h2>{tr("Members", "Miembros")}{rosterCongress && tr(` (${ordinal(rosterCongress)} Congress)`, ` (${ordinal(rosterCongress)} Congreso)`)}</h2>
+        <h2>{tr("Members", "Miembros")}{rosterCongress && tr(` (${ordinal(rosterCongress)} Congress)`, ` (${ordinal(rosterCongress)} Congreso)`)}<Ref id="src-members" text={<>{tr("Source: unitedstates/congress-legislators. Listed in committee rank order.", "Fuente: unitedstates/congress-legislators. En el orden de rango del comité.")}</>} /></h2>
         {sides.length === 0 ? <p>{tr("No membership on record.", "No hay miembros registrados.")}</p> : sides.map(([side, list]) => (
           <div key={side}>
             <h3 className="small">{side === "majority" ? tr("Majority", "Mayoría") : tr("Minority", "Minoría")}</h3>
@@ -126,11 +126,10 @@ export default function Committee() {
             </ul>
           </div>
         ))}
-        <p className="fine">{tr("Source: unitedstates/congress-legislators. Listed in committee rank order.", "Fuente: unitedstates/congress-legislators. En el orden de rango del comité.")}</p>
       </section>
 
       <section className="section">
-        <h2>{tr("Bills referred", "Proyectos remitidos")}</h2>
+        <h2>{tr("Bills referred", "Proyectos remitidos")}<Ref id="src-bills" text={<>{tr("Source: GovInfo Bill Status (Library of Congress). Includes bills referred to this committee or later handled by it.", "Fuente: GovInfo Bill Status (Biblioteca del Congreso). Incluye proyectos remitidos a este comité o que este tramitó después.")}</>} /></h2>
         <div className="filters">
           <label>{tr("Congress", "Congreso")}{" "}
             <select value={congress} onChange={(e) => set("congress", e.target.value)}>
@@ -163,8 +162,8 @@ export default function Committee() {
         )}
         {bills.rows.length > shown && <p><button className="link" onClick={() => setShown(shown + PAGE)}>{tr("Show more", "Mostrar más")}</button></p>}
         {bills.count > bills.rows.length && <p className="fine">{tr("Showing the first 1,000.", "Se muestran los primeros 1,000.")}</p>}
-        <p className="fine">{tr("Source: GovInfo Bill Status (Library of Congress). Includes bills referred to this committee or later handled by it.", "Fuente: GovInfo Bill Status (Biblioteca del Congreso). Incluye proyectos remitidos a este comité o que este tramitó después.")}</p>
       </section>
+      <NotesList />
     </main>
   );
 }

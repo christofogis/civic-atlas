@@ -1,3 +1,4 @@
+import { NotesList, Ref } from "../components/Notes.jsx";
 import { useEffect, useState } from "react";
 import { Link, useParams, useSearchParams } from "react-router-dom";
 import { db } from "../lib/db.js";
@@ -46,7 +47,7 @@ export default function Topic() {
   return (
     <main className="page wide">
       <p className="fine"><Link to="/topics">{tr("Topics", "Temas")}</Link></p>
-      <h1>{areaName(area)}</h1>
+      <h1>{areaName(area)}<Ref id="src" text={<>{tr("Sources: GovInfo Bill Status (Library of Congress); House Clerk and Senate.gov roll calls; LDA.gov.", "Fuentes: GovInfo Bill Status (Biblioteca del Congreso); votaciones del Secretario de la Cámara y de Senate.gov; LDA.gov.")}</>} /></h1>
       <div className="filters">
         <label>{tr("Congress", "Congreso")}{" "}
           <select value={congress} onChange={(e) => setParams({ congress: e.target.value })}>
@@ -107,9 +108,9 @@ export default function Topic() {
               </table>
             )}
           </section>
-          <p className="fine">{tr("Sources: GovInfo Bill Status (Library of Congress); House Clerk and Senate.gov roll calls; LDA.gov.", "Fuentes: GovInfo Bill Status (Biblioteca del Congreso); votaciones del Secretario de la Cámara y de Senate.gov; LDA.gov.")}</p>
         </>
       )}
+      <NotesList />
     </main>
   );
 }
