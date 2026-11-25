@@ -5,6 +5,8 @@
 // needs LOOKUP_CHECK_TOKEN: the token goes on the lookup request, and the bot-check widget is
 // replaced in this test browser only, since a headless browser can't complete it.
 // "fresh:" before a path shoots it as a first-time visitor (nothing remembered).
+// "at:YYYY-MM-DD|<path>" shoots it with the browser's clock set to that date (noon Eastern),
+// to rehearse date-driven changes such as a new Congress.
 import { chromium } from "playwright";
 
 const BASE = process.argv[2] ?? "https://civic-atlas-cub.pages.dev";
@@ -23,7 +25,12 @@ if (TOKEN) {
   await page.route("https://challenges.cloudflare.com/**", (route) => route.fulfill({ contentType: "text/javascript",
     body: "window.turnstile={render:(el,o)=>{setTimeout(()=>o.callback('test'),50);return 1},reset:()=>{},remove:()=>{}};" }));
 }
-for (const path of PATHS) {
+for (let path of PATHS) {
+  const at = /^at:(\d{4}-\d{2}-\d{2})\|(.*)$/.exec(path);
+  if (at) {
+    await page.clock.setFixedTime(new Date(`${at[1]}T17:00:00Z`));
+    path = at[2];
+  }
   if (path.startsWith("lookup:")) {
     if (!TOKEN) { console.log("LOOKUP_CHECK_TOKEN not set; skipping", path); continue; }
     await page.goto(BASE + "/", { waitUntil: "load" });

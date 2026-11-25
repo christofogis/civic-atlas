@@ -17,6 +17,12 @@ export default function LookupResults({ result, sectionRef, shared = false }) {
           {result.districts.length === 1 && result.officials.some((o) => o.chamber === "house" && o.district !== 0)
             ? t(`, congressional district ${result.districts[0]}`, `, distrito del Congreso ${result.districts[0]}`) : ""}</span>
         </h2>
+        {result.stale_districts && (
+          <p className="notice">
+            {t(`This link was saved under the ${result.stale_districts}th Congress. House districts can change with each new Congress, so the House member isn't shown. Look up the address again to see it.`,
+              `Este enlace se guardó durante el ${result.stale_districts}.º Congreso. Los distritos de la Cámara pueden cambiar con cada nuevo Congreso, así que no se muestra al miembro de la Cámara. Busque la dirección de nuevo para verlo.`)}
+          </p>
+        )}
         {result.approximate && (
           <p className="notice">
             {t("This location may fall in more than one district. A full street address gives an exact match.", "Este lugar puede estar en más de un distrito. Una dirección completa da un resultado exacto.")}

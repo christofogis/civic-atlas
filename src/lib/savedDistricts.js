@@ -4,7 +4,8 @@
 const KEY = "civic-atlas:my-districts";
 
 export function districtParams(r) {
-  const p = new URLSearchParams({ st: r.state });
+  // cg: the Congress whose House districts these are (district numbers change with new lines).
+  const p = new URLSearchParams({ st: r.state, cg: String(r.congress ?? "") });
   if (r.districts?.length) p.set("cd", r.districts.join(","));
   if (r.state_districts?.upper?.length) p.set("su", r.state_districts.upper.join(","));
   if (r.state_districts?.lower?.length) p.set("sl", r.state_districts.lower.join(","));

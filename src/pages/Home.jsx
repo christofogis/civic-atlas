@@ -6,7 +6,7 @@ import Turnstile from "../components/Turnstile.jsx";
 import { TURNSTILE_SITE_KEY, GOOGLE_PLACES_KEY } from "../lib/config.js";
 import { stateName } from "../lib/format.js";
 import { useLang } from "../lib/i18n.jsx";
-import { rememberRepresentatives, myRepresentatives } from "../lib/myReps.js";
+import { rememberRepresentatives, myRepresentatives, representativesOutdated } from "../lib/myReps.js";
 import MyReps from "../components/MyReps.jsx";
 import AddressInput from "../components/AddressInput.jsx";
 
@@ -111,6 +111,9 @@ export default function Home() {
         </ul>
       </header>
 
+      {representativesOutdated() && status === "idle" && (
+        <p className="notice">{t("A new Congress has begun, and some House districts changed. Look up your address again to see your current officials.", "Comenzó un nuevo Congreso y algunos distritos de la Cámara cambiaron. Busque su dirección de nuevo para ver a sus funcionarios actuales.")}</p>
+      )}
       <form onSubmit={handleSubmit} className="lookup">
         <label htmlFor="address">{mine.size > 0 ? t("Look up another address", "Buscar otra dirección") : t("Your address", "Su dirección")}</label>
         <div className="row">
