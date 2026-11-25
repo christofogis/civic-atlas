@@ -22,6 +22,12 @@ yes-man: flag weak ideas, scope creep, and shortcuts that will cost later.
   measures, show the official text, the official nonpartisan analysis (e.g. California's Legislative
   Analyst's Office), each side's official arguments unedited, and who is funding each side — never our
   own reading of a measure's effect. Don't start a new level until the federal work it depends on is done.
+  **Local pilot: Orange County, CA (Chris, Nov 24, 2026).** Order: county first (Board of Supervisors,
+  five districts; elected county officers such as Sheriff, District Attorney, Assessor), then city
+  councils (34 cities, each with its own records). Sources: OC Registrar of Voters (ocvote.gov) for
+  district boundary files, candidates and certified results; Clerk of the Board (cob.oc.gov) for
+  supervisors, agendas and minutes; OC Public Works GIS for city boundaries. State officials come first,
+  because a resident's lookup must show every level the same way.
 - Party is shown as a letter badge (D blue, R red, independents and others neutral grey), always with
   the letter, on names only — never as page or section color. One exception (Chris, Nov 24, 2026): the
   map may color districts by the party of the current representative, opt-in and off by default, with a
