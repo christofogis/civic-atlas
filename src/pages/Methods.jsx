@@ -202,6 +202,13 @@ export default function Methods() {
         site doesn't attribute dollar amounts to individual bills. Each listing links to the report itself.
       </p>
       <p>
+        Each report also lists the lobbyists who worked on each issue and any "covered" executive or
+        legislative branch position each one held in the past 20 years. Bill pages list those lobbyists and
+        their positions exactly as filed, for the issues that name the bill. Wording varies from filer to
+        filer, and some entries don't describe a government job; we don't edit them or match names to
+        members of Congress.
+      </p>
+      <p>
         Source: LDA.gov, run by the Secretary of the Senate and the Clerk of the House. The Senate Office of
         Public Records can't vouch for data or analyses derived from these reports after they're retrieved.
       </p>

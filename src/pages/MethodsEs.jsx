@@ -197,6 +197,13 @@ export default function MethodsEs() {
         individuales. Cada entrada enlaza al informe.
       </p>
       <p>
+        Cada informe también enumera a los cabilderos que trabajaron en cada tema y cualquier cargo "cubierto" en el poder
+        ejecutivo o legislativo que cada uno haya ocupado en los últimos 20 años. Las páginas de proyectos listan a esos
+        cabilderos y sus cargos tal como se presentaron, para los temas que mencionan el proyecto. La redacción varía según
+        quién presenta el informe, y algunas entradas no describen un cargo público; no las editamos ni emparejamos nombres
+        con miembros del Congreso.
+      </p>
+      <p>
         Fuente: LDA.gov, administrado por el Secretario del Senado y el Secretario de la Cámara. La Oficina de Registros
         Públicos del Senado no puede garantizar los datos ni los análisis derivados de estos informes después de obtenerlos.
       </p>

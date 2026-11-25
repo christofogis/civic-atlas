@@ -441,3 +441,6 @@ label.check { display: inline-flex; align-items: center; gap: 6px; font-size: 0.
 /* In-state vs elsewhere share of itemized individual contributions. */
 .share-bar { height: 0.75rem; background: var(--line, #ddd); border-radius: 2px; overflow: hidden; margin: 0.4rem 0 0.6rem; max-width: 28rem; }
 .share-bar .share-in { display: block; height: 100%; background: var(--ink, #333); }
+
+.former-officials { margin: 1rem 0; }
+.former-officials summary { cursor: pointer; font-weight: 600; }

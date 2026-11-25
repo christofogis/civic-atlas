@@ -23,7 +23,7 @@ async function loadBill(congress, type, number) {
   const one = (q) => q.then(({ data, error }) => { if (error) throw error; return data; });
   const key = (q) => q.eq("congress", congress).eq("bill_type", type).eq("number", number);
   const weekAgo = new Date(Date.now() - 7 * 864e5).toISOString().slice(0, 10);
-  const [bill, sponsor, cosponsors, votes, lobbying, lobbyCount, freshness, scheduled, meetings] = await Promise.all([
+  const [bill, sponsor, cosponsors, votes, lobbying, lobbyCount, freshness, scheduled, meetings, former] = await Promise.all([
     one(key(db.from("bills").select("*")).maybeSingle()),
     one(key(db.from("bill_sponsor_details").select("*")).maybeSingle()),
     one(key(db.from("bill_cosponsor_details").select("*")).order("sponsored_date").order("last_name")),
@@ -37,8 +37,10 @@ async function loadBill(congress, type, number) {
       .contains("bill_refs", [`${congress}-${type}-${number}`]).gte("event_date", weekAgo).order("event_date")),
     one(db.from("committee_meetings").select("event_id,meeting_at,title,meeting_type,status,committee_ids")
       .contains("bill_refs", [`${congress}-${type}-${number}`]).order("meeting_at", { ascending: false }).limit(50)).catch(() => []),
+    one(key(db.from("bill_lobbying_former_officials").select("lobbyist_name,covered_position,clients,last_quarter_key,latest_filing_uuid"))
+      .order("lobbyist_name").limit(500)).catch(() => []),
   ]);
-  return { bill, sponsor, cosponsors, votes, lobbying, lobbyTotal: lobbyCount?.clients ?? lobbying?.length ?? 0, freshness, scheduled, meetings };
+  return { bill, sponsor, cosponsors, votes, lobbying, lobbyTotal: lobbyCount?.clients ?? lobbying?.length ?? 0, freshness, scheduled, meetings, former };
 }
 
 function Section({ title, source, children }) {
@@ -48,6 +50,31 @@ function Section({ title, source, children }) {
       {children}
       {source && <p className="fine">{tr("Source", "Fuente")}: {source}</p>}
     </section>
+  );
+}
+
+// Lobbyists on these reports who disclosed a former government job ("covered position"), as filed.
+function FormerOfficials({ rows }) {
+  const people = new Set(rows.map((r) => r.lobbyist_name)).size;
+  return (
+    <details className="former-officials">
+      <summary>{tr(`${people.toLocaleString()} lobbyist${people === 1 ? "" : "s"} on these reports listed a former government job`, `${people.toLocaleString()} cabilder${people === 1 ? "o" : "os"} en estos informes indic${people === 1 ? "ó" : "aron"} un cargo público anterior`)}</summary>
+      <p className="fine">{tr("The law requires lobbyists to list executive or legislative branch jobs held in the past 20 years. Positions are shown as the lobbyist filed them.", "La ley exige que los cabilderos indiquen cargos en el poder ejecutivo o legislativo de los últimos 20 años. Los cargos se muestran tal como se presentaron.")}</p>
+      <table>
+        <thead><tr><th>{tr("Lobbyist", "Cabildero")}</th><th>{tr("Former position, as filed", "Cargo anterior, tal como se presentó")}</th><th>{tr("For", "Para")}</th><th>{tr("Report", "Informe")}</th></tr></thead>
+        <tbody>
+          {rows.map((r, i) => (
+            <tr key={i}>
+              <td>{r.lobbyist_name}</td>
+              <td>{r.covered_position}</td>
+              <td>{r.clients.join("; ")}</td>
+              <td><a href={filingUrl(r.latest_filing_uuid)}>{quarter(r.last_quarter_key)}</a></td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+      {rows.length >= 500 && <p className="fine">{tr("Showing the first 500. Search every report at", "Se muestran los primeros 500. Busque todos los informes en")} <a href="https://lda.gov/filings/public/filing/search/">LDA.gov</a>.</p>}
+    </details>
   );
 }
 
@@ -72,7 +99,7 @@ export default function Bill() {
   if (state.status === "missing") return <main className="page"><h1>{tr("Bill not found", "Proyecto no encontrado")}</h1><p>{tr("Bills from the 118th Congress (2023) on are covered.", "Se incluyen los proyectos desde el 118.º Congreso (2023).")} <Link to="/">{tr("Back to search", "Volver a la búsqueda")}</Link></p></main>;
   if (state.status === "error") return <main className="page"><p className="notice">{tr("Couldn't load this page right now. Try again shortly.", "No se pudo cargar esta página. Inténtelo de nuevo en un momento.")}</p></main>;
 
-  const { bill: b, sponsor, cosponsors, votes, lobbying, lobbyTotal, freshness, scheduled, meetings } = state.data;
+  const { bill: b, sponsor, cosponsors, votes, lobbying, lobbyTotal, freshness, scheduled, meetings, former } = state.data;
   const fresh = Object.fromEntries(freshness.map((f) => [f.job, f.last_success_at]));
   const updated = (job) => (fresh[job] ? tr(` Updated ${date(fresh[job])}.`, ` Actualizado el ${date(fresh[job])}.`) : "");
   const current = cosponsors.filter((x) => !x.withdrawn_date);
@@ -216,6 +243,7 @@ export default function Bill() {
                 {lobbying.length < lobbyTotal ? tr(`Show ${lobbying.length.toLocaleString()} with the most quarters`, `Mostrar ${lobbying.length.toLocaleString()} con más trimestres`) : tr(`Show all ${lobbying.length.toLocaleString()}`, `Mostrar los ${lobbying.length.toLocaleString()}`)}
               </button></p>
             )}
+            {former?.length > 0 && <FormerOfficials rows={former} />}
             {allLobbying && lobbying.length < lobbyTotal && (
               <p className="fine">{tr(`Showing ${lobbying.length.toLocaleString()} of ${lobbyTotal.toLocaleString()}. Search every report at`, `Se muestran ${lobbying.length.toLocaleString()} de ${lobbyTotal.toLocaleString()}. Busque todos los informes en`)} <a href="https://lda.gov/filings/public/filing/search/">LDA.gov</a>.</p>
             )}
