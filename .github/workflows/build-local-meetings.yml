@@ -26,7 +26,13 @@ jobs:
         env:
           PROBE: ${{ inputs.probe }}
         run: |
-          if [ "$PROBE" = "true" ]; then node scripts/data/local-meetings.mjs --probe; exit 0; fi
+          if [ "$PROBE" = "true" ]; then
+            sudo apt-get install -y -qq poppler-utils >/dev/null
+            for u in "https://board.oc.gov/sites/bos.egovoc.com/files/2025-11/2026%20APPROVED%20BOS%20Meeting%20Schedule.pdf" "https://board.oc.gov/sites/bos.egovoc.com/files/2026-11/2027%20Approved%20BOS%20Meeting%20Schedule.pdf"; do
+              curl -sfL -A "civic-atlas" -o s.pdf "$u" && pdftoppm -r 110 -png s.pdf s && for f in s*.png; do echo "SHOT-BEGIN $u $f"; base64 -w 4000 "$f" | sed 's/^/SHOT /'; echo "SHOT-END $u $f"; done; rm -f s*.png s.pdf
+            done
+            exit 0
+          fi
           node scripts/data/local-meetings.mjs
       - name: Commit
         if: ${{ !inputs.probe }}
