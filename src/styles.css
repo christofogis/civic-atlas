@@ -679,3 +679,7 @@ header.site .site-inner { position: relative; flex-wrap: nowrap; gap: 8px 14px; 
   .feature-card span { display: none; }   /* the title says enough on a phone */
 }
 @media print { .home-features { display: none; } }
+
+/* This week: reserve the summary's space so the topics below don't jump as its lines arrive. */
+.week-glance { min-height: 13rem; }
+@media (max-width: 640px) { .week-glance { min-height: 19rem; } }

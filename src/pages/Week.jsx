@@ -9,6 +9,7 @@ import { myRepresentatives } from "../lib/myReps.js";
 import ComingUp from "../components/ComingUp.jsx";
 import CommitteeCalendar from "../components/CommitteeCalendar.jsx";
 import { tr } from "../lib/lang.js";
+import { Fold, useFolds } from "../components/Fold.jsx";
 import Clamp from "../components/Clamp.jsx";
 
 const DAY = 86400000;
@@ -20,6 +21,27 @@ export default function Week() {
   const [state, setState] = useState({ status: "loading" });
   const [allVotes, setAllVotes] = useState(false);
   const mine = useMemo(() => myRepresentatives(), []);
+  const [upcoming, setUpcoming] = useState(null);
+  const { open, toggle } = useFolds(["floor", "committees", "laws", "passed", "votes"], true, "week");
+
+  // Counts for the summary: the next House floor week, committee meetings in the next two
+  // weeks, and when the Senate next meets (same reads as the home page's tile).
+  useEffect(() => {
+    const today = new Date().toLocaleDateString("en-CA", { timeZone: "America/New_York" });
+    const start = new Date(`${today}T12:00:00Z`); start.setUTCDate(start.getUTCDate() - ((start.getUTCDay() + 6) % 7));
+    const end = new Date(`${today}T12:00:00Z`); end.setUTCDate(end.getUTCDate() + 14);
+    db.from("upcoming_events").select("kind,event_date,chamber,committee_id")
+      .gte("event_date", start.toISOString().slice(0, 10)).lte("event_date", end.toISOString().slice(0, 10)).limit(500)
+      .then(({ data }) => {
+        const rows = data ?? [];
+        const floorWeek = rows.filter((e) => e.kind === "floor").map((e) => e.event_date).sort()[0];
+        const meetings = rows.filter((e) => !["floor", "convene"].includes(e.kind) && e.event_date >= today);
+        setUpcoming({
+          floorWeek, floor: rows.filter((e) => e.kind === "floor" && e.event_date === floorWeek).length, meetings,
+          convene: rows.filter((e) => e.kind === "convene" && e.event_date >= today).sort((a, z) => a.event_date.localeCompare(z.event_date))[0],
+        });
+      });
+  }, []);
 
   useEffect(() => {
     (async () => {
@@ -54,54 +76,69 @@ export default function Week() {
     })().catch(() => setState({ status: "error" }));
   }, [mine]);
 
-  if (state.status === "loading") return <main className="page"><h1>{tr("This week in Congress", "Esta semana en el Congreso")}</h1><p>{tr("Loading…", "Cargando…")}</p></main>;
+
   if (state.status === "error") return <main className="page"><h1>{tr("This week in Congress", "Esta semana en el Congreso")}</h1><p className="notice">{tr("Couldn't load this right now.", "No se pudo cargar en este momento.")}</p></main>;
-  const { votes, laws = [], passed = [], vetoed = [], positions = [], myCommittees } = state;
+  const loading = state.status === "loading";
+  const { votes = [], laws = [], passed = [], vetoed = [], positions = [], myCommittees = new Set() } = state;
   const shown = votes.filter((v) => allVotes || isFinal(v));
   const billLink = (b) => <Link to={`/bill/${b.congress}/${b.bill_type}/${b.number}`}>{billLabel(b)}</Link>;
   const passedWhere = (b) => [b.passed_house_date >= state.from && b.passed_house_date <= state.to && tr(`House (${date(b.passed_house_date)})`, `Cámara (${date(b.passed_house_date)})`),
     b.passed_senate_date >= state.from && b.passed_senate_date <= state.to && tr(`Senate (${date(b.passed_senate_date)})`, `Senado (${date(b.passed_senate_date)})`)].filter(Boolean).join(tr(" and ", " y "));
 
+  const finals = votes.filter(isFinal).length;
+  const up = upcoming;
+  const glance = [
+    up && (up.floorWeek
+      ? tr(`Coming up: ${up.floor} item${up.floor === 1 ? "" : "s"} on the House floor schedule for the week of ${date(up.floorWeek)}, and ${up.meetings.length} committee hearing${up.meetings.length === 1 ? "" : "s"} and meeting${up.meetings.length === 1 ? "" : "s"} in the next two weeks.`,
+        `Próximamente: ${up.floor} asunto${up.floor === 1 ? "" : "s"} en la agenda del pleno de la Cámara para la semana del ${date(up.floorWeek)}, y ${up.meetings.length} audiencia${up.meetings.length === 1 ? "" : "s"} y reuni${up.meetings.length === 1 ? "ón" : "ones"} de comités en las próximas dos semanas.`)
+      : tr(`The House hasn't posted its next floor schedule yet. ${up.meetings.length} committee hearings and meetings are scheduled in the next two weeks.`, `La Cámara aún no ha publicado su próxima agenda del pleno. Hay ${up.meetings.length} audiencias y reuniones de comités programadas en las próximas dos semanas.`)),
+    up?.convene && tr(`The ${up.convene.chamber === "senate" ? "Senate" : "House"} next meets ${date(up.convene.event_date)}.`, `${up.convene.chamber === "senate" ? "El Senado" : "La Cámara"} se reúne el ${date(up.convene.event_date)}.`),
+    !loading && votes.length > 0 && tr(`In the last week with votes (${date(state.from)} to ${date(state.to)}): ${votes.length} roll-call vote${votes.length === 1 ? "" : "s"}, ${finals} of them final; ${laws.length} bill${laws.length === 1 ? "" : "s"} became law; ${passed.length} passed the House or Senate.`,
+      `En la última semana con votaciones (${date(state.from)} al ${date(state.to)}): ${votes.length} votaci${votes.length === 1 ? "ón nominal" : "ones nominales"}, ${finals} final${finals === 1 ? "" : "es"}; ${laws.length} proyecto${laws.length === 1 ? "" : "s"} se convirti${laws.length === 1 ? "ó" : "eron"} en ley; ${passed.length} aprobado${passed.length === 1 ? "" : "s"} por la Cámara o el Senado.`),
+  ].filter(Boolean);
+  const wait = tr("Loading…", "Cargando…");
+  const myMeetings = up ? up.meetings.filter((e) => myCommittees.has(e.committee_id) || myCommittees.has(e.committee_id?.slice(0, 4))).length : 0;
+
   return (
     <main className="page wide">
       <h1>{tr("This week in Congress", "Esta semana en el Congreso")}</h1>
-      <ul className="level-jump" aria-label={tr("Jump to", "Ir a")}>
-        <li><a href="#floor">{tr("Floor schedule", "Agenda del pleno")}</a></li>
-        <li><a href="#committees">{tr("Committee calendar", "Calendario de comités")}</a></li>
-        <li><a href="#last-week">{tr("Last week's votes", "Votos de la semana pasada")}</a></li>
-      </ul>
-      <section className="section" id="floor">
-        <h2>{tr("Coming up", "Próximamente")}</h2>
+      <section className="glance week-glance">
+        <h2>{tr("At a glance", "En resumen")}</h2>
+        {glance.length ? <ul>{glance.map((l, i) => <li key={i}>{l}</li>)}</ul> : <p className="fine">{wait}</p>}
+      </section>
+
+      <p className="fold-hint">{tr("Tap a topic to see the details.", "Toque un tema para ver los detalles.")}</p>
+      <div className="folds">
+      <Fold id="floor" title={tr("Floor schedule", "Agenda del pleno")} open={open.has("floor")} onToggle={toggle}
+        summary={!up ? wait : up.floorWeek ? tr(`${up.floor} item${up.floor === 1 ? "" : "s"} on the House floor, week of ${date(up.floorWeek)}`, `${up.floor} asunto${up.floor === 1 ? "" : "s"} en el pleno de la Cámara, semana del ${date(up.floorWeek)}`) : tr("No House floor schedule posted yet", "Aún no hay agenda del pleno de la Cámara")}>
         <ComingUp myCommittees={myCommittees} committees={false} />
-      </section>
-
-      <section className="section" id="committees">
-        <h2>{tr("Committee hearings and markups", "Audiencias y sesiones de comités")}</h2>
+      </Fold>
+      <Fold id="committees" title={tr("Committee calendar", "Calendario de comités")} open={open.has("committees")} onToggle={toggle}
+        summary={!up ? wait : tr(`${up.meetings.length} hearings and meetings in the next two weeks${myMeetings ? `, ${myMeetings} on your representatives' committees` : ""}`, `${up.meetings.length} audiencias y reuniones en las próximas dos semanas${myMeetings ? `, ${myMeetings} en comités de sus representantes` : ""}`)}>
         <CommitteeCalendar mine={myCommittees} />
-      </section>
-
-      {votes.length === 0 ? <p>{tr("No votes on record yet.", "Todavía no hay votos registrados.")}</p> : (
-        <>
-          <h2 className="week-head" id="last-week">{tr("Last week with votes", "Última semana con votaciones")}: {date(state.from)} {tr("to", "al")} {date(state.to)}<Ref id="src" text={<>{tr("Sources: House Clerk and Senate.gov roll-call records; GovInfo Bill Status (Library of Congress).", "Fuentes: registros de votaciones del Secretario de la Cámara y de Senate.gov; GovInfo Bill Status (Biblioteca del Congreso).")}</>} /></h2>
-
+      </Fold>
+      <Fold id="laws" title={tr("Became law", "Se convirtieron en ley")} open={open.has("laws")} onToggle={toggle} status={loading ? "loading" : undefined}
+        summary={loading ? wait : tr(`${laws.length} in the last week with votes${vetoed.length ? `; ${vetoed.length} vetoed` : ""}`, `${laws.length} en la última semana con votaciones${vetoed.length ? `; ${vetoed.length} vetados` : ""}`)}>
           <section className="section">
-            <h2>{tr("Became law", "Se convirtieron en ley")}</h2>
             {laws.length === 0 ? <p>{tr("None this week.", "Ninguno esta semana.")}</p> : (
               <ul className="bare items">{laws.map((b) => <li key={`${b.bill_type}${b.number}`} className="item"><span className="item-head">{billLink(b)} <span className="fine">· {b.law_number} · {tr("signed", "firmado el")} {date(b.became_law_date)}</span></span><Clamp lines={2}>{b.short_title ?? b.title}</Clamp></li>)}</ul>
             )}
             {vetoed.length > 0 && <p>{tr("Vetoed", "Vetados")}: {vetoed.map((b, i) => <span key={b.number}>{i ? "; " : ""}{billLink(b)} {b.short_title ?? b.title} ({date(b.vetoed_date)})</span>)}</p>}
           </section>
-
+      </Fold>
+      <Fold id="passed" title={tr("Passed a chamber", "Aprobados por una cámara")} open={open.has("passed")} onToggle={toggle} status={loading ? "loading" : undefined}
+        summary={loading ? wait : tr(`${passed.length} passed the House or Senate in the last week with votes`, `${passed.length} aprobados por la Cámara o el Senado en la última semana con votaciones`)}>
           <section className="section">
-            <h2>{tr("Passed a chamber", "Aprobados por una cámara")}</h2>
             {passed.length === 0 ? <p>{tr("None this week.", "Ninguno esta semana.")}</p> : (
               <ul className="bare items">{passed.map((b) => <li key={`${b.bill_type}${b.number}`} className="item"><span className="item-head">{billLink(b)} <span className="fine">· {tr("passed the", "aprobado por:")} {passedWhere(b)}</span></span><Clamp lines={2}>{b.short_title ?? b.title}</Clamp></li>)}</ul>
             )}
             <p className="fine">{tr("Includes bills and resolutions passed by voice vote, which have no roll call.", "Incluye proyectos y resoluciones aprobados a viva voz, que no tienen votación nominal.")}</p>
           </section>
-
+      </Fold>
+      <Fold id="votes" title={tr("Roll-call votes", "Votaciones nominales")} open={open.has("votes")} onToggle={toggle} status={loading ? "loading" : undefined}
+        summary={loading ? wait : votes.length ? tr(`${finals} final vote${finals === 1 ? "" : "s"}, ${votes.length} in all, ${date(state.from)} to ${date(state.to)}`, `${finals} voto${finals === 1 ? "" : "s"} final${finals === 1 ? "" : "es"}, ${votes.length} en total, ${date(state.from)} al ${date(state.to)}`) : tr("No votes on record yet", "Todavía no hay votos registrados")}>
           <section className="section">
-            <h2>{tr("Roll-call votes", "Votaciones nominales")}</h2>
+            <p className="fine">{tr("Roll calls from the last week with votes.", "Votaciones de la última semana con votaciones.")}<Ref id="src" text={<>{tr("Sources: House Clerk and Senate.gov roll-call records; GovInfo Bill Status (Library of Congress).", "Fuentes: registros de votaciones del Secretario de la Cámara y de Senate.gov; GovInfo Bill Status (Biblioteca del Congreso).")}</>} /></p>
             <div className="toggle" role="group" aria-label={tr("Which votes to show", "Qué votos mostrar")}>
               <button type="button" aria-pressed={!allVotes} className={allVotes ? "" : "on"} onClick={() => setAllVotes(false)}>{tr("Final votes", "Votos finales")}</button>
               <button type="button" aria-pressed={allVotes} className={allVotes ? "on" : ""} onClick={() => setAllVotes(true)}>{tr(`All ${votes.length} votes`, `Los ${votes.length} votos`)}</button>
@@ -126,8 +163,8 @@ export default function Week() {
               </table>
             )}
           </section>
-        </>
-      )}
+      </Fold>
+      </div>
       <NotesList />
     </main>
   );
