@@ -53,3 +53,19 @@ for (const c of CITIES) {
   writeFileSync(out, JSON.stringify({ source: c.source, source_url: c.source_url, ...g }));
   console.log(`${c.id} council districts: ${g.features.map((f) => f.properties.district).join(", ")}; ${readFileSync(out).length} bytes`);
 }
+
+// Cities and unincorporated communities (Census places) in Orange County, from the county's
+// "OC Land Boundaries for Cities and Unincorporated Supervisory Districts" layer. Tells the
+// lookup which city an address is in: mailing addresses don't (Rossmoor mail says "Los Alamitos").
+{
+  const url = "https://services.arcgis.com/UXmFoWC7yDHcDN5Q/ArcGIS/rest/services/OC_Cities_Land_Boundaries/FeatureServer/0/query?where=1%3D1&outFields=NAME,PlaceType,GEOID&outSR=4326&f=geojson";
+  const raw = await (await fetch(url)).json();
+  if (!(raw.features?.length > 30)) throw new Error(`expected Orange County places, got ${raw.features?.length}`);
+  console.log("place types:", [...new Set(raw.features.map((f) => f.properties.PlaceType))].join(", "));
+  writeFileSync("/tmp/oc-places.json", JSON.stringify(raw));
+  const out = "public/maps/local/ca-orange-places.json";
+  await mapshaper.runCommands(`-i /tmp/oc-places.json -each "name=NAME, type=PlaceType, geoid=GEOID" -filter-fields name,type,geoid -simplify 10% keep-shapes -o precision=0.00001 format=geojson ${out}`);
+  const g = JSON.parse(readFileSync(out, "utf8"));
+  writeFileSync(out, JSON.stringify({ source: "County of Orange, OC Public Works GIS: OC Land Boundaries for Cities and Unincorporated Supervisory Districts", source_url: "https://services.arcgis.com/UXmFoWC7yDHcDN5Q/ArcGIS/rest/services/OC_Cities_Land_Boundaries/FeatureServer/0", ...g }));
+  console.log(`places: ${g.features.length}; ${readFileSync(out).length} bytes`);
+}
