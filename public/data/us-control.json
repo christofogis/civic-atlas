@@ -1,0 +1,644 @@
+{
+ "note": "Who held the presidency, and which party held the majority in the Senate and the House, by date. Majorities are as each chamber organized, counting independents with the party they caucused with; the Senate's mid-Congress changes in 2001 and 2021 are included. Update when a new Congress or president takes office.",
+ "sources": {
+  "president": "https://www.whitehouse.gov/about-the-white-house/presidents/",
+  "senate": "https://www.senate.gov/about/parties-leadership/party-division.htm",
+  "house": "https://history.house.gov/Institution/Party-Divisions/Party-Divisions/"
+ },
+ "presidents": [
+  {
+   "name": "Franklin D. Roosevelt",
+   "party": "D",
+   "start": "1933-03-04",
+   "end": "1945-04-12"
+  },
+  {
+   "name": "Harry S. Truman",
+   "party": "D",
+   "start": "1945-04-12",
+   "end": "1953-01-20"
+  },
+  {
+   "name": "Dwight D. Eisenhower",
+   "party": "R",
+   "start": "1953-01-20",
+   "end": "1961-01-20"
+  },
+  {
+   "name": "John F. Kennedy",
+   "party": "D",
+   "start": "1961-01-20",
+   "end": "1963-11-22"
+  },
+  {
+   "name": "Lyndon B. Johnson",
+   "party": "D",
+   "start": "1963-11-22",
+   "end": "1969-01-20"
+  },
+  {
+   "name": "Richard Nixon",
+   "party": "R",
+   "start": "1969-01-20",
+   "end": "1974-08-09"
+  },
+  {
+   "name": "Gerald R. Ford",
+   "party": "R",
+   "start": "1974-08-09",
+   "end": "1977-01-20"
+  },
+  {
+   "name": "Jimmy Carter",
+   "party": "D",
+   "start": "1977-01-20",
+   "end": "1981-01-20"
+  },
+  {
+   "name": "Ronald Reagan",
+   "party": "R",
+   "start": "1981-01-20",
+   "end": "1989-01-20"
+  },
+  {
+   "name": "George H. W. Bush",
+   "party": "R",
+   "start": "1989-01-20",
+   "end": "1993-01-20"
+  },
+  {
+   "name": "Bill Clinton",
+   "party": "D",
+   "start": "1993-01-20",
+   "end": "2001-01-20"
+  },
+  {
+   "name": "George W. Bush",
+   "party": "R",
+   "start": "2001-01-20",
+   "end": "2009-01-20"
+  },
+  {
+   "name": "Barack Obama",
+   "party": "D",
+   "start": "2009-01-20",
+   "end": "2017-01-20"
+  },
+  {
+   "name": "Donald J. Trump",
+   "party": "R",
+   "start": "2017-01-20",
+   "end": "2021-01-20"
+  },
+  {
+   "name": "Joseph R. Biden Jr.",
+   "party": "D",
+   "start": "2021-01-20",
+   "end": "2025-01-20"
+  },
+  {
+   "name": "Donald J. Trump",
+   "party": "R",
+   "start": "2025-01-20",
+   "end": null
+  }
+ ],
+ "senate": [
+  {
+   "congress": 77,
+   "party": "D",
+   "start": "1941-01-03",
+   "end": "1943-01-03"
+  },
+  {
+   "congress": 78,
+   "party": "D",
+   "start": "1943-01-03",
+   "end": "1945-01-03"
+  },
+  {
+   "congress": 79,
+   "party": "D",
+   "start": "1945-01-03",
+   "end": "1947-01-03"
+  },
+  {
+   "congress": 80,
+   "party": "R",
+   "start": "1947-01-03",
+   "end": "1949-01-03"
+  },
+  {
+   "congress": 81,
+   "party": "D",
+   "start": "1949-01-03",
+   "end": "1951-01-03"
+  },
+  {
+   "congress": 82,
+   "party": "D",
+   "start": "1951-01-03",
+   "end": "1953-01-03"
+  },
+  {
+   "congress": 83,
+   "party": "R",
+   "start": "1953-01-03",
+   "end": "1955-01-03"
+  },
+  {
+   "congress": 84,
+   "party": "D",
+   "start": "1955-01-03",
+   "end": "1957-01-03"
+  },
+  {
+   "congress": 85,
+   "party": "D",
+   "start": "1957-01-03",
+   "end": "1959-01-03"
+  },
+  {
+   "congress": 86,
+   "party": "D",
+   "start": "1959-01-03",
+   "end": "1961-01-03"
+  },
+  {
+   "congress": 87,
+   "party": "D",
+   "start": "1961-01-03",
+   "end": "1963-01-03"
+  },
+  {
+   "congress": 88,
+   "party": "D",
+   "start": "1963-01-03",
+   "end": "1965-01-03"
+  },
+  {
+   "congress": 89,
+   "party": "D",
+   "start": "1965-01-03",
+   "end": "1967-01-03"
+  },
+  {
+   "congress": 90,
+   "party": "D",
+   "start": "1967-01-03",
+   "end": "1969-01-03"
+  },
+  {
+   "congress": 91,
+   "party": "D",
+   "start": "1969-01-03",
+   "end": "1971-01-03"
+  },
+  {
+   "congress": 92,
+   "party": "D",
+   "start": "1971-01-03",
+   "end": "1973-01-03"
+  },
+  {
+   "congress": 93,
+   "party": "D",
+   "start": "1973-01-03",
+   "end": "1975-01-03"
+  },
+  {
+   "congress": 94,
+   "party": "D",
+   "start": "1975-01-03",
+   "end": "1977-01-03"
+  },
+  {
+   "congress": 95,
+   "party": "D",
+   "start": "1977-01-03",
+   "end": "1979-01-03"
+  },
+  {
+   "congress": 96,
+   "party": "D",
+   "start": "1979-01-03",
+   "end": "1981-01-03"
+  },
+  {
+   "congress": 97,
+   "party": "R",
+   "start": "1981-01-03",
+   "end": "1983-01-03"
+  },
+  {
+   "congress": 98,
+   "party": "R",
+   "start": "1983-01-03",
+   "end": "1985-01-03"
+  },
+  {
+   "congress": 99,
+   "party": "R",
+   "start": "1985-01-03",
+   "end": "1987-01-03"
+  },
+  {
+   "congress": 100,
+   "party": "D",
+   "start": "1987-01-03",
+   "end": "1989-01-03"
+  },
+  {
+   "congress": 101,
+   "party": "D",
+   "start": "1989-01-03",
+   "end": "1991-01-03"
+  },
+  {
+   "congress": 102,
+   "party": "D",
+   "start": "1991-01-03",
+   "end": "1993-01-03"
+  },
+  {
+   "congress": 103,
+   "party": "D",
+   "start": "1993-01-03",
+   "end": "1995-01-03"
+  },
+  {
+   "congress": 104,
+   "party": "R",
+   "start": "1995-01-03",
+   "end": "1997-01-03"
+  },
+  {
+   "congress": 105,
+   "party": "R",
+   "start": "1997-01-03",
+   "end": "1999-01-03"
+  },
+  {
+   "congress": 106,
+   "party": "R",
+   "start": "1999-01-03",
+   "end": "2001-01-03"
+  },
+  {
+   "congress": 107,
+   "party": "D",
+   "start": "2001-01-03",
+   "end": "2001-01-20"
+  },
+  {
+   "congress": 107,
+   "party": "R",
+   "start": "2001-01-20",
+   "end": "2001-06-06"
+  },
+  {
+   "congress": 107,
+   "party": "D",
+   "start": "2001-06-06",
+   "end": "2003-01-03"
+  },
+  {
+   "congress": 108,
+   "party": "R",
+   "start": "2003-01-03",
+   "end": "2005-01-03"
+  },
+  {
+   "congress": 109,
+   "party": "R",
+   "start": "2005-01-03",
+   "end": "2007-01-03"
+  },
+  {
+   "congress": 110,
+   "party": "D",
+   "start": "2007-01-03",
+   "end": "2009-01-03"
+  },
+  {
+   "congress": 111,
+   "party": "D",
+   "start": "2009-01-03",
+   "end": "2011-01-03"
+  },
+  {
+   "congress": 112,
+   "party": "D",
+   "start": "2011-01-03",
+   "end": "2013-01-03"
+  },
+  {
+   "congress": 113,
+   "party": "D",
+   "start": "2013-01-03",
+   "end": "2015-01-03"
+  },
+  {
+   "congress": 114,
+   "party": "R",
+   "start": "2015-01-03",
+   "end": "2017-01-03"
+  },
+  {
+   "congress": 115,
+   "party": "R",
+   "start": "2017-01-03",
+   "end": "2019-01-03"
+  },
+  {
+   "congress": 116,
+   "party": "R",
+   "start": "2019-01-03",
+   "end": "2021-01-03"
+  },
+  {
+   "congress": 117,
+   "party": "R",
+   "start": "2021-01-03",
+   "end": "2021-01-20"
+  },
+  {
+   "congress": 117,
+   "party": "D",
+   "start": "2021-01-20",
+   "end": "2023-01-03"
+  },
+  {
+   "congress": 118,
+   "party": "D",
+   "start": "2023-01-03",
+   "end": "2025-01-03"
+  },
+  {
+   "congress": 119,
+   "party": "R",
+   "start": "2025-01-03",
+   "end": null
+  }
+ ],
+ "house": [
+  {
+   "congress": 77,
+   "party": "D",
+   "start": "1941-01-03",
+   "end": "1943-01-03"
+  },
+  {
+   "congress": 78,
+   "party": "D",
+   "start": "1943-01-03",
+   "end": "1945-01-03"
+  },
+  {
+   "congress": 79,
+   "party": "D",
+   "start": "1945-01-03",
+   "end": "1947-01-03"
+  },
+  {
+   "congress": 80,
+   "party": "R",
+   "start": "1947-01-03",
+   "end": "1949-01-03"
+  },
+  {
+   "congress": 81,
+   "party": "D",
+   "start": "1949-01-03",
+   "end": "1951-01-03"
+  },
+  {
+   "congress": 82,
+   "party": "D",
+   "start": "1951-01-03",
+   "end": "1953-01-03"
+  },
+  {
+   "congress": 83,
+   "party": "R",
+   "start": "1953-01-03",
+   "end": "1955-01-03"
+  },
+  {
+   "congress": 84,
+   "party": "D",
+   "start": "1955-01-03",
+   "end": "1957-01-03"
+  },
+  {
+   "congress": 85,
+   "party": "D",
+   "start": "1957-01-03",
+   "end": "1959-01-03"
+  },
+  {
+   "congress": 86,
+   "party": "D",
+   "start": "1959-01-03",
+   "end": "1961-01-03"
+  },
+  {
+   "congress": 87,
+   "party": "D",
+   "start": "1961-01-03",
+   "end": "1963-01-03"
+  },
+  {
+   "congress": 88,
+   "party": "D",
+   "start": "1963-01-03",
+   "end": "1965-01-03"
+  },
+  {
+   "congress": 89,
+   "party": "D",
+   "start": "1965-01-03",
+   "end": "1967-01-03"
+  },
+  {
+   "congress": 90,
+   "party": "D",
+   "start": "1967-01-03",
+   "end": "1969-01-03"
+  },
+  {
+   "congress": 91,
+   "party": "D",
+   "start": "1969-01-03",
+   "end": "1971-01-03"
+  },
+  {
+   "congress": 92,
+   "party": "D",
+   "start": "1971-01-03",
+   "end": "1973-01-03"
+  },
+  {
+   "congress": 93,
+   "party": "D",
+   "start": "1973-01-03",
+   "end": "1975-01-03"
+  },
+  {
+   "congress": 94,
+   "party": "D",
+   "start": "1975-01-03",
+   "end": "1977-01-03"
+  },
+  {
+   "congress": 95,
+   "party": "D",
+   "start": "1977-01-03",
+   "end": "1979-01-03"
+  },
+  {
+   "congress": 96,
+   "party": "D",
+   "start": "1979-01-03",
+   "end": "1981-01-03"
+  },
+  {
+   "congress": 97,
+   "party": "D",
+   "start": "1981-01-03",
+   "end": "1983-01-03"
+  },
+  {
+   "congress": 98,
+   "party": "D",
+   "start": "1983-01-03",
+   "end": "1985-01-03"
+  },
+  {
+   "congress": 99,
+   "party": "D",
+   "start": "1985-01-03",
+   "end": "1987-01-03"
+  },
+  {
+   "congress": 100,
+   "party": "D",
+   "start": "1987-01-03",
+   "end": "1989-01-03"
+  },
+  {
+   "congress": 101,
+   "party": "D",
+   "start": "1989-01-03",
+   "end": "1991-01-03"
+  },
+  {
+   "congress": 102,
+   "party": "D",
+   "start": "1991-01-03",
+   "end": "1993-01-03"
+  },
+  {
+   "congress": 103,
+   "party": "D",
+   "start": "1993-01-03",
+   "end": "1995-01-03"
+  },
+  {
+   "congress": 104,
+   "party": "R",
+   "start": "1995-01-03",
+   "end": "1997-01-03"
+  },
+  {
+   "congress": 105,
+   "party": "R",
+   "start": "1997-01-03",
+   "end": "1999-01-03"
+  },
+  {
+   "congress": 106,
+   "party": "R",
+   "start": "1999-01-03",
+   "end": "2001-01-03"
+  },
+  {
+   "congress": 107,
+   "party": "R",
+   "start": "2001-01-03",
+   "end": "2003-01-03"
+  },
+  {
+   "congress": 108,
+   "party": "R",
+   "start": "2003-01-03",
+   "end": "2005-01-03"
+  },
+  {
+   "congress": 109,
+   "party": "R",
+   "start": "2005-01-03",
+   "end": "2007-01-03"
+  },
+  {
+   "congress": 110,
+   "party": "D",
+   "start": "2007-01-03",
+   "end": "2009-01-03"
+  },
+  {
+   "congress": 111,
+   "party": "D",
+   "start": "2009-01-03",
+   "end": "2011-01-03"
+  },
+  {
+   "congress": 112,
+   "party": "R",
+   "start": "2011-01-03",
+   "end": "2013-01-03"
+  },
+  {
+   "congress": 113,
+   "party": "R",
+   "start": "2013-01-03",
+   "end": "2015-01-03"
+  },
+  {
+   "congress": 114,
+   "party": "R",
+   "start": "2015-01-03",
+   "end": "2017-01-03"
+  },
+  {
+   "congress": 115,
+   "party": "R",
+   "start": "2017-01-03",
+   "end": "2019-01-03"
+  },
+  {
+   "congress": 116,
+   "party": "D",
+   "start": "2019-01-03",
+   "end": "2021-01-03"
+  },
+  {
+   "congress": 117,
+   "party": "D",
+   "start": "2021-01-03",
+   "end": "2023-01-03"
+  },
+  {
+   "congress": 118,
+   "party": "R",
+   "start": "2023-01-03",
+   "end": "2025-01-03"
+  },
+  {
+   "congress": 119,
+   "party": "R",
+   "start": "2025-01-03",
+   "end": null
+  }
+ ]
+}

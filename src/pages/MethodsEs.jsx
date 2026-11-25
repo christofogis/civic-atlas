@@ -202,6 +202,13 @@ export default function MethodsEs() {
         la tabla para años posteriores. La OMB actualiza las tablas con cada presupuesto del presidente, así que su último año
         real puede ir detrás de las cifras del Tesoro de arriba.
       </p>
+      <p>
+        Debajo de esa gráfica, tres filas muestran quién era presidente y qué partido tenía la mayoría en el Senado y en la
+        Cámara, en la misma escala de años fiscales. Las fechas de los presidentes vienen de la Casa Blanca; las mayorías, de
+        las tablas de división partidista del Senado y del Historiador de la Cámara, tal como se organizó cada cámara,
+        contando a los independientes con el partido con el que se agrupaban. Todos los partidos se dibujan igual. Las filas
+        dan contexto sobre las fechas; no son una conclusión sobre quién causó un déficit.
+      </p>
       <h2 id="lobbying">Cabildeo sobre proyectos</h2>
       <p>
         Según la Ley de Divulgación de Cabildeo, las firmas de cabildeo y las organizaciones que hacen cabildeo para sí mismas

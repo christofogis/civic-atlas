@@ -208,6 +208,13 @@ export default function Methods() {
         Only actual years are used; the table's estimates for later years are left out. OMB updates the
         tables with each President's Budget, so its latest actual year can trail the Treasury figures above.
       </p>
+      <p>
+        Under that chart, three rows show who was president and which party held the majority in the
+        Senate and the House, on the same fiscal-year scale. Presidents' dates come from the White House;
+        majorities from the Senate's and the House Historian's party division tables, as each chamber
+        organized, with independents counted with the party they caucused with. Every party is drawn the
+        same way. The rows are context for the dates, not a finding about who caused a deficit.
+      </p>
       <h2 id="lobbying">Lobbying on bills</h2>
       <p>
         Under the Lobbying Disclosure Act, lobbying firms and organizations that lobby for themselves file a

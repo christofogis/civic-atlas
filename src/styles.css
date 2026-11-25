@@ -25,7 +25,7 @@
   --highlight: #fff6d6;
   --shadow: rgba(0, 0, 0, 0.12);
   --chart-1: #00b894; --chart-2: #f47230; --chart-3: #6a4ce2; --chart-4: #f2a600; --chart-5: #ee7fac; --chart-6: #008a17;
-  --chart-other: #b9c0bc; --chart-in: #00b894; --chart-out: #f47230;   /* checked for color-blind separation, light and dark */
+  --chart-other: #b9c0bc; --chart-in: #00b894; --chart-out: #f47230; --chart-deficit: #d1453b;   /* checked for color-blind separation, light and dark */
   color-scheme: light;
   --wide: 1200px;
   --measure: 72ch;
@@ -60,7 +60,7 @@
   --highlight: #3a3216;
   --shadow: rgba(0, 0, 0, 0.5);
   --chart-1: #00b894; --chart-2: #f47230; --chart-3: #7b61f0; --chart-4: #c98a00; --chart-5: #dc6a9c; --chart-6: #1f9a3a;
-  --chart-other: #6f7a76; --chart-in: #00b894; --chart-out: #f47230;
+  --chart-other: #6f7a76; --chart-in: #00b894; --chart-out: #f47230; --chart-deficit: #d1453b;
   color-scheme: dark;
 }
 @media (prefers-color-scheme: dark) {
@@ -85,7 +85,7 @@
     --highlight: #3a3216;
     --shadow: rgba(0, 0, 0, 0.5);
     --chart-1: #00b894; --chart-2: #f47230; --chart-3: #7b61f0; --chart-4: #c98a00; --chart-5: #dc6a9c; --chart-6: #1f9a3a;
-  --chart-other: #6f7a76; --chart-in: #00b894; --chart-out: #f47230;
+  --chart-other: #6f7a76; --chart-in: #00b894; --chart-out: #f47230; --chart-deficit: #d1453b;
   color-scheme: dark;
   }
 }
@@ -702,3 +702,14 @@ header.site .site-inner { position: relative; flex-wrap: nowrap; gap: 8px 14px; 
 
 /* Card seat line: office, then place, each on its own line, so names line up across a row. */
 .card .seat .seat-office, .card .seat .seat-place { display: block; }
+
+/* Budget: the deficit or surplus figure in its chart color, with its words beside it. */
+.budget-figures .fig.deficit { color: var(--chart-deficit); }
+.budget-figures .fig.surplus { color: var(--chart-in); }
+
+/* Who held the presidency, Senate and House, under the since-1940 chart */
+.control-rows .row-label { font-size: 12px; fill: var(--muted); }
+.control-rows .seg { fill: var(--surface, #f5f7f6); stroke: var(--bg); stroke-width: 1; }
+.control-rows .seg.alt { fill: var(--border); }
+.control-rows .seg-name { font-size: 12px; fill: var(--text); }
+.control-rows .badge-text { font-size: 10px; font-weight: 700; fill: #fff; }

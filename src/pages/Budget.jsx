@@ -44,6 +44,20 @@ const Label = ({ en }) => <>{en}{ES[en] && tr("", <span className="fine"> ({ES[e
 const IN = "var(--chart-in)";   // receipts; chart colors are CSS tokens with light and dark steps (styles.css)
 const OUT = "var(--chart-out)";  // outlays
 const BAR = "var(--accent)";   // follows the light or dark theme
+const DEF = "var(--chart-deficit)";  // deficit (red) and surplus (green, the receipts color): Chris, Nov 25
+
+// Charts draw narrower on phones, so their text stays readable when scaled to the screen.
+function useNarrow() {
+  const q = "(max-width: 640px)";
+  const [narrow, setNarrow] = useState(() => typeof window !== "undefined" && window.matchMedia(q).matches);
+  useEffect(() => {
+    const m = window.matchMedia(q);
+    const on = () => setNarrow(m.matches);
+    m.addEventListener("change", on);
+    return () => m.removeEventListener("change", on);
+  }, []);
+  return narrow;
+}
 
 const sign = (n) => (n < 0 ? "−" : "");
 const T = (n) => `${sign(n)}$${(Math.abs(n) / 1e12).toFixed(2)} ${tr("trillion", "billones")}`;
@@ -133,7 +147,8 @@ function outlayGroups(y) {
 function Stacked({ years }) {
   const [share, setShare] = useState(false);
   const [sel, setSel] = useState(years.length - 1);
-  const W = 480, H = 280, L = 40, R = 8, Tp = 12, Bt = 26;
+  const narrow = useNarrow();
+  const W = narrow ? 480 : 960, H = narrow ? 280 : 320, L = 40, R = 8, Tp = 12, Bt = 26;
   const max = share ? 1 : Math.ceil(Math.max(...years.map((y) => y.outlays_total)) / 1e12) * 1e12;
   const slot = (W - L - R) / years.length;
   const bw = Math.max(8, slot - 8);
@@ -220,7 +235,8 @@ function Spark({ values, at, label }) {
 // Receipts and outlays by fiscal year: two lines, one axis, crosshair tooltip.
 function Trend({ years }) {
   const [hover, setHover] = useState(null);
-  const W = 480, H = 240, L = 40, R = 64, Tp = 12, Bt = 26;
+  const narrow = useNarrow();
+  const W = narrow ? 480 : 960, H = narrow ? 240 : 280, L = 40, R = 64, Tp = 12, Bt = 26;
   const max = Math.ceil(Math.max(...years.map((y) => y.outlays_total)) / 1e12);
   const x = (i) => L + (i * (W - L - R)) / (years.length - 1);
   const y = (v) => Tp + (H - Tp - Bt) * (1 - v / (max * 1e12));
@@ -271,18 +287,77 @@ function Trend({ years }) {
 // from a zero line: below it, more went out than came in (deficit); above it, a surplus. Shown as
 // a share of the economy (GDP), in dollars of the day, or adjusted for inflation; and over the
 // last 20 or 40 years, or every year since 1940.
-function History({ data }) {
+// Who held the presidency and the majority in each chamber, drawn on the same fiscal-year scale as
+// the chart above it. Every party is drawn the same way: neutral bands, a lettered badge in the
+// party's color (as on names elsewhere), and the name where it fits. A fiscal year runs October
+// to September, so a president who takes office in January starts partway through one.
+const PARTY_FILL = { D: "#1f4e9c", R: "#b42318" };
+const SHORT = { "George H. W. Bush": "G. H. W. Bush", "George W. Bush": "G. W. Bush", "Joseph R. Biden Jr.": "Biden", "Donald J. Trump": "Trump" };
+const shortName = (n) => SHORT[n] ?? n.split(" ").filter((w) => !/^[A-Z]\.$/.test(w) && w !== "Jr.").at(-1);
+function fyPos(d, first) {
+  const t = Date.parse(`${d}T12:00:00Z`), dt = new Date(t);
+  const fy = dt.getUTCFullYear() + (dt.getUTCMonth() >= 9 ? 1 : 0);
+  const a = Date.UTC(fy - 1, 9, 1), b = Date.UTC(fy, 9, 1);
+  return fy - first + (t - a) / (b - a);
+}
+const merge = (segs) => segs.reduce((out, s) => {
+  const last = out.at(-1);
+  if (last && last.party === s.party && last.end === s.start) last.end = s.end; else out.push({ ...s });
+  return out;
+}, []);
+export function controlAt(control, fy) {
+  // Everyone who held each office at some point in the fiscal year.
+  const a = `${fy - 1}-10-01`, b = `${fy}-09-30`;
+  const over = (list) => list.filter((x) => x.start <= b && (x.end == null || x.end > a));
+  return { presidents: over(control.presidents), senate: over(control.senate), house: over(control.house) };
+}
+function ControlRows({ control, years, W, L, R, slot }) {
+  const first = years[0].fiscal_year, n = years.length;
+  const x = (d) => L + Math.max(0, Math.min(n, d == null ? n : fyPos(d, first))) * slot;
+  const rows = [
+    [tr("President", "Presidente"), control.presidents, true],
+    [tr("Senate", "Senado"), merge(control.senate), false],
+    [tr("House", "Cámara"), merge(control.house), false],
+  ];
+  const RH = 22, GAP = 4, H = rows.length * (RH + GAP);
+  return (
+    <svg className="control-rows" viewBox={`0 0 ${W} ${H}`} role="img"
+      aria-label={tr("Who held the presidency, and which party held the Senate and House majority, by fiscal year. Point at a year in the chart above to read them.", "Quién ocupó la presidencia y qué partido tuvo la mayoría en el Senado y la Cámara, por año fiscal. Señale un año en la gráfica de arriba para leerlos.")}>
+      {rows.map(([label, segs, named], r) => {
+        const y = r * (RH + GAP);
+        return (
+          <g key={label}>
+            <text x={L - 6} y={y + 15} textAnchor="end" className="row-label">{label}</text>
+            {segs.map((sg, i) => {
+              const x0 = x(sg.start), x1 = x(sg.end);
+              if (x1 - x0 <= 0.5) return null;
+              const w = x1 - x0, nm = named ? shortName(sg.name) : null;
+              const fitsName = named && w >= nm.length * 6.6 + 26;
+              const fitsBadge = w >= 16;
+              return (
+                <g key={i}>
+                  <rect className={`seg${i % 2 ? " alt" : ""}`} x={x0} y={y} width={w} height={RH} />
+                  {fitsBadge && <>
+                    <rect x={x0 + 3} y={y + 4} width="14" height="14" rx="2" fill={PARTY_FILL[sg.party] ?? "#6b7280"} />
+                    <text x={x0 + 10} y={y + 15} textAnchor="middle" className="badge-text">{sg.party}</text>
+                  </>}
+                  {fitsName && <text x={x0 + 21} y={y + 15} className="seg-name">{nm}</text>}
+                  <title>{named ? `${sg.name} (${sg.party})` : tr(`${sg.party === "D" ? "Democratic" : "Republican"} majority`, `Mayoría ${sg.party === "D" ? "demócrata" : "republicana"}`)}</title>
+                </g>
+              );
+            })}
+          </g>
+        );
+      })}
+    </svg>
+  );
+}
+
+function History({ data, control }) {
   const [unit, setUnit] = useState("gdp");
   const [span, setSpan] = useState(40);
   const [hover, setHover] = useState(null);
-  // A narrower drawing on phones, so the axis text stays readable when the chart is scaled down.
-  const [narrow, setNarrow] = useState(() => typeof window !== "undefined" && window.matchMedia("(max-width: 640px)").matches);
-  useEffect(() => {
-    const m = window.matchMedia("(max-width: 640px)");
-    const on = () => setNarrow(m.matches);
-    m.addEventListener("change", on);
-    return () => m.removeEventListener("change", on);
-  }, []);
+  const narrow = useNarrow();
   const all = data.years;
   const years = span ? all.slice(-span) : all;
   const key = { gdp: "surplus_gdp", dollars: "surplus", real: "surplus_const" }[unit];
@@ -330,21 +405,29 @@ function History({ data }) {
           return (
             <g key={d.fiscal_year}>
               <rect x={x} width={bw} y={Math.min(y(v), y(0))} height={Math.max(1, Math.abs(y(v) - y(0)))}
-                style={{ fill: v < 0 ? OUT : IN, opacity: hover == null || hover === i ? 1 : 0.55 }} rx={bw > 6 ? 2 : 0} />
+                style={{ fill: v < 0 ? DEF : IN, opacity: hover == null || hover === i ? 1 : 0.55 }} rx={bw > 6 ? 2 : 0} />
               {d.fiscal_year % every === 0 && <text x={x + bw / 2} y={H - 8} textAnchor="middle" className="axis">{d.fiscal_year}</text>}
             </g>
           );
         })}
       </svg>
+      {control && <ControlRows control={control} years={years} W={W} L={L} R={R} slot={slot} />}
       <p className="legend fine">
-        <span className="swatch" style={{ background: OUT }} /> {tr("Deficit: more went out than came in (below the line)", "Déficit: salió más de lo que entró (debajo de la línea)")}
+        <span className="swatch" style={{ background: DEF }} /> {tr("Deficit: more went out than came in (below the line)", "Déficit: salió más de lo que entró (debajo de la línea)")}
         <span className="swatch" style={{ background: IN }} /> {tr("Surplus (above the line)", "Superávit (encima de la línea)")}
       </p>
       <p className="trend-tip fine" aria-live="polite">
         {h ? tr(`FY${h.fiscal_year}: ${h.surplus < 0 ? "deficit" : "surplus"} of ${B(Math.abs(h.surplus) * 1e9)}, ${Math.abs(h.surplus_gdp).toFixed(1)}% of GDP (${B(Math.abs(h.surplus_const) * 1e9)} in ${data.constant_year} dollars). Receipts ${B(h.receipts * 1e9)}, outlays ${B(h.outlays * 1e9)}.`,
           `AF${h.fiscal_year}: ${h.surplus < 0 ? "déficit" : "superávit"} de ${B(Math.abs(h.surplus) * 1e9)}, ${Math.abs(h.surplus_gdp).toFixed(1)}% del PIB (${B(Math.abs(h.surplus_const) * 1e9)} en dólares de ${data.constant_year}). Ingresos ${B(h.receipts * 1e9)}, gastos ${B(h.outlays * 1e9)}.`)
           : tr("Point at a year to see its figures.", "Señale un año para ver sus cifras.")}
+        {h && control && (() => {
+          const c = controlAt(control, h.fiscal_year);
+          const maj = (l) => [...new Set(l.map((x) => x.party))].join(tr(", then ", ", luego "));
+          return <> {tr(`President: ${c.presidents.map((p) => `${p.name} (${p.party})`).join(", then ")}. Senate majority: ${maj(c.senate)}. House majority: ${maj(c.house)}.`,
+            `Presidente: ${c.presidents.map((p) => `${p.name} (${p.party})`).join(", luego ")}. Mayoría en el Senado: ${maj(c.senate)}. Mayoría en la Cámara: ${maj(c.house)}.`)}</>;
+        })()}
       </p>
+      {control && <p className="fine">{tr("D: Democratic. R: Republican. A fiscal year runs from October to September, so a president or Congress that takes office in January starts partway through one.", "D: demócrata. R: republicano. Un año fiscal va de octubre a septiembre, así que un presidente o un Congreso que asume en enero empieza a mitad de uno.")}<Ref id="control" /></p>}
       <details>
         <summary>{tr("Show as a table", "Ver como tabla")}</summary>
         <div className="table-scroll">
@@ -367,8 +450,10 @@ export default function Budget() {
   const [err, setErr] = useState(false);
   const [fy, setFy] = useState(null);
   const [history, setHistory] = useState(null);
+  const [control, setControl] = useState(null);
   useEffect(() => {
     fetch("/data/budget-history.json").then((r) => (r.ok ? r.json() : null)).then(setHistory).catch(() => {});
+    fetch("/data/us-control.json").then((r) => (r.ok ? r.json() : null)).then(setControl).catch(() => {});
   }, []);
   useEffect(() => {
     fetch("/data/budget.json").then((r) => (r.ok ? r.json() : Promise.reject())).then((d) => { setData(d); setFy(d.years.at(-1).fiscal_year); }).catch(() => setErr(true));
@@ -388,6 +473,7 @@ export default function Budget() {
     { id: "functions", text: tr("Outlays are grouped by budget function, the categories the government uses to group spending by purpose. Category names are the Treasury's own. Outlays are money actually paid out, which differs from what Congress appropriates in a given year.", "Los gastos se agrupan por función presupuestaria, las categorías que el gobierno usa para agrupar el gasto según su propósito. Los nombres de las categorías son del Tesoro. Los gastos son el dinero realmente pagado, que difiere de lo que el Congreso asigna en un año dado.") },
     { id: "payroll", text: tr("Social insurance and retirement receipts are mostly payroll taxes for Social Security and Medicare; their parts are listed under that row.", "Las contribuciones al seguro social y la jubilación son sobre todo impuestos sobre la nómina para el Seguro Social y Medicare; sus partes aparecen bajo esa fila.") },
     history && { id: "omb", text: <>{tr("Since 1940: ", "Desde 1940: ")}<a href={history.source_url}>{tr("Office of Management and Budget, Historical Tables, Table 1.3", "Oficina de Administración y Presupuesto, Tablas Históricas, Tabla 1.3")}</a>{tr(`, actual years only (OMB's estimates for later years are left out). Inflation-adjusted figures are OMB's, in ${history.constant_year} dollars. OMB's totals can differ slightly from the Treasury figures above, which are updated monthly; FY${history.years.at(-1).fiscal_year + 1} is added here when OMB publishes its actual figure.`, `, solo años reales (se omiten las estimaciones de la OMB para años posteriores). Las cifras ajustadas por inflación son de la OMB, en dólares de ${history.constant_year}. Los totales de la OMB pueden diferir un poco de las cifras del Tesoro de arriba, que se actualizan cada mes; el AF${history.years.at(-1).fiscal_year + 1} se agregará aquí cuando la OMB publique su cifra real.`)}</> },
+    control && { id: "control", text: <>{tr("Presidents: ", "Presidentes: ")}<a href={control.sources.president}>{tr("the White House", "la Casa Blanca")}</a>{tr(". Senate majorities: ", ". Mayorías del Senado: ")}<a href={control.sources.senate}>{tr("U.S. Senate, Party Division", "Senado de EE. UU., división partidista")}</a>{tr("; House majorities: ", "; mayorías de la Cámara: ")}<a href={control.sources.house}>{tr("Office of the House Historian, Party Divisions", "Oficina del Historiador de la Cámara, divisiones partidistas")}</a>{tr(". Majorities are as each chamber organized, counting independents with the party they caucused with; the Senate changed hands during 2001 and at the start of 2021. Shown for context: Congress sets taxes and spending, the president proposes a budget and signs or vetoes bills, and deficits also move with the economy, wars and emergencies.", ". Las mayorías son las de cada cámara al organizarse, contando a los independientes con el partido con el que se agrupaban; el Senado cambió de manos durante 2001 y al inicio de 2021. Se muestra como contexto: el Congreso fija los impuestos y el gasto, el presidente propone un presupuesto y firma o veta proyectos, y los déficits también cambian con la economía, las guerras y las emergencias.")}</> },
     { id: "grouping", text: <>{tr("The chart groups spending into the six budget functions that were largest in most years since 2015, and everything else: the other 13 functions, net of offsetting receipts, such as veterans' benefits, transportation and education. The line marks total receipts. ", "La gráfica agrupa el gasto en las seis funciones presupuestarias más grandes en la mayoría de los años desde 2015, y todo lo demás: las otras 13 funciones, descontando los ingresos compensatorios, como beneficios para veteranos, transporte y educación. La línea marca los ingresos totales. ")}<Link to="/methods#budget">{tr("How this page is built", "Cómo se construye esta página")}</Link>.</> },
   ];
   const sparkLabel = tr("Trend by fiscal year; the table under Year by year has the figures.", "Tendencia por año fiscal; la tabla en Año por año tiene las cifras.");
@@ -411,7 +497,7 @@ export default function Budget() {
       <div className="budget-figures">
         <div><span className="fig">{T(year.receipts_total)}</span><span>{tr("came in (receipts)", "entró (ingresos)")}<Ref id="spark" /></span><Spark values={data.years.map((y) => y.receipts_total)} at={yi} label={sparkLabel} /></div>
         <div><span className="fig">{T(year.outlays_total)}</span><span>{tr("went out (outlays)", "salió (gastos)")}</span><Spark values={data.years.map((y) => y.outlays_total)} at={yi} label={sparkLabel} /></div>
-        <div><span className="fig">{T(Math.abs(year.deficit))}</span><span>{year.deficit >= 0 ? tr("more spent than collected (deficit)", "más gastado que recaudado (déficit)") : tr("more collected than spent (surplus)", "más recaudado que gastado (superávit)")}</span><Spark values={data.years.map((y) => y.deficit)} at={yi} label={sparkLabel} /></div>
+        <div><span className={`fig ${year.deficit >= 0 ? "deficit" : "surplus"}`}>{T(Math.abs(year.deficit))}</span><span>{year.deficit >= 0 ? tr("more spent than collected (deficit)", "más gastado que recaudado (déficit)") : tr("more collected than spent (surplus)", "más recaudado que gastado (superávit)")}</span><Spark values={data.years.map((y) => y.deficit)} at={yi} label={sparkLabel} /></div>
         {debtFy && <div><span className="fig">{T(debtFy.total)}</span><span>{tr(`total debt on ${date(debtFy.record_date)}`, `deuda total al ${date(debtFy.record_date)}`)}<Ref id="debt" /></span><Spark values={debt.fiscal_years.map((d) => d.total)} at={debt.fiscal_years.findIndex((d) => d.fiscal_year === fy)} label={sparkLabel} /></div>}
       </div>
 
@@ -430,16 +516,10 @@ export default function Budget() {
 
       <section>
         <h2>{tr("Year by year", "Año por año")}</h2>
-        <div className="budget-two">
-          <div>
-            <h3>{tr("Spending by category", "Gasto por categoría")}</h3>
-            <Stacked years={data.years} />
-          </div>
-          <div>
-            <h3>{tr("Receipts and spending", "Ingresos y gasto")}</h3>
-            <Trend years={data.years} />
-          </div>
-        </div>
+        <h3>{tr("Spending by category", "Gasto por categoría")}</h3>
+        <Stacked years={data.years} />
+        <h3>{tr("Receipts and spending", "Ingresos y gasto")}</h3>
+        <Trend years={data.years} />
         <details>
           <summary>{tr("Show as a table", "Ver como tabla")}</summary>
           <table>
@@ -457,7 +537,7 @@ export default function Budget() {
       {history && (
         <section>
           <h2>{tr(`Surplus or deficit since ${history.years[0].fiscal_year}`, `Superávit o déficit desde ${history.years[0].fiscal_year}`)}<Ref id="omb" /></h2>
-          <History data={history} />
+          <History data={history} control={control} />
         </section>
       )}
 
