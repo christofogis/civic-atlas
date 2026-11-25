@@ -72,11 +72,11 @@ export default function Layout() {
                 value={q} onChange={(e) => setQ(e.target.value)} />
             </form>
           )}
-          <div className="menu-theme"><ThemeSwitch /></div>
           </div>
           <button type="button" className="link lang-switch" lang={lang === "es" ? "en" : "es"} onClick={() => setLang(lang === "es" ? "en" : "es")}>
             {lang === "es" ? "English" : "Español"}
           </button>
+          <ThemeSwitch />
         </div>
       </header>
       <div id="main" tabIndex={-1}>
@@ -100,7 +100,6 @@ export default function Layout() {
           <Link to="/nominations">{t("Nominations", "Nominaciones")}</Link>
           <Link to="/story">{t("Look up a news story", "Buscar una noticia")}</Link>
           <ReportError />
-          <ThemeSwitch />
         </div>
       </footer>
     </>
