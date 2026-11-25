@@ -1,6 +1,6 @@
 // The Supreme Court list on /government is a small file (public/data/justices.json). Weekly,
-// confirm each justice still appears on the Court's own "Current Members" page and that the
-// A new justice almost always fills a departing one's seat, so a name that disappears is the signal.
+// confirm each justice still appears on the Court's own "Current Members" page. A new justice
+// almost always fills a departing one's seat, so a name that disappears is the signal.
 import { readFileSync } from "node:fs";
 
 const file = JSON.parse(readFileSync("public/data/justices.json", "utf8"));

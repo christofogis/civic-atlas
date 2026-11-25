@@ -67,8 +67,9 @@ export default function Government() {
           <p>{tr("Writes and passes federal laws, sets taxes and spending, and can declare war. The Senate also confirms the President's nominees and approves treaties.",
             "Redacta y aprueba las leyes federales, fija los impuestos y el gasto, y puede declarar la guerra. El Senado además confirma a los nominados del Presidente y aprueba los tratados.")}</p>
           <h3 className="small">{tr("Who serves now", "Quiénes sirven ahora")}</h3>
-          <p>{tr(`Senate: ${senate.length} senators, two per state.`, `Senado: ${senate.length} senadores, dos por estado.`)}<br /><PartyCounts rows={senate} /></p>
-          <p>{tr(`House: ${house.length} voting representatives, by district`, `Cámara: ${house.length} representantes con voto, por distrito`)}
+          <p>{tr(`Senate: 100 senators, two per state${senate.length && senate.length < 100 ? ` (${100 - senate.length} vacant)` : ""}.`, `Senado: 100 senadores, dos por estado${senate.length && senate.length < 100 ? ` (${100 - senate.length} vacantes)` : ""}.`)}<br /><PartyCounts rows={senate} /></p>
+          <p>{tr(`House: 435 voting representatives, one per district${house.length && house.length < 435 ? ` (${435 - house.length} seat${435 - house.length === 1 ? "" : "s"} vacant)` : ""}`,
+            `Cámara: 435 representantes con voto, uno por distrito${house.length && house.length < 435 ? ` (${435 - house.length} ${435 - house.length === 1 ? "escaño vacante" : "escaños vacantes"})` : ""}`)}
             {delegates.length > 0 && tr(`, plus ${delegates.length} delegates without a floor vote`, `, más ${delegates.length} delegados sin voto en el pleno`)}.<br /><PartyCounts rows={house} /></p>
           <h3 className="small">{tr("Checks on the other branches", "Límites a los otros poderes")}</h3>
           <ul className="plain">
