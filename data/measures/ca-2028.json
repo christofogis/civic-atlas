@@ -1,0 +1,44 @@
+{
+  "election": "2028-11-07",
+  "state": "CA",
+  "election_name": "November 7, 2028, Statewide General Election",
+  "sources": {
+    "qualified": "https://www.sos.ca.gov/elections/ballot-measures/qualified-ballot-measures",
+    "eligible": "https://www.sos.ca.gov/elections/ballot-measures/initiative-and-referendum-status/eligible-statewide-initiative-measures",
+    "funding": "https://www.sos.ca.gov/elections/ballot-measures/initiative-and-referendum-status/official-top-funders",
+    "voter_guide": "https://voterguide.sos.ca.gov/"
+  },
+  "measures": [
+    {
+      "id": "aca-7",
+      "kind": "legislative_constitutional_amendment",
+      "title": "Government preferences.",
+      "label": "ACA 7 (Jackson), Res. Ch. 223, Statutes of 2026",
+      "status": "qualified",
+      "dates": [
+        { "date": "2026-09-10", "event": "chaptered", "source": "https://www.sos.ca.gov/elections/ballot-measures/qualified-ballot-measures" }
+      ],
+      "text_url": "https://elections.cdn.sos.ca.gov/ballot-measures/pdf/aca-7.pdf",
+      "extract": { "from": "text_url", "start": "LEGISLATIVE COUNSEL", "end": "Vote:", "field": "digest" }
+    },
+    {
+      "id": "1995",
+      "kind": "initiative_constitutional_amendment",
+      "title": "Requires University of California to provide downpayment home loans to certain staff.",
+      "label": "Initiative 1995 (A.G. File No. 25-0018A1)",
+      "status": "eligible",
+      "proponents": ["Michael Avant"],
+      "dates": [
+        { "date": "2025-11-12", "event": "cleared_for_circulation", "source": "https://www.sos.ca.gov/administration/news-releases-and-advisories/2025-news-releases-and-advisories/proposed-initiative-enters-circulation-requires-university-california-provide-downpayment-home-loans-certain-staff-initiative-co" },
+        { "date": "2026-10-02", "event": "eligible", "source": "https://www.sos.ca.gov/administration/news-releases-and-advisories/2026-news-releases-and-advisories/california-secretary-state-shirley-n-weber-phd-announces-new-measure-eligible-californias-november-2028-ballot-requires-universi" },
+        { "date": "2028-06-29", "event": "certification_due", "source": "https://www.sos.ca.gov/administration/news-releases-and-advisories/2026-news-releases-and-advisories/california-secretary-state-shirley-n-weber-phd-announces-new-measure-eligible-californias-november-2028-ballot-requires-universi" }
+      ],
+      "text_url": "https://oag.ca.gov/system/files/initiatives/pdfs/25-0018A1%20%28UC%20Down%20Payment%20Loans%29.pdf",
+      "summary_url": "https://oag.ca.gov/system/files/initiatives/pdfs/Title%20and%20Summary%20%2825-0018A1%29.pdf",
+      "analysis_url": "https://lao.ca.gov/BallotAnalysis/BallotDetail?id=1495",
+      "analysis_pdf": "https://lao.ca.gov/ballot/2025/250426.pdf",
+      "funders_url": "https://elections.cdn.sos.ca.gov/ballot-measures/top-funders/1995-top-funders-11-13-25.pdf",
+      "extract": { "from": "summary_url", "start": "REQUIRES UNIVERSITY", "end": null, "field": "official_summary" }
+    }
+  ]
+}

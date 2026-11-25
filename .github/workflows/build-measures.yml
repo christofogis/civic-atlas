@@ -1,0 +1,32 @@
+name: Build ballot measures
+
+# Weekly, and by hand: official wording for each 2028 California measure from its official PDF,
+# and a comparison with the Secretary of State's lists. Commits public/data/measures/.
+on:
+  schedule:
+    - cron: "41 17 * * 1"   # Mondays 9:41am Pacific
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: sudo apt-get install -y -qq poppler-utils >/dev/null
+      - name: Build
+        id: build
+        run: node scripts/data/measures.mjs
+      - name: Commit
+        if: always()
+        run: |
+          git config user.name "civic-atlas bot"
+          git config user.email "christofogis@users.noreply.github.com"
+          git add public/data/measures
+          git diff --cached --quiet || (git commit -m "Ballot measures rebuilt from official documents" && git push)
