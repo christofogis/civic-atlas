@@ -19,39 +19,34 @@ writeFileSync("public/maps/local/ca-orange-supervisors.json", JSON.stringify({
 }));
 console.log(`supervisorial districts: ${out.features.map((f) => f.properties.district).join(", ")}; ${readFileSync("public/maps/local/ca-orange-supervisors.json").length} bytes`);
 
-// City council districts. Los Alamitos: the adopted 2022–2031 districts, from the web map that
-// the city's districting consultant (National Demographics Corp.) published for the city's
-// 2022 redistricting. The layer is embedded in the web map in Web Mercator; convert to lon/lat.
-const R = 6378137;
-const toLonLat = ([x, y]) => [(x / R) * (180 / Math.PI), (2 * Math.atan(Math.exp(y / R)) - Math.PI / 2) * (180 / Math.PI)];
-const signedArea = (ring) => ring.reduce((a, [x1, y1], i) => { const [x2, y2] = ring[(i + 1) % ring.length]; return a + (x1 * y2 - x2 * y1); }, 0) / 2;
-// Esri rings: clockwise outer rings, counterclockwise holes (in x/y). Group holes under the outer ring before them.
-function esriPolygon(rings) {
-  const polys = [];
-  for (const ring of rings) {
-    const ll = ring.map(toLonLat);
-    if (signedArea(ring) <= 0 || !polys.length) polys.push([ll]); else polys[polys.length - 1].push(ll);
+// City council districts for every Orange County city that elects by district, from the
+// Registrar of Voters' "City Subdistrict" shapefile (Web Mercator; reprojected here). Names
+// read like "Anaheim Council District 3"; a name that doesn't parse fails the build.
+{
+  const url = "https://ocvote.gov/bin/maps/shapefiles/zip/City/City_Subdistrict.zip";
+  const zip = "/tmp/rov-city-subdistrict.zip", dir = "/tmp/rov-city-subdistrict";
+  const res = await fetch(url, { headers: { "User-Agent": "civic-atlas map build (github.com/christofogis/civic-atlas)" } });
+  if (!res.ok) throw new Error(`Registrar city subdistricts: HTTP ${res.status}`);
+  writeFileSync(zip, Buffer.from(await res.arrayBuffer()));
+  const { execFileSync } = await import("node:child_process");
+  execFileSync("unzip", ["-qo", zip, "-d", dir]);
+  const shp = execFileSync("sh", ["-c", `ls ${dir}/*.shp ${dir}/*/*.shp 2>/dev/null | head -1`]).toString().trim();
+  await mapshaper.runCommands(`-i "${shp}" -proj wgs84 -o /tmp/rov-council.json format=geojson`);
+  const raw = JSON.parse(readFileSync("/tmp/rov-council.json", "utf8"));
+  const bad = [];
+  for (const f of raw.features) {
+    const m = /^(.+?) (?:Council District|District|Ward) (\d+)$/.exec(String(f.properties.District).trim());
+    if (!m) { bad.push(f.properties.District); continue; }
+    f.properties = { city: m[1], district: Number(m[2]) };
   }
-  return polys.length === 1 ? { type: "Polygon", coordinates: polys[0] } : { type: "MultiPolygon", coordinates: polys };
-}
-
-const CITIES = [
-  { id: "los-alamitos", item: "10f7203ba0f74bd48de0d927cb867c36", layer: /^Adopted Districts/, districts: 5,
-    source: "City of Los Alamitos adopted council districts (2022–2031), published by National Demographics Corp. for the city",
-    source_url: "https://experience.arcgis.com/experience/118312376df140dbb9f5dff642f7e309" },
-];
-for (const c of CITIES) {
-  const web = await (await fetch(`https://www.arcgis.com/sharing/rest/content/items/${c.item}/data?f=json`)).json();
-  const layer = (web.operationalLayers ?? []).find((l) => c.layer.test(l.title ?? ""));
-  const features = (layer?.featureCollection?.layers ?? []).flatMap((l) => l.featureSet?.features ?? []);
-  if (features.length !== c.districts) throw new Error(`${c.id}: expected ${c.districts} council districts, got ${features.length}`);
-  const raw = { type: "FeatureCollection", features: features.map((f) => ({ type: "Feature", properties: { district: Number(f.attributes.DISTRICT) }, geometry: esriPolygon(f.geometry.rings) })) };
-  const tmp = `/tmp/${c.id}-council.json`, out = `public/maps/local/ca-orange-${c.id}-council.json`;
-  writeFileSync(tmp, JSON.stringify(raw));
-  await mapshaper.runCommands(`-i "${tmp}" -simplify 30% keep-shapes -o precision=0.000001 format=geojson "${out}"`);
+  if (bad.length) throw new Error(`unparsed council district names: ${bad.join("; ")}`);
+  writeFileSync("/tmp/rov-council.json", JSON.stringify(raw));
+  const out = "public/maps/local/ca-orange-council.json";
+  await mapshaper.runCommands(`-i /tmp/rov-council.json -simplify 20% keep-shapes -o precision=0.000001 format=geojson ${out}`);
   const g = JSON.parse(readFileSync(out, "utf8"));
-  writeFileSync(out, JSON.stringify({ source: c.source, source_url: c.source_url, ...g }));
-  console.log(`${c.id} council districts: ${g.features.map((f) => f.properties.district).join(", ")}; ${readFileSync(out).length} bytes`);
+  writeFileSync(out, JSON.stringify({ source: "Orange County Registrar of Voters, City Subdistrict shapefile", source_url: url, ...g }));
+  const cities = [...new Set(g.features.map((f) => f.properties.city))];
+  console.log(`council districts: ${g.features.length} in ${cities.length} cities (${cities.join(", ")}); ${readFileSync(out).length} bytes`);
 }
 
 // Cities and unincorporated communities (Census places) in Orange County, from the county's
