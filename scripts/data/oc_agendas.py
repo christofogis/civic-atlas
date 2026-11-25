@@ -43,7 +43,13 @@ if probe:
         print("DOC", u, ct, len(raw), raw[:8])
         with tempfile.NamedTemporaryFile(suffix=".pdf", delete=False) as f: f.write(raw)
         txt = subprocess.run(["pdftotext", "-layout", f.name, "-"], capture_output=True, text=True).stdout
-        print("TEXT", txt[:6000])
+        i = txt.find("CONSENT CALENDAR")
+        print("TEXT", txt[i:i + 9000])
+        import fitz
+        d = fitz.open(f.name)
+        links = [l.get("uri") for pg in d for l in pg.get_links() if l.get("uri")]
+        print("LINKS", len(links), links[:12])
+        print("CLICK", txt.count("Click for Files"))
     sys.exit(0)
     # Context around the first agenda link
     m = re.search(r"ExtDocViewer", html)
