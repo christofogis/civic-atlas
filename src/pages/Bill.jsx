@@ -95,6 +95,10 @@ export default function Bill() {
       .catch(() => setState({ status: "error" }));
   }, [congress, type, number, valid]);
 
+  useEffect(() => {
+    const b = state.data?.bill;
+    if (b) document.title = `${billLabel(b)} · Civic Atlas`;
+  }, [state.data]);
   if (state.status === "loading") return <main className="page"><p>{tr("Loading…", "Cargando…")}</p></main>;
   if (state.status === "missing") return <main className="page"><h1>{tr("Bill not found", "Proyecto no encontrado")}</h1><p>{tr("Bills from the 118th Congress (2023) on are covered.", "Se incluyen los proyectos desde el 118.º Congreso (2023).")} <Link to="/">{tr("Back to search", "Volver a la búsqueda")}</Link></p></main>;
   if (state.status === "error") return <main className="page"><p className="notice">{tr("Couldn't load this page right now. Try again shortly.", "No se pudo cargar esta página. Inténtelo de nuevo en un momento.")}</p></main>;

@@ -1,0 +1,36 @@
+name: Lighthouse (phone speed and accessibility)
+
+# By hand: Lighthouse's mobile profile (slow 4G, mid-range phone) on a few pages of the live site.
+# Prints the scores and the slowest items; writes nothing.
+on:
+  workflow_dispatch:
+    inputs:
+      paths:
+        description: "Comma-separated paths"
+        default: "/,/member/P000145,/bill/119/hr/1,/budget,/week,/local/ca-orange"
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Lighthouse
+        env:
+          PATHS: ${{ inputs.paths }}
+        run: |
+          IFS=',' read -ra P <<< "$PATHS"
+          for p in "${P[@]}"; do
+            npx -y lighthouse@12 "https://civic-atlas-cub.pages.dev$p" --quiet --output=json --output-path=lh.json \
+              --only-categories=performance,accessibility,best-practices,seo --chrome-flags="--headless=new --no-sandbox" || { echo "$p: lighthouse failed"; continue; }
+            node -e '
+              const r = require("./lh.json"); const c = r.categories, a = r.audits;
+              const s = (k) => Math.round((c[k]?.score ?? 0) * 100);
+              console.log(`\n${process.argv[1]}  perf ${s("performance")}  a11y ${s("accessibility")}  best ${s("best-practices")}  seo ${s("seo")}`);
+              for (const k of ["first-contentful-paint","largest-contentful-paint","total-blocking-time","cumulative-layout-shift","speed-index"]) console.log(`  ${a[k].title}: ${a[k].displayValue}`);
+              const fails = Object.values(a).filter((x) => x.score !== null && x.score < 0.9 && x.scoreDisplayMode !== "informative" && x.scoreDisplayMode !== "notApplicable").map((x) => `  - ${x.title}${x.displayValue ? ` (${x.displayValue})` : ""}`);
+              console.log(fails.slice(0, 12).join("\n"));
+            ' "$p"
+          done

@@ -4,6 +4,23 @@ import ReportError from "./ReportError.jsx";
 import { useLang } from "../lib/i18n.jsx";
 
 // Site header on every page: name, main sections, and a search box for members and bills.
+const TITLES = {
+  "/": ["Who represents you?", "¿Quién le representa?"],
+  "/search": ["Search", "Buscar"], "/members": ["Members of Congress", "Miembros del Congreso"],
+  "/bills": ["Bills", "Proyectos de ley"], "/compare": ["Compare two members", "Comparar dos miembros"],
+  "/week": ["This week in Congress", "Esta semana en el Congreso"], "/glossary": ["Glossary", "Glosario"],
+  "/quiz": ["Quiz", "Cuestionario"], "/topics": ["Topics", "Temas"], "/topic": ["Topic", "Tema"],
+  "/elections": ["2028 candidates", "Candidatos de 2028"], "/corrections": ["Corrections", "Correcciones"],
+  "/nominations": ["Nominations", "Nominaciones"], "/story": ["Look up a news story", "Buscar una noticia"],
+  "/hearing": ["Hearing", "Audiencia"], "/map": ["Map", "Mapa"],
+  "/government": ["Three branches of government", "Los tres poderes del gobierno"],
+  "/budget": ["Federal budget", "Presupuesto federal"], "/measures": ["California ballot measures", "Medidas en la boleta de California"],
+  "/officials": ["Elected officials", "Funcionarios electos"], "/local": ["Local officials", "Funcionarios locales"],
+  "/state": ["State official", "Funcionario estatal"], "/committees": ["Committees", "Comités"],
+  "/committee": ["Committee", "Comité"], "/member": ["Member of Congress", "Miembro del Congreso"],
+  "/bill": ["Bill", "Proyecto de ley"], "/methods": ["How this site works", "Cómo funciona este sitio"],
+};
+
 export default function Layout() {
   const navigate = useNavigate();
   const location = useLocation();
@@ -12,6 +29,13 @@ export default function Layout() {
   // On phones the sections and search fold behind a Menu button; it closes on every page change.
   const [menuOpen, setMenuOpen] = useState(false);
   useEffect(() => setMenuOpen(false), [location.pathname, location.search]);
+  // A plain title for each section, so tabs, bookmarks and search results say where they lead.
+  // Pages with a record (a member, a bill, a county) replace it with the record's name once loaded.
+  useEffect(() => {
+    const first = "/" + (location.pathname.split("/")[1] ?? "");
+    const name = TITLES[first];
+    document.title = name ? `${t(name[0], name[1])} · Civic Atlas` : "Civic Atlas";
+  }, [location.pathname, lang]);
 
   function submit(e) {
     e.preventDefault();

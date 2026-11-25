@@ -238,6 +238,10 @@ export default function Member() {
       .catch(() => setState({ status: "error" }));
   }, [bioguide]);
 
+  useEffect(() => {
+    const m = state.data?.member;
+    if (m) document.title = `${m.official_full_name ?? `${m.first_name} ${m.last_name}`} · Civic Atlas`;
+  }, [state.data]);
   if (state.status === "loading") return <main className="page"><p>{tr("Loading…", "Cargando…")}</p></main>;
   if (state.status === "missing") return <main className="page"><h1>{tr("Member not found", "Miembro no encontrado")}</h1><p><Link to="/">{tr("Back to search", "Volver a la búsqueda")}</Link></p></main>;
   if (state.status === "error") return <main className="page"><p className="notice">{tr("Couldn't load this page right now. Try again shortly.", "No se pudo cargar esta página. Inténtelo de nuevo en un momento.")}</p></main>;
