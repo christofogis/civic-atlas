@@ -30,14 +30,23 @@ for (const m of src.measures) {
   if (m.extract) {
     try {
       const text = await pdfText(m[m.extract.from]);
-      const all = paragraphs(text);
-      const i = all.findIndex((p) => p.toUpperCase().includes(m.extract.start));
+      // Work on the text as one run of words: PDFs break lines (and sometimes paragraphs) anywhere.
+      const joined = paragraphs(text).join(" ");
+      const i = joined.toUpperCase().indexOf(m.extract.start.toUpperCase());
       if (i < 0) throw new Error(`"${m.extract.start}" not found`);
-      const end = m.extract.end ? all.findIndex((p, k) => k > i && p.includes(m.extract.end)) : -1;
-      let parts = all.slice(i, end > i ? end : all.length);
-      if (m.extract.field === "digest") parts = parts.slice(1); // drop the heading line
-      // Stop at page furniture (page numbers, file stamps) that pdftotext keeps.
-      parts = parts.filter((p) => !/^(Page \d+|\d+|—\s*\d+\s*—|\d+ of \d+)$/i.test(p) && !/^(Initiative|A\.G\. File No\.)\s/.test(p));
+      const ends = (m.extract.end ?? []).map((e) => joined.indexOf(e, i + m.extract.start.length)).filter((k) => k > i);
+      let segment = joined.slice(i, ends.length ? Math.min(...ends) : joined.length).trim();
+      if (m.extract.drop_heading) segment = segment.slice(m.extract.start.length).replace(/^[^A-Za-z]+/, "");
+      segment = segment.replace(/\s*\(\d{2}-\d{4}A?\d*\.\)\s*$/, "");   // the AG file stamp at the end
+      // An AG title and summary: title (through "AMENDMENT." / "STATUTE."), summary, fiscal estimate.
+      let parts = [segment];
+      if (m.extract.field === "official_summary") {
+        const t = /^(.*?(?:AMENDMENT|STATUTE|AMENDMENT AND STATUTE)\.)\s+(.*?)\s*(Summary of estimate by Legislative Analyst.*)$/s.exec(segment);
+        if (!t) throw new Error("couldn't split title, summary and fiscal estimate");
+        out.official_title = t[1];
+        out.fiscal_estimate = t[3].replace(/^Summary of estimate by Legislative Analyst and Director of Finance of fiscal impact on state and local governments:\s*/, "");
+        parts = [t[2]];
+      }
       out[m.extract.field] = parts;
       out.extracted_from = m[m.extract.from];
       console.log(`${m.id}: ${m.extract.field} ${parts.length} paragraph(s), ${parts.join(" ").length} characters`);
