@@ -18,3 +18,38 @@ writeFileSync("public/maps/local/ca-orange-supervisors.json", JSON.stringify({
   ...out,
 }));
 console.log(`supervisorial districts: ${out.features.map((f) => f.properties.district).join(", ")}; ${readFileSync("public/maps/local/ca-orange-supervisors.json").length} bytes`);
+
+// City council districts. Los Alamitos: the adopted 2022–2031 districts, from the web map that
+// the city's districting consultant (National Demographics Corp.) published for the city's
+// 2022 redistricting. The layer is embedded in the web map in Web Mercator; convert to lon/lat.
+const R = 6378137;
+const toLonLat = ([x, y]) => [(x / R) * (180 / Math.PI), (2 * Math.atan(Math.exp(y / R)) - Math.PI / 2) * (180 / Math.PI)];
+const signedArea = (ring) => ring.reduce((a, [x1, y1], i) => { const [x2, y2] = ring[(i + 1) % ring.length]; return a + (x1 * y2 - x2 * y1); }, 0) / 2;
+// Esri rings: clockwise outer rings, counterclockwise holes (in x/y). Group holes under the outer ring before them.
+function esriPolygon(rings) {
+  const polys = [];
+  for (const ring of rings) {
+    const ll = ring.map(toLonLat);
+    if (signedArea(ring) <= 0 || !polys.length) polys.push([ll]); else polys[polys.length - 1].push(ll);
+  }
+  return polys.length === 1 ? { type: "Polygon", coordinates: polys[0] } : { type: "MultiPolygon", coordinates: polys };
+}
+
+const CITIES = [
+  { id: "los-alamitos", item: "10f7203ba0f74bd48de0d927cb867c36", layer: /^Adopted Districts/, districts: 5,
+    source: "City of Los Alamitos adopted council districts (2022–2031), published by National Demographics Corp. for the city",
+    source_url: "https://experience.arcgis.com/experience/118312376df140dbb9f5dff642f7e309" },
+];
+for (const c of CITIES) {
+  const web = await (await fetch(`https://www.arcgis.com/sharing/rest/content/items/${c.item}/data?f=json`)).json();
+  const layer = (web.operationalLayers ?? []).find((l) => c.layer.test(l.title ?? ""));
+  const features = (layer?.featureCollection?.layers ?? []).flatMap((l) => l.featureSet?.features ?? []);
+  if (features.length !== c.districts) throw new Error(`${c.id}: expected ${c.districts} council districts, got ${features.length}`);
+  const raw = { type: "FeatureCollection", features: features.map((f) => ({ type: "Feature", properties: { district: Number(f.attributes.DISTRICT) }, geometry: esriPolygon(f.geometry.rings) })) };
+  const tmp = `/tmp/${c.id}-council.json`, out = `public/maps/local/ca-orange-${c.id}-council.json`;
+  writeFileSync(tmp, JSON.stringify(raw));
+  await mapshaper.runCommands(`-i "${tmp}" -simplify 30% keep-shapes -o precision=0.000001 format=geojson "${out}"`);
+  const g = JSON.parse(readFileSync(out, "utf8"));
+  writeFileSync(out, JSON.stringify({ source: c.source, source_url: c.source_url, ...g }));
+  console.log(`${c.id} council districts: ${g.features.map((f) => f.properties.district).join(", ")}; ${readFileSync(out).length} bytes`);
+}
