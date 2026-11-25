@@ -1,4 +1,4 @@
-name: Ingest members, committees and state officials
+name: Ingest members, committees, state officials and executive branch
 
 on:
   schedule:
@@ -35,3 +35,5 @@ jobs:
         run: |
           git clone -q --depth 1 https://github.com/openstates/people.git /tmp/osp
           OPENSTATES_DIR=/tmp/osp node scripts/ingest/state-people.mjs
+      - name: President, vice president and executive orders
+        run: node scripts/ingest/executive.mjs
