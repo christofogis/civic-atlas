@@ -36,6 +36,7 @@ export default function ThemeSwitch() {
     try { if (t === "system") localStorage.removeItem(KEY); else localStorage.setItem(KEY, t); } catch { /* storage unavailable */ }
     if (t === "system") delete document.documentElement.dataset.theme;
     else document.documentElement.dataset.theme = t;
+    window.dispatchEvent(new Event("civic-atlas:theme"));   // the map redraws in the new theme
   }
   const options = [["light", tr("Light", "Claro")], ["dark", tr("Dark", "Oscuro")], ["system", tr("System (same as this device)", "Sistema (igual que este dispositivo)")]];
   const current = options.find(([id]) => id === theme)[1];

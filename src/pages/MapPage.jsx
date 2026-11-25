@@ -16,14 +16,21 @@ import { partyTag } from "../lib/format.js";
 // with the next Congress), zooming down to streets. Districts are drawn in one neutral color;
 // party appears only on names, as everywhere on the site. The state list under the map is the
 // keyboard and screen-reader way to do everything the map does.
-const BASEMAP = "https://tiles.openfreemap.org/styles/positron";
+// Base map and line colors follow the site's light or dark theme, chosen when the map opens.
+// OpenFreeMap's dark style is the Dark Matter style it hosts beside Positron.
+const isDark = () => document.documentElement.dataset.theme === "dark"
+  || (!document.documentElement.dataset.theme && Boolean(window.matchMedia?.("(prefers-color-scheme: dark)").matches));
+const THEME = {
+  light: { basemap: "https://tiles.openfreemap.org/styles/positron", accent: "#0e5a4b", line: "#1b2420", vacant: "#d9dedb" },
+  dark: { basemap: "https://tiles.openfreemap.org/styles/dark", accent: "#6fcaa8", line: "#e4ebe8", vacant: "#3a4440" },
+};
 const CURRENT = congressOn();
 // District files built so far (scripts/maps/build.mjs). The toggle offers the neighbors of the current Congress that exist.
 const AVAILABLE = [119, 120];
 const OTHER = AVAILABLE.includes(CURRENT + 1) ? CURRENT + 1 : AVAILABLE.includes(CURRENT - 1) ? CURRENT - 1 : null;
-const ACCENT = "#0e5a4b", MARK = "#f4d35e", LINE = "#1b2420";
+const MARK = "#f4d35e";
 // Same colors as the party badges: D blue, R red, independents and others neutral grey; vacant seats pale.
-const PARTY_FILL = { d: "#1f4e9c", r: "#b42318", other: "#5b6470", vacant: "#d9dedb" };
+const PARTY_FILL = { d: "#1f4e9c", r: "#b42318", other: "#5b6470" };
 const AT_LARGE = new Set(["AK", "DE", "ND", "SD", "VT", "WY", "DC", "PR", "GU", "VI", "AS", "MP"]);
 
 const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
@@ -52,6 +59,16 @@ const districtName = (st, cd) => (cd === 0 || AT_LARGE.has(st)
 export default function MapPage() {
   const box = useRef(null);
   const map = useRef(null);
+  const colors = useRef(THEME.light);
+  // Rebuild the map when the theme changes (the header switch, or the device's setting).
+  const [themeKey, setThemeKey] = useState(() => (isDark() ? "dark" : "light"));
+  useEffect(() => {
+    const check = () => setThemeKey(isDark() ? "dark" : "light");
+    const mq = window.matchMedia?.("(prefers-color-scheme: dark)");
+    window.addEventListener("civic-atlas:theme", check);
+    mq?.addEventListener?.("change", check);
+    return () => { window.removeEventListener("civic-atlas:theme", check); mq?.removeEventListener?.("change", check); };
+  }, []);
   const statesGeo = useRef(null);
   const [ready, setReady] = useState(false);
   const [failed, setFailed] = useState(false);
@@ -97,8 +114,11 @@ export default function MapPage() {
   // Create the map once.
   useEffect(() => {
     let m;
+    setReady(false);
+    const theme = THEME[themeKey];
+    colors.current = theme;
     try {
-      m = new maplibregl.Map({ container: box.current, style: BASEMAP, bounds: [[-125, 24], [-66.5, 49.5]], fitBoundsOptions: { padding: 10 }, minZoom: 2, maxZoom: 16,
+      m = new maplibregl.Map({ container: box.current, style: theme.basemap, bounds: [[-125, 24], [-66.5, 49.5]], fitBoundsOptions: { padding: 10 }, minZoom: 2, maxZoom: 16,
         attributionControl: { compact: true }, cooperativeGestures: true });
     } catch { setFailed(true); return undefined; }
     map.current = m;
@@ -112,14 +132,14 @@ export default function MapPage() {
       for (const src of ["districts", "detail"]) {
         const party = ["coalesce", ["feature-state", "party"], ""];
         m.addLayer({ id: `${src}-fill`, type: "fill", source: src, paint: {
-          "fill-color": ["match", party, "d", PARTY_FILL.d, "r", PARTY_FILL.r, "other", PARTY_FILL.other, "vacant", PARTY_FILL.vacant, ACCENT],
+          "fill-color": ["match", party, "d", PARTY_FILL.d, "r", PARTY_FILL.r, "other", PARTY_FILL.other, "vacant", theme.vacant, theme.accent],
           "fill-opacity": ["case", ["!=", party, ""],
             ["case", ["boolean", ["feature-state", "selected"], false], 0.95, ["boolean", ["feature-state", "hover"], false], 0.85, 0.62],
             ["case", ["boolean", ["feature-state", "selected"], false], 0.28, ["boolean", ["feature-state", "hover"], false], 0.14, ["boolean", ["feature-state", "mine"], false], 0.0, 0.03]] } });
         m.addLayer({ id: `${src}-mine`, type: "line", source: src, paint: { "line-color": MARK, "line-width": ["case", ["boolean", ["feature-state", "mine"], false], 4, 0] } });
-        m.addLayer({ id: `${src}-line`, type: "line", source: src, paint: { "line-color": LINE, "line-opacity": 0.55, "line-width": ["interpolate", ["linear"], ["zoom"], 3, 0.4, 8, 1.2] } });
+        m.addLayer({ id: `${src}-line`, type: "line", source: src, paint: { "line-color": theme.line, "line-opacity": 0.55, "line-width": ["interpolate", ["linear"], ["zoom"], 3, 0.4, 8, 1.2] } });
       }
-      m.addLayer({ id: "states-line", type: "line", source: "states", paint: { "line-color": LINE, "line-width": ["interpolate", ["linear"], ["zoom"], 3, 1.1, 8, 2.4] } });
+      m.addLayer({ id: "states-line", type: "line", source: "states", paint: { "line-color": theme.line, "line-width": ["interpolate", ["linear"], ["zoom"], 3, 1.1, 8, 2.4] } });
       setReady(true);
     });
     let hovered = null;
@@ -162,7 +182,7 @@ export default function MapPage() {
       if (f) setSel({ st: f.properties.st, cd: f.properties.cd, zoom: false });
     });
     return () => m.remove();
-  }, []);
+  }, [themeKey]);
 
   // Party coloring: set or clear each district's party feature-state.
   const paintParty = (source, features) => {
@@ -177,8 +197,8 @@ export default function MapPage() {
     if (!ready) return;
     paintParty("districts", loaded.current.districts);
     paintParty("detail", loaded.current.detail);
-    map.current.setPaintProperty("districts-line", "line-color", byParty && congress <= CURRENT ? "#ffffff" : LINE);
-    map.current.setPaintProperty("detail-line", "line-color", byParty && congress <= CURRENT ? "#ffffff" : LINE);
+    map.current.setPaintProperty("districts-line", "line-color", byParty && congress <= CURRENT ? "#ffffff" : colors.current.line);
+    map.current.setPaintProperty("detail-line", "line-color", byParty && congress <= CURRENT ? "#ffffff" : colors.current.line);
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [ready, byParty, repsLoaded, congress]);
 
@@ -270,7 +290,7 @@ export default function MapPage() {
       {byParty && !future && (
         <div className="fine map-legend">
           {[["d", tr("D: Democrat", "D: Demócrata")], ["r", tr("R: Republican", "R: Republicano")], ["other", tr("Independent or other", "Independiente u otro")], ["vacant", tr("Vacant", "Vacante")]].map(([k, label]) => (
-            <span key={k} className="map-legend-item"><span className="swatch" style={{ background: PARTY_FILL[k] }} aria-hidden="true" />{label}</span>
+            <span key={k} className="map-legend-item"><span className="swatch" style={{ background: k === "vacant" ? colors.current.vacant : PARTY_FILL[k] }} aria-hidden="true" />{label}</span>
           ))}
           <p className="fine">{tr("Shows who holds each seat today, not vote margins. Hover or tap a district for its representative's name and party letter.",
             "Muestra quién ocupa cada escaño hoy, no márgenes de votación. Pase el cursor o toque un distrito para ver el nombre y la letra del partido de su representante.")}</p>
