@@ -186,7 +186,7 @@ export default function Bill() {
 
       <Section title={tr("Summary", "Resumen")} source={<>{tr("Congressional Research Service, via GovInfo Bill Status.", "Servicio de Investigación del Congreso, vía GovInfo Bill Status. Los resúmenes se publican solo en inglés.")} <Explain id="crs-summary">{tr("About these summaries", "Sobre estos resúmenes")}</Explain></>}>
         {b.crs_summary
-          ? <p>{b.crs_summary}</p>
+          ? <p><Clamp lines={6}>{b.crs_summary}</Clamp></p>
           : <p>{tr("The Congressional Research Service hasn't published a summary of this bill yet. The bill text is at Congress.gov.", "El Servicio de Investigación del Congreso todavía no ha publicado un resumen de este proyecto. El texto está en Congress.gov.")}</p>}
       </Section>
 
