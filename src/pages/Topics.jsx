@@ -2,7 +2,7 @@ import { NotesList, Ref } from "../components/Notes.jsx";
 import { useEffect, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { db } from "../lib/db.js";
-import { ordinal } from "../lib/format.js";
+import { ordinal, date } from "../lib/format.js";
 import { topicSlug, areaName } from "../lib/policyAreas.js";
 import { congressOn, congressYears } from "../../lib/congress.js";
 import { Explain } from "../components/Explain.jsx";
@@ -15,14 +15,25 @@ export default function Topics() {
   const congress = Number(params.get("congress")) || CURRENT;
   const [rows, setRows] = useState(null);
   const [prior, setPrior] = useState(null);
+  const [samePoint, setSamePoint] = useState(null);
   // The prior Congress's totals, for comparison (coverage starts with the 118th).
   const prev = congress - 1 >= 118 ? congress - 1 : null;
 
   useEffect(() => {
-    setRows(null); setPrior(null);
+    setRows(null); setPrior(null); setSamePoint(null);
     db.from("topic_stats").select("*").eq("congress", congress).order("bills", { ascending: false })
       .then(({ data }) => setRows(data ?? []));
     if (prev) db.from("topic_stats").select("bills,passed_any,laws").eq("congress", prev).then(({ data }) => setPrior(data ?? []));
+    // While a Congress is in session, also the previous one as it stood the same number of days
+    // into its term: bills pass and become law late in a Congress, so final totals aren't a fair
+    // comparison until the current one ends.
+    if (prev && congress === CURRENT) {
+      const start = (c) => Date.UTC(1789 + 2 * (c - 1), 0, 3);
+      const today = new Date();
+      const days = Math.floor((Date.UTC(today.getFullYear(), today.getMonth(), today.getDate()) - start(congress)) / 864e5);
+      const through = new Date(start(prev) + days * 864e5).toISOString().slice(0, 10);
+      db.rpc("topic_totals_at", { c: prev, through }).then(({ data }) => { if (data?.[0]) setSamePoint({ ...data[0], through }); });
+    }
   }, [congress]);
 
   const total = (list) => list.reduce((t, r) => ({ bills: t.bills + r.bills, passed_any: t.passed_any + r.passed_any, laws: t.laws + r.laws }), { bills: 0, passed_any: 0, laws: 0 });
@@ -50,10 +61,17 @@ export default function Topics() {
           <tbody className="topics-totals">
             {prev && prior && (() => { const t = total(prior); return (
               <tr className="prior-row">
-                <th scope="row"><Link to={`/topics?congress=${prev}`}>{tr(`All topics, ${ordinal(prev)} Congress (${congressYears(prev)})`, `Todos los temas, ${ordinal(prev)} Congreso (${congressYears(prev)})`)}</Link></th>
+                <th scope="row"><Link to={`/topics?congress=${prev}`}>{tr(`All topics, ${ordinal(prev)} Congress (${congressYears(prev)})${inSession ? ", final" : ""}`, `Todos los temas, ${ordinal(prev)} Congreso (${congressYears(prev)})${inSession ? ", final" : ""}`)}</Link></th>
                 <td>{t.bills.toLocaleString()}</td><td>{t.passed_any.toLocaleString()}</td><td>{t.laws.toLocaleString()}</td><td>{pctLaw(t)}</td>
               </tr>
             ); })()}
+            {samePoint && (
+              <tr className="prior-row">
+                <th scope="row">{tr(`${ordinal(prev)} Congress at the same point in its term (through ${date(samePoint.through)})`, `${ordinal(prev)} Congreso en el mismo punto de su período (hasta el ${date(samePoint.through)})`)}</th>
+                <td>{Number(samePoint.bills).toLocaleString()}</td><td>{Number(samePoint.passed_any).toLocaleString()}</td><td>{Number(samePoint.laws).toLocaleString()}</td>
+                <td>{pctLaw({ bills: Number(samePoint.bills), laws: Number(samePoint.laws) })}</td>
+              </tr>
+            )}
             {(() => { const t = total(rows); return (
               <tr className="total-row">
                 <th scope="row">{tr(`All topics, ${ordinal(congress)} Congress${inSession ? ", so far" : ""}`, `Todos los temas, ${ordinal(congress)} Congreso${inSession ? ", hasta ahora" : ""}`)}<Ref id="totals" text={tr("Totals add up the topics below. Bills not yet assigned a policy area by the Library of Congress (usually the newest) aren't in any topic, so they aren't counted here.", "Los totales suman los temas de abajo. Los proyectos a los que la Biblioteca del Congreso aún no asigna un área de política (normalmente los más recientes) no están en ningún tema, así que no se cuentan aquí.")} /></th>
@@ -74,7 +92,7 @@ export default function Topics() {
           </tbody>
         </table>
         </div>
-        {inSession && prev && <p className="fine">{tr(`The ${ordinal(congress)} Congress runs through January 3, ${endYear}, so its counts are still growing; the ${ordinal(prev)} Congress's are final. Bills often pass and become law late in a Congress.`, `El ${ordinal(congress)} Congreso dura hasta el 3 de enero de ${endYear}, así que sus cifras siguen creciendo; las del ${ordinal(prev)} Congreso son definitivas. Los proyectos a menudo se aprueban y se convierten en ley al final de un Congreso.`)}</p>}
+        {inSession && prev && <p className="fine">{tr(`The ${ordinal(congress)} Congress runs through January 3, ${endYear}, so its counts are still growing. Bills often pass and become law late in a Congress, so the fairer comparison is the ${ordinal(prev)} Congress at the same point in its term.`, `El ${ordinal(congress)} Congreso dura hasta el 3 de enero de ${endYear}, así que sus cifras siguen creciendo. Los proyectos a menudo se aprueban y se convierten en ley al final de un Congreso, así que la comparación más justa es el ${ordinal(prev)} Congreso en el mismo punto de su período.`)}</p>}
         </>
       )}
       <NotesList />
