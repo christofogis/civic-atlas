@@ -40,6 +40,11 @@ jobs:
         env:
           LOOKUP_CHECK_TOKEN: ${{ secrets.LOOKUP_CHECK_TOKEN }}
         run: node scripts/checks/lookup.mjs "${{ inputs.base_url || 'https://civic-atlas-cub.pages.dev' }}"
+      - name: Human check enforced? (reports only)
+        if: always()
+        env:
+          SITE_URL: ${{ inputs.base_url || 'https://civic-atlas-cub.pages.dev' }}
+        run: node scripts/checks/turnstile.mjs
       - name: Congress transition rehearsal (next Jan 3)
         if: always()
         env:
