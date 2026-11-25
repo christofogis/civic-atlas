@@ -654,3 +654,28 @@ header.site .site-inner { position: relative; flex-wrap: nowrap; gap: 8px 14px; 
 .my-reps-head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
 .my-reps-head h2 { margin-bottom: 0; }
 .button-secondary.small { padding: 5px 12px; font-size: 0.85rem; }
+
+/* Home as a dashboard: the lookup beside four picture cards, then the tiles and your officials. */
+.home-top { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr); gap: 28px 56px; align-items: start; padding-top: 16px; }
+.home-hero .lookup { margin-top: 18px; }
+.home-features { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.feature-card { display: flex; flex-direction: column; gap: 2px; padding: 12px 14px 14px; border: 1px solid var(--border); border-radius: 10px;
+  text-decoration: none; color: var(--text); }
+.feature-card:hover { border-color: var(--border-strong); background: var(--surface); }
+.feature-card:hover strong { color: var(--accent); }
+.feature-card strong { font-weight: 600; font-size: 0.98rem; line-height: 1.3; }
+.feature-card span { font-size: 0.85rem; color: var(--muted); }
+.feature-drawing { width: 100%; height: 72px; color: var(--text); opacity: 0.75; margin-bottom: 6px; }
+.home .glance { margin-top: 36px; }
+.home .my-reps { margin-top: 36px; }
+@media (max-width: 900px) {
+  .home-top { grid-template-columns: 1fr; padding-top: 0; }
+}
+@media (max-width: 640px) {
+  .home-features { gap: 8px; }
+  .feature-card { padding: 10px 10px 12px; }
+  .feature-drawing { height: 54px; }
+  .feature-card strong { font-size: 0.9rem; }
+  .feature-card span { display: none; }   /* the title says enough on a phone */
+}
+@media print { .home-features { display: none; } }

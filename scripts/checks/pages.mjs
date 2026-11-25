@@ -1,6 +1,6 @@
 // Pages the site and accessibility checks open: [path, text that must appear].
 export const PAGES = [
-  ["/", ["Civic Atlas", "Who represents you?", "Find my officials", "At a glance", "Coming up in Congress", "Federal budget, FY"]],
+  ["/", ["Civic Atlas", "Who represents you?", "Find my officials", "At a glance", "Coming up in Congress", "Federal budget, FY", "Explore the map", "Three branches"]],
   ["/member/P000145", ["Alex Padilla", "At a glance", "Contact", "Washington office", "Votes", "Voted on", "Campaign money", "next up for election"]],
   ["/member/P000145#votes", ["Voting record", "Recent roll-call votes"]],
   ["/member/P000145/votes", ["to pass it"]],

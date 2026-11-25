@@ -10,6 +10,7 @@ import { rememberRepresentatives, myRepresentatives, representativesOutdated } f
 import MyReps from "../components/MyReps.jsx";
 import AddressInput from "../components/AddressInput.jsx";
 import HomeDashboard from "../components/HomeDashboard.jsx";
+import { BallotDrawing, MapDrawing, BranchesDrawing, WeekDrawing } from "../components/FeatureDrawings.jsx";
 
 // Lookup errors come from /api/lookup in English; these are their Spanish versions.
 const ERR_ES = {
@@ -36,7 +37,7 @@ export default function Home() {
   const [armed, setArmed] = useState(false);
   const arm = () => { if (!armed) setArmed(true); };
   const [mine, setMine] = useState(() => myRepresentatives());
-  const { t, lang, setLang } = useLang();
+  const { t } = useLang();
 
   // The bot check usually finishes in the background before anyone presses the button. If it
   // hasn't yet, the lookup waits for it and then goes ahead on its own.
@@ -94,28 +95,24 @@ export default function Home() {
     }
   }
 
+  const features = [
+    ["/quiz", BallotDrawing, t("Do you vote like your representatives?", "¿Vota como sus representantes?"), t("Answer 10 real bills", "Responda sobre 10 proyectos reales")],
+    ["/map", MapDrawing, t("Explore the map", "Explore el mapa"), t("Districts down to your street", "Distritos hasta su calle")],
+    ["/government", BranchesDrawing, t("Three branches", "Los tres poderes"), t("Who does what, and who serves now", "Quién hace qué y quién sirve ahora")],
+    ["/week", WeekDrawing, t("This week in Congress", "Esta semana en el Congreso"), t("What's scheduled and what passed", "Lo programado y lo aprobado")],
+  ];
+
   return (
     <main className="page full home">
-      <div className="home-grid">
-      <div className="home-main">
-      <header>
-        <div className="home-title">
-          <h1>{t("Who represents you?", "¿Quién le representa?")}</h1>
-          <div className="toggle home-lang" role="group" aria-label="Language / Idioma">
-            <button type="button" lang="en" aria-pressed={lang === "en"} className={lang === "en" ? "on" : ""} onClick={() => setLang("en")}>English</button>
-            <button type="button" lang="es" aria-pressed={lang === "es"} className={lang === "es" ? "on" : ""} onClick={() => setLang("es")}>Español</button>
-          </div>
-        </div>
+      {/* Dashboard: the lookup and four ways in at the top; below, short tiles of what's coming
+          up, then the visitor's own officials if a lookup is remembered on this device. */}
+      <section className="home-top">
+      <div className="home-hero">
+        <h1>{t("Who represents you?", "¿Quién le representa?")}</h1>
         <p className="home-promise">
-          {t("Enter your address to see every official elected to represent it, what each one does, and their record, from official sources.",
-            "Escriba su dirección para ver a cada funcionario elegido para representarla, qué hace cada uno y su historial, según fuentes oficiales.")}
+          {t("Enter your address to see everyone elected to represent it, in Congress, your state and (in Orange County, CA) your county and city, with their records from official sources.",
+            "Escriba su dirección para ver a todos los elegidos para representarla, en el Congreso, su estado y (en el Condado de Orange, CA) su condado y ciudad, con su historial según fuentes oficiales.")}
         </p>
-        <ul className="home-levels">
-          <li>{t("U.S. Congress", "Congreso de EE. UU.")}</li>
-          <li>{t("State legislature and statewide offices", "Legislatura y cargos estatales")}</li>
-          <li>{t("County and city (Orange County, CA)", "Condado y ciudad (Condado de Orange, CA)")}</li>
-        </ul>
-      </header>
 
       {representativesOutdated() && status === "idle" && (
         <p className="notice">{t("A new Congress has begun, and some House districts changed. Look up your address again to see your current officials.", "Comenzó un nuevo Congreso y algunos distritos de la Cámara cambiaron. Busque su dirección de nuevo para ver a sus funcionarios actuales.")}</p>
@@ -139,23 +136,23 @@ export default function Home() {
           {GOOGLE_PLACES_KEY && t(" Suggestions as you type come from Google, which receives what you type in this box.", " Las sugerencias mientras escribe vienen de Google, que recibe lo que escribe en esta casilla.")}
         </p>
       </form>
-
       {status === "error" && <p className="notice">{error}</p>}
+      </div>
+
+      <nav className="home-features" aria-label={t("Explore", "Explorar")}>
+        {features.map(([to, Drawing, title, line]) => (
+          <Link key={to} to={to} className="feature-card">
+            <Drawing />
+            <strong>{title}</strong>
+            <span>{line}</span>
+          </Link>
+        ))}
+      </nav>
+      </section>
 
       {status === "done" && result && <LookupResults result={result} sectionRef={resultsRef} />}
       {status !== "done" && <HomeDashboard />}
-
-      </div>
-      <div className="home-side">
       {mine.size > 0 && status !== "done" && <MyReps ids={mine} onForget={() => { setMine(new Set()); setResult(null); setStatus("idle"); setAddress(""); }} />}
-      <section className="home-links">
-        <Link to="/quiz" className="home-card"><strong>{t("Do you vote like your representatives?", "¿Vota usted como sus representantes?")}</strong><span>{t("Answer 10 real bills Congress voted on and see who agrees with you.", "Responda sobre 10 proyectos reales que el Congreso votó y vea quién coincide con usted.")}</span></Link>
-        <Link to="/map" className="home-card"><strong>{t("Explore the map", "Explore el mapa")}</strong><span>{t("States and congressional districts, down to your street. Tap one to see who represents it.", "Estados y distritos del Congreso, hasta su calle. Toque uno para ver quién lo representa.")}</span></Link>
-        <Link to="/government" className="home-card"><strong>{t("Three branches of government", "Los tres poderes del gobierno")}</strong><span>{t("Congress, the President and the courts: what each does and who serves now.", "El Congreso, el Presidente y los tribunales: qué hace cada uno y quiénes sirven ahora.")}</span></Link>
-        <Link to="/week" className="home-card"><strong>{t("This week in Congress", "Esta semana en el Congreso")}</strong><span>{t("What's scheduled, and what passed, failed or became law.", "Lo programado y lo que se aprobó, fracasó o se convirtió en ley.")}</span></Link>
-      </section>
-      </div>
-      </div>
     </main>
   );
 }
