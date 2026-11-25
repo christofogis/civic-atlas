@@ -117,7 +117,8 @@ export async function onRequestGet({ request, env }) {
     try {
       stateOfficials = await rest(`state_officeholders?state=eq.${state}&or=(${filters.join(",")})&select=id,name,party,type,district,start_date`);
     } catch { /* state officials are optional; federal results still show */ }
-    const order = (o) => (o.type === "upper" || o.type === "legislature" ? 100 : o.type === "lower" ? 200 : STATEWIDE.indexOf(o.type));
+    // The address's own legislators first, then statewide offices.
+    const order = (o) => (o.type === "upper" || o.type === "legislature" ? 0 : o.type === "lower" ? 1 : 10 + STATEWIDE.indexOf(o.type));
     const distOrder = (o) => {
       const list = o.type === "lower" ? stateDistricts.lower : stateDistricts.upper;
       return list.indexOf(districtKey(o.district));

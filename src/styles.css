@@ -392,3 +392,7 @@ label.check { display: inline-flex; align-items: center; gap: 6px; font-size: 0.
 @media (max-width: 640px) {
   .tabs { -webkit-mask-image: linear-gradient(to right, #000 85%, transparent); mask-image: linear-gradient(to right, #000 85%, transparent); }
 }
+.results, .level, .level h2 { scroll-margin-top: 72px; }
+#level-local > h2 { margin-top: 28px; }
+#level-local > h2:first-child { margin-top: 0; }
+.home-levels { margin-bottom: 22px; }

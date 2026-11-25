@@ -147,8 +147,8 @@ export default function Home() {
               <ul className="cards">
                 {result.state_officials.map((o) => <StateOfficialCard key={`${o.type}-${o.id}`} official={o} state={result.state} />)}
               </ul>
-              <p className="fine">{t("State legislators shown are for the districts that include this address. Statewide offices shown are the governor, lieutenant governor, attorney general and secretary of state as listed by Open States; a few states' offices aren't listed there yet, and other statewide offices (such as treasurer) aren't shown for any state.",
-                "Los legisladores estatales que se muestran son los de los distritos que incluyen esta dirección. Los cargos estatales que se muestran son gobernador, vicegobernador, fiscal general y secretario de estado según Open States; algunos estados aún no aparecen allí, y otros cargos estatales (como tesorero) no se muestran para ningún estado.")}</p>
+              <p className="fine">{t("Statewide offices shown: governor, lieutenant governor, attorney general and secretary of state, where Open States lists them. Others, such as treasurer, aren't on Civic Atlas yet for any state.",
+                "Cargos estatales que se muestran: gobernador, vicegobernador, fiscal general y secretario de estado, donde Open States los incluye. Otros, como tesorero, aún no están en Civic Atlas para ningún estado.")}</p>
             </section>
           )}
 
