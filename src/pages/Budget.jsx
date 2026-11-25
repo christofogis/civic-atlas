@@ -51,24 +51,42 @@ const B = (n) => (Math.abs(n) >= 1e12 ? T(n) : `${sign(n)}$${Math.round(Math.abs
 const per100 = (part, total) => { const v = (100 * part) / total; return v.toFixed(v < 1 ? 2 : v < 10 ? 1 : 0); };
 const fyRange = (fy) => tr(`Oct ${fy - 1} – Sep ${fy}`, `oct. ${fy - 1} – sep. ${fy}`);
 
-// Horizontal bars, one series, sorted largest first. Shares are of the positive total.
-function Bars({ rows, perHundred, total, color = BAR }) {
-  const pos = rows.filter((r) => r.amount > 0).sort((a, z) => z.amount - a.amount);
+// Horizontal bars, one series, largest first. A row with `children` opens in place to list
+// them (same scale), and a row may carry a swatch that ties it to the year-by-year chart.
+// Shares are of the positive total. Negative amounts reduce the total and are listed apart.
+function Bars({ rows, perHundred, total, color = BAR, last }) {
+  const [open, setOpen] = useState(() => new Set());
+  const pos = rows.filter((r) => r.amount > 0).sort((a, z) => (a.label === last) - (z.label === last) || z.amount - a.amount);
   const neg = rows.filter((r) => r.amount < 0);
-  const max = pos[0]?.amount ?? 1;
+  const max = Math.max(...pos.map((r) => r.amount), 1);
+  const toggle = (k) => setOpen((s) => { const n = new Set(s); n.has(k) ? n.delete(k) : n.add(k); return n; });
+  const row = (r, sub) => (
+    <>
+      <span className="hbar-label">
+        {r.swatch && <span className="swatch" style={{ background: r.swatch }} />}
+        {r.children?.length ? (
+          <button type="button" className="hbar-open" aria-expanded={open.has(r.label)} onClick={() => toggle(r.label)}>
+            {r.name ?? <Label en={r.label} />}<span className="fine"> {tr(`(${r.children.length})`, `(${r.children.length})`)}</span>
+          </button>
+        ) : (r.name ?? <Label en={r.label} />)}
+      </span>
+      <span className="hbar-track"><span className="hbar" style={{ width: `${(100 * Math.max(0, r.amount)) / max}%`, background: color, opacity: sub ? 0.75 : 1 }} /></span>
+      <span className="hbar-value">
+        {B(r.amount)}
+        {perHundred && r.amount > 0 && <span className="fine"> · {tr(`$${per100(r.amount, total)} of every $100`, `$${per100(r.amount, total)} de cada $100`)}</span>}
+      </span>
+    </>
+  );
   return (
     <>
       <ul className="hbars">
         {pos.map((r) => (
-          <li key={r.label}>
-            <span className="hbar-label"><Label en={r.label} /></span>
-            <span className="hbar-track"><span className="hbar" style={{ width: `${(100 * r.amount) / max}%`, background: color }} /></span>
-            <span className="hbar-value">
-              {B(r.amount)}
-              {perHundred && <span className="fine"> · {tr(`$${per100(r.amount, total)} of every $100`, `$${per100(r.amount, total)} de cada $100`)}</span>}
-            </span>
-            {r.parts && (
-              <span className="hbar-parts fine">{r.parts.map((p) => `${p.label}: ${B(p.amount)}`).join(" · ")}</span>
+          <li key={r.label} className={r.children?.length ? "has-sub" : undefined}>
+            {row(r)}
+            {r.children?.length > 0 && open.has(r.label) && (
+              <ul className="hbars sub">
+                {[...r.children].sort((a, z) => z.amount - a.amount).map((c) => <li key={c.label}>{row(c, true)}</li>)}
+              </ul>
             )}
           </li>
         ))}
@@ -101,6 +119,16 @@ function grouped(y) {
   return [...parts, { key: "Everything else", color: OTHER, amount: rest }];
 }
 const groupName = (k) => (k === "Everything else" ? tr("Everything else", "Todo lo demás") : <Label en={k} />);
+// "Where the money went" in the chart's groups: the six largest functions, then everything else,
+// which opens to the functions inside it (negative ones included, since they're part of the sum).
+function outlayGroups(y) {
+  const big = new Set(GROUPS.map((g) => g.key));
+  const rest = y.outlays.filter((o) => !big.has(o.label));
+  return grouped(y).map((g) => ({
+    label: g.key, amount: g.amount, swatch: g.color, name: groupName(g.key),
+    children: g.key === "Everything else" ? rest : undefined,
+  }));
+}
 
 function Stacked({ years }) {
   const [share, setShare] = useState(false);
@@ -382,12 +410,12 @@ export default function Budget() {
       <div className="budget-two">
       <section>
         <h2>{tr("Where the money went", "En qué se gastó")}<Ref id="functions" /></h2>
-        <Bars rows={year.outlays} perHundred total={year.outlays_total} color={OUT} />
+        <Bars rows={outlayGroups(year)} perHundred total={year.outlays_total} color={OUT} last="Everything else" />
       </section>
 
       <section>
         <h2>{tr("Where the money came from", "De dónde vino el dinero")}<Ref id="payroll" /></h2>
-        <Bars rows={year.receipts} perHundred total={year.receipts_total} color={IN} />
+        <Bars rows={year.receipts.map((r) => (r.parts ? { ...r, children: r.parts } : r))} perHundred total={year.receipts_total} color={IN} />
       </section>
 
       </div>
