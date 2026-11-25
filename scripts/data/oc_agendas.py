@@ -61,6 +61,9 @@ def parse_agenda(pdf_bytes):
         files = [l["uri"] for pg in doc for l in pg.get_links() if "meetingitemfiles" in (l.get("uri") or "")]
     except Exception:
         files = []
+    if "--debug" in sys.argv:
+        i = txt.find("PUBLIC HEARINGS")
+        print("TAIL", txt[i:i + 9000])
     updated = re.search(r"Document Last Updated: (\d{2})/(\d{2})/(\d{4})", txt)
     lines = [l for l in txt.splitlines() if not HEADER.search(l)]
     start = next((i for i, l in enumerate(lines) if SECTION.match(l)), len(lines))
