@@ -77,7 +77,7 @@ export default function StatePerson() {
       <p className="fine">
         {tr("Data: ", "Datos: ")}<a href={`https://github.com/openstates/people/tree/main/data/${p.state.toLowerCase()}`} rel="noopener">Open States</a>
         {tr(" (public domain), compiled from state legislature and government websites. Sources it lists: ", " (dominio público), recopilado de los sitios web de las legislaturas y gobiernos estatales. Fuentes que cita: ")}
-        {p.sources.map((u, i) => <span key={u}>{i ? ", " : ""}<a href={u} rel="noopener">{host(u)}</a></span>)}.
+        {[...new Map(p.sources.map((u) => [host(u), u])).values()].map((u, i) => <span key={u}>{i ? ", " : ""}<a href={u} rel="noopener">{host(u)}</a></span>)}.
       </p>
     </main>
   );
