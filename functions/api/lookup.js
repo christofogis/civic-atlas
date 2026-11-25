@@ -13,6 +13,12 @@ import { containing } from "../../lib/geo.js";
 // static file built from the county's own GIS layer; the officials are in public/data/local/.
 const LOCAL = { "CA|Orange County": {
   id: "ca-orange", map: "/maps/local/ca-orange-supervisors.json", places: "/maps/local/ca-orange-places.json",
+  // The county's layer marks unincorporated communities (Rossmoor, Ladera Ranch) as "City" too,
+  // so incorporation comes from this list of Orange County's 34 cities.
+  incorporated: new Set(["Aliso Viejo", "Anaheim", "Brea", "Buena Park", "Costa Mesa", "Cypress", "Dana Point", "Fountain Valley",
+    "Fullerton", "Garden Grove", "Huntington Beach", "Irvine", "La Habra", "La Palma", "Laguna Beach", "Laguna Hills", "Laguna Niguel",
+    "Laguna Woods", "Lake Forest", "Los Alamitos", "Mission Viejo", "Newport Beach", "Orange", "Placentia", "Rancho Santa Margarita",
+    "San Clemente", "San Juan Capistrano", "Santa Ana", "Seal Beach", "Stanton", "Tustin", "Villa Park", "Westminster", "Yorba Linda"]),
   cities: { "Los Alamitos": { id: "los-alamitos", map: "/maps/local/ca-orange-los-alamitos-council.json" } },
 } };
 
@@ -32,7 +38,11 @@ async function localFor(geoJson, request, env) {
     out.supervisor_district = containing(map.features ?? [], lng, lat)?.properties?.district ?? null;
     // Which city (or unincorporated community) the point is in, from the county's boundaries.
     const place = containing((await load(conf.places)).features ?? [], lng, lat)?.properties;
-    if (place) out.place = { name: place.name, type: place.type };
+    if (place) {
+      const city = conf.incorporated.has(place.name);
+      // Unincorporated land outside a named community comes back as "Supervisory District N".
+      out.place = { name: city || place.type === "City" ? place.name : null, type: city ? "city" : "unincorporated" };
+    }
     const city = place && conf.cities[place.name];
     if (city) {
       const council = containing((await load(city.map)).features ?? [], lng, lat)?.properties?.district ?? null;

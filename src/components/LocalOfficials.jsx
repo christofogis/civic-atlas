@@ -84,8 +84,10 @@ export default function LocalOfficials({ local, approximate }) {
         {data.officers.map((o) => <OfficerCard key={o.office} o={o} county={data.county} />)}
       </ul>
       <p className="fine">
-        {!city && place && place.type !== "City" && tr(`This address is in ${place.name}, an unincorporated community: it has no city council, and the Board of Supervisors governs local matters. `, `Esta dirección está en ${place.name}, una comunidad no incorporada: no tiene concejo municipal, y la Junta de Supervisores gobierna los asuntos locales. `)}
-        {!city && place?.type === "City" && tr(`${place.name}'s city council isn't on Civic Atlas yet. `, `El concejo municipal de ${place.name} aún no está en Civic Atlas. `)}
+        {!city && place?.type === "unincorporated" && (place.name
+          ? tr(`This address is in ${place.name}, an unincorporated community: it has no city council, and the Board of Supervisors governs local matters. `, `Esta dirección está en ${place.name}, una comunidad no incorporada: no tiene concejo municipal, y la Junta de Supervisores gobierna los asuntos locales. `)
+          : tr("This address is in an unincorporated area: it has no city council, and the Board of Supervisors governs local matters. ", "Esta dirección está en una zona no incorporada: no tiene concejo municipal, y la Junta de Supervisores gobierna los asuntos locales. "))}
+        {!city && place?.type === "city" && tr(`${place.name}'s city council isn't on Civic Atlas yet. `, `El concejo municipal de ${place.name} aún no está en Civic Atlas. `)}
         <Link to={`/local/${local.id}`}>{tr(`All ${data.county} officials`, `Todos los funcionarios del ${data.county}`)}</Link>
       </p>
     </>

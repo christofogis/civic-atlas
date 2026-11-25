@@ -13,6 +13,7 @@ const CASES = [
   ["Vermont State House", "115 State St, Montpelier, VT 05633", { upper: 1, lower: 1 }],
   ["Nebraska State Capitol", "1445 K St, Lincoln, NE 68508", { legislature: 1 }],
   ["Orange County Hall of Administration", "400 W Civic Center Dr, Santa Ana, CA 92701", { upper: 1, lower: 1 }, { supervisor: 2 }],
+  ["Rossmoor (unincorporated)", "3001 Blume Dr, Rossmoor, CA 90720", { upper: 1, lower: 1 }, { supervisor: 1, unincorporated: "Rossmoor" }],
   ["Los Alamitos City Hall", "3191 Katella Ave, Los Alamitos, CA 90720", { upper: 1, lower: 1 }, { supervisor: 1, city: "los-alamitos" }],
 ];
 
@@ -32,6 +33,7 @@ for (const [label, address, want, local] of CASES) {
     }
     if (local?.supervisor && body.local?.supervisor_district !== local.supervisor) problems.push(`expected supervisor district ${local.supervisor}, got ${JSON.stringify(body.local)}`);
     if (local?.city && (body.local?.city?.id !== local.city || !body.local.city.council_district)) problems.push(`expected ${local.city} with a council district, got ${JSON.stringify(body.local?.city)}`);
+    if (local?.unincorporated && (body.local?.place?.type !== "unincorporated" || body.local.place.name !== local.unincorporated)) problems.push(`expected unincorporated ${local.unincorporated}, got ${JSON.stringify(body.local?.place)}`);
     if (local && !local.city && body.local?.city) problems.push(`unexpected city ${JSON.stringify(body.local.city)}`);
     if (!local && body.local?.covered) problems.push("local officials shown outside Orange County");
     const names = st.filter((o) => ["upper", "lower", "legislature"].includes(o.type)).map((o) => `${o.type} ${o.district}: ${o.name}`);
