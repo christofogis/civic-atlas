@@ -11,7 +11,8 @@ const OFFICES = {
   treasurer_tax_collector: ["Treasurer-Tax Collector", "Tesorero(a)-Recaudador(a) de Impuestos"],
 };
 export const officeName = (o) => tr(...(OFFICES[o] ?? [o, o]));
-export const supervisorSeat = (county, d) => tr(`${county} Board of Supervisors, District ${d}`, `Junta de Supervisores del Condado de ${county.replace(/ County$/, "")}, distrito ${d}`);
+export const supervisorParts = (county, d) => [tr(`${county} Board of Supervisors`, `Junta de Supervisores del Condado de ${county.replace(/ County$/, "")}`), tr(`District ${d}`, `Distrito ${d}`)];
+export const supervisorSeat = (county, d) => supervisorParts(county, d).join(", ");
 export const roleName = (r) => (r === "chair" ? tr("Chair", "Presidente(a)") : r === "vice_chair" ? tr("Vice Chair", "Vicepresidente(a)") : null);
 
 // A term that has ended with no newer record means the file is behind: show the seat as updating.
@@ -24,7 +25,8 @@ export function loadLocal(id) {
 }
 
 export const councilRole = (r) => (r === "mayor" ? tr("Mayor", "Alcalde(sa)") : r === "mayor_pro_tem" ? tr("Mayor Pro Tem", "Alcalde(sa) Pro Tem") : null);
-export const councilSeat = (city, d) => tr(`${city} City Council, District ${d}`, `Concejo Municipal de ${city}, distrito ${d}`);
+export const councilParts = (city, d) => [tr(`${city} City Council`, `Concejo Municipal de ${city}`), d ? tr(`District ${d}`, `Distrito ${d}`) : tr("Elected citywide", "Elegido en toda la ciudad")];
+export const councilSeat = (city, d) => councilParts(city, d).join(", ");
 const today = () => new Date().toISOString().slice(0, 10);
 // A seat on the ballot: once its change-over date passes with no update, it shows as updating.
 export const seatUpdating = (m) => Boolean(m.on_ballot && m.seat_change_by && m.seat_change_by < today());

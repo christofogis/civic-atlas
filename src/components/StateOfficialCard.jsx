@@ -2,7 +2,8 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { date, stateName } from "../lib/format.js";
 import { tr } from "../lib/lang.js";
-import { stateOfficeLabel, stateParty } from "../lib/stateOffices.js";
+import { stateOfficeParts, stateParty } from "../lib/stateOffices.js";
+import Seat from "./Seat.jsx";
 
 export function StatePartyTag({ party }) {
   const p = stateParty(party);
@@ -17,14 +18,14 @@ export default function StateOfficialCard({ official, state }) {
   if (official.updating) {
     return (
       <li className="card pending">
-        <p className="seat">{stateOfficeLabel(official, state)}</p>
+        <Seat parts={stateOfficeParts(official, state)} />
         <p>{tr(`A new term began on ${date(official.term_ended)}. Information for this office is being updated.`, `Un nuevo período comenzó el ${date(official.term_ended)}. La información de este cargo se está actualizando.`)}</p>
       </li>
     );
   }
   return (
     <li className="card">
-      <p className="seat">{stateOfficeLabel(official, state)}</p>
+      <Seat parts={stateOfficeParts(official, state)} />
       <h3><Link to={statePersonPath(official.id)}>{official.name}</Link></h3>
       <p className="meta">
         <StatePartyTag party={official.party} /> {official.party}
@@ -47,15 +48,15 @@ export function ExtraStatewideCards({ state, boe = [] }) {
   const today = new Date().toISOString().slice(0, 10);
   const updating = data.seat_change_by && data.seat_change_by <= today;
   const boeCards = (data.boe?.members ?? []).filter((m) => boe.includes(m.district)).map((m) => {
-    const seat = tr(`${stateName(state)} ${data.boe.title[0]}, District ${m.district}`, `${data.boe.title[1]} de ${stateName(state)}, Distrito ${m.district}`);
+    const seat = <Seat parts={[tr(`${stateName(state)} ${data.boe.title[0]}`, `${data.boe.title[1]} de ${stateName(state)}`), tr(`District ${m.district}`, `Distrito ${m.district}`)]} />;
     return updating ? (
       <li key={`boe-${m.district}`} className="card pending">
-        <p className="seat">{seat}</p>
+        {seat}
         <p>{tr(`A new term began on ${date(data.seat_change_by)}. Information for this office is being updated.`, `Un nuevo período comenzó el ${date(data.seat_change_by)}. La información de este cargo se está actualizando.`)}</p>
       </li>
     ) : (
       <li key={`boe-${m.district}`} className="card">
-        <p className="seat">{seat}</p>
+        {seat}
         <h3><a href={data.boe.website} rel="noopener">{m.name}</a></h3>
         <p className="meta">
           <StatePartyTag party={m.party} /> {m.party}
@@ -67,12 +68,12 @@ export function ExtraStatewideCards({ state, boe = [] }) {
   return [...data.offices.map((o) => (
     updating ? (
       <li key={o.office} className="card pending">
-        <p className="seat">{tr(`${stateName(state)} ${o.title[0]}`, `${o.title[1]} de ${stateName(state)}`)}</p>
+        <Seat parts={[tr(o.title[0], o.title[1]), stateName(state)]} />
         <p>{tr(`A new term began on ${date(data.seat_change_by)}. Information for this office is being updated.`, `Un nuevo período comenzó el ${date(data.seat_change_by)}. La información de este cargo se está actualizando.`)}</p>
       </li>
     ) : (
       <li key={o.office} className="card">
-        <p className="seat">{tr(`${stateName(state)} ${o.title[0]}`, `${o.title[1]} de ${stateName(state)}`)}</p>
+        <Seat parts={[tr(o.title[0], o.title[1]), stateName(state)]} />
         <h3><a href={o.website} rel="noopener">{o.name}</a></h3>
         <p className="meta">
           {o.nonpartisan ? tr("Nonpartisan office", "Cargo no partidista") : <><StatePartyTag party={o.party} /> {o.party}</>}

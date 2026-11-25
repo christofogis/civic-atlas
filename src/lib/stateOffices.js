@@ -20,18 +20,20 @@ const EXEC = {
   auditor: ["Auditor", "Auditor(a)"],
 };
 
-// "California State Senate, District 36", "California Assembly, District 72", "Governor of California".
-export function stateOfficeLabel(role, st) {
+// As [office, place], for cards on two lines: ["California State Senate", "District 36"],
+// ["Governor", "California"]. Joined: "California State Senate, District 36", "Governor, California".
+export function stateOfficeParts(role, st) {
   const d = role.district;
-  const where = (body) => (d ? tr(`${body}, District ${d}`, `${body}, distrito ${d}`) : body);
-  if (role.type === "upper") return where(tr(`${stateName(st)} State Senate`, `Senado de ${stateName(st)}`));
-  if (role.type === "lower") return where(tr(`${stateName(st)} ${lowerChamber(st)}`, `${lowerChamber(st)} de ${stateName(st)}`));
+  const dist = d ? tr(`District ${d}`, `Distrito ${d}`) : "";
+  if (role.type === "upper") return [tr(`${stateName(st)} State Senate`, `Senado de ${stateName(st)}`), dist];
+  if (role.type === "lower") return [tr(`${stateName(st)} ${lowerChamber(st)}`, `${lowerChamber(st)} de ${stateName(st)}`), dist];
   if (role.type === "legislature") return st === "DC"
-    ? (d ? tr(`D.C. Council, ${d}`, `Concejo de D.C., ${d}`) : tr("D.C. Council", "Concejo de D.C."))
-    : where(tr(`${stateName(st)} Legislature`, `Legislatura de ${stateName(st)}`));
+    ? [tr("D.C. Council", "Concejo de D.C."), d ? String(d) : ""]
+    : [tr(`${stateName(st)} Legislature`, `Legislatura de ${stateName(st)}`), dist];
   const name = EXEC[role.type];
-  return name ? tr(`${name[0]} of ${stateName(st)}`, `${name[1]} de ${stateName(st)}`) : role.type;
+  return name ? [tr(name[0], name[1]), stateName(st)] : [role.type, ""];
 }
+export const stateOfficeLabel = (role, st) => stateOfficeParts(role, st).filter(Boolean).join(", ");
 
 // Party as published by the state ("Democratic-Farmer-Labor") -> badge letter and color class.
 export function stateParty(party) {

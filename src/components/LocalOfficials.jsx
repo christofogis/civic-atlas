@@ -3,20 +3,21 @@ import LocalMeetings from "./LocalMeetings.jsx";
 import { Link } from "react-router-dom";
 import { date } from "../lib/format.js";
 import { tr } from "../lib/lang.js";
-import { councilRole, councilSeat, loadLocal, officeName, roleName, rolesCurrent, seatUpdating, supervisorSeat, termEnded } from "../lib/local.js";
+import { councilParts, councilRole, loadLocal, officeName, roleName, rolesCurrent, seatUpdating, supervisorParts, termEnded } from "../lib/local.js";
+import Seat from "./Seat.jsx";
 
 export function SupervisorCard({ s, county }) {
   if (termEnded(s)) {
     return (
       <li className="card pending">
-        <p className="seat">{supervisorSeat(county, s.district)}</p>
+        <Seat parts={supervisorParts(county, s.district)} />
         <p>{tr(`A new term began on ${date(s.term_end)}. Information for this seat is being updated.`, `Un nuevo período comenzó el ${date(s.term_end)}. La información de este escaño se está actualizando.`)}</p>
       </li>
     );
   }
   return (
     <li className="card">
-      <p className="seat">{supervisorSeat(county, s.district)}{s.role && <> · {roleName(s.role)}</>}</p>
+      <Seat parts={supervisorParts(county, s.district)} extra={s.role && roleName(s.role)} />
       <h3><a href={s.website} rel="noopener">{s.name}</a></h3>
       <p className="meta">{tr("Nonpartisan office", "Cargo no partidista")}{s.term_end && <> · {tr("term ends", "el período termina el")} {date(s.term_end)}</>}</p>
       {s.phone && <p className="fine">{s.phone}</p>}
@@ -27,7 +28,7 @@ export function SupervisorCard({ s, county }) {
 export function OfficerCard({ o, county }) {
   return (
     <li className="card">
-      <p className="seat">{officeName(o.office)}, {county}</p>
+      <Seat parts={[officeName(o.office), county]} />
       <h3>{o.name}</h3>
       <p className="meta">{tr("Nonpartisan office · elected countywide", "Cargo no partidista · elegido en todo el condado")}</p>
     </li>
@@ -38,7 +39,7 @@ export function CouncilCard({ m, city }) {
   if (seatUpdating(m)) {
     return (
       <li className="card pending">
-        <p className="seat">{councilSeat(city.name, m.district)}</p>
+        <Seat parts={councilParts(city.name, m.district)} />
         <p>{tr("This seat was on the November ballot. Information for it is being updated.", "Este escaño estuvo en la boleta de noviembre. Su información se está actualizando.")}</p>
       </li>
     );
@@ -46,7 +47,7 @@ export function CouncilCard({ m, city }) {
   const role = rolesCurrent(city) ? councilRole(m.role) : null;
   return (
     <li className="card">
-      <p className="seat">{councilSeat(city.name, m.district)}{role && <> · {role}</>}</p>
+      <Seat parts={councilParts(city.name, m.district)} extra={role} />
       <h3><a href={city.website} rel="noopener">{m.name}</a></h3>
       <p className="meta">{tr("Nonpartisan office", "Cargo no partidista")} · {tr(`term ends ${m.term_end_label}`, `el período termina en ${m.term_end_label.replace("November", "noviembre de")}`)}</p>
       {m.on_ballot && <p className="fine">{tr("On the November 3, 2026 ballot; results are being certified.", "En la boleta del 3 de noviembre de 2026; los resultados se están certificando.")}</p>}

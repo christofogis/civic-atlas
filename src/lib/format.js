@@ -24,15 +24,16 @@ export const stateName = (st) => tr(STATE_NAMES[st] ?? st, STATE_NAMES_ES[st] ??
 export const partyName = (p) => tr(p, { Democrat: "Demócrata", Republican: "Republicano", Independent: "Independiente", Libertarian: "Libertario" }[p] ?? p);
 const TERRITORIES = new Set(["DC", "PR", "GU", "VI", "AS", "MP"]);
 
-export function seatLabel(s) {
+// A seat as [office, place]: cards show them on two lines so names line up across a row.
+export function seatParts(s) {
   const state = stateName(s.state);
-  if (s.chamber === "senate") return tr(`U.S. Senator, ${state}`, `Senado de EE. UU., ${state}`);
-  if (s.state === "PR") return tr("Resident Commissioner, Puerto Rico", "Comisionado(a) Residente, Puerto Rico");
-  if (TERRITORIES.has(s.state)) return tr(`Delegate, ${state}`, `Delegado(a) ante la Cámara, ${state}`);
-  return s.district === 0
-    ? tr(`U.S. Representative, ${state} at-large`, `Cámara de Representantes de EE. UU., ${state}, distrito único`)
-    : tr(`U.S. Representative, ${state} District ${s.district}`, `Cámara de Representantes de EE. UU., ${state}, distrito ${s.district}`);
+  if (s.chamber === "senate") return [tr("U.S. Senator", "Senado de EE. UU."), state];
+  if (s.state === "PR") return [tr("Resident Commissioner", "Comisionado(a) Residente"), "Puerto Rico"];
+  if (TERRITORIES.has(s.state)) return [tr("Delegate", "Delegado(a) ante la Cámara"), state];
+  return [tr("U.S. Representative", "Cámara de Representantes de EE. UU."),
+    s.district === 0 ? tr(`${state} at-large`, `${state}, distrito único`) : tr(`${state} District ${s.district}`, `${state}, distrito ${s.district}`)];
 }
+export const seatLabel = (s) => seatParts(s).join(", ");
 
 export const date = (d) =>
   d ? new Date(d.length === 10 ? `${d}T12:00:00Z` : d).toLocaleDateString(locale(), { year: "numeric", month: "short", day: "numeric" }) : "";
