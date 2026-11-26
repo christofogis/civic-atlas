@@ -138,7 +138,7 @@ export default function MethodsEs() {
       <p>
         La página En la boleta muestra los escaños de cada boleta de elección general y quién los ocupa ahora. Se calcula a
         partir de las fechas de fin de los períodos, no de quién se presenta: un escaño está en la boleta de un año cuando el
-        período de su titular termina después de la elección general anterior y a más tardar el 3 de enero posterior a la
+        período de su titular termina después del 3 de enero del año anterior y a más tardar el 3 de enero posterior a la
         elección de ese año. Así también se incluye a un senador designado hasta una elección especial. Los escaños de la
         Cámara de la próxima elección aparecen cuando asumen los miembros elegidos antes. Los ciclos de California (cargos
         estatales en los años de elección de gobernador, y los distritos pares e impares del Senado estatal en elecciones

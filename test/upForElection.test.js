@@ -20,6 +20,8 @@ test("seats on the ballot by term end", () => {
   assert.equal(onBallot({ end_date: "2026-12-15" }, 2026), true);   // appointee until a special election
   assert.equal(onBallot({ end_date: "2029-01-03" }, 2026), false);
   assert.equal(onBallot({ end_date: "2029-01-03" }, 2028), true);   // class 3
+  assert.equal(onBallot({ end_date: "2027-01-03" }, 2028), false);  // elected in 2026, not up in 2028
+  assert.equal(onBallot({ end_date: "2026-12-15" }, 2028), false);
   assert.equal(onBallot({ end_date: "2031-01-03" }, 2030), true);   // class 1
 });
 

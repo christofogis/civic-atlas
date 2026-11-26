@@ -76,10 +76,7 @@ export default function UpForElection() {
             <h2>{tr(`U.S. Senate: ${senate.length} seats`, `Senado de EE. UU.: ${senate.length} escaños`)}</h2>
             <p className="fine">{tr(`Senators serve six-year terms; about a third of the seats (class ${senateClassFor(year)}) are on each ballot. A seat filled by appointment can also be on the ballot in a special election.`, `Los senadores tienen períodos de seis años; cerca de un tercio de los escaños (clase ${senateClassFor(year)}) está en cada boleta. Un escaño ocupado por designación también puede estar en la boleta en una elección especial.`)}</p>
             {senate.length === 0 ? <p>{tr("No current senator's term ends after this election. The seats will be listed once the senators elected before it take office.", "El período de ningún senador actual termina después de esta elección. Los escaños se mostrarán cuando asuman los senadores elegidos antes.")}</p> : (
-              <table className="bill-table">
-                <thead><tr><th>{tr("State", "Estado")}</th><th>{tr("Holds the seat now", "Ocupa el escaño ahora")}</th><th>{tr("Term ends", "Fin del período")}</th></tr></thead>
-                <tbody>{senate.map((x) => <tr key={x.bioguide_id}><td>{stateName(x.state)}</td><td><Holder x={x} /></td><td>{date(x.end_date)}</td></tr>)}</tbody>
-              </table>
+              <ul className="plain">{senate.map((x) => <li key={x.bioguide_id}>{stateName(x.state)}: <Holder x={x} />{x.end_date !== `${year + 1}-01-03` && <span className="fine"> · {tr("term ends", "fin del período")} {date(x.end_date)}</span>}</li>)}</ul>
             )}
             <p className="fine"><Link to="/elections">{tr("Candidates who have filed with the FEC", "Candidatos inscritos ante la FEC")}</Link></p>
           </section>
