@@ -24,7 +24,7 @@ HEADER = re.compile(r"MINUTES - BOARD OF SUPERVISORS' MEETING.*PAGE \d+|Document
 # A section heading is a whole line ("CLOSED SESSION (Item CS1)"); a sentence that happens to start
 # with the same words ("CLOSED SESSION AND GAVE DIRECTION ...") is not.
 SECTION = re.compile(r"^\s*(CONSENT CALENDAR|DISCUSSION ITEMS|PUBLIC HEARINGS|CLOSED SESSION)\s*(\([^)]*\))?\s*$")
-STOP = re.compile(r"^\s*(PUBLIC COMMENTS|BOARD COMMENTS|ADJOURNED)\b")
+STOP = re.compile(r"^\s*(PUBLIC COMMENTS|PUBLIC, BOARD & CEO COMMENTS|BOARD COMMENTS|ADJOURNED)\b")
 ITEM = re.compile(r"^\s{0,12}((?:S?CS-?\d+[A-Z]?)|(?:S?\d+[A-Z]?))\.\s+(.*)$")
 MOTION = re.compile(r"^\s*(ON THE MOTION OF|BOARD ORDER|BOARD APPROVED|DELETED|NO ACTION|RECEIVED AND FILED|BOARD (?:DIRECTED|RECEIVED))")
 VOTE = re.compile(r"^\s*(Ayes|Noes|Abstained|Absent|Excused|Recused)\s*:\s*(.*)$")
