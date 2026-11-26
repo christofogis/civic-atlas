@@ -1,0 +1,29 @@
+name: Build California 2026 results
+
+# California's November 3, 2026 general election results from the Secretary of State: semi-official
+# counts from the SOS returns API while counties count ballots, then the certified Statement of Vote
+# (certification is scheduled for Dec 11, 2026). Once the file is marked certified, runs change nothing.
+# Commits public/data/state/ca-results-2026.json.
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "41 15 * * *"   # daily, 7:41am Pacific (counties post updates in the afternoon and evening)
+    - cron: "41 3 * * *"    # and 7:41pm Pacific
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build
+        run: python3 scripts/data/ca_results.py
+      - name: Commit
+        run: |
+          git config user.name "civic-atlas bot"
+          git config user.email "christofogis@users.noreply.github.com"
+          git add public/data/state/ca-results-2026.json
+          git diff --cached --quiet || (git commit -m "California 2026 results updated from the Secretary of State" && git pull --rebase -q && git push)
