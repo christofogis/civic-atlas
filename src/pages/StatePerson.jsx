@@ -77,7 +77,7 @@ export default function StatePerson() {
           {p.links.length > 0 && (
             <>
               <h3 className="small">{tr("Official websites", "Sitios web oficiales")}</h3>
-              <ul className="plain">{[...new Map(p.links.map((u) => [u.replace(/\/+$/, ""), u])).values()].map((u) => <li key={u}><a href={u} rel="noopener">{host(u)}</a></li>)}</ul>
+              <ul className="plain">{[...new Map(p.links.map((u) => [u.replace(/^https?:\/\/(www\.)?/, "").replace(/\/+$/, ""), u])).values()].map((u) => <li key={u}><a href={u} rel="noopener">{host(u)}</a></li>)}</ul>
             </>
           )}
         </aside>
