@@ -49,7 +49,7 @@ Rules:
 - No words that judge or rate: for example significant, major, sweeping, landmark, controversial, harmful, important, modest, strict, generous, loophole, crackdown.
 - When the section amends another law by striking and inserting words and the result can't be understood from this text alone, say which law and provision it amends and what wording it changes. Do not guess what the change does.
 - Write at about an 8th-grade reading level. If you must use a legal term, explain it in a few words.
-- Length: one or two sentences for a simple section; at most five sentences, or at most six short lines starting with "- " when the section has several separate provisions. Never longer than needed.
+- Length: one or two sentences for a simple section; at most five sentences, or at most six short lines starting with "- " when the section has several separate provisions. Keep the English to 150 words or fewer, even for a long section: cover its main provisions and leave detail to the text beside it.
 - Spanish: give a faithful Spanish version of the same summary in neutral Latin American Spanish, with the same content and no additions. Keep official names of laws, programs, and agencies in English as printed.
 
 Reply with JSON only, no other text: {"en": "...", "es": "..."}`;
@@ -148,7 +148,7 @@ async function collect(db) {
       const msg = r.result.message;
       inTok += msg.usage?.input_tokens ?? 0; outTok += msg.usage?.output_tokens ?? 0;
       const s = parseReply(msg.content?.find((c) => c.type === "text")?.text);
-      if (!s) { bad++; console.log(`${r.custom_id}: reply was not the expected JSON`); continue; }
+      if (!s) { bad++; console.log(`${r.custom_id}: reply was not the expected JSON (stop: ${msg.stop_reason}, ${msg.usage?.output_tokens} tokens)`); continue; }
       rows.push({ ...item, summary_en: s.en, summary_es: s.es, model: b.model, batch_id: b.id, published: false });
     }
     if (!DRY) await upsertBatches(db, "bill_section_summaries", rows, "congress,bill_type,number,version_code,section_key", 200);
@@ -192,7 +192,7 @@ async function send(db) {
       items[id] = { congress: bill.congress, bill_type: bill.bill_type, number: bill.number, version_code: version.version_code,
         section_key: s.key, path: s.path, header: s.header, words: s.words };
       requests.push({ custom_id: id, params: {
-        model: MODEL, max_tokens: 1000, system: SYSTEM,
+        model: MODEL, max_tokens: 3000, system: SYSTEM,
         messages: [{ role: "user", content: userPrompt(bill, version, s) }],
       } });
       done.add(k);
