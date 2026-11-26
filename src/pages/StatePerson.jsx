@@ -56,7 +56,7 @@ export default function StatePerson() {
             <>
               <h3 className="small">{tr("Earlier offices", "Cargos anteriores")}</h3>
               <ul className="plain">
-                {past.map((r) => <li key={`p${r.type}${r.district}${r.start_date}`}>{stateOfficeLabel(r, p.state)} <span className="fine">{r.start_date ? date(r.start_date) : "?"} – {date(r.end_date)}</span></li>)}
+                {past.map((r) => <li key={`p${r.type}${r.district}${r.start_date}`}>{stateOfficeLabel(r, p.state)} <span className="fine">{r.start_date ? <>{date(r.start_date)} – {date(r.end_date)}</> : <>{tr("until", "hasta el")} {date(r.end_date)}</>}</span></li>)}
               </ul>
             </>
           )}
@@ -77,7 +77,7 @@ export default function StatePerson() {
           {p.links.length > 0 && (
             <>
               <h3 className="small">{tr("Official websites", "Sitios web oficiales")}</h3>
-              <ul className="plain">{p.links.map((u) => <li key={u}><a href={u} rel="noopener">{host(u)}</a></li>)}</ul>
+              <ul className="plain">{[...new Map(p.links.map((u) => [u.replace(/\/+$/, ""), u])).values()].map((u) => <li key={u}><a href={u} rel="noopener">{host(u)}</a></li>)}</ul>
             </>
           )}
         </aside>
