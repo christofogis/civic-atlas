@@ -200,7 +200,9 @@ async function send(db) {
       items[id] = { congress: bill.congress, bill_type: bill.bill_type, number: bill.number, version_code: version.version_code,
         section_key: s.key, path: s.path, header: s.header, words: s.words };
       requests.push({ custom_id: id, params: {
-        model: MODEL, max_tokens: 3000, system: SYSTEM,
+        // Haiku 5.5 thinks by default and its (hidden) thinking counts toward max_tokens: low effort
+        // keeps it short, and the limit leaves room for thinking plus both languages.
+        model: MODEL, max_tokens: 8000, output_config: { effort: "low" }, system: SYSTEM,
         messages: [{ role: "user", content: userPrompt(bill, version, s) }],
       } });
       done.add(k);
