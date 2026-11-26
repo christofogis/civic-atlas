@@ -5,6 +5,7 @@ import { date, stateName } from "../lib/format.js";
 import { tr } from "../lib/lang.js";
 import { stateOfficeLabel } from "../lib/stateOffices.js";
 import { StatePartyTag } from "../components/StateOfficialCard.jsx";
+import { NotesList, Ref } from "../components/Notes.jsx";
 
 // A state legislator or statewide official: current office, contact details, past roles.
 // Data: Open States (openstates/people, public domain), compiled from state legislature sites.
@@ -33,7 +34,11 @@ export default function StatePerson() {
   return (
     <main className="page wide">
       <p className="fine"><Link to="/">{tr("Home", "Inicio")}</Link> / {stateName(p.state)}</p>
-      <h1>{p.name}</h1>
+      <h1>{p.name}<Ref id="src" text={<>
+        {tr("Source: ", "Fuente: ")}<a href={`https://github.com/openstates/people/tree/main/data/${p.state.toLowerCase()}`} rel="noopener">Open States</a>
+        {tr(" (public domain), compiled from state legislature and government websites. Sources it lists: ", " (dominio público), recopilado de los sitios web de las legislaturas y gobiernos estatales. Fuentes que cita: ")}
+        {[...new Map(p.sources.map((u) => [host(u), u])).values()].map((u, i) => <span key={u}>{i ? ", " : ""}<a href={u} rel="noopener">{host(u)}</a></span>)}.
+      </>} /></h1>
       <p className="meta"><StatePartyTag party={p.party} /> {p.party}{!p.active && <> · {tr("No longer in office", "Ya no ocupa el cargo")}</>}</p>
       <div className="split">
         <div className="split-main">
@@ -74,11 +79,7 @@ export default function StatePerson() {
           )}
         </aside>
       </div>
-      <p className="fine">
-        {tr("Data: ", "Datos: ")}<a href={`https://github.com/openstates/people/tree/main/data/${p.state.toLowerCase()}`} rel="noopener">Open States</a>
-        {tr(" (public domain), compiled from state legislature and government websites. Sources it lists: ", " (dominio público), recopilado de los sitios web de las legislaturas y gobiernos estatales. Fuentes que cita: ")}
-        {[...new Map(p.sources.map((u) => [host(u), u])).values()].map((u, i) => <span key={u}>{i ? ", " : ""}<a href={u} rel="noopener">{host(u)}</a></span>)}.
-      </p>
+      <NotesList />
     </main>
   );
 }
