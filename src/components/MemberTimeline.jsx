@@ -42,12 +42,15 @@ async function loadWindow(id, from, to) {
 function Entry({ e }) {
   if (e.type === "vote") {
     const { v, k } = e;
-    const what = v.document_name || v.description;
+    // Nominations are named by the clerk's description (the nominee and post), not the PN number;
+    // other votes by the measure's number and its description.
+    const what = k.kind === "nomination" ? (v.description || v.document_name)
+      : [v.document_name, v.description].filter(Boolean).join(": ");
     return (
       <>
         <span className="tl-kind">{tr("Vote", "Voto")}</span>
         <span>
-          <strong lang="en">{v.position}</strong>{" "}{tr("on", "en")} {k.label.toLowerCase()}{what && <>: <span lang="en">{what}</span></>}
+          <strong lang="en">{v.position}</strong>{" "}{tr("on", "en")} {k.label.toLowerCase()}{what && <>: <span lang="en" className="clamp2-inline">{what}</span></>}
           <span className="fine"> · <span lang="en">{v.result}</span> · <a href={v.source_url} rel="noopener">{tr("Roll call", "Votación")}</a></span>
         </span>
       </>
@@ -61,7 +64,7 @@ function Entry({ e }) {
         <span>
           {e.type === "law" ? tr("Their bill became law: ", "Su proyecto se convirtió en ley: ") : tr("Introduced ", "Presentó ")}
           <Link to={`/bill/${b.congress}/${b.bill_type}/${b.number}`}>{billLabel(b)}</Link>{" "}
-          <span lang="en">{b.short_title ?? b.title}</span>
+          <span lang="en" className="clamp2-inline">{b.short_title ?? b.title}</span>
           {e.type === "law" && b.law_number && <span className="fine"> · {tr("Public Law", "Ley Pública")} {b.law_number}</span>}
         </span>
       </>
