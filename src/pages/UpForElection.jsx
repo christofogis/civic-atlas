@@ -47,15 +47,18 @@ export default function UpForElection() {
   // year's class even though its current holder (an appointee) leaves earlier, after a special election.
   const serving = (x) => x.start_date <= today && today < x.end_date;
   const pastYear = (y) => generalElectionDate(y) < today;
+  // For an election that has passed, only those still in office on election day: someone who left
+  // earlier (a resignation in the year before) wasn't the holder on that ballot.
+  const onElectionDay = (x, y) => x.start_date <= generalElectionDate(y) && x.end_date > generalElectionDate(y);
   const one = (list) => [...new Map(list.map((x) => [x.bioguide_id, x])).values()];
   // A Senate seat is on the ballot when its holder's term ends that cycle, or when it belongs to that
   // year's class even though its holder (an appointee) leaves earlier, after a special election. For an
   // election that has passed, the terms that ended with it are listed; otherwise, today's holders.
-  const senateIn = (y) => one((seats || []).filter((x) => x.chamber === "senate" && (pastYear(y) || serving(x)) && (onBallot(x, y) ||
+  const senateIn = (y) => one((seats || []).filter((x) => x.chamber === "senate" && (pastYear(y) ? onElectionDay(x, y) : serving(x)) && (onBallot(x, y) ||
     (x.how === "appointment" && x.senate_class === senateClassFor(y) && nextElectionYear(x.end_date) === y)))).sort(byState);
   const senate = senateIn(year);
   const held = (list) => Object.entries(list.reduce((m, x) => ({ ...m, [x.party]: (m[x.party] ?? 0) + 1 }), {})).sort((a, z) => z[1] - a[1]);
-  const house = one((seats || []).filter((x) => x.chamber === "house" && (past || serving(x)) && onBallot(x, year))).sort(byState);
+  const house = one((seats || []).filter((x) => x.chamber === "house" && (past ? onElectionDay(x, year) : serving(x)) && onBallot(x, year))).sort(byState);
   const houseShown = state ? house.filter((x) => x.state === state) : house;
   // After an election, once new terms have begun: did the holder return, and (Senate) who holds the seat now.
   // House districts can be redrawn between Congresses, so no House successor is named.
