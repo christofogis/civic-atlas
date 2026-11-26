@@ -134,6 +134,18 @@ export default function MethodsEs() {
         cámaras, que tiene las mismas palabras.
       </p>
 
+      <h2 id="on-the-ballot">En la boleta</h2>
+      <p>
+        La página En la boleta muestra los escaños de cada boleta de elección general y quién los ocupa ahora. Se calcula a
+        partir de las fechas de fin de los períodos, no de quién se presenta: un escaño está en la boleta de un año cuando el
+        período de su titular termina después de la elección general anterior y a más tardar el 3 de enero posterior a la
+        elección de ese año. Así también se incluye a un senador designado hasta una elección especial. Los escaños de la
+        Cámara de la próxima elección aparecen cuando asumen los miembros elegidos antes. Los ciclos de California (cargos
+        estatales en los años de elección de gobernador, y los distritos pares e impares del Senado estatal en elecciones
+        alternas) siguen la constitución del estado; los del Condado de Orange provienen de las fechas de los períodos de
+        cada funcionario. Los candidatos inscritos están en la página de candidatos de 2028.
+      </p>
+
       <h2 id="hearings">Audiencias y reuniones de comités</h2>
       <p>
         Las audiencias, sesiones de enmiendas y reuniones de trabajo de ambas cámaras provienen de los registros de

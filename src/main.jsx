@@ -43,6 +43,7 @@ const Quiz = lazy(() => import("./pages/Quiz.jsx"));
 const Topics = lazy(() => import("./pages/Topics.jsx"));
 const Topic = lazy(() => import("./pages/Topic.jsx"));
 const Elections = lazy(() => import("./pages/Elections.jsx"));
+const UpForElection = lazy(() => import("./pages/UpForElection.jsx"));
 const Corrections = lazy(() => import("./pages/Corrections.jsx"));
 const Nominations = lazy(() => import("./pages/Nominations.jsx"));
 const ExplainStory = lazy(() => import("./pages/ExplainStory.jsx"));
@@ -76,6 +77,7 @@ createRoot(document.getElementById("root")).render(
         <Route path="/topics" element={<Topics />} />
         <Route path="/topic/:slug" element={<Topic />} />
         <Route path="/elections" element={<Elections />} />
+        <Route path="/on-the-ballot" element={<UpForElection />} />
         <Route path="/corrections" element={<Corrections />} />
         <Route path="/nominations" element={<Nominations />} />
         <Route path="/story" element={<ExplainStory />} />

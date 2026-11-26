@@ -12,6 +12,7 @@ import Follow from "../components/Follow.jsx";
 import { KindLabel, Position } from "../components/Explain.jsx";
 import { seatLabel, date, money, billLabel, ordinal, stateName, partyName } from "../lib/format.js";
 import { tr } from "../lib/lang.js";
+import { ballotYearFor, generalElectionDate } from "../../lib/upForElection.js";
 import { NotesList, NotesProvider, Ref } from "../components/Notes.jsx";
 import { PartyName } from "../components/PartyTag.jsx";
 
@@ -337,7 +338,8 @@ export default function Member() {
         <h1>{name}</h1>
         {seat?.seat_status === "serving" ? (
           <><p className="lede">{seatLabel(seat)}</p>
-          <p className="member-meta"><PartyName party={seat.party} /> · {tr("Current term", "Período actual")} {date(seat.start_date)} – {date(seat.end_date)}</p></>
+          <p className="member-meta"><PartyName party={seat.party} /> · {tr("Current term", "Período actual")} {date(seat.start_date)} – {date(seat.end_date)}</p>
+          <BallotLine seat={seat} /></>
         ) : (
           <p className="lede">{tr("Not currently serving. Most recent", "No está en el cargo. Último cargo")}: {seatLabel(latest)}, {date(latest.start_date)} – {date(latest.end_date)} <PartyName party={latest.party} /></p>
         )}
@@ -574,5 +576,20 @@ export default function Member() {
       <NotesList />
     </main>
     </NotesProvider>
+  );
+}
+
+// When this seat is next on the ballot (or was, if that election has passed and the term hasn't ended).
+function BallotLine({ seat }) {
+  const year = ballotYearFor(seat);
+  if (!year) return null;
+  const day = generalElectionDate(year);
+  const held = day < new Date().toLocaleDateString("en-CA", { timeZone: "America/Los_Angeles" });
+  return (
+    <p className="fine">
+      {held ? tr(`This seat was on the ballot on ${date(day)}.`, `Este escaño estuvo en la boleta el ${date(day)}.`)
+        : tr(`This seat is next on the ballot on ${date(day)}.`, `Este escaño estará en la boleta el ${date(day)}.`)}{" "}
+      <Link to={`/on-the-ballot?year=${year}`}>{tr(`Everything on the ${year} ballot`, `Todo lo que está en la boleta de ${year}`)}</Link>
+    </p>
   );
 }

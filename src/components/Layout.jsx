@@ -13,7 +13,7 @@ const TITLES = {
   "/bills": ["Bills", "Proyectos de ley"], "/compare": ["Compare two members", "Comparar dos miembros"],
   "/week": ["This week in Congress", "Esta semana en el Congreso"], "/glossary": ["Glossary", "Glosario"],
   "/quiz": ["Quiz", "Cuestionario"], "/topics": ["Topics", "Temas"], "/topic": ["Topic", "Tema"],
-  "/elections": ["2028 candidates", "Candidatos de 2028"], "/corrections": ["Corrections", "Correcciones"],
+  "/elections": ["2028 candidates", "Candidatos de 2028"], "/on-the-ballot": ["On the ballot", "En la boleta"], "/corrections": ["Corrections", "Correcciones"],
   "/nominations": ["Nominations", "Nominaciones"], "/story": ["Look up a news story", "Buscar una noticia"],
   "/hearing": ["Hearing", "Audiencia"], "/map": ["Map", "Mapa"],
   "/government": ["Three branches of government", "Los tres poderes del gobierno"],
@@ -91,6 +91,7 @@ export default function Layout() {
             <NavLink to="/government">{t("Three branches", "Los tres poderes")}</NavLink>
             <NavLink to="/budget">{t("Federal budget", "Presupuesto federal")}</NavLink>
             <NavLink to="/measures">{t("2028 ballot measures (CA)", "Medidas en la boleta 2028 (CA)")}</NavLink>
+            <NavLink to="/on-the-ballot">{t("On the ballot", "En la boleta")}</NavLink>
             <NavLink to="/elections">{t("2028 candidates", "Candidatos 2028")}</NavLink>
             <NavLink to="/quiz">{t("Quiz: do you vote like them?", "Cuestionario: ¿vota como ellos?")}</NavLink>
             <NavLink to="/methods">{t("How this site works", "Cómo funciona este sitio")}</NavLink>
@@ -127,6 +128,7 @@ export default function Layout() {
           <Link to="/corrections">{t("Corrections", "Correcciones")}</Link>
           <Link to="/compare">{t("Compare two members", "Comparar dos miembros")}</Link>
           <Link to="/quiz">{t("Quiz", "Cuestionario")}</Link>
+          <Link to="/on-the-ballot">{t("On the ballot", "En la boleta")}</Link>
           <Link to="/elections">{t("2028 candidates", "Candidatos 2028")}</Link>
           <Link to="/measures">{t("2028 ballot measures (CA)", "Medidas en la boleta 2028 (CA)")}</Link>
           <Link to="/nominations">{t("Nominations", "Nominaciones")}</Link>

@@ -57,7 +57,8 @@ export default function Elections() {
   return (
     <main className="page wide">
       <h1>{year ? tr(`${year} elections: who has filed`, `Elecciones ${year}: quién se ha inscrito`) : tr("Upcoming elections: who has filed", "Próximas elecciones: quién se ha inscrito")}<Ref id="src" text={<>{tr("Source: Federal Election Commission (OpenFEC), updated weekly.", "Fuente: Comisión Federal de Elecciones (OpenFEC), actualizada cada semana.")}</>} /></h1>
-      <p className="lede">{tr("Candidates for Congress who have registered with the Federal Election Commission.", "Candidatos al Congreso que se han inscrito ante la Comisión Federal de Elecciones.")}</p>
+      <p className="lede">{tr("Candidates for Congress who have registered with the Federal Election Commission.", "Candidatos al Congreso que se han inscrito ante la Comisión Federal de Elecciones.")}{" "}
+        <Link to={`/on-the-ballot${year ? `?year=${year}` : ""}`}>{tr("Which seats are on the ballot", "Qué escaños están en la boleta")}</Link></p>
       <p className="fine">
         {tr(`Anyone can file, and filing doesn't mean a campaign is active; money raised shows which campaigns are reporting activity. Listed alphabetically. House districts are as filed; ${year} House races use the district maps adopted for 2026.`,
           `Cualquiera puede inscribirse, y la inscripción no significa que haya una campaña activa; el dinero recaudado muestra qué campañas informan actividad. En orden alfabético. Los distritos de la Cámara son los indicados en la inscripción; las contiendas de ${year} usan los mapas adoptados para 2026.`)}

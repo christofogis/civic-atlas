@@ -141,6 +141,17 @@ export default function Methods() {
         summarized. A public law's text is read from the enrolled bill, which has the same words.
       </p>
 
+      <h2 id="on-the-ballot">On the ballot</h2>
+      <p>
+        The On the ballot page lists the seats on each general-election ballot and who holds them now. It is worked out
+        from term end dates, not from who is running: a seat is on a year's ballot when its holder's term ends after the
+        previous general election and by January 3 after that year's election. That also catches a senator appointed until
+        a special election. House seats for the next election appear once the members elected before it take office.
+        California's cycles (statewide offices in gubernatorial years, the state Senate's odd- and even-numbered districts
+        in alternate elections) follow the state constitution; Orange County's come from each official's term dates.
+        Candidates who have filed are on the 2028 candidates page.
+      </p>
+
       <h2 id="hearings">Committee hearings and meetings</h2>
       <p>
         Hearings, markups and business meetings in both chambers come from Congress.gov's committee meeting records,
