@@ -8,6 +8,7 @@ import { PartyName, partyClass } from "../components/PartyTag.jsx";
 import { partyName } from "../lib/format.js";
 import { NotesList, Ref } from "../components/Notes.jsx";
 import { myRepresentatives } from "../lib/myReps.js";
+import { useCaResults, ResultsStatus, RaceResult, MeasureResult, PartyKey, OFFICE_TITLES } from "../components/CaResults.jsx";
 import { generalElectionDate, nextElectionYear, onBallot, senateClassFor, isGubernatorialYear, localOnBallot, yearOfLabel } from "../../lib/upForElection.js";
 
 // Which seats are on the ballot in a given general-election year, and who holds each one now.
@@ -25,6 +26,7 @@ export default function UpForElection() {
   const [seats, setSeats] = useState(null);
   const [local, setLocal] = useState(null);
   const mine = useMemo(() => myRepresentatives(), []);
+  const caResults = useCaResults();
 
   useEffect(() => {
     Promise.all([
@@ -167,6 +169,7 @@ export default function UpForElection() {
                 ? tr("State Senate: the 20 even-numbered districts.", "Senado estatal: los 20 distritos con número par.")
                 : tr("State Senate: the 20 odd-numbered districts.", "Senado estatal: los 20 distritos con número impar.")}</li>
             </ul>
+            {caResults && caResults.election.startsWith(`${year}-`) && <CaResultsBlock data={caResults} />}
           </section>
 
           {local && (supervisors.length > 0 || councils.length > 0) && (
@@ -191,6 +194,37 @@ export default function UpForElection() {
       )}
       <NotesList />
     </main>
+  );
+}
+
+// California's results from the Secretary of State: statewide offices, Board of Equalization, measures,
+// and the U.S. House districts (folded, since member pages show each member's own race).
+function CaResultsBlock({ data }) {
+  return (
+    <div className="ca-results" id="ca-results">
+      <h3>{tr("Results from the Secretary of State", "Resultados de la Secretaría de Estado")}</h3>
+      <ResultsStatus data={data} />
+      <PartyKey />
+      <h3>{tr("Statewide offices", "Cargos estatales")}</h3>
+      <div className="results-grid">
+        {data.statewide.map((r) => <RaceResult key={r.office} race={r} title={tr(...(OFFICE_TITLES[r.office] ?? [r.race_title, r.race_title]))} />)}
+      </div>
+      <h3>{tr("Board of Equalization", "Junta de Igualación")}</h3>
+      <div className="results-grid">
+        {data.boe.map((r) => <RaceResult key={r.district} race={r} title={tr(`District ${r.district}`, `Distrito ${r.district}`)} />)}
+      </div>
+      <h3>{tr("Statewide ballot measures", "Medidas estatales en la boleta")}</h3>
+      <div className="results-grid">
+        {data.measures.map((m) => <MeasureResult key={m.number} m={m} />)}
+      </div>
+      <details>
+        <summary>{tr(`U.S. House: California's ${data.house.length} districts (new maps in 2026)`, `Cámara de EE. UU.: los ${data.house.length} distritos de California (mapas nuevos en 2026)`)}</summary>
+        <div className="results-grid">
+          {data.house.map((r) => <RaceResult key={r.district} race={r} title={tr(`District ${r.district}`, `Distrito ${r.district}`)} />)}
+        </div>
+      </details>
+      <p className="fine">{tr("No U.S. Senate seat from California was on the 2026 ballot. Civic Atlas shows the counts as published and doesn't call races.", "Ningún escaño de California en el Senado de EE. UU. estuvo en la boleta de 2026. Civic Atlas muestra los conteos tal como se publican y no declara ganadores.")}</p>
+    </div>
   );
 }
 

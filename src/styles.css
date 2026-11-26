@@ -876,3 +876,11 @@ ol.bare { list-style: none; padding: 0; margin: 0; }
 .face-name { font-weight: 600; text-decoration: underline; text-decoration-color: var(--border-strong); text-underline-offset: 2px; }
 .face-meta { color: var(--muted); font-size: 0.8rem; }
 .face-outcome { font-size: 0.8rem; font-weight: 600; }
+
+/* California election results (On the ballot, member pages). Counts as published; no winner styling. */
+.results-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 4px 28px; }
+.race-result h4 { margin: 14px 0 4px; font-size: 0.95rem; }
+.results-table td, .results-table th { padding-top: 6px; padding-bottom: 6px; }
+.results-table .num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.ca-results details { margin: 14px 0; }
+.ca-results summary { cursor: pointer; font-weight: 600; }
