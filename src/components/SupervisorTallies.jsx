@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { date } from "../lib/format.js";
 import { tr } from "../lib/lang.js";
+import { boardRecords } from "../../lib/boardVotes.js";
 
 // Each supervisor's recorded votes across the meetings whose minutes have been read: how many
 // times the minutes list them under Ayes, Noes, Abstained or Absent, and the items behind every
@@ -11,21 +12,13 @@ export default function SupervisorTallies({ minutes }) {
   const [who, setWho] = useState(null);
   const meetings = minutes?.meetings ?? [];
   if (!meetings.length) return null;
-  const rows = new Map();
-  for (const m of meetings) for (const i of m.items) for (const a of i.actions) for (const [kind, names] of Object.entries(a.votes)) {
-    for (const n of names) {
-      const r = rows.get(n) ?? { name: n, counts: {}, other: [] };
-      r.counts[kind] = (r.counts[kind] ?? 0) + 1;
-      if (kind !== "Ayes") r.other.push({ kind, date: m.date, number: i.number, text: i.text, url: m.minutes_url });
-      rows.set(n, r);
-    }
-  }
-  const list = [...rows.values()].sort((a, z) => a.name.localeCompare(z.name));
+  const list = boardRecords(minutes);
+  const inText = list[0]?.inText.length ?? 0;
   const sel = list.find((r) => r.name === who);
   return (
     <div className="supervisor-tallies">
       <h3>{tr("Supervisors' recorded votes", "Votos registrados de los supervisores")}</h3>
-      <p className="fine">{tr(`From the minutes of ${meetings.length} recent meetings (${date(meetings.at(-1).date)} to ${date(meetings[0].date)}). Each count is a vote line in the minutes that names the supervisor.`, `De las actas de ${meetings.length} reuniones recientes (${date(meetings.at(-1).date)} al ${date(meetings[0].date)}). Cada conteo es una línea de votación del acta que nombra al supervisor.`)}</p>
+      <p className="fine">{tr(`From the minutes of ${meetings.length} recent meetings (${date(meetings.at(-1).date)} to ${date(meetings[0].date)}). Each count is a vote line in the minutes that names the supervisor.`, `De las actas de ${meetings.length} reuniones recientes (${date(meetings.at(-1).date)} al ${date(meetings[0].date)}). Cada conteo es una línea de votación del acta que nombra al supervisor.`)}{inText > 0 && " " + tr(`${inText} ${inText === 1 ? "action describes" : "actions describe"} a vote in a sentence instead of vote lines and ${inText === 1 ? "isn't" : "aren't"} counted; each supervisor's card lists ${inText === 1 ? "it" : "them"}.`, `${inText} ${inText === 1 ? "acción describe" : "acciones describen"} una votación en una oración en lugar de líneas de votación y no se ${inText === 1 ? "cuenta" : "cuentan"}; la tarjeta de cada supervisor ${inText === 1 ? "la menciona" : "las menciona"}.`)}</p>
       <div className="table-scroll">
         <table>
           <thead><tr><th>{tr("Supervisor", "Supervisor")}</th>{KINDS.map(([k, en, es]) => <th key={k}>{tr(en, es)}</th>)}<th /></tr></thead>

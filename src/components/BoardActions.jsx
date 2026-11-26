@@ -36,6 +36,7 @@ export default function BoardActions({ meeting }) {
                     {Object.entries(a.votes).map(([kind, who]) => (
                       <div key={kind} className="fine"><span className="vote-kind">{tr(...(VOTE_LABEL[kind] ?? [kind, kind]))}:</span> {who.join(", ")}</div>
                     ))}
+                    {a.vote_in_text && <div className="fine">{tr("The minutes describe this vote in the sentence above, without vote lines, so it isn't in the supervisors' counts.", "El acta describe esta votación en la oración anterior, sin líneas de votación, así que no está en los conteos de los supervisores.")}</div>}
                     {(a.notes ?? []).map((n) => <div key={n} className="fine">{n}</div>)}
                   </div>
                 ))}

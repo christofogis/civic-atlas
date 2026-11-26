@@ -4,6 +4,7 @@ import { tr } from "../lib/lang.js";
 import { Ref } from "./Notes.jsx";
 import BoardActions from "./BoardActions.jsx";
 import SupervisorTallies from "./SupervisorTallies.jsx";
+import { loadMinutes } from "../lib/local.js";
 
 // What the Board of Supervisors will take up at its next meeting, item by item, in the county's
 // own words (records stay in English as published). Items can be narrowed to those that name one
@@ -38,7 +39,7 @@ export default function CountyAgenda({ district }) {
   const [mine, setMine] = useState(false);
   useEffect(() => {
     loadAgendas().then((d) => setData(d ?? false));
-    fetch("/data/local/ca-orange-minutes.json").then((r) => (r.ok ? r.json() : null)).then(setMinutes).catch(() => {});
+    loadMinutes().then(setMinutes);
   }, []);
   if (data === null) return null;
   const today = new Intl.DateTimeFormat("en-CA", { timeZone: "America/Los_Angeles" }).format(new Date());

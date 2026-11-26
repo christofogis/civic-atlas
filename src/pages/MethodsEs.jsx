@@ -294,11 +294,15 @@ export default function MethodsEs() {
         por número; los asuntos para todos los distritos se cuentan aparte.
       </p>
       <p>
-        Lo que hizo la Junta viene del acta resumida de acciones de la Secretaría de las reuniones ordinarias recientes:
-        cada asunto, cada moción tal como se imprimió y las líneas de votación (a favor, en contra, abstenciones, ausentes,
-        excusados) tal como se registraron. Los conteos de votos de los supervisores suman esas líneas; un supervisor se
-        cuenta solo donde el acta lo nombra, así que una moción que menciona solo a parte de la Junta cuenta solo a los
-        nombrados. Aún no se leen las reuniones especiales cuyas actas usan otro formato.
+        Lo que hizo la Junta viene del acta resumida de acciones de la Secretaría de las reuniones ordinarias y especiales
+        recientes: cada asunto, cada moción tal como se imprimió y las líneas de votación (a favor, en contra, abstenciones,
+        ausentes, excusados) tal como se registraron. Los conteos de votos de los supervisores suman esas líneas; un
+        supervisor se cuenta solo donde el acta lo nombra, así que una moción que menciona solo a parte de la Junta cuenta
+        solo a los nombrados. La tarjeta de cada supervisor muestra sus conteos, los asuntos de cada voto distinto de a
+        favor y cuántas mociones mencionan solo a parte de la Junta sin nombrarlo. Algunas acciones, a menudo informes de
+        sesiones a puerta cerrada, describen una votación en una oración ("on a vote of 3 to 2, with ... voting yes") en
+        lugar de líneas de votación. Se muestran tal como se imprimieron y aparecen en la tarjeta de cada supervisor, pero
+        no se cuentan, porque contarlas significaría sacar nombres de una oración.
       </p>
       <p>
         "Su semana" muestra lo que viene para los funcionarios de la dirección que buscó, con los mismos tipos de asuntos

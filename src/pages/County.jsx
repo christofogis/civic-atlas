@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { date } from "../lib/format.js";
 import { tr } from "../lib/lang.js";
-import { loadLocal } from "../lib/local.js";
+import { loadLocal, loadMinutes } from "../lib/local.js";
 import { CouncilCard, OfficerCard, SupervisorCard } from "../components/LocalOfficials.jsx";
 import LocalMeetings from "../components/LocalMeetings.jsx";
 import CountyAgenda from "../components/CountyAgenda.jsx";
@@ -15,6 +15,8 @@ import { NotesList, NotesProvider, Ref } from "../components/Notes.jsx";
 export default function County() {
   const { id } = useParams();
   const [data, setData] = useState(undefined);
+  const [minutes, setMinutes] = useState(null);
+  useEffect(() => { if (id === "ca-orange") loadMinutes().then(setMinutes); }, [id]);
   useEffect(() => {
     if (!/^[a-z-]+$/.test(id)) { setData(null); return; }
     loadLocal(id).then((d) => { setData(d); document.title = `${d.county} · Civic Atlas`; }).catch(() => setData(null));
@@ -39,7 +41,7 @@ export default function County() {
           "Una Junta de Supervisores de cinco miembros, cada uno elegido por un distrito, aprueba el presupuesto y las políticas del condado y administra sus servicios, incluso en las zonas no incorporadas. Otros seis funcionarios se eligen en todo el condado. En California, todos los cargos de condado son no partidistas.")}
       </p>
       <h2>{tr("Board of Supervisors", "Junta de Supervisores")}</h2>
-      <ul className="cards">{data.supervisors.map((s) => <SupervisorCard key={s.district} s={s} county={data.county} />)}</ul>
+      <ul className="cards">{data.supervisors.map((s) => <SupervisorCard key={s.district} s={s} county={data.county} minutes={minutes} />)}</ul>
       <p className="branch-links">
         <a href={data.meetings_url} rel="noopener">{tr("Meetings and agendas", "Reuniones y agendas")}</a>
         <a href={data.results_url} rel="noopener">{tr("Election results (Registrar of Voters)", "Resultados electorales (Registro de Votantes)")}</a>
@@ -75,7 +77,7 @@ export default function County() {
           </ul>
         </section>
       )}
-      <p className="notice">{tr("Votes and campaign money for county and city officials aren't on Civic Atlas yet.", "Los votos y los fondos de campaña de los funcionarios del condado y de la ciudad aún no están en Civic Atlas.")}</p>
+      <p className="notice">{tr("City council votes, and campaign money for county and city officials, aren't on Civic Atlas yet.", "Los votos de los concejos municipales y los fondos de campaña de los funcionarios del condado y de la ciudad aún no están en Civic Atlas.")}</p>
       <NotesList />
     </main>
     </NotesProvider>

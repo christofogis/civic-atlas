@@ -830,3 +830,10 @@ ol.bare { list-style: none; padding: 0; margin: 0; }
 .board-action .vote-kind { font-weight: 600; }
 .board-actions .clamp2-inline { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
 .supervisor-tallies { margin-top: 1.4rem; } .supervisor-tallies td:nth-child(n+2):not(:last-child), .supervisor-tallies th:nth-child(n+2) { text-align: right; font-variant-numeric: tabular-nums; } .supervisor-tallies .clamp2-inline { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.supervisor-record { margin-top: 0.8rem; border-top: 1px solid var(--border); padding-top: 0.6rem; }
+.supervisor-record h4 { margin: 0 0 0.2rem; font-size: 0.95rem; }
+.supervisor-record .record-counts { margin: 0.2rem 0; font-variant-numeric: tabular-nums; font-size: 0.9rem; }
+.supervisor-record .fine { margin: 0.3rem 0; }
+.supervisor-record summary { cursor: pointer; font-size: 0.88rem; margin-top: 0.3rem; }
+.record-items li { padding: 0.4rem 0; border-bottom: 1px solid var(--border); font-size: 0.85rem; }
+.record-items .clamp2-inline { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
