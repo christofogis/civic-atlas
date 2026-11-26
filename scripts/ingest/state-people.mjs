@@ -25,6 +25,8 @@ await withRun(db, "state-people", async () => {
         people.push({
           id: y.id, state, name: y.name, given_name: y.given_name ?? null, family_name: y.family_name ?? null, party,
           email: y.email ?? null,
+          // Official photo link as Open States lists it; only https links, so pages never load mixed content.
+          image_url: /^https:\/\//.test(y.image ?? "") ? y.image : null,
           offices: (y.offices ?? []).map(({ classification, address, voice, fax }) => ({ classification, address, voice, fax })),
           links: (y.links ?? []).map((l) => l.url).filter(Boolean),
           sources: (y.sources ?? []).map((l) => l.url).filter(Boolean),

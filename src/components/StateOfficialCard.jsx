@@ -26,6 +26,7 @@ export default function StateOfficialCard({ official, state }) {
   return (
     <li className="card">
       <Seat parts={stateOfficeParts(official, state)} />
+      {official.image && <img className="member-photo small" src={official.image} alt={official.name} width="60" height="73" loading="lazy" referrerPolicy="no-referrer" onError={(e) => { e.currentTarget.style.display = "none"; }} />}
       <h3><Link to={statePersonPath(official.id)}>{official.name}</Link></h3>
       <p className="meta">
         <StatePartyTag party={official.party} /> {official.party}
