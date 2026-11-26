@@ -34,13 +34,15 @@ export default function StatePerson() {
   return (
     <main className="page wide">
       <p className="fine"><Link to="/">{tr("Home", "Inicio")}</Link> / {stateName(p.state)}</p>
-      {p.image_url && <img className="member-photo small" src={p.image_url} alt={p.name} width="90" height="110" referrerPolicy="no-referrer" onError={(e) => { e.currentTarget.style.display = "none"; }} />}
+      <header className={p.image_url ? "page-head member-head" : "page-head"}>
+      {p.image_url && <img className="member-photo" src={p.image_url} alt={p.name} width="90" height="110" referrerPolicy="no-referrer" onError={(e) => { e.currentTarget.style.display = "none"; }} />}
       <h1>{p.name}<Ref id="src" text={<>
         {tr("Source: ", "Fuente: ")}<a href={`https://github.com/openstates/people/tree/main/data/${p.state.toLowerCase()}`} rel="noopener">Open States</a>
         {tr(" (public domain), compiled from state legislature and government websites; the photo, where shown, is the official one it links to, loaded from that website. Sources it lists: ", " (dominio público), recopilado de los sitios web de las legislaturas y gobiernos estatales; la foto, cuando aparece, es la oficial que enlaza, cargada desde ese sitio. Fuentes que cita: ")}
         {[...new Map(p.sources.map((u) => [host(u), u])).values()].map((u, i) => <span key={u}>{i ? ", " : ""}<a href={u} rel="noopener">{host(u)}</a></span>)}.
       </>} /></h1>
       <p className="meta"><StatePartyTag party={p.party} /> {p.party}{!p.active && <> · {tr("No longer in office", "Ya no ocupa el cargo")}</>}</p>
+      </header>
       <div className="split">
         <div className="split-main">
           <h2>{tr("Office", "Cargo")}</h2>
