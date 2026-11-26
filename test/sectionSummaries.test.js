@@ -17,3 +17,19 @@ test("prompt names the bill, version and location, and is the same for every bil
   assert.match(p, /Section text:\nIn this Act/);
   assert.doesNotMatch(SYSTEM, /Republican|Democrat/);
 });
+
+import { parseCheck, checkPrompt, rewritePrompt, CHECK_SYSTEM } from "../scripts/ingest/section-summaries.mjs";
+
+test("parseCheck: ok only with no problems listed", () => {
+  assert.deepEqual(parseCheck('{"ok":true,"problems":[]}'), { ok: true, problems: [] });
+  assert.deepEqual(parseCheck('{"ok":true,"problems":["x"]}'), { ok: false, problems: ["x"] });
+  assert.equal(parseCheck('{"problems":[]}'), null);
+});
+
+test("check and rewrite prompts carry the text, the summary and the problems", () => {
+  const bill = { congress: 119, bill_type: "s", number: 2, title: "T" };
+  const s = { path: [], header: "H", text: "The Secretary shall..." };
+  assert.match(checkPrompt(bill, { version_name: "Enrolled Bill" }, s, { en: "E", es: "S" }), /Section text:\nThe Secretary shall[\s\S]*Summary \(English\):\nE[\s\S]*Summary \(Spanish\):\nS/);
+  assert.match(rewritePrompt(bill, { version_name: "Enrolled Bill" }, s, ["says lenders"]), /- says lenders$/);
+  assert.match(CHECK_SYSTEM, /Leaving provisions out is allowed/);
+});
