@@ -22,7 +22,7 @@ export default function Topics() {
   useEffect(() => {
     setRows(null); setPrior(null); setSamePoint(null);
     db.from("topic_stats").select("*").eq("congress", congress).order("bills", { ascending: false })
-      .then(({ data }) => setRows(data ?? []));
+      .then(({ data, error }) => setRows(error ? false : data ?? []));
     if (prev) db.from("topic_stats").select("bills,passed_any,laws").eq("congress", prev).then(({ data }) => setPrior(data ?? []));
     // While a Congress is in session, also the previous one as it stood the same number of days
     // into its term: bills pass and become law late in a Congress, so final totals aren't a fair
@@ -53,7 +53,7 @@ export default function Topics() {
           </select>
         </label>
       </div>
-      {!rows ? <p>{tr("Loading…", "Cargando…")}</p> : (
+      {rows === false ? <p className="notice">{tr("Couldn't load topics right now.", "No se pudieron cargar los temas en este momento.")}</p> : !rows ? <p>{tr("Loading…", "Cargando…")}</p> : (
         <>
         <div className="table-scroll">
         <table className="topics-table">

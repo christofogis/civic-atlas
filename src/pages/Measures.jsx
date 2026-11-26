@@ -107,7 +107,7 @@ export default function Measures() {
           "Medidas estatales que decidirán los votantes, hasta ahora. Las descripciones son las palabras de los documentos oficiales; Civic Atlas no resume ni califica las medidas. Los números de proposición se asignan en el verano de 2028.")}
       </p>
       <p className="fine">{tr("Official text is shown in English, as published. The Secretary of State publishes the voter guide in Spanish and other languages before the election.", "El texto oficial se muestra en inglés, tal como se publicó. La Secretaría de Estado publica la guía para el votante en español y otros idiomas antes de la elección.")}</p>
-      {data === false && <p className="notice">{tr("Couldn't load the measures. Try again shortly.", "No se pudieron cargar las medidas. Inténtelo en un momento.")}</p>}
+      {data === false && <p className="notice">{tr("Couldn't load the measures. Try again shortly.", "No se pudieron cargar las medidas. Inténtelo de nuevo en un momento.")}</p>}
       {data && data.measures.map((m) => <Measure key={m.id} m={m} />)}
       <NotesList />
     </main>

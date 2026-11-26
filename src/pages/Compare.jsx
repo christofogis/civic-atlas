@@ -74,7 +74,7 @@ export default function Compare() {
 
       {a && b && a === b && <p className="notice">{tr("Pick two different members.", "Elija dos miembros distintos.")}</p>}
       {result.status === "loading" && <p>{tr("Comparing…", "Comparando…")}</p>}
-      {result.status === "error" && <p className="notice">{tr("Couldn't compare right now. Try again shortly.", "No se pudo comparar en este momento. Inténtelo en un momento.")}</p>}
+      {result.status === "error" && <p className="notice">{tr("Couldn't compare right now. Try again shortly.", "No se pudo comparar en este momento. Inténtelo de nuevo en un momento.")}</p>}
       {result.status === "done" && (
         result.by_congress.length === 0
           ? <p className="notice">{tr("These two members haven't voted on any of the same roll calls since 2023. Members can only be compared within the same chamber.", "Estos dos miembros no han votado en las mismas votaciones desde 2023. Solo se pueden comparar miembros de la misma cámara.")}</p>

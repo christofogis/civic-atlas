@@ -11,6 +11,8 @@ import { tr } from "../lib/lang.js";
 
 const CURRENT = congressOn();
 const PAGE = 50;
+// Congress.gov writes the Congress as an English ordinal in its URLs ("119th", "121st").
+const urlOrdinal = (n) => `${n}${n % 100 >= 11 && n % 100 <= 13 ? "th" : ({ 1: "st", 2: "nd", 3: "rd" })[n % 10] ?? "th"}`;
 
 // Senate votes on presidential nominations: who was nominated to what, the cloture vote and the
 // confirmation vote, with how each senator voted.
@@ -26,12 +28,12 @@ export default function Nominations() {
   useEffect(() => {
     setRows(null);
     db.from("nominations").select("*").eq("congress", congress).order("last_vote_at", { ascending: false }).limit(1000)
-      .then(({ data }) => setRows(data ?? []));
+      .then(({ data, error }) => setRows(error ? false : data ?? []));
   }, [congress]);
 
   const filtered = useMemo(() => {
     const t = q.trim().toLowerCase();
-    return (rows ?? []).filter((r) => !t || `${r.nominee} ${r.position}`.toLowerCase().includes(t));
+    return (rows || []).filter((r) => !t || `${r.nominee} ${r.position}`.toLowerCase().includes(t));
   }, [rows, q]);
 
   return (
@@ -51,11 +53,11 @@ export default function Nominations() {
           <input type="search" value={q} placeholder={tr("Name or position, e.g. judge", "Nombre o cargo, p. ej., judge (en inglés)")} onChange={(e) => set("q", e.target.value)} />
         </label>
       </div>
-      {!rows ? <p>{tr("Loading…", "Cargando…")}</p> : (
+      {rows === false ? <p className="notice">{tr("Couldn't load nominations right now.", "No se pudieron cargar las nominaciones en este momento.")}</p> : !rows ? <p>{tr("Loading…", "Cargando…")}</p> : (
         <>
           <p role="status">{tr(`${filtered.length.toLocaleString()} nomination${filtered.length === 1 ? "" : "s"} with a recorded vote.`, `${filtered.length.toLocaleString()} nominaci${filtered.length === 1 ? "ón" : "ones"} con votación registrada.`)}</p>
           <table>
-            <thead><tr><th>{tr("Nominee", "Persona nominada")}</th><th>Cloture</th><th>{tr("Confirmation", "Confirmación")}</th></tr></thead>
+            <thead><tr><th>{tr("Nominee", "Persona nominada")}</th><th>{tr("Cloture", "Cloture (cierre del debate)")}</th><th>{tr("Confirmation", "Confirmación")}</th></tr></thead>
             <tbody>
               {filtered.slice(0, shown).map((n) => {
                 const voteId = n.confirmation_vote_id ?? n.cloture_vote_id;
@@ -63,7 +65,7 @@ export default function Nominations() {
                   <tr key={n.document_name}>
                     <td>
                       <strong>{n.nominee}</strong>
-                      <div className="fine">{n.position} · <a href={`https://www.congress.gov/nomination/${n.congress}th-congress/${n.document_name.replace(/^PN/, "").split("-")[0]}`}>{n.document_name}</a></div>
+                      <div className="fine">{n.position} · <a href={`https://www.congress.gov/nomination/${urlOrdinal(n.congress)}-congress/${n.document_name.replace(/^PN/, "").split("-")[0]}`}>{n.document_name}</a></div>
                       <button className="link fine" aria-expanded={open === voteId} onClick={() => setOpen(open === voteId ? null : voteId)}>
                         {open === voteId ? tr("Hide how senators voted", "Ocultar cómo votaron") : tr("How senators voted", "Cómo votaron los senadores")}
                       </button>

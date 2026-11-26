@@ -91,12 +91,12 @@ export default function MemberVotes() {
   }, [filtered]);
 
   if (state.status === "missing") return <main className="page"><h1>{tr("Member not found", "Miembro no encontrado")}</h1><p><Link to="/">{tr("Back to search", "Volver a la búsqueda")}</Link></p></main>;
-  if (state.status === "error") return <main className="page"><p className="notice">{tr("Couldn't load votes right now. Try again shortly.", "No se pudieron cargar los votos. Inténtelo en un momento.")}</p></main>;
+  if (state.status === "error") return <main className="page"><p className="notice">{tr("Couldn't load votes right now. Try again shortly.", "No se pudieron cargar los votos. Inténtelo de nuevo en un momento.")}</p></main>;
   const name = member ? (member.official_full_name ?? `${member.first_name} ${member.last_name}`) : "";
 
   return (
     <main className="page wide">
-      <p><Link to={`/member/${bioguide}`}>← {name || tr("Member", "Miembro")}</Link></p>
+      <p className="fine"><Link to={`/member/${bioguide}`}>{name || tr("Member", "Miembro")}</Link></p>
       <h1>{tr("Roll-call votes", "Votaciones nominales")}{name && <>: {name}</>}<Ref id="src" text={<>{tr("Source: House Clerk and Senate.gov roll-call records; positions as recorded. Policy areas: Library of Congress, via GovInfo Bill Status.", "Fuente: registros de votaciones del Secretario de la Cámara y de Senate.gov; votos tal como se registraron (Yea = sí, Nay = no). Áreas de política: Biblioteca del Congreso, vía GovInfo Bill Status.")}</>} /></h1>
       <p className="fine">
         {tr("Issue is the policy area the Library of Congress assigns to the bill a vote was on. Votes on amendments and procedural motions count under their bill.", "El tema es el área de política que la Biblioteca del Congreso asigna al proyecto votado. Las votaciones sobre enmiendas y mociones de procedimiento cuentan bajo su proyecto.")}{" "}

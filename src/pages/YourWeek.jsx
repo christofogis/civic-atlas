@@ -6,6 +6,7 @@ import { savedDistricts } from "../lib/savedDistricts.js";
 import { rest } from "../../lib/rest.js";
 import { clock, weekIcs, weekItems } from "../../lib/yourWeek.js";
 import MyReps from "../components/MyReps.jsx";
+import { StatePartyTag, statePersonPath } from "../components/StateOfficialCard.jsx";
 import { NotesList, Ref } from "../components/Notes.jsx";
 
 // "Your week": everything coming up for the officials from the visitor's last lookup, at every
@@ -119,7 +120,7 @@ export default function YourWeek() {
           <section>
             <h2>{tr(`Your ${stateName(result.state)} legislators`, `Sus legisladores de ${stateName(result.state)}`)}</h2>
             <ul className="plain">
-              {legislators.map((o) => <li key={o.id ?? o.name}>{o.id ? <Link to={`/state/person/${o.id}`}>{o.name}</Link> : o.name}{o.party && <span className="fine"> · {o.party}</span>}</li>)}
+              {legislators.map((o) => <li key={o.id ?? o.name}>{o.id ? <Link to={statePersonPath(o.id)}>{o.name}</Link> : o.name}{o.party && <> <StatePartyTag party={o.party} /></>}</li>)}
             </ul>
             <p className="fine">{tr("State legislators' votes and bills aren't on Civic Atlas yet.", "Los votos y proyectos de los legisladores estatales aún no están en Civic Atlas.")}</p>
           </section>

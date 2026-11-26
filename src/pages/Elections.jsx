@@ -44,11 +44,11 @@ export default function Elections() {
 
   useEffect(() => {
     db.from("candidates").select("*").order("election_year", { ascending: false }).order("name").limit(5000)
-      .then(({ data }) => setRows(data ?? []));
+      .then(({ data, error }) => setRows(error ? false : data ?? []));
   }, []);
 
   const year = rows?.[0]?.election_year;
-  const inYear = useMemo(() => (rows ?? []).filter((r) => r.election_year === year), [rows, year]);
+  const inYear = useMemo(() => (rows || []).filter((r) => r.election_year === year), [rows, year]);
   const states = useMemo(() => [...new Set(inYear.map((r) => r.state))].sort((a, z) => (STATE_NAMES[a] ?? a).localeCompare(STATE_NAMES[z] ?? z)), [inYear]);
   const here = inYear.filter((r) => r.state === state);
   const senate = here.filter((r) => r.office === "S");
@@ -62,7 +62,7 @@ export default function Elections() {
         {tr(`Anyone can file, and filing doesn't mean a campaign is active; money raised shows which campaigns are reporting activity. Listed alphabetically. House districts are as filed; ${year} House races use the district maps adopted for 2026.`,
           `Cualquiera puede inscribirse, y la inscripción no significa que haya una campaña activa; el dinero recaudado muestra qué campañas informan actividad. En orden alfabético. Los distritos de la Cámara son los indicados en la inscripción; las contiendas de ${year} usan los mapas adoptados para 2026.`)}
       </p>
-      {!rows ? <p>{tr("Loading…", "Cargando…")}</p> : inYear.length === 0 ? <p>{tr("No candidates have filed yet.", "Todavía no se ha inscrito ningún candidato.")}</p> : (
+      {rows === false ? <p className="notice">{tr("Couldn't load candidates right now.", "No se pudieron cargar los candidatos en este momento.")}</p> : !rows ? <p>{tr("Loading…", "Cargando…")}</p> : inYear.length === 0 ? <p>{tr("No candidates have filed yet.", "Todavía no se ha inscrito ningún candidato.")}</p> : (
         <>
           <div className="filters">
             <label>{tr("State", "Estado")}{" "}
