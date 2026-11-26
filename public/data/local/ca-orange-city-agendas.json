@@ -1,6 +1,6 @@
 {
  "built_at": "2026-11-26",
- "source": "Each city's Legistar agenda system (webapi.legistar.com)",
+ "source": "Each city's agenda system: Legistar (webapi.legistar.com) or CivicClerk (api.civicclerk.com)",
  "cities": {
   "Costa Mesa": {
    "source": "https://costamesa.legistar.com/Calendar.aspx",
@@ -13,6 +13,21 @@
      "agenda_url": null,
      "meeting_url": "https://costamesa.legistar.com/MeetingDetail.aspx?LEGID=1446&GID=839&G=5247A5EF-DEC8-4683-BF5A-81EAA9A32B09",
      "agenda_status": "Final",
+     "items": []
+    }
+   ]
+  },
+  "Fountain Valley": {
+   "source": "https://fountainvalleyca.portal.civicclerk.com/",
+   "meetings": [
+    {
+     "body": "City Council Meeting",
+     "date": "2026-12-01",
+     "time": "6:00 PM",
+     "location": "City Hall - City Council Chambers, 10200 Slater Ave",
+     "agenda_url": null,
+     "meeting_url": "https://fountainvalleyca.portal.civicclerk.com/event/3074/files",
+     "agenda_status": null,
      "items": []
     }
    ]
@@ -177,6 +192,46 @@
     }
    ]
   },
+  "La Palma": {
+   "source": "https://lapalmaca.portal.civicclerk.com/",
+   "meetings": [
+    {
+     "body": "City Council Meeting",
+     "date": "2026-12-08",
+     "time": "6:30 PM",
+     "location": "7822 Walker Street",
+     "agenda_url": null,
+     "meeting_url": "https://lapalmaca.portal.civicclerk.com/event/1395/files",
+     "agenda_status": null,
+     "items": []
+    }
+   ]
+  },
+  "Laguna Hills": {
+   "source": "https://lagunahillsca.portal.civicclerk.com/",
+   "meetings": [
+    {
+     "body": "City Council / Planning Agency Regular Meeting",
+     "date": "2026-12-08",
+     "time": "6:00 PM",
+     "location": "City Council Chamber, 24035 El Toro Road",
+     "agenda_url": null,
+     "meeting_url": "https://lagunahillsca.portal.civicclerk.com/event/844/files",
+     "agenda_status": null,
+     "items": []
+    },
+    {
+     "body": "City Council / Planning Agency Regular Meeting - CANCELLED",
+     "date": "2026-12-22",
+     "time": "6:00 PM",
+     "location": "City Council Chamber, 24035 El Toro Road",
+     "agenda_url": null,
+     "meeting_url": "https://lagunahillsca.portal.civicclerk.com/event/856/files",
+     "agenda_status": null,
+     "items": []
+    }
+   ]
+  },
   "Newport Beach": {
    "source": "https://newportbeach.legistar.com/Calendar.aspx",
    "meetings": []
@@ -195,6 +250,10 @@
      "items": []
     }
    ]
+  },
+  "San Clemente": {
+   "source": "https://san-clemente.legistar.com/Calendar.aspx",
+   "meetings": []
   },
   "Westminster": {
    "source": "https://westminsterca.legistar.com/Calendar.aspx",
