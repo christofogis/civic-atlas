@@ -13,7 +13,7 @@ const BIOGUIDE = /^[A-Z][0-9]{6}$/;
 const PAGE = 50;
 const NOMINATIONS = "Nominations";  // also browsable at /nominations
 const NO_BILL = "Other votes (no bill or nominee)";
-const COLUMNS = "vote_id,chamber,congress,voted_at,question,description,document_name,result,source_url,position,bill_congress,bill_type,bill_number,policy_area,bill_title";
+const COLUMNS = "vote_id,chamber,congress,voted_at,question,description,document_name,result,source_url,position,bill_congress,bill_type,bill_number,policy_area,bill_title,yea_total,nay_total,required,amendment_ref";
 
 const isNomination = (v) => /^PN\d/.test(v.document_name ?? "") || voteKind(v).kind === "nomination";
 const issueOf = (v) => v.policy_area ?? (isNomination(v) ? NOMINATIONS : NO_BILL);

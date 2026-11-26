@@ -74,7 +74,7 @@ const SECTION_DATA = {
   votes: async (id) => ({
     // member_votes starts from the member's positions (indexed), so this stays fast.
     votes: await one(db.from("member_votes")
-      .select("vote_id,chamber,question,result,voted_at,description,document_name,source_url,position,bill_type,bill_number")
+      .select("vote_id,chamber,question,result,voted_at,description,document_name,source_url,position,bill_type,bill_number,yea_total,nay_total,required,amendment_ref")
       .eq("bioguide_id", id).order("voted_at", { ascending: false }).limit(120))
       .then((rows) => rows.map((v) => ({ ...v, vote_positions: [{ position: v.position }] }))),
   }),

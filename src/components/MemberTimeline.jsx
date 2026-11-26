@@ -18,7 +18,7 @@ const MONTH = (iso) => new Date(`${iso}T12:00:00Z`).toLocaleDateString(tr("en-US
 
 async function loadWindow(id, from, to) {
   const [votes, bills, laws, trades] = await Promise.all([
-    db.from("member_votes").select("vote_id,chamber,question,result,voted_at,description,document_name,source_url,position,bill_type,bill_number")
+    db.from("member_votes").select("vote_id,chamber,question,result,voted_at,description,document_name,source_url,position,bill_type,bill_number,yea_total,nay_total,required,amendment_ref")
       .eq("bioguide_id", id).gte("voted_at", from).lt("voted_at", back(to, -1)).order("voted_at", { ascending: false }).limit(1000),
     db.from("bills").select("congress,bill_type,number,title,short_title,introduced_date")
       .eq("sponsor_bioguide_id", id).gte("introduced_date", from).lte("introduced_date", to).order("introduced_date", { ascending: false }).limit(500),
