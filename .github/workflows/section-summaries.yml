@@ -18,6 +18,10 @@ on:
         description: "Minutes to wait for the batch before leaving it for the next run"
         type: string
         default: "90"
+      redo:
+        description: "Summarize again and replace existing summaries (after the instructions change)"
+        type: boolean
+        default: false
       dry_run:
         description: "Build the requests and print one; send nothing"
         type: boolean
@@ -51,6 +55,7 @@ jobs:
           LIMIT: ${{ inputs.limit || '50' }}
           WAIT: ${{ inputs.wait || '90' }}
           DRY_RUN: ${{ inputs.dry_run && '--dry-run' || '' }}
+          REDO: ${{ inputs.redo && '--redo' || '' }}
         run: |
-          if [ -n "$BILLS" ]; then node scripts/ingest/section-summaries.mjs --bills "$BILLS" --wait "$WAIT" $DRY_RUN
-          else node scripts/ingest/section-summaries.mjs --limit "$LIMIT" --wait "$WAIT" $DRY_RUN; fi
+          if [ -n "$BILLS" ]; then node scripts/ingest/section-summaries.mjs --bills "$BILLS" --wait "$WAIT" $DRY_RUN $REDO
+          else node scripts/ingest/section-summaries.mjs --limit "$LIMIT" --wait "$WAIT" $DRY_RUN $REDO; fi

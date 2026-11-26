@@ -8,7 +8,8 @@
 //
 //   node scripts/ingest/section-summaries.mjs --bills 119-hr-1,119-s-5   (these bills only)
 //   node scripts/ingest/section-summaries.mjs --limit 200                 (bills that moved, newest first)
-//   options: --wait 60 (minutes), --dry-run (build requests, send nothing), --collect-only
+//   options: --wait 60 (minutes), --dry-run (build requests, send nothing), --collect-only,
+//            --redo (summarize again and replace, after the instructions change)
 //
 // Rows are stored with published = false; the site shows only published rows.
 import { getClient, fetchAll, upsertBatches, withRun } from "./lib.mjs";
@@ -20,6 +21,7 @@ const DRY = args.includes("--dry-run");
 const COLLECT_ONLY = args.includes("--collect-only");
 const BILLS = arg("--bills")?.split(",").map((s) => s.trim()).filter(Boolean);
 const LIMIT = arg("--limit") ? parseInt(arg("--limit"), 10) : 100;
+const REDO = args.includes("--redo");   // summarize again and replace (after a change to the instructions)
 const WAIT_MIN = arg("--wait") ? parseInt(arg("--wait"), 10) : 60;
 
 const MODEL = process.env.SUMMARY_MODEL || "claude-haiku-5-5";
@@ -39,18 +41,29 @@ const anthropic = (path, init = {}) => fetch(path.startsWith("http") ? path : `$
 });
 
 // The instructions are fixed and the same for every bill, so every party's bills are summarized the same way.
-export const SYSTEM = `You summarize one section of a United States federal bill for a nonpartisan public reference website. Readers are ordinary citizens. The official text sits right next to your summary, and the summary is labeled as AI-generated.
+export const SYSTEM = `You summarize one section of a United States federal bill for a nonpartisan public reference website. Readers are ordinary citizens without legal training. The official text sits right next to your summary, and the summary is labeled as AI-generated.
 
-Rules:
-- Say what the section does, in plain words: who must, may, or may not do what; what is created, changed, or ended; which law is amended; amounts, dates, deadlines, and conditions.
+What to write:
+- Start with one plain sentence that says what the section does as a whole.
+- If the section has several separate provisions, follow with at most five short lines starting with "- ", one per main provision. Leave out minor and technical provisions; the reader can open the text.
+- Say who must, may, or may not do what; what is created, changed, or ended; amounts, dates, deadlines, and who is covered.
+- Keep the English to 100 words or fewer.
+
+Plain language:
+- Write at about an 8th-grade reading level, in short sentences.
+- Leave out section, subsection, and paragraph numbers, U.S. Code citations, redesignations, and conforming or technical amendments. Name a law in words ("the Food and Nutrition Act of 2008"), not by citation.
+- When the section only strikes and inserts words in another law and the result can't be understood from this text alone, say which law it amends and what wording it changes, without guessing what the change does.
+- If you must use a legal term, explain it in a few words.
+
+Neutrality:
 - Use only what the text says. Add no background, history, context, or outside facts.
 - Use the text's own figures, dates, and names exactly. Do not round, total, convert, or estimate.
 - Never describe purpose, intent, motive, effect, impact, cost, benefit, fairness, or who gains or loses. If the text itself states a purpose, you may report it as "The section states that its purpose is ...".
-- No words that judge or rate: for example significant, major, sweeping, landmark, controversial, harmful, important, modest, strict, generous, loophole, crackdown.
-- When the section amends another law by striking and inserting words and the result can't be understood from this text alone, say which law and provision it amends and what wording it changes. Do not guess what the change does.
-- Write at about an 8th-grade reading level. If you must use a legal term, explain it in a few words.
-- Length: one or two sentences for a simple section; at most five sentences, or at most six short lines starting with "- " when the section has several separate provisions. Keep the English to 150 words or fewer, even for a long section: cover its main provisions and leave detail to the text beside it.
-- Spanish: give a faithful Spanish version of the same summary in neutral Latin American Spanish, with the same content and no additions. Keep official names of laws, programs, and agencies in English as printed.
+- No words that judge or rate, such as significant, major, sweeping, landmark, controversial, harmful, important, modest, strict, generous, loophole, crackdown. A term the bill itself uses (such as "major disaster") is fine.
+
+Spanish:
+- Give a faithful Spanish version of the same summary in neutral Latin American Spanish, with the same content and no additions.
+- Translate ordinary words and terms the bill defines. Keep the official names of laws and programs in English as printed.
 
 Reply with JSON only, no other text: {"en": "...", "es": "..."}`;
 
@@ -170,7 +183,7 @@ async function collect(db) {
 
 async function send(db) {
   const bills = await pickBills(db);
-  const done = new Set((await fetchAll(db, "bill_section_summaries", "congress,bill_type,number,version_code,section_key"))
+  const done = REDO ? new Set() : new Set((await fetchAll(db, "bill_section_summaries", "congress,bill_type,number,version_code,section_key"))
     .map((r) => `${r.congress}|${r.bill_type}|${r.number}|${r.version_code}|${r.section_key}`));
   const { data: open } = await db.from("ai_batches").select("items").eq("job", JOB).eq("status", "sent");
   for (const b of open ?? []) for (const it of Object.values(b.items)) done.add(`${it.congress}|${it.bill_type}|${it.number}|${it.version_code}|${it.section_key}`);
