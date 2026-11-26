@@ -64,6 +64,22 @@ export default function BillParts({ congress, type, number }) {
         {tr(`, about ${total.toLocaleString()} words. `, `, unas ${total.toLocaleString("es")} palabras. `)}
         <span className="fine">{tr(`From the version "${v.version_name}"${v.version_date ? `, ${date(v.version_date)}` : ""}. Headings and text are the bill's own, in English.`, `De la versión "${v.version_name}"${v.version_date ? `, ${date(v.version_date)}` : ""}. Los encabezados y el texto son los del proyecto, en inglés.`)}</span>
       </p>
+      {tops.length > 1 && (
+        <ul className="plain parts-overview" aria-label={tr("The bill's titles or divisions, by share of its words", "Los títulos o divisiones del proyecto, por proporción de palabras")}>
+          {tops.map((t) => {
+            const in_ = sections.filter((x) => x.path[0] === t);
+            const w = in_.reduce((n, x) => n + x.words, 0);
+            const pct = Math.round((100 * w) / total);
+            return (
+              <li key={t}>
+                <button type="button" className="link" onClick={() => setQ(t)} lang="en">{t}</button>
+                <span className="parts-len"><span style={{ width: `${Math.max(2, pct)}%` }} /></span>
+                <span className="fine">{tr(`${in_.length} sec. · ${pct < 1 ? "<1" : pct}%`, `${in_.length} secc. · ${pct < 1 ? "<1" : pct}%`)}</span>
+              </li>
+            );
+          })}
+        </ul>
+      )}
       <label className="parts-search">
         <span>{tr("Find the parts that mention a word", "Buscar las partes que mencionan una palabra")}</span>
         <input type="search" value={q} onChange={(e) => setQ(e.target.value)} placeholder={tr("e.g. Medicaid, tariff, veterans", "p. ej. Medicaid, tariff, veterans")} />
