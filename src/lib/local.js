@@ -32,3 +32,10 @@ const today = () => new Date().toISOString().slice(0, 10);
 export const seatUpdating = (m) => Boolean(m.on_ballot && m.seat_change_by && m.seat_change_by < today());
 // The council picks its mayor each December; past roles_until, titles aren't shown until updated.
 export const rolesCurrent = (city) => !city.roles_until || city.roles_until >= today();
+
+// The Board of Supervisors' minutes as read (Orange County only), loaded once per page.
+let minutesCache = null;
+export function loadMinutes() {
+  minutesCache ??= fetch("/data/local/ca-orange-minutes.json").then((r) => (r.ok ? r.json() : null)).catch(() => null);
+  return minutesCache;
+}
