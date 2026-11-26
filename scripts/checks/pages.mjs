@@ -6,6 +6,7 @@ export const PAGES = [
   ["/member/P000145/votes", ["to pass it"]],
   ["/member/P000145/votes", ["Roll-call votes", "Issue"]],
   ["/bill/119/hr/1", ["Became law", "At a glance", "Furthest step so far", "Cosponsors", "Votes", "Lobbying", "Text versions", "reported lobbying on it"]],
+  ["/bill/119/hr/1#parts", ["Every part of the bill", "Find the parts that mention a word"]],
   ["/bill/119/hr/1#votes", ["Roll-call votes"]],
   ["/bill/119/hr/1#text", ["Engrossed in House"]],
   ["/bill/119/hr/1#lobbying", ["Lobbying reports naming this bill"]],

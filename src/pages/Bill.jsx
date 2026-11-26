@@ -1,10 +1,12 @@
 import { label as stepLabel } from "../components/StatusBar.jsx";
 import { Fold, useFolds } from "../components/Fold.jsx";
 import { billSteps } from "../../lib/billprogress.js";
-import { Fragment, useEffect, useState } from "react";
+import { Fragment, useEffect, useState, lazy, Suspense } from "react";
 import { Link, useParams } from "react-router-dom";
 import { db } from "../lib/db.js";
 import TextVersions from "../components/TextVersions.jsx";
+// Loaded when its topic opens: it brings an XML parser the rest of the page doesn't need.
+const BillParts = lazy(() => import("../components/BillParts.jsx"));
 import Clamp from "../components/Clamp.jsx";
 import { areaName } from "../lib/policyAreas.js";
 import MeetingList from "../components/MeetingList.jsx";
@@ -109,7 +111,7 @@ export default function Bill() {
   const congress = Number(c), type = String(t ?? "").toLowerCase(), number = Number(n);
   const valid = Number.isInteger(congress) && TYPES.has(type) && Number.isInteger(number) && number > 0;
   const [state, setState] = useState({ status: "loading" });
-  const { open, toggle } = useFolds(["text", "cosponsors", "hearings", "votes", "lobbying"], state.status === "done", `${congress}-${type}-${number}`);
+  const { open, toggle } = useFolds(["parts", "text", "cosponsors", "hearings", "votes", "lobbying"], state.status === "done", `${congress}-${type}-${number}`);
   const [allLobbying, setAllLobbying] = useState(false);
   const [openVote, setOpenVote] = useState(null);
 
@@ -192,6 +194,10 @@ export default function Bill() {
 
       <p className="fold-hint">{tr("Tap a topic to see the details and records.", "Toque un tema para ver los detalles y registros.")}</p>
       <div className="folds">
+      <Fold id="parts" title={tr("Every part of the bill", "Todas las partes del proyecto")} open={open.has("parts")} onToggle={toggle}
+        summary={tr("Each section's heading and length, with a search, so any one talking point can be read against the whole bill", "El encabezado y la extensión de cada sección, con búsqueda, para leer cualquier argumento frente al proyecto completo")}>
+        <Suspense fallback={<p>{tr("Loading…", "Cargando…")}</p>}><BillParts congress={congress} type={type} number={number} /></Suspense>
+      </Fold>
       <Fold id="text" title={tr("Text versions", "Versiones del texto")} open={open.has("text")} onToggle={toggle}
         summary={tr("The official text, and which sections changed between versions", "El texto oficial y qué secciones cambiaron entre versiones")}>
         <TextVersions congress={congress} type={type} number={number} inFold />
