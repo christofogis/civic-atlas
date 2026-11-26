@@ -13,7 +13,7 @@ key or CAPTCHA. "Feed" means RSS. Everything else is a web page or PDFs.
 | System | Cities | Read by Civic Atlas |
 |---|---|---|
 | Legistar (public web API) | 7: Costa Mesa, Fullerton, Huntington Beach, Newport Beach, Orange, San Clemente, Westminster | Yes, all 7 (`scripts/data/city_agendas.py`) |
-| CivicClerk (public OData API) | 4: Fountain Valley, La Palma, Laguna Hills, Los Alamitos | Not yet (API works; see below) |
+| CivicClerk (public OData API) | 4: Fountain Valley, La Palma, Laguna Hills, Los Alamitos | Yes for 3 (since Nov 26, 2026); Los Alamitos pending Chris's decision |
 | PrimeGov (public JSON API) | 4: Laguna Beach, Lake Forest, Santa Ana, Seal Beach | Not yet (API works; see below) |
 | Granicus (agenda viewer + RSS) | 4: Aliso Viejo, Irvine, Mission Viejo (also OnBase Agenda Online), Tustin | No: RSS lists meetings and agenda links only, no items |
 | eSCRIBE | 1: Yorba Linda | No: only the calendar endpoint its own page calls |
@@ -25,8 +25,9 @@ key or CAPTCHA. "Feed" means RSS. Everything else is a web page or PDFs.
 | Not identified | 5: Anaheim, Cypress, Laguna Woods, Rancho Santa Margarita, San Juan Capistrano | No |
 
 Headline: 15 of 34 cities publish through a clean public API (Legistar 7, CivicClerk 4,
-PrimeGov 4). The 7 Legistar cities are read now; CivicClerk and PrimeGov would add 8 more,
-including Los Alamitos and Santa Ana.
+PrimeGov 4). Read now: the 7 Legistar cities and 3 CivicClerk cities (Fountain Valley, La Palma,
+Laguna Hills). Los Alamitos is in the reader's list but commented out, pending Chris's decision on
+the Los Alamitos route. PrimeGov would add 4 more, including Santa Ana.
 
 ## All 34 cities
 
@@ -39,19 +40,19 @@ including Los Alamitos and Santa Ana.
 | Costa Mesa | Legistar | `costamesa` | Yes | Read. Council body: "REGULAR CITY COUNCIL AND HOUSING AUTHORITY*". |
 | Cypress | Not identified | cypressca.org | — | Website answers 403 to automated requests; left alone. No Legistar, CivicClerk or PrimeGov account under likely names. |
 | Dana Point | PDFs on city site | danapoint.org/City-Government/City-Council/Meetings-Agendas-Minutes | No | Granicus OpenCities website; agenda PDFs under /files/assets/; older records in Laserfiche (`r-0ead2617`). |
-| Fountain Valley | CivicClerk | `fountainvalleyca` | Yes | Also posts to its CivicPlus Agenda Center (RSS has council agendas). |
+| Fountain Valley | CivicClerk | `fountainvalleyca` | Yes | Read. Also posts to its CivicPlus Agenda Center (RSS has council agendas). |
 | Fullerton | Legistar | `fullerton` | Yes | Read. |
 | Garden Grove | AgendaSuite | `agendasuite.org/iip/gardengrove` | Unknown | ggcity.org/city-council/agenda-video redirects there. |
 | Huntington Beach | Legistar | `huntingtonbeach` | Yes | Read. |
 | Irvine | Granicus | `irvine.granicus.com/ViewPublisher.php?view_id=68` | No (RSS) | RSS `ViewPublisherRSS.php?view_id=68&mode=agendas` lists council meetings with AgendaViewer links. |
 | La Habra | CivicPlus Agenda Center | lahabraca.gov/AgendaCenter | No (RSS) | RSS `RSSFeed.aspx?ModID=65&CID=All-0` answers. |
-| La Palma | CivicClerk | `lapalmaca` | Yes | Next council meeting Dec 8, 2026 listed. |
+| La Palma | CivicClerk | `lapalmaca` | Yes | Read. Next council meeting Dec 8, 2026 listed. |
 | Laguna Beach | PrimeGov | `lagunabeachcity` | Yes | City website answers 403; the PrimeGov API is a separate public service and answered normally. |
-| Laguna Hills | CivicClerk | `lagunahillsca` | Yes | Portal `lagunahillsca.portal.civicclerk.com` linked from the city site. Item-level sample below. |
+| Laguna Hills | CivicClerk | `lagunahillsca` | Yes | Read. Portal `lagunahillsca.portal.civicclerk.com` linked from the city site. Item-level sample below. |
 | Laguna Niguel | CivicPlus Agenda Center | cityoflagunaniguel.org/AgendaCenter | No (RSS) | RSS lists "Agenda and Staff Reports for Regular City Council Meeting…" with file links. |
 | Laguna Woods | Not identified | lagunawoods.gov/current-agendas/ | — | WordPress site; no vendor link found on the agenda pages. |
 | Lake Forest | PrimeGov | `lakeforest` | Yes | Older records in Laserfiche (`r-d45ef59a`). |
-| Los Alamitos | CivicClerk | `losalamitosca` | Yes | City website refuses automated requests and was not requested. CivicClerk's API (`losalamitosca.api.civicclerk.com`) is a separate public service and answered normally: council meeting Dec 14, 2026, commissions through Feb 2027. |
+| Los Alamitos | CivicClerk | `losalamitosca` | Yes | Not read: commented out in `CIVICCLERK`, pending Chris's decision on the Los Alamitos route. City website refuses automated requests and was not requested. CivicClerk's API (`losalamitosca.api.civicclerk.com`) is a separate public service and answered normally: council meeting Dec 14, 2026, commissions through Feb 2027. |
 | Mission Viejo | Granicus + OnBase Agenda Online | `missionviejo.granicus.com` view 25; `dms.missionviejo.gov/OnBaseAgendaOnline/` | No (RSS) | Agenda and packet PDFs on OnBase; Granicus RSS lists meetings. |
 | Newport Beach | Legistar | `newportbeach` | Yes | Read. |
 | Orange | Legistar | `cityoforange` | Yes | Read. |
@@ -107,6 +108,33 @@ Report", `attachmentsList`, `reportsList`). Item names can contain HTML (`<span 
 they need tags stripped. The same filter as Legistar applies naturally: keep items with an item
 number or attachments; top-level entries without them are headings or procedure.
 
+### How the reader uses it (`scripts/data/city_agendas.py`, `CIVICCLERK`)
+
+- Council meetings: events in the next 45 days whose `categoryName` or `eventName` contains "City
+  Council" (Fountain Valley files some council events under category "General"); first 3 per city.
+- Items are read only once the event lists a published file of type "Agenda", as Legistar items are
+  read only once an agenda file exists.
+- Filter: an entry is an item if it has an item number (shown as the file number) or published,
+  undeleted attachments. An entry with child items and no attachments of its own is a section: its
+  outline number and name become the heading of the items under it (nested sections joined with
+  " — "), and it is never an item, even with a number (Laguna Hills' "Planning Agency Public
+  Hearings", 2026-1057). Procedure items that carry a number (e.g. "Roll Call of Planning Agency
+  Members") are kept, as they would be on Legistar.
+- Titles: the city's wording; HTML tags removed, paragraph and line breaks turned into spaces.
+- Time: `startDateTime` is the local clock time with a "Z" suffix (a 6:00 PM meeting reads
+  `T18:00:00Z`), so it is shown as written, not converted from UTC.
+- Links, all on the city's own CivicClerk service:
+  agenda PDF `Meetings/GetMeetingFileStream(fileId={publishedFiles.fileId},plainText=false)`;
+  item attachments `Meetings/GetAttachmentFile(fileId={attachment id})` (the route the public
+  portal uses; checked against the recorded file size); meeting page
+  `https://{tenant}.portal.civicclerk.com/event/{eventId}/files`. The `mediaFullPath` /
+  `pdfVersionFullPath` links in the response are signed and expire within a day, so they are not used.
+- Staff reports (`reportsList`) are not linked: no public route answered with the file (the
+  portal's file route returned an empty PDF for the report and item ids tried). They are reachable
+  from the meeting page.
+- Parsing tests: `test/city_agendas_test.py` on `test/fixtures/civicclerk-laguna-hills.json`
+  (trimmed; no staff or private names), run by `npm test`.
+
 ## PrimeGov (4 cities)
 
 JSON at `https://{tenant}.primegov.com/api/v2/PublicPortal/ListUpcomingMeetings`, no key.
@@ -126,11 +154,11 @@ PDF `compileOutputType` 1, HTML packet as 3). Item-level data would come from th
 not probed tonight. Cancelled meetings say so in `title` ("CANCELLED- Regular City Council
 Meeting"). Meetings of all bodies are mixed together; filter on `title`/`committeeId`.
 
-## Not built tonight
+## Not built yet
 
-- CivicClerk and PrimeGov readers (8 cities, including Los Alamitos and Santa Ana). Both fit the
-  existing JSON shape in `ca-orange-city-agendas.json`; PrimeGov would need its HTML agenda parsed
-  for items.
+- PrimeGov reader (4 cities, including Santa Ana). Fits the existing JSON shape in
+  `ca-orange-city-agendas.json`, but items would need its HTML agenda parsed.
+- Los Alamitos (CivicClerk): one uncommented line once Chris decides.
 - Granicus and Agenda Center RSS could give meeting date and agenda link only (no items) for 6
   more cities.
 - Anaheim, Cypress, Laguna Woods, Rancho Santa Margarita, San Juan Capistrano: system not

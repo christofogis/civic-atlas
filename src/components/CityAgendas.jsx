@@ -4,7 +4,7 @@ import { tr } from "../lib/lang.js";
 import { Ref } from "./Notes.jsx";
 
 // City council meetings coming up, for the Orange County cities that publish agendas through
-// Legistar's public data feed: date, time, place, the agenda, and each item as the city titled it
+// Legistar's or CivicClerk's public data feed: date, time, place, the agenda, and each item as the city titled it
 // (records stay in English). Cities whose sites refuse automated reading aren't listed.
 export function loadCityAgendas() {
   return fetch("/data/local/ca-orange-city-agendas.json").then((r) => (r.ok ? r.json() : null)).catch(() => null);
@@ -55,7 +55,7 @@ export default function CityAgendas({ only }) {
   if (!cities.length) return null;
   return (
     <section id="city-agendas" className="county-agenda">
-      <h3>{tr("Upcoming council meetings", "Próximas reuniones de concejos")}<Ref id="city-agenda-src" text={tr("From each city's Legistar agenda system, read twice a day. Items are shown as each city titled them, in English. Only cities whose agenda systems allow automated reading are listed; for the others, see each city's website below.", "Del sistema de agendas Legistar de cada ciudad, leído dos veces al día. Los asuntos se muestran como los tituló cada ciudad, en inglés. Solo se incluyen las ciudades cuyos sistemas permiten la lectura automática; para las demás, vea el sitio web de cada ciudad abajo.")} /></h3>
+      <h3>{tr("Upcoming council meetings", "Próximas reuniones de concejos")}<Ref id="city-agenda-src" text={tr("From each city's agenda system (Legistar or CivicClerk), read twice a day. Items are shown as each city titled them, in English. Only cities whose agenda systems allow automated reading are listed; for the others, see each city's website below.", "Del sistema de agendas de cada ciudad (Legistar o CivicClerk), leído dos veces al día. Los asuntos se muestran como los tituló cada ciudad, en inglés. Solo se incluyen las ciudades cuyos sistemas permiten la lectura automática; para las demás, vea el sitio web de cada ciudad abajo.")} /></h3>
       {cities.map(([name, c]) => (
         <div key={name}>
           <h4>{tr(`${name} City Council`, `Concejo Municipal de ${name}`)}</h4>
