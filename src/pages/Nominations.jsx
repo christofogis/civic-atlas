@@ -11,6 +11,8 @@ import { tr } from "../lib/lang.js";
 
 const CURRENT = congressOn();
 const PAGE = 50;
+// Congress.gov writes the Congress as an English ordinal in its URLs ("119th", "121st").
+const urlOrdinal = (n) => `${n}${n % 100 >= 11 && n % 100 <= 13 ? "th" : ({ 1: "st", 2: "nd", 3: "rd" })[n % 10] ?? "th"}`;
 
 // Senate votes on presidential nominations: who was nominated to what, the cloture vote and the
 // confirmation vote, with how each senator voted.
@@ -63,7 +65,7 @@ export default function Nominations() {
                   <tr key={n.document_name}>
                     <td>
                       <strong>{n.nominee}</strong>
-                      <div className="fine">{n.position} · <a href={`https://www.congress.gov/nomination/${n.congress}th-congress/${n.document_name.replace(/^PN/, "").split("-")[0]}`}>{n.document_name}</a></div>
+                      <div className="fine">{n.position} · <a href={`https://www.congress.gov/nomination/${urlOrdinal(n.congress)}-congress/${n.document_name.replace(/^PN/, "").split("-")[0]}`}>{n.document_name}</a></div>
                       <button className="link fine" aria-expanded={open === voteId} onClick={() => setOpen(open === voteId ? null : voteId)}>
                         {open === voteId ? tr("Hide how senators voted", "Ocultar cómo votaron") : tr("How senators voted", "Cómo votaron los senadores")}
                       </button>
