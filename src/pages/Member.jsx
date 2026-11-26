@@ -17,6 +17,7 @@ import { ballotYearFor, generalElectionDate } from "../../lib/upForElection.js";
 import { NotesList, NotesProvider, Ref } from "../components/Notes.jsx";
 import { PartyName } from "../components/PartyTag.jsx";
 import { CandidateTable } from "./Elections.jsx";
+import { useCaResults, ResultsStatus, RaceResult, PartyKey } from "../components/CaResults.jsx";
 
 const BIOGUIDE = /^[A-Z][0-9]{6}$/;
 const TERRITORIES = new Set(["DC", "PR", "GU", "VI", "AS", "MP"]);
@@ -559,6 +560,7 @@ export default function Member() {
           );
         })()}
         {seat?.seat_status === "serving" && <RaceFilers seat={seat} upIn={upIn} mode="table" />}
+        {terms.some((t) => t.chamber === "house" && t.state === "CA") && <CaHouseResult bioguide={m.bioguide_id} />}
         <ul className="plain">
           {terms.map((t) => (
             <li key={`${t.chamber}-${t.start_date}`}>{seatLabel(t)} <PartyName party={t.party} /> · {date(t.start_date)} – {date(t.end_date)}</li>
@@ -579,6 +581,22 @@ export default function Member() {
       <NotesList />
     </main>
     </NotesProvider>
+  );
+}
+
+// The 2026 California House race this member's name is printed in, from the Secretary of State. Linked
+// by the name as printed, never by district number: California used new congressional maps in 2026.
+function CaHouseResult({ bioguide }) {
+  const data = useCaResults();
+  const race = data && data.house.find((r) => r.candidates.some((c) => c.bioguide_id === bioguide));
+  if (!race) return null;
+  return (
+    <div id="ca-2026-result">
+      <h3>{tr(`November 3, 2026 general election: California District ${race.district} (new map)`, `Elección general del 3 de noviembre de 2026: distrito ${race.district} de California (mapa nuevo)`)}</h3>
+      <RaceResult race={race} />
+      <ResultsStatus data={data} race={race} />
+      <PartyKey />
+    </div>
   );
 }
 
