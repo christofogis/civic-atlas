@@ -55,7 +55,7 @@ export default function Nominations() {
         <>
           <p role="status">{tr(`${filtered.length.toLocaleString()} nomination${filtered.length === 1 ? "" : "s"} with a recorded vote.`, `${filtered.length.toLocaleString()} nominaci${filtered.length === 1 ? "ón" : "ones"} con votación registrada.`)}</p>
           <table>
-            <thead><tr><th>{tr("Nominee", "Persona nominada")}</th><th>Cloture</th><th>{tr("Confirmation", "Confirmación")}</th></tr></thead>
+            <thead><tr><th>{tr("Nominee", "Persona nominada")}</th><th>{tr("Cloture", "Cloture (cierre del debate)")}</th><th>{tr("Confirmation", "Confirmación")}</th></tr></thead>
             <tbody>
               {filtered.slice(0, shown).map((n) => {
                 const voteId = n.confirmation_vote_id ?? n.cloture_vote_id;

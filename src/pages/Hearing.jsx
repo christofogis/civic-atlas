@@ -127,7 +127,7 @@ export default function Hearing() {
           <h2>{tr("Documents", "Documentos")}</h2>
           <ul className="plain">
             {m.documents.map((d, i) => (
-              <li key={i}>{d.url ? <a href={d.url}>{d.name ?? d.type ?? "Document"}</a> : (d.name ?? d.type)}{d.type && d.name && d.type !== d.name && <span className="fine"> · {d.type}</span>}</li>
+              <li key={i}>{d.url ? <a href={d.url}>{d.name ?? d.type ?? tr("Document", "Documento")}</a> : (d.name ?? d.type)}{d.type && d.name && d.type !== d.name && <span className="fine"> · {d.type}</span>}</li>
             ))}
           </ul>
         </section>
