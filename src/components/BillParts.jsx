@@ -127,7 +127,8 @@ export default function BillParts({ congress, type, number }) {
   );
 }
 
-// One section's AI summary: an opening sentence, then "- " lines as a list. Labeled every time.
+// One section's AI summary: its opening sentence first; the main provisions ("- " lines) behind
+// "More detail"; the official text is the section's own toggle above. Labeled every time.
 function AiSummary({ row }) {
   const es = getLang() === "es";
   const text = es ? row.summary_es : row.summary_en;
@@ -138,7 +139,12 @@ function AiSummary({ row }) {
     <div className="parts-ai" lang={es ? "es" : "en"}>
       <span className="parts-ai-label">{tr("AI-generated summary", "Resumen generado por IA")}</span>
       {lead.map((l, i) => <p key={i}>{l}</p>)}
-      {items.length > 0 && <ul>{items.map((l, i) => <li key={i}>{l}</li>)}</ul>}
+      {items.length > 0 && (
+        <details className="parts-ai-more">
+          <summary>{tr(`More detail (${items.length})`, `Más detalles (${items.length})`)}</summary>
+          <ul>{items.map((l, i) => <li key={i}>{l}</li>)}</ul>
+        </details>
+      )}
     </div>
   );
 }

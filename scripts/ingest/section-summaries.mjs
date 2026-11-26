@@ -14,7 +14,7 @@
 // Every summary is then checked by a second request that compares it with the section text and
 // lists any statement the text doesn't support. A flagged summary is rewritten once with those
 // problems named; if the rewrite is flagged too, it is held (status "held") and never published.
-// Rows are stored with published = false; the site shows only published rows.
+// A summary is published (shown on the site) only once it passes the check.
 import { getClient, fetchAll, upsertBatches, withRun } from "./lib.mjs";
 import { sectionsFromXml } from "../../lib/billtext.js";
 
@@ -230,7 +230,8 @@ async function collect(db) {
       await upsertBatches(db, "bill_section_summaries", summaries, KEYS.join(","), 200);
       await mapLimit(checks, 8, async ({ item, ok, problems }) => {
         const status = ok ? "passed" : (item.attempts ?? 1) >= 2 ? "held" : "flagged";
-        let q = db.from("bill_section_summaries").update({ status, check_notes: problems.length ? problems : null, check_model: b.model });
+        // Chris approved publishing (Nov 26, 2026): a summary goes live when it passes the check, never otherwise.
+        let q = db.from("bill_section_summaries").update({ status, published: status === "passed", check_notes: problems.length ? problems : null, check_model: b.model });
         for (const k of KEYS) q = q.eq(k, item[k]);
         // Only if the summary checked is still the one stored (a redo may have replaced it).
         const { error: e } = await q.eq("attempts", item.attempts ?? 1).eq("batch_id", item.summary_batch);

@@ -1,9 +1,11 @@
 name: Bill section summaries (AI)
 
 # Plain-language summaries of each bill section, written by Claude through Anthropic's Batch API.
-# Manual only for now: summaries are stored unpublished until Chris has reviewed a test batch.
-# A daily schedule is added once they're approved.
+# Daily after the bills job: new summaries for bills that moved (passed a chamber or became law),
+# newest Congress first, a limited number of bills per run; each is checked before it is published.
 on:
+  schedule:
+    - cron: "41 15 * * *"   # 7:41am PT, after the morning bills run
   workflow_dispatch:
     inputs:
       bills:
@@ -52,8 +54,8 @@ jobs:
       - name: Summarize
         env:
           BILLS: ${{ inputs.bills }}
-          LIMIT: ${{ inputs.limit || '50' }}
-          WAIT: ${{ inputs.wait || '90' }}
+          LIMIT: ${{ inputs.limit || '120' }}
+          WAIT: ${{ inputs.wait || '120' }}
           DRY_RUN: ${{ inputs.dry_run && '--dry-run' || '' }}
           REDO: ${{ inputs.redo && '--redo' || '' }}
         run: |
