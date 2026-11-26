@@ -854,6 +854,24 @@ ol.bare { list-style: none; padding: 0; margin: 0; }
 .face-grid { list-style: none; padding: 0; margin: 12px 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(104px, 1fr)); gap: 14px 12px; }
 .face-grid li { display: flex; flex-direction: column; gap: 2px; font-size: 0.85rem; line-height: 1.3; }
 .face-grid a { display: flex; flex-direction: column; gap: 4px; text-decoration: none; color: inherit; }
-.face-grid img { width: 100%; height: auto; aspect-ratio: 225 / 275; object-fit: cover; border-radius: 6px; background: var(--surface); }
+.face-photo { position: relative; display: block; border: 3px solid var(--face, #5b6470); border-radius: 8px; overflow: hidden; }
+.face-photo img { display: block; width: 100%; height: auto; aspect-ratio: 225 / 275; object-fit: cover; background: var(--surface); }
+.face-photo .party { position: absolute; left: 0; bottom: 0; border-radius: 0 4px 0 0; font-size: 0.8rem; padding: 0 6px; }
+.face.party-d { --face: #1f4e9c; } .face.party-r { --face: #b42318; } .face.party-other { --face: #5b6470; }
+.face.party, .face.party-d, .face.party-r, .face.party-other { background: none; }
+
+/* Senate seats on each ballot, clustered bars by party (On the ballot). Party colors as in the badges. */
+.seat-chart { margin: 8px 0 18px; }
+.seat-chart figcaption { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 6px 14px; font-size: 0.9rem; margin-bottom: 10px; }
+.seat-legend { display: inline-flex; gap: 12px; color: var(--muted); font-size: 0.85rem; }
+.seat-bars { display: flex; gap: 10px; align-items: stretch; height: 190px; }
+.seat-cluster { flex: 1; display: flex; flex-direction: column; background: none; border: 0; padding: 0; cursor: pointer; color: var(--text); font: inherit; border-radius: 6px; }
+.seat-cluster.on { background: var(--surface); }
+.seat-cluster-bars { flex: 1; display: flex; justify-content: center; align-items: flex-end; gap: 4px; padding: 0 6px; border-bottom: 1px solid var(--border-strong); }
+.seat-bar-wrap { flex: 0 1 26px; height: calc(100% - 18px); display: flex; flex-direction: column; justify-content: flex-end; align-items: center; }
+.seat-count { font-size: 0.8rem; font-variant-numeric: tabular-nums; margin-bottom: 2px; }
+.seat-bar { width: 100%; border-radius: 4px 4px 0 0; min-height: 2px; }
+.seat-year { font-size: 0.85rem; padding: 6px 0 4px; text-align: center; }
+.seat-cluster.on .seat-year { font-weight: 600; }
 .face-name { font-weight: 600; text-decoration: underline; text-decoration-color: var(--border-strong); text-underline-offset: 2px; }
 .face-meta { color: var(--muted); font-size: 0.8rem; }

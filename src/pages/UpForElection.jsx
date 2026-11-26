@@ -3,7 +3,8 @@ import { Link, useSearchParams } from "react-router-dom";
 import { db } from "../lib/db.js";
 import { STATE_NAMES, stateName, seatLabel, date } from "../lib/format.js";
 import { tr } from "../lib/lang.js";
-import { PartyName } from "../components/PartyTag.jsx";
+import { PartyName, partyClass } from "../components/PartyTag.jsx";
+import { partyName } from "../lib/format.js";
 import { NotesList, Ref } from "../components/Notes.jsx";
 import { myRepresentatives } from "../lib/myReps.js";
 import { generalElectionDate, nextElectionYear, onBallot, senateClassFor, isGubernatorialYear, localOnBallot, yearOfLabel } from "../../lib/upForElection.js";
@@ -41,8 +42,9 @@ export default function UpForElection() {
   const byState = (a, z) => (STATE_NAMES[a.state] ?? a.state).localeCompare(STATE_NAMES[z.state] ?? z.state) || (a.district ?? 0) - (z.district ?? 0);
   // A Senate seat is on the ballot when its holder's term ends that cycle, or when it belongs to that
   // year's class even though its current holder (an appointee) leaves earlier, after a special election.
-  const senate = (seats || []).filter((x) => x.chamber === "senate" && x.seat_status === "serving" && (onBallot(x, year) ||
-    (x.how === "appointment" && x.senate_class === senateClassFor(year) && nextElectionYear(x.end_date) === year))).sort(byState);
+  const senateIn = (y) => (seats || []).filter((x) => x.chamber === "senate" && x.seat_status === "serving" && (onBallot(x, y) ||
+    (x.how === "appointment" && x.senate_class === senateClassFor(y) && nextElectionYear(x.end_date) === y))).sort(byState);
+  const senate = senateIn(year);
   const held = (list) => Object.entries(list.reduce((m, x) => ({ ...m, [x.party]: (m[x.party] ?? 0) + 1 }), {})).sort((a, z) => z[1] - a[1]);
   const house = (seats || []).filter((x) => x.chamber === "house" && x.seat_status === "serving" && onBallot(x, year)).sort(byState);
   const houseShown = state ? house.filter((x) => x.state === state) : house;
@@ -63,6 +65,7 @@ export default function UpForElection() {
           ? tr(`The general election was held on ${date(generalElectionDate(year))}. These seats were on the ballot; the people listed hold them until the new terms begin.`, `La elección general se celebró el ${date(generalElectionDate(year))}. Estos escaños estuvieron en la boleta; las personas indicadas los ocupan hasta que comiencen los nuevos períodos.`)
           : tr(`General election: ${date(generalElectionDate(year))}. These seats are on the ballot, listed with who holds them now. A seat on the ballot doesn't mean its holder is running.`, `Elección general: ${date(generalElectionDate(year))}. Estos escaños están en la boleta, con quién los ocupa ahora. Que un escaño esté en la boleta no significa que su titular se presente.`)}
       </p>
+      {seats && <SeatChart years={years} year={year} counts={years.map((y) => [y, held(senateIn(y))])} onPick={(y) => set({ year: y, state: "" })} />}
       <div className="tabs" role="group" aria-label={tr("Election year", "Año de la elección")}>
         {years.map((y) => <button key={y} type="button" className={y === year ? "on" : ""} aria-pressed={y === year} onClick={() => set({ year: y, state: "" })}>{y}</button>)}
       </div>
@@ -83,13 +86,15 @@ export default function UpForElection() {
               <>
                 <p>{tr("Held now by: ", "Ocupados ahora por: ")}{held(senate).map(([party, n], i) => <span key={party}>{i ? ", " : ""}<PartyName party={party} /> {n}</span>)}</p>
                 <ul className="face-grid">{senate.map((x) => (
-                  <li key={x.bioguide_id}>
+                  <li key={x.bioguide_id} className={`face ${partyClass(x.party).split(" ")[1]}`}>
                     <Link to={`/member/${x.bioguide_id}`}>
-                      <img src={`https://unitedstates.github.io/images/congress/225x275/${x.bioguide_id}.jpg`} alt="" width="112" height="137" loading="lazy" onError={(e) => { e.currentTarget.style.visibility = "hidden"; }} />
+                      <span className="face-photo">
+                        <img src={`https://unitedstates.github.io/images/congress/225x275/${x.bioguide_id}.jpg`} alt="" width="112" height="137" loading="lazy" onError={(e) => { e.currentTarget.style.visibility = "hidden"; }} />
+                        <span className={partyClass(x.party)} title={x.party}>{partyLetter(x.party)}</span>
+                      </span>
                       <span className="face-name">{x.name ?? x.bioguide_id}</span>
                     </Link>
                     <span className="face-meta">{stateName(x.state)}</span>
-                    <span className="face-meta"><PartyName party={x.party} /></span>
                     {x.how === "appointment" && <span className="face-meta">{x.end_date < `${year}-01-01` ? tr(`Appointed until a special election; term ends ${date(x.end_date)}`, `Designado(a) hasta una elección especial; el período termina el ${date(x.end_date)}`) : tr("Appointed", "Designado(a)")}</span>}
                   </li>
                 ))}</ul>
@@ -149,5 +154,46 @@ export default function UpForElection() {
       )}
       <NotesList />
     </main>
+  );
+}
+
+const partyLetter = (party) => (party === "Democrat" ? "D" : party === "Republican" ? "R" : partyName(party).slice(0, 1));
+const PARTY_ORDER = ["Democrat", "Republican"];
+
+// Senate seats on each year's ballot, by the party of the senator who holds each seat now: one cluster
+// of bars per year, a bar per party, the count on each bar. Tapping a year shows that year's seats.
+function SeatChart({ years, year, counts, onPick }) {
+  const shown = counts.filter(([, c]) => c.length);
+  if (!shown.length) return null;
+  const parties = [...new Set(shown.flatMap(([, c]) => c.map(([p]) => p)))]
+    .sort((a, z) => (PARTY_ORDER.indexOf(a) + 1 || 9) - (PARTY_ORDER.indexOf(z) + 1 || 9));
+  const max = Math.max(...shown.flatMap(([, c]) => c.map(([, n]) => n)));
+  const missing = years.filter((y) => !shown.some(([sy]) => sy === y));
+  return (
+    <figure className="seat-chart">
+      <figcaption>
+        <strong>{tr("Senate seats on the ballot, by party of the senator who holds each seat now", "Escaños del Senado en la boleta, según el partido de quien ocupa cada escaño ahora")}</strong>
+        <span className="seat-legend">{parties.map((p) => <span key={p}><span className={partyClass(p)}>{partyLetter(p)}</span> {partyName(p)}</span>)}</span>
+      </figcaption>
+      <div className="seat-bars" role="img" aria-label={shown.map(([y, c]) => `${y}: ${c.map(([p, n]) => `${n} ${partyName(p)}`).join(", ")}`).join("; ")}>
+        {shown.map(([y, c]) => (
+          <button key={y} type="button" className={`seat-cluster${y === year ? " on" : ""}`} onClick={() => onPick(y)} aria-pressed={y === year}>
+            <span className="seat-cluster-bars">
+              {parties.map((p) => {
+                const n = c.find(([q]) => q === p)?.[1] ?? 0;
+                return (
+                  <span key={p} className="seat-bar-wrap" title={`${y}: ${n} ${partyName(p)}`}>
+                    <span className="seat-count">{n}</span>
+                    <span className={`seat-bar ${partyClass(p).split(" ")[1]}`} style={{ height: `${(n / max) * 100}%` }} />
+                  </span>
+                );
+              })}
+            </span>
+            <span className="seat-year">{y}</span>
+          </button>
+        ))}
+      </div>
+      {missing.length > 0 && <p className="fine">{tr(`${missing.join(", ")}: shown once the senators elected before then take office.`, `${missing.join(", ")}: se muestra cuando asuman los senadores elegidos antes.`)}</p>}
+    </figure>
   );
 }
