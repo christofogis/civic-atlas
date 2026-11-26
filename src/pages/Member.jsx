@@ -15,6 +15,7 @@ import { tr } from "../lib/lang.js";
 import { ballotYearFor, generalElectionDate } from "../../lib/upForElection.js";
 import { NotesList, NotesProvider, Ref } from "../components/Notes.jsx";
 import { PartyName } from "../components/PartyTag.jsx";
+import { CandidateTable } from "./Elections.jsx";
 
 const BIOGUIDE = /^[A-Z][0-9]{6}$/;
 const TERRITORIES = new Set(["DC", "PR", "GU", "VI", "AS", "MP"]);
@@ -339,7 +340,8 @@ export default function Member() {
         {seat?.seat_status === "serving" ? (
           <><p className="lede">{seatLabel(seat)}</p>
           <p className="member-meta"><PartyName party={seat.party} /> · {tr("Current term", "Período actual")} {date(seat.start_date)} – {date(seat.end_date)}</p>
-          <BallotLine seat={seat} /></>
+          <BallotLine seat={seat} />
+          <RaceFilers seat={seat} upIn={upIn} mode="line" /></>
         ) : (
           <p className="lede">{tr("Not currently serving. Most recent", "No está en el cargo. Último cargo")}: {seatLabel(latest)}, {date(latest.start_date)} – {date(latest.end_date)} <PartyName party={latest.party} /></p>
         )}
@@ -552,10 +554,10 @@ export default function Member() {
               {upIn === nextElectionYear() && (filed
                 ? <> {tr(`Has filed with the FEC to run in ${upIn}`, `Se inscribió ante la FEC para postularse en ${upIn}`)}{filed.office === "S" ? tr(" for the Senate", " al Senado") : tr(` for the House${filed.district ? `, District ${filed.district}` : ""}`, ` a la Cámara${filed.district ? `, distrito ${filed.district}` : ""}`)} (<a href={`https://www.fec.gov/data/candidate/${filed.fec_candidate_id}/`}>FEC</a>).</>
                 : <> {tr(`Hasn't filed with the FEC for ${upIn} yet.`, `Todavía no se ha inscrito ante la FEC para ${upIn}.`)}</>)}
-              {" "}<Link to={`/elections?state=${seat.state}`}>{tr("Who has filed in", "Quién se ha inscrito en")} {stateName(seat.state)}</Link>
             </p>
           );
         })()}
+        {seat?.seat_status === "serving" && <RaceFilers seat={seat} upIn={upIn} mode="table" />}
         <ul className="plain">
           {terms.map((t) => (
             <li key={`${t.chamber}-${t.start_date}`}>{seatLabel(t)} <PartyName party={t.party} /> · {date(t.start_date)} – {date(t.end_date)}</li>
@@ -591,5 +593,42 @@ function BallotLine({ seat }) {
         : tr(`This seat is next on the ballot on ${date(day)}.`, `Este escaño estará en la boleta el ${date(day)}.`)}{" "}
       <Link to={`/on-the-ballot?year=${year}`}>{tr(`Everything on the ${year} ballot`, `Todo lo que está en la boleta de ${year}`)}</Link>
     </p>
+  );
+}
+
+// Everyone who has filed with the FEC to run for this member's seat in the next election, the member
+// included if they filed. "line" is a one-line count under the header; "table" is the list in the
+// Time in office section. Shown only once the seat's next race is the coming election.
+function RaceFilers({ seat, upIn, mode }) {
+  const [list, setList] = useState(null);
+  const active = upIn && upIn === nextElectionYear();
+  useEffect(() => {
+    if (!active) return;
+    let q = db.from("candidates").select("*").eq("election_year", upIn).eq("office", seat.chamber === "senate" ? "S" : "H").eq("state", seat.state);
+    if (seat.chamber === "house") q = q.eq("district", seat.district);
+    q.order("name").then(({ data }) => setList(data ?? []));
+  }, [active, upIn, seat.chamber, seat.state, seat.district]);
+  if (!active || !list) return null;
+  const others = list.filter((c) => c.bioguide_id !== seat.bioguide_id).length;
+  const self = list.some((c) => c.bioguide_id === seat.bioguide_id);
+  if (mode === "line") {
+    return (
+      <p className="fine">
+        {others === 0
+          ? tr(`No one else has filed with the FEC for this seat in ${upIn} yet.`, `Nadie más se ha inscrito ante la FEC para este escaño en ${upIn} todavía.`)
+          : tr(`${others} other ${others === 1 ? "person has" : "people have"} filed with the FEC to run for this seat in ${upIn}.`, `${others} ${others === 1 ? "persona más se ha inscrito" : "personas más se han inscrito"} ante la FEC para postularse a este escaño en ${upIn}.`)}{" "}
+        {list.length > 0 && <Link to="#service">{tr("See who", "Ver quiénes")}</Link>}
+      </p>
+    );
+  }
+  return (
+    <div id="race-filers">
+      <h3>{tr(`Filed with the FEC for this seat in ${upIn}`, `Inscritos ante la FEC para este escaño en ${upIn}`)}</h3>
+      {list.length === 0 ? <p>{tr("No one has filed yet.", "Nadie se ha inscrito todavía.")}</p> : <CandidateTable list={list} />}
+      <p className="fine">
+        {tr(`Anyone can file, and filing doesn't mean a campaign is active. ${self ? "" : "This member hasn't filed for the seat. "}Party is shown as filed.`, `Cualquiera puede inscribirse, y la inscripción no significa que haya una campaña activa. ${self ? "" : "Este miembro no se ha inscrito para el escaño. "}El partido aparece según la inscripción.`)}{" "}
+        <Link to={`/elections?state=${seat.state}`}>{tr(`All races in ${stateName(seat.state)}`, `Todas las contiendas en ${stateName(seat.state)}`)}</Link>
+      </p>
+    </div>
   );
 }
