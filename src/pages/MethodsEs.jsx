@@ -134,6 +134,15 @@ export default function MethodsEs() {
         cámaras, que tiene las mismas palabras.
       </p>
 
+      <h2 id="photos">Fotos</h2>
+      <p>
+        Los miembros del Congreso aparecen con su retrato oficial, de la colección de dominio público que mantiene el
+        proyecto unitedstates. Los funcionarios estatales aparecen con la foto oficial que enlaza Open States, cargada
+        desde el sitio de la legislatura o de la oficina. Cuando una fuente no tiene foto, no se muestra ninguna. Los
+        funcionarios de condados y ciudades aparecen sin foto en todas partes, porque ninguna fuente las reúne para
+        todos los lugares.
+      </p>
+
       <h2 id="on-the-ballot">En la boleta</h2>
       <p>
         La página En la boleta muestra los escaños de cada boleta de elección general y quién los ocupa ahora. Se calcula a

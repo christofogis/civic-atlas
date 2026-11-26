@@ -141,6 +141,14 @@ export default function Methods() {
         summarized. A public law's text is read from the enrolled bill, which has the same words.
       </p>
 
+      <h2 id="photos">Photos</h2>
+      <p>
+        Members of Congress are shown with their official portraits, from the public-domain collection kept by the
+        unitedstates project. State officials are shown with the official photo Open States links to, loaded from the
+        legislature's or office's own website. Where a source has no photo, none is shown. County and city officials
+        are shown without photos everywhere, because no source collects them for every place.
+      </p>
+
       <h2 id="on-the-ballot">On the ballot</h2>
       <p>
         The On the ballot page lists the seats on each general-election ballot and who holds them now. It is worked out

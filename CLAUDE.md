@@ -38,6 +38,10 @@ Two goals; every feature should serve at least one. More data sources are not a 
   district boundary files, candidates and certified results; Clerk of the Board (cob.oc.gov) for
   supervisors, agendas and minutes; OC Public Works GIS for city boundaries. State officials come first,
   because a resident's lookup must show every level the same way.
+- Photos (Chris, Nov 26, 2026): official portraits only where a data source provides them for a whole
+  level: Congress (unitedstates/images) and state officials (Open States photo links, loaded from the
+  official site). No photos for county or city officials anywhere, so every place looks the same; don't
+  collect them by hand or ask offices for them. A missing photo just isn't shown.
 - Party is shown as a letter badge (D blue, R red, independents and others neutral grey), always with
   the letter, on names only — never as page or section color. One exception (Chris, Nov 24, 2026): the
   map may color districts by the party of the current representative, opt-in and off by default, with a
