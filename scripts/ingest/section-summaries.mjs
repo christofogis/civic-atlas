@@ -147,8 +147,16 @@ async function collect(db) {
       if (r.result?.type !== "succeeded") { bad++; console.log(`${r.custom_id}: ${r.result?.type} ${r.result?.error?.type ?? ""}`); continue; }
       const msg = r.result.message;
       inTok += msg.usage?.input_tokens ?? 0; outTok += msg.usage?.output_tokens ?? 0;
-      const s = parseReply(msg.content?.find((c) => c.type === "text")?.text);
-      if (!s) { bad++; console.log(`${r.custom_id}: reply was not the expected JSON (stop: ${msg.stop_reason}, ${msg.usage?.output_tokens} tokens)`); continue; }
+      const raw = msg.content?.find((c) => c.type === "text")?.text ?? "";
+      const s = parseReply(raw);
+      if (!s) {
+        bad++;
+        const clip = (t) => JSON.stringify(t.replace(/\s+/g, " "));
+        console.log(`${r.custom_id}: reply was not the expected JSON (stop: ${msg.stop_reason}, ${msg.usage?.output_tokens} tokens; ${item.bill_type}${item.number} "${item.header}", ${item.words} words)`);
+        console.log(`  starts ${clip(raw.slice(0, 300))}`);
+        console.log(`  ends   ${clip(raw.slice(-200))}`);
+        continue;
+      }
       rows.push({ ...item, summary_en: s.en, summary_es: s.es, model: b.model, batch_id: b.id, published: false });
     }
     if (!DRY) await upsertBatches(db, "bill_section_summaries", rows, "congress,bill_type,number,version_code,section_key", 200);
