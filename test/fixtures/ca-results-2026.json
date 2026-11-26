@@ -1,0 +1,332 @@
+{
+ "_note": "Responses from api.sos.ca.gov/returns/<path>, retrieved 2026-11-26 by scripts/probe/ca_results2.py. ballot-measures trimmed to four measures. The legislators list is synthetic (shape of unitedstates/congress-legislators legislators-current.json) for testing name matching.",
+ "api": {
+  "governor": {
+   "raceTitle": "Governor - Statewide Results",
+   "Reporting": "100% (23,860 of 23,860) precincts reporting",
+   "ReportingTime": "November 25, 2026, 6:54 p.m.",
+   "candidates": [
+    {
+     "Name": "Xavier Becerra",
+     "Party": "Dem",
+     "Votes": "8,740,676",
+     "Percent": "65.7",
+     "incumbent": false
+    },
+    {
+     "Name": "Steve Hilton",
+     "Party": "Rep",
+     "Votes": "4,571,042",
+     "Percent": "34.3",
+     "incumbent": false
+    }
+   ]
+  },
+  "insurance-commissioner": {
+   "raceTitle": "Insurance Commissioner - Statewide Results",
+   "Reporting": "100% (23,860 of 23,860) precincts reporting",
+   "ReportingTime": "November 25, 2026, 6:54 p.m.",
+   "candidates": [
+    {
+     "Name": "Ben Allen",
+     "Party": "Dem",
+     "Votes": "5,206,834",
+     "Percent": "45.7",
+     "incumbent": false
+    },
+    {
+     "Name": "Jane Kim",
+     "Party": "Dem",
+     "Votes": "6,197,646",
+     "Percent": "54.3",
+     "incumbent": false
+    }
+   ]
+  },
+  "superintendent-of-public-instruction": {
+   "raceTitle": "Superintendent of Public Instruction - Statewide Results",
+   "Reporting": "100% (23,860 of 23,860) precincts reporting",
+   "ReportingTime": "November 25, 2026, 6:54 p.m.",
+   "candidates": [
+    {
+     "Name": "Richard Barrera",
+     "Party": "Non",
+     "Votes": "6,632,963",
+     "Percent": "59.0",
+     "incumbent": false
+    },
+    {
+     "Name": "Sonja Shaw",
+     "Party": "Non",
+     "Votes": "4,602,504",
+     "Percent": "41.0",
+     "incumbent": false
+    }
+   ]
+  },
+  "board-of-equalization/district/2": {
+   "raceTitle": "Board of Equalization District 2 - Districtwide Results",
+   "Reporting": "100% (6,558 of 6,558) precincts reporting",
+   "ReportingTime": "November 25, 2026, 6:54 p.m.",
+   "candidates": [
+    {
+     "Name": "Sally J. Lieber",
+     "Party": "Dem",
+     "Votes": "1,828,948",
+     "Percent": "59.5",
+     "incumbent": true
+    },
+    {
+     "Name": "John Pimentel",
+     "Party": "Dem",
+     "Votes": "1,245,928",
+     "Percent": "40.5",
+     "incumbent": false
+    }
+   ]
+  },
+  "us-rep/district/29": {
+   "raceTitle": "U.S. House of Representatives District 29 - Districtwide Results",
+   "Reporting": "100% (115 of 115) precincts reporting",
+   "ReportingTime": "November 25, 2026, 6:54 p.m.",
+   "candidates": [
+    {
+     "Name": "Angélica María Dueñas",
+     "Party": "Dem",
+     "Votes": "74,834",
+     "Percent": "42.7",
+     "incumbent": false
+    },
+    {
+     "Name": "Luz Maria Rivas",
+     "Party": "Dem",
+     "Votes": "100,270",
+     "Percent": "57.3",
+     "incumbent": false
+    }
+   ]
+  },
+  "us-rep/district/40": {
+   "raceTitle": "U.S. House of Representatives District 40 - Districtwide Results",
+   "Reporting": "100% (558 of 558) precincts reporting",
+   "ReportingTime": "November 25, 2026, 6:54 p.m.",
+   "candidates": [
+    {
+     "Name": "Ken Calvert",
+     "Party": "Rep",
+     "Votes": "132,518",
+     "Percent": "52.5",
+     "incumbent": false
+    },
+    {
+     "Name": "Young Kim",
+     "Party": "Rep",
+     "Votes": "120,098",
+     "Percent": "47.5",
+     "incumbent": false
+    }
+   ]
+  },
+  "us-rep/district/45": {
+   "raceTitle": "U.S. House of Representatives District 45 - Districtwide Results",
+   "Reporting": "100% (424 of 424) precincts reporting",
+   "ReportingTime": "November 25, 2026, 6:54 p.m.",
+   "candidates": [
+    {
+     "Name": "Derek Tran",
+     "Party": "Dem",
+     "Votes": "152,012",
+     "Percent": "61.0",
+     "incumbent": false
+    },
+    {
+     "Name": "Chuong V. Vo",
+     "Party": "Rep",
+     "Votes": "97,111",
+     "Percent": "39.0",
+     "incumbent": false
+    }
+   ]
+  },
+  "ballot-measures": {
+   "raceTitle": "Ballot Measures - Statewide Results",
+   "Reporting": "100.0% (23,860 of 23,860) precincts reporting",
+   "ReportingTime": "November 25, 2026, 6:54 p.m.",
+   "ballot-measures": [
+    {
+     "Name": "Authorizes Bonds For Housing Affordability Programs. Legislative Statute.",
+     "Number": "01",
+     "yesVotes": "7912244",
+     "yesPercent": "61.2",
+     "noVotes": "5013208",
+     "noPercent": "38.8"
+    },
+    {
+     "Name": "Repeals Prohibition Against Public Funding Of Election Campaigns. Legislative Statute.",
+     "Number": "04",
+     "yesVotes": "6354181",
+     "yesPercent": "49.8",
+     "noVotes": "6399083",
+     "noPercent": "50.2"
+    },
+    {
+     "Name": "Changes Recall Election Process For Statewide Officers. Legislative Constitutional Amendment.",
+     "Number": "05",
+     "yesVotes": "6511022",
+     "yesPercent": "52.0",
+     "noVotes": "6021239",
+     "noPercent": "48.0"
+    },
+    {
+     "Name": "Prohibits Citizens From Voting Unless They Present Government-Issued Identification. Initiative Constitutional Amendment.",
+     "Number": "39",
+     "yesVotes": "5172758",
+     "yesPercent": "39.5",
+     "noVotes": "7937763",
+     "noPercent": "60.5"
+    }
+   ]
+  }
+ },
+ "legislators": [
+  {
+   "id": {
+    "bioguide": "K000397"
+   },
+   "name": {
+    "first": "Young",
+    "last": "Kim",
+    "official_full": "Young Kim"
+   },
+   "terms": [
+    {
+     "type": "rep",
+     "state": "XX"
+    },
+    {
+     "type": "rep",
+     "state": "CA"
+    }
+   ]
+  },
+  {
+   "id": {
+    "bioguide": "C000059"
+   },
+   "name": {
+    "first": "Ken",
+    "last": "Calvert",
+    "official_full": "Ken Calvert"
+   },
+   "terms": [
+    {
+     "type": "rep",
+     "state": "XX"
+    },
+    {
+     "type": "rep",
+     "state": "CA"
+    }
+   ]
+  },
+  {
+   "id": {
+    "bioguide": "T000491"
+   },
+   "name": {
+    "first": "Derek",
+    "last": "Tran",
+    "official_full": "Derek Tran"
+   },
+   "terms": [
+    {
+     "type": "rep",
+     "state": "XX"
+    },
+    {
+     "type": "rep",
+     "state": "CA"
+    }
+   ]
+  },
+  {
+   "id": {
+    "bioguide": "R000599"
+   },
+   "name": {
+    "first": "Raul",
+    "last": "Ruiz"
+   },
+   "terms": [
+    {
+     "type": "rep",
+     "state": "XX"
+    },
+    {
+     "type": "rep",
+     "state": "CA"
+    }
+   ]
+  },
+  {
+   "id": {
+    "bioguide": "Z000001"
+   },
+   "name": {
+    "first": "Angelica",
+    "last": "Duenas",
+    "official_full": "Angélica María Dueñas Test"
+   },
+   "terms": [
+    {
+     "type": "rep",
+     "state": "XX"
+    },
+    {
+     "type": "rep",
+     "state": "CA"
+    }
+   ]
+  },
+  {
+   "id": {
+    "bioguide": "S000001"
+   },
+   "name": {
+    "first": "Derek",
+    "last": "Tran",
+    "official_full": "Derek Tran"
+   },
+   "terms": [
+    {
+     "type": "rep",
+     "state": "XX"
+    },
+    {
+     "type": "sen",
+     "state": "CA"
+    }
+   ]
+  },
+  {
+   "id": {
+    "bioguide": "O000001"
+   },
+   "name": {
+    "first": "Chuong",
+    "last": "Vo",
+    "official_full": "Chuong V. Vo"
+   },
+   "terms": [
+    {
+     "type": "rep",
+     "state": "XX"
+    },
+    {
+     "type": "rep",
+     "state": "TX"
+    }
+   ]
+  }
+ ]
+}
