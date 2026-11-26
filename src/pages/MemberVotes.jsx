@@ -3,7 +3,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Link, useParams, useSearchParams } from "react-router-dom";
 import { db } from "../lib/db.js";
 import DownloadCsv from "../components/DownloadCsv.jsx";
-import { KindLabel, Position } from "../components/Explain.jsx";
+import { KindLabel, Position, VoteMeaning } from "../components/Explain.jsx";
 import { date, billLabel, ordinal } from "../lib/format.js";
 import { voteKind, isFinal } from "../lib/voteKind.js";
 import { areaName } from "../lib/policyAreas.js";
@@ -141,6 +141,7 @@ export default function MemberVotes() {
                     <tr key={v.vote_id}>
                       <td>{date(v.voted_at)}</td>
                       <td>
+                        <VoteMeaning v={v} />
                         <KindLabel v={v} />
                         <a href={v.source_url}>{v.question}</a>
                         <div className="fine">

@@ -4,6 +4,7 @@ import { db } from "../lib/db.js";
 import { billLabel, date } from "../lib/format.js";
 import { tr } from "../lib/lang.js";
 import { voteKind } from "../lib/voteKind.js";
+import { VoteMeaning } from "./Explain.jsx";
 
 // A member's record in date order: roll-call votes (their recorded position, the clerk's wording),
 // bills they introduced, their bills that became law, and stock trades they reported. Every member
@@ -17,7 +18,7 @@ const MONTH = (iso) => new Date(`${iso}T12:00:00Z`).toLocaleDateString(tr("en-US
 
 async function loadWindow(id, from, to) {
   const [votes, bills, laws, trades] = await Promise.all([
-    db.from("member_votes").select("vote_id,chamber,question,result,voted_at,description,document_name,source_url,position")
+    db.from("member_votes").select("vote_id,chamber,question,result,voted_at,description,document_name,source_url,position,bill_type,bill_number")
       .eq("bioguide_id", id).gte("voted_at", from).lt("voted_at", back(to, -1)).order("voted_at", { ascending: false }).limit(1000),
     db.from("bills").select("congress,bill_type,number,title,short_title,introduced_date")
       .eq("sponsor_bioguide_id", id).gte("introduced_date", from).lte("introduced_date", to).order("introduced_date", { ascending: false }).limit(500),
@@ -52,6 +53,7 @@ function Entry({ e }) {
       <>
         <span className="tl-kind">{tr("Vote", "Voto")}</span>
         <span>
+          <VoteMeaning v={v} showFallback />
           <strong lang="en">{v.position}</strong>{" "}{tr("on", "en")} {k.label.toLowerCase()}{what && <>: <span lang="en" className="clamp2-inline">{what}</span></>}
           <span className="fine"> · <span lang="en">{v.result}</span> · <a href={v.source_url} rel="noopener">{tr("Roll call", "Votación")}</a></span>
         </span>

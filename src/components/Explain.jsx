@@ -1,6 +1,7 @@
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { GLOSSARY } from "../lib/glossary.js";
 import { voteKind, positionMeaning } from "../lib/voteKind.js";
+import { voteMeaning } from "../lib/voteMeaning.js";
 import { useLang } from "../lib/i18n.jsx";
 
 // Open/close state for a small pop-up that closes on a tap outside or Escape.
@@ -68,4 +69,15 @@ export function KindLabel({ v }) {
 export function Position({ v, position }) {
   const meaning = positionMeaning(v, position);
   return <><strong>{position}</strong>{meaning && <span className="position-meaning"> · {meaning}</span>}</>;
+}
+
+// One plain sentence on what a Yes vote meant and what the result did, from fixed templates
+// (src/lib/voteMeaning.js). Shown first; the official question and result stay beneath it.
+// The generic fallback only repeats the official question and result, so it's left out where
+// those are already on screen (showFallback for places that don't show the question).
+export function VoteMeaning({ v, showFallback = false }) {
+  const { lang } = useLang();
+  const m = voteMeaning(v, lang);
+  if (m.fallback && !showFallback) return null;
+  return <div className="vote-meaning">{m.text}</div>;
 }

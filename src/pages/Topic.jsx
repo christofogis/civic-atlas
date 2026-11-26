@@ -5,7 +5,7 @@ import { db } from "../lib/db.js";
 import { billLabel, ordinal, date } from "../lib/format.js";
 import { areaFromSlug, areaName } from "../lib/policyAreas.js";
 import { congressOn, congressYears } from "../../lib/congress.js";
-import { KindLabel } from "../components/Explain.jsx";
+import { KindLabel, VoteMeaning } from "../components/Explain.jsx";
 import { tr } from "../lib/lang.js";
 import Clamp from "../components/Clamp.jsx";
 
@@ -99,7 +99,7 @@ export default function Topic() {
                   {state.votes.map((v) => (
                     <tr key={v.vote_id}>
                       <td>{date(v.voted_at)}<div className="fine">{v.chamber === "house" ? tr("House", "Cámara") : tr("Senate", "Senado")}</div></td>
-                      <td><KindLabel v={v} /> <a href={v.source_url}>{v.question}</a>
+                      <td><VoteMeaning v={v} /><KindLabel v={v} /> <a href={v.source_url}>{v.question}</a>
                         <div className="fine">{link({ congress: v.bill_congress, bill_type: v.bill_type, number: v.bill_number })} {v.bill_title}</div></td>
                       <td>{v.result}<div className="fine">{v.yea_total}–{v.nay_total}</div></td>
                     </tr>

@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
 import { db } from "../lib/db.js";
 import { billLabel, date } from "../lib/format.js";
 import { isFinal } from "../lib/voteKind.js";
-import { KindLabel, Position } from "../components/Explain.jsx";
+import { KindLabel, Position, VoteMeaning } from "../components/Explain.jsx";
 import { myRepresentatives } from "../lib/myReps.js";
 import ComingUp from "../components/ComingUp.jsx";
 import CommitteeCalendar from "../components/CommitteeCalendar.jsx";
@@ -53,7 +53,7 @@ export default function Week() {
       const from = iso(start), to = iso(end);
       const cols = "congress,bill_type,number,title,short_title,passed_house_date,passed_senate_date,became_law_date,law_number,vetoed_date";
       const [votes, laws, passed, vetoed] = await Promise.all([
-        db.from("votes").select("vote_id,chamber,voted_at,question,description,document_name,result,yea_total,nay_total,source_url,bill_congress,bill_type,bill_number")
+        db.from("votes").select("vote_id,chamber,voted_at,question,description,document_name,result,required,amendment_ref,yea_total,nay_total,source_url,bill_congress,bill_type,bill_number")
           .gte("voted_at", `${from}T00:00:00Z`).order("voted_at", { ascending: false }).limit(500),
         db.from("bills").select(cols).gte("became_law_date", from).lte("became_law_date", to),
         db.from("bills").select(cols).or(`and(passed_house_date.gte.${from},passed_house_date.lte.${to}),and(passed_senate_date.gte.${from},passed_senate_date.lte.${to})`).limit(200),
@@ -171,6 +171,7 @@ export default function Week() {
                     <tr key={v.vote_id}>
                       <td>{date(v.voted_at)}<div className="fine">{v.chamber === "house" ? tr("House", "Cámara") : tr("Senate", "Senado")}</div></td>
                       <td>
+                        <VoteMeaning v={v} />
                         <KindLabel v={v} /> <a href={v.source_url}>{v.question}</a>
                         <div className="fine">{v.bill_type ? billLink({ congress: v.bill_congress, bill_type: v.bill_type, number: v.bill_number }) : v.description}</div>
                       </td>
