@@ -84,7 +84,6 @@ export default function UpForElection() {
             <p className="fine">{tr(`Senators serve six-year terms; about a third of the seats (class ${senateClassFor(year)}) are on each ballot. A seat filled by appointment can also be on the ballot in a special election.`, `Los senadores tienen períodos de seis años; cerca de un tercio de los escaños (clase ${senateClassFor(year)}) está en cada boleta. Un escaño ocupado por designación también puede estar en la boleta en una elección especial.`)}</p>
             {senate.length === 0 ? <p>{tr("No current senator's term ends after this election. The seats will be listed once the senators elected before it take office.", "El período de ningún senador actual termina después de esta elección. Los escaños se mostrarán cuando asuman los senadores elegidos antes.")}</p> : (
               <>
-                <p>{tr("Held now by: ", "Ocupados ahora por: ")}{held(senate).map(([party, n], i) => <span key={party}>{i ? ", " : ""}<PartyName party={party} /> {n}</span>)}</p>
                 <ul className="face-grid">{senate.map((x) => (
                   <li key={x.bioguide_id} className={`face ${partyClass(x.party).split(" ")[1]}`}>
                     <Link to={`/member/${x.bioguide_id}`}>
