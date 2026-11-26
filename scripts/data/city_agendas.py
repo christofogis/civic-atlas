@@ -16,6 +16,7 @@ CITIES = {
     "Huntington Beach": "huntingtonbeach",
     "Newport Beach": "newportbeach",
     "Orange": "cityoforange",
+    "San Clemente": "san-clemente",
     "Westminster": "westminsterca",
 }
 UA = {"User-Agent": "civic-atlas data build (github.com/christofogis/civic-atlas)"}
