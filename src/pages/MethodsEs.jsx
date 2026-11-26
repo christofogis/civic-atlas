@@ -83,6 +83,23 @@ export default function MethodsEs() {
         procedimiento, según el tipo de votación; nunca lo que la votación habría hecho ni por qué un miembro votó así.
       </p>
 
+      <h2 id="vote-sentences">Lo que decidió una votación, en una frase</h2>
+      <p>
+        Cada votación empieza con una frase, por ejemplo "Votar Sí significaba aprobar H.R. 1. Se aprobó,
+        218–214, así que pasa al Senado." Se llena una plantilla fija para ese tipo de votación, usando solo la
+        pregunta oficial del secretario, el resultado oficial y el número de la medida; no la escribe una IA y
+        no describe el contenido ni los efectos del proyecto. Todas las votaciones del mismo tipo reciben la
+        misma redacción, sin importar quién votó.
+      </p>
+      <p>
+        Un umbral de votos se menciona solo cuando lo fijan las reglas (dos tercios para suspender las reglas o
+        anular un veto, 60 votos para el cloture sobre legislación, mayoría simple para el cloture sobre
+        nominaciones) o cuando lo indica el propio resultado del Senado. "Lo que sigue" se menciona solo cuando
+        el tipo de medida lo determina, como un proyecto de la Cámara que pasa al Senado después de que la
+        Cámara lo aprueba. Si una pregunta no es de un tipo reconocido, la frase solo da la pregunta y el
+        resultado oficiales. La redacción del propio secretario siempre aparece debajo, con enlace a la votación.
+      </p>
+
       <h2 id="vote-issues">Votos por tema</h2>
       <p>
         Cada proyecto recibe un área de política de la Biblioteca del Congreso (por ejemplo, "Salud" o "Inmigración"),

@@ -10,7 +10,7 @@ import AtAGlance from "../components/AtAGlance.jsx";
 import EmbedCode from "../components/EmbedCode.jsx";
 import Scale from "../components/Scale.jsx";
 import Follow from "../components/Follow.jsx";
-import { KindLabel, Position } from "../components/Explain.jsx";
+import { KindLabel, Position, VoteMeaning } from "../components/Explain.jsx";
 import { seatLabel, date, money, billLabel, ordinal, stateName, partyName } from "../lib/format.js";
 import { tr } from "../lib/lang.js";
 import { ballotYearFor, generalElectionDate } from "../../lib/upForElection.js";
@@ -74,7 +74,7 @@ const SECTION_DATA = {
   votes: async (id) => ({
     // member_votes starts from the member's positions (indexed), so this stays fast.
     votes: await one(db.from("member_votes")
-      .select("vote_id,chamber,question,result,voted_at,description,document_name,source_url,position")
+      .select("vote_id,chamber,question,result,voted_at,description,document_name,source_url,position,bill_type,bill_number")
       .eq("bioguide_id", id).order("voted_at", { ascending: false }).limit(120))
       .then((rows) => rows.map((v) => ({ ...v, vote_positions: [{ position: v.position }] }))),
   }),
@@ -401,6 +401,7 @@ export default function Member() {
                 <tr key={v.vote_id}>
                   <td>{date(v.voted_at)}</td>
                   <td>
+                    <VoteMeaning v={v} />
                     <KindLabel v={v} />
                     <a href={v.source_url}>{v.question}</a>
                     {(v.document_name || v.description) && <div className="fine">{[v.document_name, v.description].filter(Boolean).join(" · ")}</div>}

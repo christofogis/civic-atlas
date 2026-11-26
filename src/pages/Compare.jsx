@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { db } from "../lib/db.js";
 import DownloadCsv from "../components/DownloadCsv.jsx";
-import { KindLabel } from "../components/Explain.jsx";
+import { KindLabel, VoteMeaning } from "../components/Explain.jsx";
 import { billLabel, ordinal, partyTag, date } from "../lib/format.js";
 import { tr } from "../lib/lang.js";
 import { PartyTag } from "../components/PartyTag.jsx";
@@ -112,6 +112,7 @@ export default function Compare() {
                             <tr key={v.vote_id}>
                               <td>{date(v.voted_at)}</td>
                               <td>
+                                <VoteMeaning v={v} />
                                 <KindLabel v={v} />
                                 <a href={v.source_url}>{v.question}</a>
                                 <div className="fine">

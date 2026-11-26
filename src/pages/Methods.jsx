@@ -93,6 +93,23 @@ export default function Methods() {
         procedure only, from the vote type, never what the vote would have done or why a member voted that way.
       </p>
 
+      <h2 id="vote-sentences">What a vote decided, in one sentence</h2>
+      <p>
+        Each roll call starts with one sentence, such as "A Yes vote was to pass H.R. 1. It passed, 218–214,
+        so it goes to the Senate." It is filled into a fixed template for that kind of vote, using only the
+        clerk's official question, the official result and the measure's number; it is not written by AI and
+        doesn't describe the bill's content or effects. Every vote of the same kind gets the same wording,
+        whoever voted on it.
+      </p>
+      <p>
+        A vote threshold is mentioned only where it is fixed by the rules (two-thirds to suspend the rules or
+        override a veto, 60 votes for cloture on legislation, a simple majority for cloture on nominations) or
+        stated in the Senate's own result. "What happens next" is mentioned only where the measure's type
+        settles it, such as a House bill going to the Senate after the House passes it. If a question isn't
+        one of the recognized kinds, the sentence just gives the official question and result. The clerk's own
+        wording always appears beneath it, linked to the roll call.
+      </p>
+
       <h2 id="vote-issues">Votes by issue</h2>
       <p>
         Each bill gets one policy area from the Library of Congress (for example "Health" or "Immigration"),

@@ -17,7 +17,7 @@ import { NotesList, NotesProvider, Ref } from "../components/Notes.jsx";
 import VoteBreakdown from "../components/VoteBreakdown.jsx";
 import StatusBar from "../components/StatusBar.jsx";
 import Follow from "../components/Follow.jsx";
-import { Explain } from "../components/Explain.jsx";
+import { Explain, VoteMeaning } from "../components/Explain.jsx";
 import { PartyTag } from "../components/PartyTag.jsx";
 
 const TYPES = new Set(["hr", "s", "hres", "sres", "hjres", "sjres", "hconres", "sconres"]);
@@ -33,7 +33,7 @@ async function loadBill(congress, type, number) {
     one(key(db.from("bills").select("*")).maybeSingle()),
     one(key(db.from("bill_sponsor_details").select("*")).maybeSingle()),
     one(key(db.from("bill_cosponsor_details").select("*")).order("sponsored_date").order("last_name")),
-    one(db.from("votes").select("vote_id,chamber,voted_at,question,result,yea_total,nay_total,present_total,not_voting_total,source_url")
+    one(db.from("votes").select("vote_id,chamber,voted_at,question,description,document_name,result,required,amendment_ref,bill_type,bill_number,yea_total,nay_total,present_total,not_voting_total,source_url")
       .eq("bill_congress", congress).eq("bill_type", type).eq("bill_number", number).order("voted_at", { ascending: false })),
     // Lobbying is the heaviest query; if it fails, the rest of the page still shows.
     one(key(db.from("bill_lobbying_clients").select("*")).order("quarters", { ascending: false }).order("client_name").limit(1000)).catch(() => null),
@@ -244,6 +244,7 @@ export default function Bill() {
                     <td>{date(v.voted_at)}</td>
                     <td>{v.chamber === "house" ? tr("House", "Cámara") : tr("Senate", "Senado")}</td>
                     <td>
+                      <VoteMeaning v={v} />
                       <a href={v.source_url}>{v.question}</a>
                       <div><button className="link fine" aria-expanded={openVote === v.vote_id}
                         onClick={() => setOpenVote(openVote === v.vote_id ? null : v.vote_id)}>
