@@ -837,3 +837,11 @@ ol.bare { list-style: none; padding: 0; margin: 0; }
 .supervisor-record summary { cursor: pointer; font-size: 0.88rem; margin-top: 0.3rem; }
 .record-items li { padding: 0.4rem 0; border-bottom: 1px solid var(--border); font-size: 0.85rem; }
 .record-items .clamp2-inline { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+
+/* Faces: a grid of official portraits with name, place and party badge underneath. Same for every party. */
+.face-grid { list-style: none; padding: 0; margin: 12px 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(104px, 1fr)); gap: 14px 12px; }
+.face-grid li { display: flex; flex-direction: column; gap: 2px; font-size: 0.85rem; line-height: 1.3; }
+.face-grid a { display: flex; flex-direction: column; gap: 4px; text-decoration: none; color: inherit; }
+.face-grid img { width: 100%; height: auto; aspect-ratio: 225 / 275; object-fit: cover; border-radius: 6px; background: var(--surface); }
+.face-name { font-weight: 600; text-decoration: underline; text-decoration-color: var(--border-strong); text-underline-offset: 2px; }
+.face-meta { color: var(--muted); font-size: 0.8rem; }

@@ -37,9 +37,13 @@ export default function UpForElection() {
   }, []);
 
   const set = (patch) => setParams(Object.fromEntries(Object.entries({ year, state, ...patch }).filter(([, v]) => v)));
-  const held = generalElectionDate(year) < today;
+  const past = generalElectionDate(year) < today;
   const byState = (a, z) => (STATE_NAMES[a.state] ?? a.state).localeCompare(STATE_NAMES[z.state] ?? z.state) || (a.district ?? 0) - (z.district ?? 0);
-  const senate = (seats || []).filter((x) => x.chamber === "senate" && x.seat_status === "serving" && onBallot(x, year)).sort(byState);
+  // A Senate seat is on the ballot when its holder's term ends that cycle, or when it belongs to that
+  // year's class even though its current holder (an appointee) leaves earlier, after a special election.
+  const senate = (seats || []).filter((x) => x.chamber === "senate" && x.seat_status === "serving" && (onBallot(x, year) ||
+    (x.how === "appointment" && x.senate_class === senateClassFor(year) && nextElectionYear(x.end_date) === year))).sort(byState);
+  const held = (list) => Object.entries(list.reduce((m, x) => ({ ...m, [x.party]: (m[x.party] ?? 0) + 1 }), {})).sort((a, z) => z[1] - a[1]);
   const house = (seats || []).filter((x) => x.chamber === "house" && x.seat_status === "serving" && onBallot(x, year)).sort(byState);
   const houseShown = state ? house.filter((x) => x.state === state) : house;
   const yours = [...senate, ...house].filter((x) => mine.has(x.bioguide_id));
@@ -55,7 +59,7 @@ export default function UpForElection() {
     <main className="page wide">
       <h1>{tr(`On the ballot in ${year}`, `En la boleta en ${year}`)}<Ref id="src" text={<>{tr("Worked out from each official's term end date: Congress from the official member list (unitedstates/congress-legislators), Orange County from the Clerk of the Board and city websites. California's election cycles are set by the state constitution.", "Calculado a partir de la fecha de fin del período de cada funcionario: el Congreso según la lista oficial de miembros (unitedstates/congress-legislators) y el Condado de Orange según la Secretaría de la Junta y los sitios de las ciudades. Los ciclos electorales de California los fija la constitución del estado.")}</>} /></h1>
       <p className="lede">
-        {held
+        {past
           ? tr(`The general election was held on ${date(generalElectionDate(year))}. These seats were on the ballot; the people listed hold them until the new terms begin.`, `La elección general se celebró el ${date(generalElectionDate(year))}. Estos escaños estuvieron en la boleta; las personas indicadas los ocupan hasta que comiencen los nuevos períodos.`)
           : tr(`General election: ${date(generalElectionDate(year))}. These seats are on the ballot, listed with who holds them now. A seat on the ballot doesn't mean its holder is running.`, `Elección general: ${date(generalElectionDate(year))}. Estos escaños están en la boleta, con quién los ocupa ahora. Que un escaño esté en la boleta no significa que su titular se presente.`)}
       </p>
@@ -76,7 +80,20 @@ export default function UpForElection() {
             <h2>{tr(`U.S. Senate: ${senate.length} seats`, `Senado de EE. UU.: ${senate.length} escaños`)}</h2>
             <p className="fine">{tr(`Senators serve six-year terms; about a third of the seats (class ${senateClassFor(year)}) are on each ballot. A seat filled by appointment can also be on the ballot in a special election.`, `Los senadores tienen períodos de seis años; cerca de un tercio de los escaños (clase ${senateClassFor(year)}) está en cada boleta. Un escaño ocupado por designación también puede estar en la boleta en una elección especial.`)}</p>
             {senate.length === 0 ? <p>{tr("No current senator's term ends after this election. The seats will be listed once the senators elected before it take office.", "El período de ningún senador actual termina después de esta elección. Los escaños se mostrarán cuando asuman los senadores elegidos antes.")}</p> : (
-              <ul className="plain">{senate.map((x) => <li key={x.bioguide_id}>{stateName(x.state)}: <Holder x={x} />{x.end_date !== `${year + 1}-01-03` && <span className="fine"> · {tr("term ends", "fin del período")} {date(x.end_date)}</span>}</li>)}</ul>
+              <>
+                <p>{tr("Held now by: ", "Ocupados ahora por: ")}{held(senate).map(([party, n], i) => <span key={party}>{i ? ", " : ""}<PartyName party={party} /> {n}</span>)}</p>
+                <ul className="face-grid">{senate.map((x) => (
+                  <li key={x.bioguide_id}>
+                    <Link to={`/member/${x.bioguide_id}`}>
+                      <img src={`https://unitedstates.github.io/images/congress/225x275/${x.bioguide_id}.jpg`} alt="" width="112" height="137" loading="lazy" onError={(e) => { e.currentTarget.style.visibility = "hidden"; }} />
+                      <span className="face-name">{x.name ?? x.bioguide_id}</span>
+                    </Link>
+                    <span className="face-meta">{stateName(x.state)}</span>
+                    <span className="face-meta"><PartyName party={x.party} /></span>
+                    {x.how === "appointment" && <span className="face-meta">{x.end_date < `${year}-01-01` ? tr(`Appointed until a special election; term ends ${date(x.end_date)}`, `Designado(a) hasta una elección especial; el período termina el ${date(x.end_date)}`) : tr("Appointed", "Designado(a)")}</span>}
+                  </li>
+                ))}</ul>
+              </>
             )}
             <p className="fine"><Link to="/elections">{tr("Candidates who have filed with the FEC", "Candidatos inscritos ante la FEC")}</Link></p>
           </section>
