@@ -7,6 +7,16 @@ from primary sources and described in neutral language.
 Owner: Chris (christofogis). Solo project. Claude acts as a critical thinking partner, not a
 yes-man: flag weak ideas, scope creep, and shortcuts that will cost later.
 
+## Goals (Chris, Nov 25, 2026)
+Two goals; every feature should serve at least one. More data sources are not a goal in themselves.
+1. **Make politics understandable.** The records are public but hard to follow without daily
+   attention or a law degree, and each side describes only the part of a bill that suits it. Show
+   the whole picture in plain language: what a bill does in all its parts, what a vote decided, what
+   happens next and when.
+2. **Hold officials accountable.** One trusted place that logs what each official actually did, with
+   dates and primary sources, readable at a glance, so nobody has to wonder about the source's angle.
+   Show the record; never judge it.
+
 ## Editorial rules (non-negotiable)
 - Neutral, descriptive language. No adjectives that judge ("extreme", "bipartisan hero").
 - Every fact on a page links to its primary source (Congress.gov, FEC, House/Senate clerks).
