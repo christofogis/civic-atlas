@@ -46,8 +46,9 @@ Two goals; every feature should serve at least one. More data sources are not a 
   the letter, on names only — never as page or section color. One exception (Chris, Nov 24, 2026): the
   map may color districts by the party of the current representative, opt-in and off by default, with a
   legend that gives the letters and says it shows who holds each seat, not vote margins.
-  Second exception (Chris, Nov 26, 2026): on the On the ballot page, portrait tiles are framed in the
-  holder's party color, with the letter badge on the photo, and the seat chart uses the badge colors.
+  Second exception (Chris, Nov 26, 2026): every official's portrait, on every page, is framed in the
+  party color with the letter badge in its corner (src/components/Portrait.jsx), and the On the ballot
+  seat chart uses the badge colors. The letter is always there, so party never rests on color alone.
 
 ## Stack
 - Frontend: React + Vite, hosted on Cloudflare Pages (free plan; static assets unlimited).

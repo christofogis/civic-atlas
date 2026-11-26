@@ -1,3 +1,4 @@
+import Portrait from "../components/Portrait.jsx";
 import { noPhoto } from "../lib/photo.js";
 import { useEffect, useMemo, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
@@ -161,12 +162,9 @@ export default function UpForElection() {
             {senate.length === 0 ? <p>{tr("No current senator's term ends after this election. The seats will be listed once the senators elected before it take office.", "El período de ningún senador actual termina después de esta elección. Los escaños se mostrarán cuando asuman los senadores elegidos antes.")}</p> : (
               <>
                 <ul className="face-grid">{senate.map((x) => (
-                  <li key={x.bioguide_id} className={`face ${partyClass(x.party).split(" ")[1]}`}>
+                  <li key={x.bioguide_id}>
                     <Link to={`/member/${x.bioguide_id}`}>
-                      <span className="face-photo">
-                        <img src={`https://unitedstates.github.io/images/congress/225x275/${x.bioguide_id}.jpg`} alt="" width="112" height="137" loading="lazy" onError={noPhoto} />
-                        <span className={partyClass(x.party)} title={x.party}>{partyLetter(x.party)}</span>
-                      </span>
+                      <Portrait size="tile" party={x.party} src={`https://unitedstates.github.io/images/congress/225x275/${x.bioguide_id}.jpg`} width="112" height="137" loading="lazy" />
                       <span className="face-name">{x.name ?? x.bioguide_id}</span>
                     </Link>
                     <span className="face-meta">{stateName(x.state)}</span>

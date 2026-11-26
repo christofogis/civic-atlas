@@ -209,7 +209,14 @@ button.link { background: none; border: 0; padding: 0; color: var(--accent); tex
 .member-head { display: grid; grid-template-columns: auto 1fr; column-gap: 20px; align-items: center; }
 .member-head > :not(.member-photo) { grid-column: 2; }
 .member-head .lede { margin-bottom: 0; }
-.member-photo { grid-row: 1 / span 3; border-radius: 8px; object-fit: cover; }
+.member-photo { grid-row: 1 / span 3; }
+/* Portraits everywhere: party-color frame, letter badge in the lower-left corner (Portrait.jsx). */
+.portrait { position: relative; display: inline-block; border: 3px solid var(--frame, #5b6470); border-radius: 8px; overflow: hidden; line-height: 0; background: var(--surface); }
+.portrait img { display: block; width: 100%; height: 100%; object-fit: cover; aspect-ratio: 225 / 275; }
+.portrait .party { position: absolute; left: 0; bottom: 0; border-radius: 0 4px 0 0; line-height: 1.35; }
+.portrait-large { width: 90px; } .portrait-small { width: 60px; border-width: 2px; border-radius: 6px; } .portrait-small .party { font-size: 0.68rem; padding: 0 4px; }
+.portrait-tile { display: block; width: 100%; }
+.party-d-frame { --frame: #1f4e9c; } .party-r-frame { --frame: #b42318; } .party-other-frame { --frame: #5b6470; }
 .member-photo.small { float: left; margin: 2px 12px 4px 0; border-radius: 6px; }
 .tabs { clear: both; display: flex; gap: 6px; margin: 18px 0 8px; border-bottom: 1px solid var(--border); overflow-x: auto; scrollbar-width: none; }
 .tabs button { background: none; border: 0; border-bottom: 2px solid transparent; padding: 10px 12px 9px; font: inherit; font-weight: 500; color: var(--muted); cursor: pointer; white-space: nowrap; }
@@ -354,7 +361,7 @@ h2.week-head { font-size: 1.4rem; margin-top: 44px; }
   .row { flex-direction: column; }
   main table { display: block; max-width: 100%; overflow-x: auto; font-size: 0.86rem; }
   .member-head { grid-template-columns: auto 1fr; column-gap: 14px; }
-  .member-photo:not(.small) { width: 72px; height: 88px; }
+  .member-photo:not(.small) { width: 72px; }
   .map-canvas { height: 60vh; }
   .events li.event-row { grid-template-columns: 4.6rem 1fr; gap: 8px; }
 }

@@ -1,4 +1,4 @@
-import { noPhoto } from "../lib/photo.js";
+import Portrait from "./Portrait.jsx";
 import { Link } from "react-router-dom";
 import { seatParts, date } from "../lib/format.js";
 import Seat from "./Seat.jsx";
@@ -19,7 +19,7 @@ export default function OfficialCard({ official }) {
   return (
     <li className="card">
       <Seat parts={seatParts(official)} />
-      <img className="member-photo small" src={`https://unitedstates.github.io/images/congress/225x275/${official.bioguide_id}.jpg`} alt={official.name} width="60" height="73" loading="lazy" onError={noPhoto} />
+      <Portrait className="member-photo small" size="small" party={official.party} src={`https://unitedstates.github.io/images/congress/225x275/${official.bioguide_id}.jpg`} alt={official.name} width="60" height="73" loading="lazy" />
       <h3><Link to={`/member/${official.bioguide_id}`}>{official.name}</Link></h3>
       <p className="meta"><PartyName party={official.party} /> · {t("Current term began", "Período actual desde el")} {date(official.start_date)}</p>
       {official.phone && <p className="fine card-phone"><a href={`tel:${official.phone.replace(/[^\d+]/g, "")}`}>{official.phone}</a> <span className="print-only">· {official.url}</span></p>}
