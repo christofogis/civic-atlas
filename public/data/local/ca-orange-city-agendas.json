@@ -1,6 +1,6 @@
 {
  "built_at": "2026-11-26",
- "source": "Each city's agenda system: Legistar (webapi.legistar.com) or CivicClerk (api.civicclerk.com)",
+ "source": "Each city's agenda system: Legistar (webapi.legistar.com), CivicClerk (api.civicclerk.com) or PrimeGov (primegov.com)",
  "cities": {
   "Costa Mesa": {
    "source": "https://costamesa.legistar.com/Calendar.aspx",
@@ -207,6 +207,21 @@
     }
    ]
   },
+  "Laguna Beach": {
+   "source": "https://lagunabeachcity.primegov.com/public/portal",
+   "meetings": [
+    {
+     "body": "Regular City Council Meeting",
+     "date": "2026-12-08",
+     "time": "5:00 PM",
+     "location": null,
+     "agenda_url": null,
+     "meeting_url": "https://lagunabeachcity.primegov.com/public/portal",
+     "agenda_status": null,
+     "items": []
+    }
+   ]
+  },
   "Laguna Hills": {
    "source": "https://lagunahillsca.portal.civicclerk.com/",
    "meetings": [
@@ -232,6 +247,246 @@
     }
    ]
   },
+  "Lake Forest": {
+   "source": "https://lakeforest.primegov.com/public/portal",
+   "meetings": [
+    {
+     "body": "City Council - Regular Meeting",
+     "date": "2026-12-01",
+     "time": "6:30 PM",
+     "location": "City Council Chambers, 100 Civic Center Drive, Lake Forest, California",
+     "agenda_url": "https://lakeforest.primegov.com/Public/CompiledDocument?meetingTemplateId=12223&compileOutputType=1",
+     "meeting_url": "https://lakeforest.primegov.com/Portal/Meeting?meetingTemplateId=12225",
+     "agenda_status": "Published",
+     "items": [
+      {
+       "number": "1.",
+       "heading": "PRESENTATIONS (Item Nos. 1 – 5)",
+       "title": "2026 HALLOWEEN HOUSE DECORATING CONTEST",
+       "file": null,
+       "type": null,
+       "attachments": [
+        {
+         "name": "City Council Staff Report",
+         "url": "https://lakeforest.primegov.com/api/compilemeetingattachmenthistory/historyattachment/?historyId=96975a1a-e623-4792-b6b8-84f3ecc6837d"
+        },
+        {
+         "name": "Certificate of Recognition - Halloween Contest 2026",
+         "url": "https://lakeforest.primegov.com/api/compilemeetingattachmenthistory/historyattachment/?historyId=7c1256c4-2f3e-477d-a893-3456e759e99d"
+        }
+       ]
+      },
+      {
+       "number": "2.",
+       "heading": "PRESENTATIONS (Item Nos. 1 – 5)",
+       "title": "RECOGNITION OF BALLET FOLKLORICO DE GATES DANCE PERFORMANCE AT THE ANNUAL HALLOWEEN SPOOKTACULAR EVENT AT THE LAKE FOREST SPORTS PARK",
+       "file": null,
+       "type": null,
+       "attachments": [
+        {
+         "name": "City Council Staff Report",
+         "url": "https://lakeforest.primegov.com/api/compilemeetingattachmenthistory/historyattachment/?historyId=edbc364a-00f7-4e3f-a27d-a22fc96e1813"
+        },
+        {
+         "name": "Attachment - Sample Certificate",
+         "url": "https://lakeforest.primegov.com/api/compilemeetingattachmenthistory/historyattachment/?historyId=39e0d874-d386-42f7-9fd5-8cb300ad1f90"
+        }
+       ]
+      },
+      {
+       "number": "3.",
+       "heading": "PRESENTATIONS (Item Nos. 1 – 5)",
+       "title": "SERVICE AWARD",
+       "file": null,
+       "type": null,
+       "attachments": [
+        {
+         "name": "City Council Staff Report",
+         "url": "https://lakeforest.primegov.com/api/compilemeetingattachmenthistory/historyattachment/?historyId=66c41015-8a6f-4e75-81bd-63c88f47959f"
+        },
+        {
+         "name": "Attachment - Sample Service Award",
+         "url": "https://lakeforest.primegov.com/api/compilemeetingattachmenthistory/historyattachment/?historyId=34524b9b-f01d-4c85-ba01-9e5769f6068c"
+        }
+       ]
+      },
+      {
+       "number": "4.",
+       "heading": "PRESENTATIONS (Item Nos. 1 – 5)",
+       "title": "MAYOR'S AWARD",
+       "file": null,
+       "type": null,
+       "attachments": [
+        {
+         "name": "City Council Staff Report",
+         "url": "https://lakeforest.primegov.com/api/compilemeetingattachmenthistory/historyattachment/?historyId=460bbd90-cfde-47a1-aed8-b60d50946d6a"
+        },
+        {
+         "name": "Attachment 1 - City Council Policy Mayor's Award",
+         "url": "https://lakeforest.primegov.com/api/compilemeetingattachmenthistory/historyattachment/?historyId=5fadd979-ff4e-4889-915f-624efc874966"
+        },
+        {
+         "name": "Attachment 2 - Sample of Recogniton Certificate",
+         "url": "https://lakeforest.primegov.com/api/compilemeetingattachmenthistory/historyattachment/?historyId=614e6a0d-08d7-43e0-839c-2590a4c75406"
+        }
+       ]
+      },
+      {
+       "number": "5.",
+       "heading": "PRESENTATIONS (Item Nos. 1 – 5)",
+       "title": "PRESENTATION FROM ASSEMBLYMEMBER DIANE DIXON",
+       "file": null,
+       "type": null,
+       "attachments": [
+        {
+         "name": "City Council Staff Report",
+         "url": "https://lakeforest.primegov.com/api/compilemeetingattachmenthistory/historyattachment/?historyId=60d2d640-cb6a-4dde-8d37-bb7f707da605"
+        }
+       ]
+      },
+      {
+       "number": "6.",
+       "heading": "CONSENT CALENDAR (Item Nos. 6 – 11)",
+       "title": "MOTION TO WAIVE READING OF RESOLUTIONS AND ORDINANCES",
+       "file": null,
+       "type": null,
+       "attachments": [
+        {
+         "name": "MOTION TO WAIVE READING OF RESOLUTIONS AND ORDINANCES",
+         "url": "https://lakeforest.primegov.com/api/compilemeetingattachmenthistory/historyattachment/?historyId=c05386d1-5f7c-4a22-91e2-c06e8060dba0"
+        }
+       ]
+      },
+      {
+       "number": "7.",
+       "heading": "CONSENT CALENDAR (Item Nos. 6 – 11)",
+       "title": "MINUTES OF THE REGULAR MEETING OF THE CITY COUNCIL HELD ON NOVEMBER 17, 2026",
+       "file": null,
+       "type": null,
+       "attachments": [
+        {
+         "name": "11.17.26 Minutes",
+         "url": "https://lakeforest.primegov.com/api/compilemeetingattachmenthistory/historyattachment/?historyId=da8ddadc-3674-478e-905c-79321fdb914c"
+        }
+       ]
+      },
+      {
+       "number": "8.",
+       "heading": "CONSENT CALENDAR (Item Nos. 6 – 11)",
+       "title": "FIRST AMENDMENT TO PROFESSIONAL CONSULTANT SERVICES AGREEMENT WITH THE RETAIL COACH FOR RETAIL RECRUITMENT CONSULTING SERVICES",
+       "file": null,
+       "type": null,
+       "attachments": [
+        {
+         "name": "City Council Staff Report",
+         "url": "https://lakeforest.primegov.com/api/compilemeetingattachmenthistory/historyattachment/?historyId=938ae7a9-a06e-4947-94da-6b9e3df20b55"
+        },
+        {
+         "name": "Attachment 1 - Original Agreement with The Retail Coach",
+         "url": "https://lakeforest.primegov.com/api/compilemeetingattachmenthistory/historyattachment/?historyId=27bdaf25-67b6-44ab-adf4-fb98743738ad"
+        },
+        {
+         "name": "Attachment 2 - Proposed First Amendment to the Agreement with The Retail Coach",
+         "url": "https://lakeforest.primegov.com/api/compilemeetingattachmenthistory/historyattachment/?historyId=8d69ae73-9380-4d0d-8e9c-4e8663d02d1d"
+        }
+       ]
+      },
+      {
+       "number": "9.",
+       "heading": "CONSENT CALENDAR (Item Nos. 6 – 11)",
+       "title": "AWARD OF CONTRACT FOR SPORTS COMPLEX FACILITY LANDSCAPE & PARK MAINTENANCE SERVICES",
+       "file": null,
+       "type": null,
+       "attachments": [
+        {
+         "name": "City Council Staff Report",
+         "url": "https://lakeforest.primegov.com/api/compilemeetingattachmenthistory/historyattachment/?historyId=bbd101a2-6358-4687-9316-936e22daff6c"
+        },
+        {
+         "name": "Attachment 1 - Landscape West Management Services.docx",
+         "url": "https://lakeforest.primegov.com/api/compilemeetingattachmenthistory/historyattachment/?historyId=e40cf1ce-c7ca-4736-999e-4d686c5c5507"
+        },
+        {
+         "name": "Attachment 2 -  Reference Checklist - Landscape West Management Landscape Services",
+         "url": "https://lakeforest.primegov.com/api/compilemeetingattachmenthistory/historyattachment/?historyId=cbaffb20-7a2a-4977-8ef8-db2943e1b413"
+        }
+       ]
+      },
+      {
+       "number": "10.",
+       "heading": "CONSENT CALENDAR (Item Nos. 6 – 11)",
+       "title": "EIGHTH AMENDMENT TO THE AGREEMENT WITH CARLSON STRATEGIC LAND SOLUTIONS, INC. FOR ENVIRONMENTAL PERMIT IMPLEMENTATION SERVICES",
+       "file": null,
+       "type": null,
+       "attachments": [
+        {
+         "name": "City Council Staff Report",
+         "url": "https://lakeforest.primegov.com/api/compilemeetingattachmenthistory/historyattachment/?historyId=fee00f52-6815-4250-a1e5-96345cad455a"
+        },
+        {
+         "name": "Attachment 1 - Agreement Carlson Strategic Land Solutions",
+         "url": "https://lakeforest.primegov.com/api/compilemeetingattachmenthistory/historyattachment/?historyId=bd11bda9-7b71-46dd-b868-8a1444ea7ee0"
+        },
+        {
+         "name": "Attachment 2 - First Amendment to Agreement for Professional Consultant Services - Carlson, Inc",
+         "url": "https://lakeforest.primegov.com/api/compilemeetingattachmenthistory/historyattachment/?historyId=5a3ebee4-7e0c-4365-b42d-24c3f08e605f"
+        },
+        {
+         "name": "Attachment 3 - Second Amendment to Agreement for Professional Consultant Services - Carlson, Inc",
+         "url": "https://lakeforest.primegov.com/api/compilemeetingattachmenthistory/historyattachment/?historyId=a90f0dc4-577d-4f75-a1c3-d0c16b1a0b19"
+        },
+        {
+         "name": "Attachment 4 - Third Amendment to Agreement for Professional Consultant Services - Carlson, Inc",
+         "url": "https://lakeforest.primegov.com/api/compilemeetingattachmenthistory/historyattachment/?historyId=ba96160b-6f4f-4719-b958-159b31ebd95c"
+        },
+        {
+         "name": "Attachment 5 - Fourth Amendment to Agreement for Professional Consultant Services - Carlson, Inc",
+         "url": "https://lakeforest.primegov.com/api/compilemeetingattachmenthistory/historyattachment/?historyId=65079c7a-fe83-4844-8029-db09a74fcd13"
+        }
+       ]
+      },
+      {
+       "number": "11.",
+       "heading": "CONSENT CALENDAR (Item Nos. 6 – 11)",
+       "title": "THREE-YEAR RENEWAL OF CISCO MERAKI LICENSES FOR CITY NETWORK INFRASTRUCTURE",
+       "file": null,
+       "type": null,
+       "attachments": [
+        {
+         "name": "City Council Staff Report",
+         "url": "https://lakeforest.primegov.com/api/compilemeetingattachmenthistory/historyattachment/?historyId=e6e6d1fc-cfdd-4223-acf2-92eba13bf6e5"
+        },
+        {
+         "name": "Abtech Technologies Quote for Three-Year Renewal of Cisco Meraki Licenses",
+         "url": "https://lakeforest.primegov.com/api/compilemeetingattachmenthistory/historyattachment/?historyId=43b8da24-7a52-4fa8-86e1-1fbb149bf40b"
+        }
+       ]
+      },
+      {
+       "number": "12.",
+       "heading": "PUBLIC HEARING(S) (Item No. 12)",
+       "title": "AUTHORIZING APPLICATION FOR PERMANENT LOCAL HOUSING ALLOCATION PROGRAM GRANT AND APPROVAL OF THE PROPOSED FIVE-YEAR PLAN",
+       "file": null,
+       "type": null,
+       "attachments": [
+        {
+         "name": "City Council Staff Report",
+         "url": "https://lakeforest.primegov.com/api/compilemeetingattachmenthistory/historyattachment/?historyId=4b6e9819-fd7e-4334-bd44-836bc0461997"
+        },
+        {
+         "name": "Attachment 1 - Resolution",
+         "url": "https://lakeforest.primegov.com/api/compilemeetingattachmenthistory/historyattachment/?historyId=1ffb3b59-8d5e-4dce-aa2f-2e99a16b9a66"
+        },
+        {
+         "name": "Attachment 2 - City Council Resolution Authorizing the Application and Adopting th",
+         "url": "https://lakeforest.primegov.com/api/compilemeetingattachmenthistory/historyattachment/?historyId=496b0a77-e7c0-4ef1-9667-7221a00d5926"
+        }
+       ]
+      }
+     ]
+    }
+   ]
+  },
   "Newport Beach": {
    "source": "https://newportbeach.legistar.com/Calendar.aspx",
    "meetings": []
@@ -253,6 +508,25 @@
   },
   "San Clemente": {
    "source": "https://san-clemente.legistar.com/Calendar.aspx",
+   "meetings": []
+  },
+  "Santa Ana": {
+   "source": "https://santa-ana.primegov.com/public/portal",
+   "meetings": [
+    {
+     "body": "CANCELLED- Regular City Council Meeting",
+     "date": "2026-12-01",
+     "time": "5:00 PM",
+     "location": "22 Civic Center Plaza Santa Ana, CA 92701",
+     "agenda_url": null,
+     "meeting_url": "https://santa-ana.primegov.com/public/portal",
+     "agenda_status": null,
+     "items": []
+    }
+   ]
+  },
+  "Seal Beach": {
+   "source": "https://sealbeach.primegov.com/public/portal",
    "meetings": []
   },
   "Westminster": {
