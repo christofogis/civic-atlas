@@ -50,7 +50,7 @@ def parse(pdf):
             close(); section = SECTION.match(line).group(1).title(); continue
         if STOP.match(line):
             close(); section = None; continue
-        if not section:
+        if not section or re.match(r"^\s*END OF CONSENT CALENDAR", line):
             continue
         m = ITEM.match(line)
         if m:

@@ -819,3 +819,8 @@ ol.bare { list-style: none; padding: 0; margin: 0; }
 .glance-laws li { padding: 0.3rem 0; border-bottom: 1px solid var(--border); }
 .glance-laws .clamp2-inline { display: -webkit-inline-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; vertical-align: top; }
 .recent-meetings { margin-top: 1.4rem; } .recent-meetings li { padding: 0.4rem 0; border-bottom: 1px solid var(--border); }
+.board-actions { margin: 0.4rem 0 0.2rem; }
+.board-actions summary { cursor: pointer; color: var(--accent); }
+.board-action { margin-top: 0.35rem; padding-left: 0.6rem; border-left: 2px solid var(--border-strong); }
+.board-action .vote-kind { font-weight: 600; }
+.board-actions .clamp2-inline { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }

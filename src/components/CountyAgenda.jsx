@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { date } from "../lib/format.js";
 import { tr } from "../lib/lang.js";
 import { Ref } from "./Notes.jsx";
+import BoardActions from "./BoardActions.jsx";
 
 // What the Board of Supervisors will take up at its next meeting, item by item, in the county's
 // own words (records stay in English as published). Items can be narrowed to those that name one
@@ -32,8 +33,12 @@ function districtsLabel(d) {
 
 export default function CountyAgenda({ district }) {
   const [data, setData] = useState(null);
+  const [minutes, setMinutes] = useState(null);
   const [mine, setMine] = useState(false);
-  useEffect(() => { loadAgendas().then((d) => setData(d ?? false)); }, []);
+  useEffect(() => {
+    loadAgendas().then((d) => setData(d ?? false));
+    fetch("/data/local/ca-orange-minutes.json").then((r) => (r.ok ? r.json() : null)).then(setMinutes).catch(() => {});
+  }, []);
   if (data === null) return null;
   const today = new Intl.DateTimeFormat("en-CA", { timeZone: "America/Los_Angeles" }).format(new Date());
   const m = data && data.meetings.find((x) => x.date >= today && x.items.length);
@@ -48,9 +53,10 @@ export default function CountyAgenda({ district }) {
           <li key={p.date + p.time}>
             <strong>{date(p.date)}</strong> <span className="fine" lang="en">{p.title}</span>
             <div className="fine">
-              {p.minutes_url && <a href={p.minutes_url} rel="noopener">{tr("Minutes: each item's outcome and vote", "Acta: resultado y votación de cada asunto")}</a>}
+              {p.minutes_url && <a href={p.minutes_url} rel="noopener">{tr("Minutes (PDF)", "Acta (PDF)")}</a>}
               {p.video_url && <>{p.minutes_url ? " · " : ""}<a href={p.video_url} rel="noopener">{tr("Video", "Video")}</a></>}
             </div>
+            {(() => { const mm = minutes?.meetings?.find((x) => x.date === p.date && x.time === p.time); return mm ? <BoardActions meeting={mm} /> : null; })()}
           </li>
         ))}
       </ul>
