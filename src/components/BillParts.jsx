@@ -74,7 +74,9 @@ export default function BillParts({ congress, type, number }) {
       </p>
       {summaries.size > 0 && (
         <p className="fine parts-ai-note">
-          {tr(`${summaries.size} of these sections have a plain-language summary written by AI from the section's text and checked against it. The text is the official record; `, `${summaries.size} de estas secciones tienen un resumen en lenguaje sencillo escrito por IA a partir del texto de la sección y verificado contra él. El texto es el registro oficial; `)}
+          {summaries.size === 1
+            ? tr("1 of these sections has a plain-language summary written by AI from the section's text and checked against it. The text is the official record; ", "1 de estas secciones tiene un resumen en lenguaje sencillo escrito por IA a partir del texto de la sección y verificado contra él. El texto es el registro oficial; ")
+            : tr(`${summaries.size} of these sections have a plain-language summary written by AI from the section's text and checked against it. The text is the official record; `, `${summaries.size} de estas secciones tienen un resumen en lenguaje sencillo escrito por IA a partir del texto de la sección y verificado contra él. El texto es el registro oficial; `)}
           <Link to="/methods#section-summaries">{tr("how the summaries are made", "cómo se hacen los resúmenes")}</Link>.
         </p>
       )}
