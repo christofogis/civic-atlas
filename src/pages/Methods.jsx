@@ -183,6 +183,35 @@ export default function Methods() {
         (ignoring capital letters and punctuation), never by district number alone.
       </p>
 
+      <h2 id="election-results">Election results</h2>
+      <p>
+        Member pages list each general election in which the member was a candidate, and the On the ballot page shows a
+        seat holder's share of the vote, from official certified results. The main source is the FEC's Federal Elections
+        publication, which compiles each state's certified results for the Senate and House, including special elections,
+        runoffs and ranked-choice rounds. The FEC publishes it long after the election (Federal Elections 2022 appeared in
+        2025). For a year the FEC hasn't published yet, results come from the House Clerk's Statistics of the Presidential
+        and Congressional Election, published a few months after the election; 2024 currently comes from the Clerk. A
+        monthly job checks for new publications and switches a year to the FEC's file once it appears.
+      </p>
+      <p>
+        Names and parties are shown exactly as printed: the FEC prints "Last, First" and party codes (D, R, LIB, W for
+        write-in), the Clerk prints full names and party names. In New York, Connecticut and other states where a candidate
+        can run on more than one party line, each line is listed and the total is the candidate's combined vote. In the
+        FEC's file, percent is as printed: the share of all votes cast in the race. The Clerk prints votes only, so for
+        those years the percent is calculated here, as the candidate's votes over all votes printed for the race, leaving
+        out blank, void, over- and under-votes. Some states don't print unopposed candidates on the ballot, so there is no
+        vote count for them. The site doesn't mark winners or margins: the On the ballot page says who held each seat
+        afterward from the official member list.
+      </p>
+      <p>
+        Members are matched to candidates by FEC candidate ID, the same IDs the member data carries. The FEC's file
+        prints an ID for each candidate. For Clerk years, IDs come from the FEC's list of congressional candidates on
+        general-election ballots, matched within the same race by last name (and first name, or a one- or two-letter
+        spelling difference). When a source prints one ID for two candidates in the same race, the ID stays only with the
+        candidate who is the member of Congress holding it, and otherwise is dropped, so that race may not appear on
+        that member's page.
+      </p>
+
       <h2 id="hearings">Committee hearings and meetings</h2>
       <p>
         Hearings, markups and business meetings in both chambers come from Congress.gov's committee meeting records,
@@ -366,6 +395,7 @@ export default function Methods() {
         <li><strong>Bills, cosponsors, summaries:</strong> GovInfo Bill Status records from the Library of Congress. Summaries are written by the nonpartisan Congressional Research Service.</li>
         <li><strong>Stock trades:</strong> Periodic Transaction Reports from the Clerk of the House and the Senate's electronic financial disclosure system.</li>
         <li><strong>Campaign finance:</strong> the Federal Election Commission, totals by two-year cycle.</li>
+        <li><strong>Election results:</strong> the FEC's Federal Elections publications of certified results, or the House Clerk's election statistics until the FEC publishes a year (<a href="#election-results">details</a>).</li>
         <li><strong>Your district:</strong> Geocodio, using Census Bureau district boundaries. Your address is used only for the lookup and is never stored by us. When address suggestions are on, what you type in the address box is sent to Google Places to suggest matching addresses.</li>
         <li><strong>Visits:</strong> Cloudflare Web Analytics counts page views and visits without cookies and without collecting personal data, so it can't tell who you are or whether you've visited before.</li>
       </ul>

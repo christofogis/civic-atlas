@@ -181,6 +181,38 @@ export default function MethodsEs() {
         miembro (sin tener en cuenta mayúsculas ni puntuación), nunca solo por el número de distrito.
       </p>
 
+      <h2 id="election-results">Resultados electorales</h2>
+      <p>
+        Las páginas de los miembros muestran cada elección general en la que el miembro fue candidato(a), y la página En la
+        boleta muestra la proporción de votos de quien ocupa cada escaño, según resultados oficiales certificados. La fuente
+        principal es la publicación Federal Elections de la FEC, que recopila los resultados certificados de cada estado para
+        el Senado y la Cámara, incluidas las elecciones especiales, las segundas vueltas y las rondas de voto preferencial. La
+        FEC la publica mucho después de la elección (Federal Elections 2022 apareció en 2025). Para un año que la FEC aún no
+        ha publicado, los resultados provienen de las estadísticas de la elección presidencial y del Congreso de la Secretaría
+        de la Cámara (Statistics of the Presidential and Congressional Election), publicadas unos meses después de la
+        elección; 2024 proviene por ahora de la Secretaría. Un proceso mensual busca publicaciones nuevas y cambia un año al
+        archivo de la FEC cuando aparece.
+      </p>
+      <p>
+        Los nombres y partidos se muestran tal como aparecen: la FEC imprime "Apellido, Nombre" y códigos de partido (D, R,
+        LIB, W para votos por escrito), y la Secretaría imprime nombres completos y nombres de partido. En Nueva York,
+        Connecticut y otros estados donde un candidato puede presentarse en más de una línea de partido, se muestra cada
+        línea y el total es el voto combinado del candidato. En el archivo de la FEC, el porcentaje es el publicado: la
+        proporción de todos los votos emitidos en la contienda. La Secretaría solo publica votos, así que para esos años el
+        porcentaje se calcula aquí, como los votos del candidato sobre todos los votos publicados para la contienda, sin
+        contar los votos en blanco, nulos, de más ni de menos. Algunos estados no imprimen en la boleta a los candidatos sin
+        oposición, por lo que no hay recuento de votos para ellos. El sitio no marca ganadores ni márgenes: la página En la
+        boleta indica quién ocupó cada escaño después, según la lista oficial de miembros.
+      </p>
+      <p>
+        Los miembros se asocian a los candidatos por su número de candidato de la FEC, el mismo que tienen los datos de los
+        miembros. El archivo de la FEC da un número para cada candidato. Para los años de la Secretaría, los números provienen
+        de la lista de la FEC de candidatos al Congreso en las boletas de la elección general, asociados dentro de la misma
+        contienda por apellido (y nombre, o una diferencia de ortografía de una o dos letras). Cuando una fuente da un mismo
+        número a dos candidatos de una contienda, el número queda solo con el candidato que es el miembro del Congreso al que
+        pertenece; si no, se descarta, y esa contienda puede no aparecer en la página de ese miembro.
+      </p>
+
       <h2 id="hearings">Audiencias y reuniones de comités</h2>
       <p>
         Las audiencias, sesiones de enmiendas y reuniones de trabajo de ambas cámaras provienen de los registros de
@@ -366,6 +398,7 @@ export default function MethodsEs() {
         <li><strong>Proyectos, copatrocinadores, resúmenes:</strong> registros GovInfo Bill Status de la Biblioteca del Congreso. Los resúmenes los escribe el Servicio de Investigación del Congreso, que es apartidista, y se publican en inglés.</li>
         <li><strong>Compraventa de acciones:</strong> Informes Periódicos de Transacciones del Secretario de la Cámara y del sistema electrónico de divulgación financiera del Senado.</li>
         <li><strong>Finanzas de campaña:</strong> la Comisión Federal de Elecciones, totales por ciclo de dos años.</li>
+        <li><strong>Resultados electorales:</strong> las publicaciones Federal Elections de la FEC con resultados certificados, o las estadísticas electorales de la Secretaría de la Cámara hasta que la FEC publique un año (<a href="#election-results">detalles</a>).</li>
         <li><strong>Su distrito:</strong> Geocodio, con los límites de distritos de la Oficina del Censo. Su dirección se usa solo para la búsqueda y nunca la guardamos. Cuando las sugerencias de dirección están activas, lo que escribe en la casilla de dirección se envía a Google Places para sugerir direcciones.</li>
         <li><strong>Visitas:</strong> Cloudflare Web Analytics cuenta páginas vistas y visitas sin cookies y sin recopilar datos personales, así que no puede saber quién es usted ni si ya visitó el sitio antes.</li>
       </ul>
