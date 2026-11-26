@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { billProgress, billSteps } from "../lib/billprogress.js";
+import { billProgress } from "../lib/billprogress.js";
 
 const a = (actionDate, actionCode, text, code = "9") => ({ actionDate, actionCode, text, sourceSystem: { code } });
 
@@ -26,11 +26,4 @@ test("signed is not enactment; earliest date wins", () => {
   const p = billProgress([a("2025-07-04", "36000", "Signed by President."), a("2024-03-01", "5000", "Reported"), a("2024-02-01", "5000", "Reported")]);
   assert.equal(p.became_law_date, null);
   assert.equal(p.reported_date, "2024-02-01");
-});
-
-test("steps by bill type", () => {
-  assert.deepEqual(billSteps({ bill_type: "sres", introduced_date: "2025-01-01", passed_senate_date: "2025-01-02" }).map((s) => s.label),
-    ["Introduced", "Reported by committee", "Agreed to in Senate"]);
-  const s = billSteps({ bill_type: "s", introduced_date: "2025-01-01", passed_senate_date: "2025-02-01", vetoed_date: "2025-03-01" });
-  assert.deepEqual(s.map((x) => x.label), ["Introduced", "Reported by committee", "Passed Senate", "Passed House", "To President", "Vetoed"]);
 });

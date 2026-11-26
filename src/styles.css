@@ -242,10 +242,25 @@ button.link { background: none; border: 0; padding: 0; color: var(--accent); tex
 .status-bar .step { flex: 1 1 110px; padding: 10px 10px 6px 0; border-top: 3px solid var(--border); font-size: 0.85rem; max-width: none; }
 .status-bar .step.done { border-top-color: var(--accent); }
 .status-bar .step.failed { border-top-color: #7a4a12; }
-.status-bar .step.skipped { border-top-color: #b9cfc0; border-top-style: dashed; }
+.status-bar .step.no_report, .status-bar .step.unknown { border-top-style: dotted; border-top-color: var(--border-strong); }
+/* The current step: a thicker dashed accent line plus its own words ("Next step", "Referred …"). */
+.status-bar .step.current { border-top: 5px dashed var(--accent); padding-top: 8px; }
 .status-bar .step-label { display: block; font-weight: 600; }
 .status-bar .step.todo .step-label { color: var(--faint); font-weight: 400; }
 .status-bar .step-date { display: block; color: var(--faint); font-size: 0.78rem; }
+.status-bar .step.current .step-date { color: var(--text); font-weight: 600; }
+.bill-track { margin: 4px 0 12px; }
+.bill-track-h { font-size: 1rem; margin: 0 0 2px; }
+.bill-track-next { margin: 0 0 4px; }
+/* Phones: one step per line, the line on the left, so six steps stay readable at 390px. */
+@media (max-width: 480px) {
+  .status-bar { flex-direction: column; }
+  .status-bar .step, .status-bar .step.current { flex: none; border-top: 0; border-left: 3px solid var(--border); padding: 3px 0 3px 10px; display: flex; gap: 8px; align-items: baseline; flex-wrap: wrap; }
+  .status-bar .step.done { border-left-color: var(--accent); }
+  .status-bar .step.failed { border-left-color: #7a4a12; }
+  .status-bar .step.no_report, .status-bar .step.unknown { border-left-style: dotted; border-left-color: var(--border-strong); }
+  .status-bar .step.current { border-left: 5px dashed var(--accent); padding-left: 8px; }
+}
 .versions li { margin-bottom: 10px; }
 .agenda { font-size: 0.92rem; color: var(--muted); }
 

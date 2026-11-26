@@ -152,6 +152,35 @@ export default function MethodsEs() {
         junto con los de inglés y se verifican contra ellos.
       </p>
 
+      <h2 id="bill-stage">En qué etapa está un proyecto</h2>
+      <p>
+        Las etapas en la parte superior de la página de un proyecto se construyen a partir de la lista oficial de acciones
+        del proyecto en GovInfo Bill Status. Cada etapa es la primera fecha en que aparece su código de acción de la
+        Biblioteca del Congreso: presentado; informado por un comité (5000 o 14000); aprobado o adoptado por la Cámara
+        (8000) o rechazado allí (9000); lo mismo en el Senado (17000, 18000); presentado al Presidente (28000); vetado
+        (31000); convertido en ley (36000, solo cuando la acción dice que se convirtió en ley pública o privada, no solo que
+        fue firmado). La etapa del comité también muestra la fecha en que el proyecto fue remitido, según su lista de comités.
+      </p>
+      <p>
+        Las etapas dependen del tipo de medida. Una resolución simple (H.Res., S.Res.) solo necesita su propia cámara. Una
+        resolución concurrente necesita ambas cámaras y no se envía al Presidente. Una resolución conjunta cuyo título
+        oficial propone una enmienda a la Constitución pasa a los estados después de que ambas cámaras la aprueban; la
+        ratificación estatal no está en los registros que usamos, así que esa etapa no tiene fecha. Los proyectos de ley y
+        las demás resoluciones conjuntas se envían al Presidente.
+      </p>
+      <p>
+        No se completa nada por suposición. Cuando una etapa posterior está en el registro pero falta la fecha de una
+        anterior, la anterior dice "Fecha no registrada". Cuando un proyecto avanzó sin un informe de comité en el registro
+        (un comité puede ser relevado u omitido), la etapa del comité lo indica. Una votación nominal se enlaza a una etapa
+        solo cuando hay exactamente una votación de aprobación en esa cámara ese día; muchos proyectos se aprueban a viva
+        voz, sin votación nominal. La frase "Siguiente paso" nombra la cámara que actuaría después, y dice que hay una
+        votación programada solo cuando la agenda del pleno de la Cámara o una sesión de enmiendas de un comité incluye el
+        proyecto. Para un proyecto de un Congreso anterior que no se convirtió en ley, la página dice que el Congreso terminó
+        sin que se convirtiera en ley: los proyectos que no se aprueban antes del fin de un Congreso tendrían que presentarse
+        de nuevo. La sección "Pasos y acciones" muestra cada fecha registrada con su código de acción y enlaza a la lista
+        completa de acciones en Congress.gov.
+      </p>
+
       <h2 id="photos">Fotos</h2>
       <p>
         Los miembros del Congreso aparecen con su retrato oficial, de la colección de dominio público que mantiene el

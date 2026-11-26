@@ -1,6 +1,4 @@
-import { label as stepLabel } from "../components/StatusBar.jsx";
 import { Fold, useFolds } from "../components/Fold.jsx";
-import { billSteps } from "../../lib/billprogress.js";
 import { Fragment, useEffect, useState, lazy, Suspense } from "react";
 import { Link, useParams } from "react-router-dom";
 import { db } from "../lib/db.js";
@@ -29,7 +27,7 @@ async function loadBill(congress, type, number) {
   const one = (q) => q.then(({ data, error }) => { if (error) throw error; return data; });
   const key = (q) => q.eq("congress", congress).eq("bill_type", type).eq("number", number);
   const weekAgo = new Date(Date.now() - 7 * 864e5).toISOString().slice(0, 10);
-  const [bill, sponsor, cosponsors, votes, lobbying, lobbyCount, freshness, scheduled, meetings, former] = await Promise.all([
+  const [bill, sponsor, cosponsors, votes, lobbying, lobbyCount, freshness, scheduled, meetings, former, referrals] = await Promise.all([
     one(key(db.from("bills").select("*")).maybeSingle()),
     one(key(db.from("bill_sponsor_details").select("*")).maybeSingle()),
     one(key(db.from("bill_cosponsor_details").select("*")).order("sponsored_date").order("last_name")),
@@ -45,8 +43,10 @@ async function loadBill(congress, type, number) {
       .contains("bill_refs", [`${congress}-${type}-${number}`]).order("meeting_at", { ascending: false }).limit(50)).catch(() => []),
     one(key(db.from("bill_lobbying_former").select("lobbyist_name,covered_position,clients,last_quarter_key,latest_filing_uuid"))
       .order("lobbyist_name").limit(500)).catch(() => []),
+    // Committee referrals, for the "Committee" step and the record behind the track.
+    one(key(db.from("bill_committees").select("committee_id,first_activity_date,activities,committees(name,parent_id)")).order("first_activity_date")).catch(() => []),
   ]);
-  return { bill, sponsor, cosponsors, votes, lobbying, lobbyTotal: lobbyCount?.clients ?? lobbying?.length ?? 0, freshness, scheduled, meetings, former };
+  return { bill, sponsor, cosponsors, votes, lobbying, lobbyTotal: lobbyCount?.clients ?? lobbying?.length ?? 0, freshness, scheduled, meetings, former, referrals };
 }
 
 // A section's source goes in the page's notes, cited from its heading.
@@ -86,16 +86,12 @@ function FormerOfficials({ rows }) {
 }
 
 // A plain summary at the top of a bill page, filled in from the records in the same words for
-// every bill. Step names are the progress bar's own.
+// every bill. Where the bill stands is in the track just above it.
 function BillGlance({ b, sponsor, cosponsors, votes, lobbyTotal }) {
-  const steps = billSteps(b).filter((x) => x.date);
-  const last = steps.at(-1);
   const lines = [];
   lines.push(sponsor
     ? tr(`Introduced ${date(b.introduced_date)} by ${sponsor.name}.`, `Presentado el ${date(b.introduced_date)} por ${sponsor.name}.`)
     : tr(`Introduced ${date(b.introduced_date)}.`, `Presentado el ${date(b.introduced_date)}.`));
-  if (last && last.label !== "Introduced") lines.push(tr(`Furthest step so far: ${last.label}, ${date(last.date)}.`, `Etapa más avanzada hasta ahora: ${stepLabel(last.label)}, ${date(last.date)}.`));
-  else lines.push(tr("Hasn't moved past introduction yet.", "Todavía no ha avanzado más allá de su presentación."));
   lines.push(tr(`${cosponsors} cosponsor${cosponsors === 1 ? "" : "s"}; ${votes} recorded roll-call vote${votes === 1 ? "" : "s"}.`, `${cosponsors} copatrocinador${cosponsors === 1 ? "" : "es"}; ${votes} votaci${votes === 1 ? "ón nominal registrada" : "ones nominales registradas"}.`));
   if (lobbyTotal != null) lines.push(tr(`${lobbyTotal.toLocaleString()} organization${lobbyTotal === 1 ? "" : "s"} reported lobbying on it.`, `${lobbyTotal.toLocaleString()} organizaci${lobbyTotal === 1 ? "ón informó" : "ones informaron"} cabildeo sobre este proyecto.`));
   return (
@@ -106,12 +102,57 @@ function BillGlance({ b, sponsor, cosponsors, votes, lobbyTotal }) {
   );
 }
 
+// The record behind the track: each milestone's first date with the Library of Congress action
+// code it comes from, the committee referrals, and the latest action, as published.
+const MILESTONES = [
+  ["introduced_date", "Introduced", "Presentado", null],
+  ["reported_date", "Reported by committee", "Informado por el comité", "5000, 14000"],
+  ["passed_house_date", "Passed or agreed to in House", "Aprobado o adoptado por la Cámara", "8000"],
+  ["failed_house_date", "Failed in House", "Rechazado en la Cámara", "9000"],
+  ["passed_senate_date", "Passed or agreed to in Senate", "Aprobado o adoptado por el Senado", "17000"],
+  ["failed_senate_date", "Failed in Senate", "Rechazado en el Senado", "18000"],
+  ["presented_date", "Presented to President", "Presentado al Presidente", "28000"],
+  ["vetoed_date", "Vetoed", "Vetado", "31000"],
+  ["became_law_date", "Became law", "Se convirtió en ley", "36000"],
+];
+function BillRecord({ b, referrals, source }) {
+  return (
+    <Section title={tr("The record behind the track", "El registro detrás de las etapas")} source={source}>
+      <table>
+        <thead><tr><th>{tr("Milestone", "Hito")}</th><th>{tr("First date", "Primera fecha")}</th><th>{tr("Action code", "Código de acción")}</th></tr></thead>
+        <tbody>
+          {MILESTONES.map(([k, en, es, code]) => (
+            <tr key={k}><td>{tr(en, es)}</td><td>{b[k] ? date(b[k]) : <span className="fine">{tr("Not in the record", "No registrado")}</span>}</td><td className="fine">{code ?? "—"}</td></tr>
+          ))}
+        </tbody>
+      </table>
+      {b.law_number && <p>{tr("Law number", "Número de ley")}: {b.law_number}</p>}
+      {referrals.length > 0 && (
+        <>
+          <h4>{tr("Committee referrals", "Remisiones a comités")}</h4>
+          <ul className="plain">
+            {referrals.map((r) => (
+              <li key={r.committee_id}>
+                <Link to={`/committee/${r.committee_id}`}>{r.committees?.name ?? r.committee_id}</Link>
+                {r.first_activity_date && <span className="fine"> · {date(r.first_activity_date)}</span>}
+                {r.activities?.length > 0 && <span className="fine"> · {r.activities.join(", ")}</span>}
+              </li>
+            ))}
+          </ul>
+        </>
+      )}
+      {b.latest_action_text && <p>{tr("Latest action", "Última acción")} ({date(b.latest_action_date)}): {b.latest_action_text}</p>}
+      <p><a href={`${b.source_url}/all-actions`}>{tr("Every action on this bill at Congress.gov", "Todas las acciones sobre este proyecto en Congress.gov (en inglés)")}</a></p>
+    </Section>
+  );
+}
+
 export default function Bill() {
   const { congress: c, type: t, number: n } = useParams();
   const congress = Number(c), type = String(t ?? "").toLowerCase(), number = Number(n);
   const valid = Number.isInteger(congress) && TYPES.has(type) && Number.isInteger(number) && number > 0;
   const [state, setState] = useState({ status: "loading" });
-  const { open, toggle } = useFolds(["parts", "text", "cosponsors", "hearings", "votes", "lobbying"], state.status === "done", `${congress}-${type}-${number}`);
+  const { open, toggle } = useFolds(["steps", "parts", "text", "cosponsors", "hearings", "votes", "lobbying"], state.status === "done", `${congress}-${type}-${number}`);
   const [allLobbying, setAllLobbying] = useState(false);
   const [openVote, setOpenVote] = useState(null);
 
@@ -132,7 +173,10 @@ export default function Bill() {
   if (state.status === "missing") return <main className="page"><h1>{tr("Bill not found", "Proyecto no encontrado")}</h1><p>{tr("Bills from the 118th Congress (2023) on are covered.", "Se incluyen los proyectos desde el 118.º Congreso (2023).")} <Link to="/">{tr("Back to search", "Volver a la búsqueda")}</Link></p></main>;
   if (state.status === "error") return <main className="page"><p className="notice">{tr("Couldn't load this page right now. Try again shortly.", "No se pudo cargar esta página. Inténtelo de nuevo en un momento.")}</p></main>;
 
-  const { bill: b, sponsor, cosponsors, votes, lobbying, lobbyTotal, freshness, scheduled, meetings, former } = state.data;
+  const { bill: b, sponsor, cosponsors, votes, lobbying, lobbyTotal, freshness, scheduled, meetings, former, referrals } = state.data;
+  // Floor items are dated by the Monday of their week, so this week's stay; other events must be ahead.
+  const today = new Date().toISOString().slice(0, 10);
+  const ahead = scheduled.filter((e) => e.kind === "floor" || e.event_date >= today);
   const fresh = Object.fromEntries(freshness.map((f) => [f.job, f.last_success_at]));
   const updated = (job) => (fresh[job] ? tr(` Updated ${date(fresh[job])}.`, ` Actualizado el ${date(fresh[job])}.`) : "");
   const current = cosponsors.filter((x) => !x.withdrawn_date);
@@ -182,7 +226,7 @@ export default function Bill() {
       </aside>
 
       <div className="split-main">
-      <StatusBar bill={b} />
+      <StatusBar bill={b} referrals={referrals} votes={votes} scheduled={ahead} />
 
       <BillGlance b={b} sponsor={sponsor} cosponsors={current.length} votes={votes.length} lobbyTotal={lobbying ? lobbyTotal : null} />
 
@@ -194,6 +238,10 @@ export default function Bill() {
 
       <p className="fold-hint">{tr("Tap a topic to see the details and records.", "Toque un tema para ver los detalles y registros.")}</p>
       <div className="folds">
+      <Fold id="steps" title={tr("Steps and actions", "Pasos y acciones")} open={open.has("steps")} onToggle={toggle}
+        summary={tr("Each step's date as recorded, committee referrals, and the full list of actions", "La fecha registrada de cada paso, las remisiones a comités y la lista completa de acciones")}>
+        <BillRecord b={b} referrals={referrals} source={tr(`GovInfo Bill Status (Library of Congress).${updated("bills")}`, `GovInfo Bill Status (Biblioteca del Congreso).${updated("bills")}`)} />
+      </Fold>
       <Fold id="parts" title={tr("Every part of the bill", "Todas las partes del proyecto")} open={open.has("parts")} onToggle={toggle}
         summary={tr("Each section's heading and length, with a search, so any one talking point can be read against the whole bill", "El encabezado y la extensión de cada sección, con búsqueda, para leer cualquier argumento frente al proyecto completo")}>
         <Suspense fallback={<p>{tr("Loading…", "Cargando…")}</p>}><BillParts congress={congress} type={type} number={number} /></Suspense>
