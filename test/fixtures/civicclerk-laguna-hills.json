@@ -1,0 +1,373 @@
+{
+ "_note": "Trimmed from lagunahillsca.api.civicclerk.com (Events filter id eq 843; Meetings/835), Nov 26, 2026. Only fields the reader uses; staff names, user ids and the names of private people removed; items whose ids are negative and names start with SYNTHETIC were added to test the filter.",
+ "event": {
+  "id": 843,
+  "eventName": "City Council / Planning Agency Regular Meeting",
+  "startDateTime": "2026-11-10T18:00:00Z",
+  "agendaId": 835,
+  "categoryName": "City Council / Planning Agency",
+  "eventLocation": {
+   "address1": "City Council Chamber",
+   "address2": "24035 El Toro Road",
+   "city": "Laguna Hills",
+   "state": "California",
+   "zipCode": "92653"
+  },
+  "publishedFiles": [
+   {
+    "fileId": 3030,
+    "type": "Agenda",
+    "name": "20261110_CCPA_Agenda_Final",
+    "publishOn": "2026-11-06T13:49:48.44Z"
+   },
+   {
+    "fileId": 3032,
+    "type": "Agenda Packet",
+    "name": "20261110_CCPA_Packet_Final",
+    "publishOn": "2026-11-06T15:20:00.737Z"
+   }
+  ]
+ },
+ "meeting": {
+  "@odata.context": "https://lagunahillsca.api.civicclerk.com/v1/$metadata#Meetings/$entity",
+  "id": 835,
+  "agendaIsPublish": true,
+  "publishedFiles": [
+   {
+    "id": 0,
+    "fileId": 3030,
+    "publishTo": null,
+    "type": "Agenda",
+    "publishOn": "2026-11-06T13:49:48.44Z",
+    "publishBy": null,
+    "name": "20261110_CCPA_Agenda_Final",
+    "url": null,
+    "sort": 0,
+    "fileType": 0,
+    "streamUrl": null
+   },
+   {
+    "id": 0,
+    "fileId": 3032,
+    "publishTo": null,
+    "type": "Agenda Packet",
+    "publishOn": "2026-11-06T15:20:00.737Z",
+    "publishBy": null,
+    "name": "20261110_CCPA_Packet_Final",
+    "url": null,
+    "sort": 0,
+    "fileType": 0,
+    "streamUrl": null
+   }
+  ],
+  "items": [
+   {
+    "id": 9246,
+    "agendaObjectItemNumber": "",
+    "agendaObjectItemOutlineNumber": "",
+    "agendaObjectItemName": "Call to Order",
+    "agendaObjItemCategoryTypeDesc": null,
+    "sortOrder": 2,
+    "isDeleted": false,
+    "parentId": -1,
+    "attachmentsList": [],
+    "reportsList": [],
+    "childItems": []
+   },
+   {
+    "id": 9250,
+    "agendaObjectItemNumber": "",
+    "agendaObjectItemOutlineNumber": "1.",
+    "agendaObjectItemName": "Presentations and Proclamations",
+    "agendaObjItemCategoryTypeDesc": null,
+    "sortOrder": 6,
+    "isDeleted": false,
+    "parentId": -1,
+    "attachmentsList": [],
+    "reportsList": [],
+    "childItems": [
+     {
+      "id": 9549,
+      "agendaObjectItemNumber": "2026-1192",
+      "agendaObjectItemOutlineNumber": "1.",
+      "agendaObjectItemName": "Laguna Hills High School Student Liaison Report",
+      "agendaObjItemCategoryTypeDesc": null,
+      "sortOrder": 7,
+      "isDeleted": false,
+      "parentId": 9250,
+      "attachmentsList": [],
+      "reportsList": [],
+      "childItems": []
+     }
+    ]
+   },
+   {
+    "id": 9251,
+    "agendaObjectItemNumber": "",
+    "agendaObjectItemOutlineNumber": "2.",
+    "agendaObjectItemName": "Schedule of Future Events",
+    "agendaObjItemCategoryTypeDesc": null,
+    "sortOrder": 8,
+    "isDeleted": false,
+    "parentId": -1,
+    "attachmentsList": [],
+    "reportsList": [],
+    "childItems": [
+     {
+      "id": 9271,
+      "agendaObjectItemNumber": "2026-1051",
+      "agendaObjectItemOutlineNumber": "1.",
+      "agendaObjectItemName": "<span style=\"font-family: Arial;\">Schedule of Future Events</span>",
+      "agendaObjItemCategoryTypeDesc": null,
+      "sortOrder": 9,
+      "isDeleted": false,
+      "parentId": 9251,
+      "attachmentsList": [
+       {
+        "id": 2305,
+        "agendaObjectItemId": 9271,
+        "fileName": "Excursion to Sony Pictures_Flyer_",
+        "contentType": "application/pdf",
+        "fileSize": 313556,
+        "isPublished": true,
+        "isDeleted": false,
+        "sortOrder": 1
+       },
+       {
+        "id": 2304,
+        "agendaObjectItemId": 9271,
+        "fileName": "GHS Fall Classics Concert",
+        "contentType": "image/png",
+        "fileSize": 8816462,
+        "isPublished": true,
+        "isDeleted": false,
+        "sortOrder": 2
+       }
+      ],
+      "reportsList": [
+       {
+        "id": 1796,
+        "agendaObjectItemId": 9271,
+        "agendaObjItemReportName": "November 10, 2026 Schedule of Events Report",
+        "isDeleted": false,
+        "sortOrder": 1
+       }
+      ],
+      "childItems": []
+     }
+    ]
+   },
+   {
+    "id": 9253,
+    "agendaObjectItemNumber": "",
+    "agendaObjectItemOutlineNumber": "4.",
+    "agendaObjectItemName": "Consent Calendar",
+    "agendaObjItemCategoryTypeDesc": null,
+    "sortOrder": 11,
+    "isDeleted": false,
+    "parentId": -1,
+    "attachmentsList": [],
+    "reportsList": [],
+    "childItems": [
+     {
+      "id": 9272,
+      "agendaObjectItemNumber": "2026-1052",
+      "agendaObjectItemOutlineNumber": "1.",
+      "agendaObjectItemName": "Waive Reading in Full of all Ordinances and Resolutions on the Agenda\u00a0",
+      "agendaObjItemCategoryTypeDesc": null,
+      "sortOrder": 12,
+      "isDeleted": false,
+      "parentId": 9253,
+      "attachmentsList": [],
+      "reportsList": [],
+      "childItems": []
+     },
+     {
+      "id": 9544,
+      "agendaObjectItemNumber": "2026-1187",
+      "agendaObjectItemOutlineNumber": "2.",
+      "agendaObjectItemName": "Approval of the Minutes for the October 27, 2026, Regular Meeting",
+      "agendaObjItemCategoryTypeDesc": null,
+      "sortOrder": 13,
+      "isDeleted": false,
+      "parentId": 9253,
+      "attachmentsList": [
+       {
+        "id": 2315,
+        "agendaObjectItemId": 9544,
+        "fileName": "20261027_CCPA_Minutes_Draft_1",
+        "contentType": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+        "fileSize": 76092,
+        "isPublished": true,
+        "isDeleted": false,
+        "sortOrder": 1
+       }
+      ],
+      "reportsList": [],
+      "childItems": []
+     },
+     {
+      "id": -1,
+      "agendaObjectItemNumber": "2026-0001",
+      "agendaObjectItemOutlineNumber": "9.",
+      "agendaObjectItemName": "SYNTHETIC deleted item",
+      "agendaObjItemCategoryTypeDesc": null,
+      "sortOrder": 900,
+      "isDeleted": true,
+      "parentId": 9253,
+      "attachmentsList": [],
+      "reportsList": [],
+      "childItems": []
+     },
+     {
+      "id": -2,
+      "agendaObjectItemNumber": "",
+      "agendaObjectItemOutlineNumber": "10.",
+      "agendaObjectItemName": "<p>SYNTHETIC item</p><p>with only an unpublished attachment</p>",
+      "agendaObjItemCategoryTypeDesc": null,
+      "sortOrder": 901,
+      "isDeleted": false,
+      "parentId": 9253,
+      "attachmentsList": [
+       {
+        "id": -3,
+        "agendaObjectItemId": -2,
+        "fileName": "draft",
+        "contentType": "application/pdf",
+        "fileSize": 1,
+        "isPublished": false,
+        "isDeleted": false,
+        "sortOrder": 1
+       }
+      ],
+      "reportsList": [],
+      "childItems": []
+     }
+    ]
+   },
+   {
+    "id": 9255,
+    "agendaObjectItemNumber": "",
+    "agendaObjectItemOutlineNumber": "5.",
+    "agendaObjectItemName": "Planning Agency",
+    "agendaObjItemCategoryTypeDesc": null,
+    "sortOrder": 19,
+    "isDeleted": false,
+    "parentId": -1,
+    "attachmentsList": [],
+    "reportsList": [],
+    "childItems": [
+     {
+      "id": 9273,
+      "agendaObjectItemNumber": "2026-1053",
+      "agendaObjectItemOutlineNumber": "1.",
+      "agendaObjectItemName": "Roll Call of Planning Agency Members",
+      "agendaObjItemCategoryTypeDesc": null,
+      "sortOrder": 20,
+      "isDeleted": false,
+      "parentId": 9255,
+      "attachmentsList": [],
+      "reportsList": [],
+      "childItems": []
+     },
+     {
+      "id": 9277,
+      "agendaObjectItemNumber": "2026-1057",
+      "agendaObjectItemOutlineNumber": "3.",
+      "agendaObjectItemName": "Planning Agency Public Hearings",
+      "agendaObjItemCategoryTypeDesc": null,
+      "sortOrder": 22,
+      "isDeleted": false,
+      "parentId": 9255,
+      "attachmentsList": [],
+      "reportsList": [],
+      "childItems": [
+       {
+        "id": 9490,
+        "agendaObjectItemNumber": "2026-1158",
+        "agendaObjectItemOutlineNumber": "1",
+        "agendaObjectItemName": "Site Development Permit/Master Sign Program (SDP/MSP) No. USE-0228-2025, for Approval of an Amendment to the MemorialCare Saddleback Medical Center Master Sign Program to Accommodate Signage for the New Central Utility Plant Located at 24451 Health Center Drive.",
+        "agendaObjItemCategoryTypeDesc": null,
+        "sortOrder": 23,
+        "isDeleted": false,
+        "parentId": 9277,
+        "attachmentsList": [
+         {
+          "id": 2321,
+          "agendaObjectItemId": 9490,
+          "fileName": "Proposed Resolution of Approval",
+          "contentType": "application/pdf",
+          "fileSize": 114103,
+          "isPublished": true,
+          "isDeleted": false,
+          "sortOrder": 1
+         },
+         {
+          "id": 2322,
+          "agendaObjectItemId": 9490,
+          "fileName": "Letter of Justification",
+          "contentType": "application/pdf",
+          "fileSize": 87054,
+          "isPublished": true,
+          "isDeleted": false,
+          "sortOrder": 2
+         }
+        ],
+        "reportsList": [
+         {
+          "id": 1772,
+          "agendaObjectItemId": 9490,
+          "agendaObjItemReportName": "Staff Report",
+          "isDeleted": false,
+          "sortOrder": 1
+         }
+        ],
+        "childItems": []
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "id": 9266,
+    "agendaObjectItemNumber": "",
+    "agendaObjectItemOutlineNumber": "",
+    "agendaObjectItemName": "Announcement of Closed Session Item(s)",
+    "agendaObjItemCategoryTypeDesc": null,
+    "sortOrder": 38,
+    "isDeleted": false,
+    "parentId": -1,
+    "attachmentsList": [],
+    "reportsList": [],
+    "childItems": [
+     {
+      "id": 9285,
+      "agendaObjectItemNumber": "2026-1065",
+      "agendaObjectItemOutlineNumber": "",
+      "agendaObjectItemName": "A. Public Employee Performance Evaluation<br><br>Pursuant to Government Code Section 54957(b)(1)<br>Public Employee Title: City Manager - Annual Performance Review",
+      "agendaObjItemCategoryTypeDesc": null,
+      "sortOrder": 39,
+      "isDeleted": false,
+      "parentId": 9266,
+      "attachmentsList": [],
+      "reportsList": [],
+      "childItems": []
+     }
+    ]
+   },
+   {
+    "id": 9261,
+    "agendaObjectItemNumber": "",
+    "agendaObjectItemOutlineNumber": "",
+    "agendaObjectItemName": "Adjournment",
+    "agendaObjItemCategoryTypeDesc": null,
+    "sortOrder": 47,
+    "isDeleted": false,
+    "parentId": -1,
+    "attachmentsList": [],
+    "reportsList": [],
+    "childItems": []
+   }
+  ]
+ }
+}
