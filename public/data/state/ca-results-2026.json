@@ -7,7 +7,7 @@
  "updated_text": "November 25, 2026, 6:54 p.m.",
  "certified_on": null,
  "certification_scheduled": "2026-12-11",
- "retrieved": "2026-11-26T16:47:48+00:00",
+ "retrieved": "2026-11-26T16:50:21+00:00",
  "source": {
   "name": "California Secretary of State",
   "url": "https://api.sos.ca.gov/returns/",
@@ -985,7 +985,8 @@
      "name": "Gil Cisneros",
      "party": "Dem",
      "votes": 158687,
-     "percent": 66.4
+     "percent": 66.4,
+     "bioguide_id": "C001123"
     },
     {
      "name": "Eric Ching",
@@ -1282,7 +1283,8 @@
      "name": "Nanette Diaz Barragan",
      "party": "Dem",
      "votes": 149015,
-     "percent": 81.8
+     "percent": 81.8,
+     "bioguide_id": "B001300"
     },
     {
      "name": "Genevieve Angel",
@@ -1327,7 +1329,8 @@
      "name": "Lou Correa",
      "party": "Dem",
      "votes": 139833,
-     "percent": 71.6
+     "percent": 71.6,
+     "bioguide_id": "C001110"
     },
     {
      "name": "David Pan",
