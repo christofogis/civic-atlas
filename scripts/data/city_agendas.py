@@ -104,8 +104,9 @@ def cc_api(tenant):
 
 def cc_text(s):
     """CivicClerk item names can carry HTML markup (<span style=...>, <br>). The words stay as the
-    city wrote them; only markup is removed and whitespace collapsed."""
-    s = re.sub(r"<br\s*/?>", " ", s or "", flags=re.I)
+    city wrote them; only markup is removed (line and paragraph breaks become spaces) and
+    whitespace collapsed."""
+    s = re.sub(r"</?(?:br|p|div|li|ul|ol|tr|td|h\d)\b[^>]*>", " ", s or "", flags=re.I)
     s = html.unescape(re.sub(r"<[^>]+>", "", s))
     return re.sub(r"\s+", " ", s).strip()
 
