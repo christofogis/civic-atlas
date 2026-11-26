@@ -1,13 +1,16 @@
 import { useEffect, useMemo, useState } from "react";
 import { db } from "../lib/db.js";
 import { date } from "../lib/format.js";
-import { tr } from "../lib/lang.js";
+import { tr, getLang } from "../lib/lang.js";
+import { Link } from "react-router-dom";
 import { sectionsFromXml } from "../../lib/billtext.js";
 
 // Every part of a bill, from its latest official text: the titles and sections in order, each
 // section's official heading and length, and its text on request. A search finds the sections
 // that mention a word, so any one talking point can be read against the whole bill. Nothing is
 // summarized or characterized: headings and text are the bill's own (in English, as published).
+// Where a section has a published AI summary (written and checked by scripts/ingest/section-summaries.mjs),
+// it is shown under the heading, labeled, with the official text one tap away.
 
 const MAX_SHOWN = 300;
 
@@ -15,6 +18,7 @@ export default function BillParts({ congress, type, number }) {
   const [state, setState] = useState({ status: "loading" });
   const [q, setQ] = useState("");
   const [openKey, setOpenKey] = useState(null);
+  const [summaries, setSummaries] = useState(new Map());
 
   useEffect(() => {
     let live = true;
@@ -30,6 +34,10 @@ export default function BillParts({ congress, type, number }) {
         const sections = sectionsFromXml(await res.text());
         if (sections?.length > 1 || (sections?.length === 1 && versions.length === 1)) {
           if (live) setState({ status: "done", v, sections });
+          // Published summaries for this version only: a summary describes the text it was written from.
+          const { data: sums } = await db.from("bill_section_summaries").select("section_key,summary_en,summary_es")
+            .eq("congress", congress).eq("bill_type", type).eq("number", number).eq("version_code", v.version_code);
+          if (live && sums?.length) setSummaries(new Map(sums.map((x) => [x.section_key, x])));
           return;
         }
       }
@@ -64,6 +72,12 @@ export default function BillParts({ congress, type, number }) {
         {tr(`, about ${total.toLocaleString()} words. `, `, unas ${total.toLocaleString("es")} palabras. `)}
         <span className="fine">{tr(`From the version "${v.version_name}"${v.version_date ? `, ${date(v.version_date)}` : ""}. Headings and text are the bill's own, in English.`, `De la versión "${v.version_name}"${v.version_date ? `, ${date(v.version_date)}` : ""}. Los encabezados y el texto son los del proyecto, en inglés.`)}</span>
       </p>
+      {summaries.size > 0 && (
+        <p className="fine parts-ai-note">
+          {tr(`${summaries.size} of these sections have a plain-language summary written by AI from the section's text and checked against it. The text is the official record; `, `${summaries.size} de estas secciones tienen un resumen en lenguaje sencillo escrito por IA a partir del texto de la sección y verificado contra él. El texto es el registro oficial; `)}
+          <Link to="/methods#section-summaries">{tr("how the summaries are made", "cómo se hacen los resúmenes")}</Link>.
+        </p>
+      )}
       {tops.length > 1 && (
         <ul className="plain parts-overview" aria-label={tr("The bill's titles or divisions, by share of its words", "Los títulos o divisiones del proyecto, por proporción de palabras")}>
           {tops.map((t) => {
@@ -102,12 +116,29 @@ export default function BillParts({ congress, type, number }) {
                 </span>
                 <span className="fine">{s.words.toLocaleString()}</span>
               </button>
+              {summaries.has(s.key) && <AiSummary row={summaries.get(s.key)} />}
               {isOpen && <p className="parts-text" lang="en">{s.text}</p>}
             </li>
           )];
         })}
       </ol>
       {found.length > MAX_SHOWN && <p className="fine">{tr(`Showing the first ${MAX_SHOWN} of ${found.length}. Search to narrow the list.`, `Se muestran las primeras ${MAX_SHOWN} de ${found.length}. Busque para reducir la lista.`)}</p>}
+    </div>
+  );
+}
+
+// One section's AI summary: an opening sentence, then "- " lines as a list. Labeled every time.
+function AiSummary({ row }) {
+  const es = getLang() === "es";
+  const text = es ? row.summary_es : row.summary_en;
+  const lines = text.split("\n").map((l) => l.trim()).filter(Boolean);
+  const lead = lines.filter((l) => !l.startsWith("- "));
+  const items = lines.filter((l) => l.startsWith("- ")).map((l) => l.slice(2));
+  return (
+    <div className="parts-ai" lang={es ? "es" : "en"}>
+      <span className="parts-ai-label">{tr("AI-generated summary", "Resumen generado por IA")}</span>
+      {lead.map((l, i) => <p key={i}>{l}</p>)}
+      {items.length > 0 && <ul>{items.map((l, i) => <li key={i}>{l}</li>)}</ul>}
     </div>
   );
 }
