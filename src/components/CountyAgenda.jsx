@@ -3,6 +3,7 @@ import { date } from "../lib/format.js";
 import { tr } from "../lib/lang.js";
 import { Ref } from "./Notes.jsx";
 import BoardActions from "./BoardActions.jsx";
+import SupervisorTallies from "./SupervisorTallies.jsx";
 
 // What the Board of Supervisors will take up at its next meeting, item by item, in the county's
 // own words (records stay in English as published). Items can be narrowed to those that name one
@@ -60,6 +61,7 @@ export default function CountyAgenda({ district }) {
           </li>
         ))}
       </ul>
+      <SupervisorTallies minutes={minutes} />
     </div>
   );
   if (!m) return recent ? <section id="agenda" className="county-agenda">{recent}</section> : null;
