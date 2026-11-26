@@ -152,7 +152,11 @@ export default function MethodsEs() {
         Cámara de la próxima elección aparecen cuando asumen los miembros elegidos antes. Los ciclos de California (cargos
         estatales en los años de elección de gobernador, y los distritos pares e impares del Senado estatal en elecciones
         alternas) siguen la constitución del estado; los del Condado de Orange provienen de las fechas de los períodos de
-        cada funcionario. Los candidatos inscritos están en la página de candidatos de 2028.
+        cada funcionario. Después de una elección, cuando comienzan los nuevos períodos y aparecen en la lista oficial de
+        miembros, cada escaño indica si quien lo ocupaba regresó y, en el Senado, quién lo ocupa ahora. En la Cámara solo
+        se indica si el miembro regresó, porque los distritos pueden cambiar entre un Congreso y otro. El sitio no dice
+        que alguien perdió: puede que no se haya presentado. Los retratos que faltan se muestran como una silueta gris.
+        Los candidatos inscritos están en la página de candidatos de 2028.
       </p>
 
       <h2 id="hearings">Audiencias y reuniones de comités</h2>

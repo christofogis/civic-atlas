@@ -875,3 +875,4 @@ ol.bare { list-style: none; padding: 0; margin: 0; }
 .seat-cluster.on .seat-year { font-weight: 600; }
 .face-name { font-weight: 600; text-decoration: underline; text-decoration-color: var(--border-strong); text-underline-offset: 2px; }
 .face-meta { color: var(--muted); font-size: 0.8rem; }
+.face-outcome { font-size: 0.8rem; font-weight: 600; }

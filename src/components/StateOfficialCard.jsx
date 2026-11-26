@@ -1,3 +1,4 @@
+import { NO_PHOTO, noPhoto } from "../lib/photo.js";
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { date, stateName } from "../lib/format.js";
@@ -26,7 +27,7 @@ export default function StateOfficialCard({ official, state }) {
   return (
     <li className="card">
       <Seat parts={stateOfficeParts(official, state)} />
-      {official.image && <img className="member-photo small" src={official.image} alt={official.name} width="60" height="73" loading="lazy" referrerPolicy="no-referrer" onError={(e) => { e.currentTarget.style.display = "none"; }} />}
+      <img className="member-photo small" src={official.image || NO_PHOTO} alt={official.name} width="60" height="73" loading="lazy" referrerPolicy="no-referrer" onError={noPhoto} />
       <h3><Link to={statePersonPath(official.id)}>{official.name}</Link></h3>
       <p className="meta">
         <StatePartyTag party={official.party} /> {official.party}

@@ -1,3 +1,4 @@
+import { noPhoto } from "../lib/photo.js";
 import { Fold } from "../components/Fold.jsx";
 import { memberPage } from "../lib/memberPage.js";
 import { useEffect, useState, lazy, Suspense } from "react";
@@ -335,7 +336,7 @@ export default function Member() {
     <NotesProvider>
     <main className="page full">
       <header className="page-head member-head">
-        <img className="member-photo" src={`https://unitedstates.github.io/images/congress/225x275/${m.bioguide_id}.jpg`} alt={name} width="90" height="110" fetchpriority="high" onError={(e) => { e.currentTarget.style.display = "none"; }} />
+        <img className="member-photo" src={`https://unitedstates.github.io/images/congress/225x275/${m.bioguide_id}.jpg`} alt={name} width="90" height="110" fetchpriority="high" onError={noPhoto} />
         <h1>{name}</h1>
         {seat?.seat_status === "serving" ? (
           <><p className="lede">{seatLabel(seat)}</p>

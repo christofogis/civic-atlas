@@ -1,3 +1,4 @@
+import { noPhoto } from "../lib/photo.js";
 import { useEffect, useMemo, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { db } from "../lib/db.js";
@@ -27,7 +28,9 @@ export default function UpForElection() {
 
   useEffect(() => {
     Promise.all([
-      db.from("seat_holders").select("bioguide_id,chamber,state,district,senate_class,party,start_date,end_date,how,seat_status"),
+      // Every term from early 2025 on: the current holders, the ones whose seats were on a ballot that
+      // has passed, and (from the day new terms begin) who holds each seat after that election.
+      db.from("terms").select("bioguide_id,chamber,state,district,senate_class,party,start_date,end_date,how").gte("end_date", "2025-01-04"),
       db.from("member_directory").select("bioguide_id,name"),
     ]).then(([s, m]) => {
       if (s.error || m.error) return setSeats(false);
@@ -42,15 +45,44 @@ export default function UpForElection() {
   const byState = (a, z) => (STATE_NAMES[a.state] ?? a.state).localeCompare(STATE_NAMES[z.state] ?? z.state) || (a.district ?? 0) - (z.district ?? 0);
   // A Senate seat is on the ballot when its holder's term ends that cycle, or when it belongs to that
   // year's class even though its current holder (an appointee) leaves earlier, after a special election.
-  const senateIn = (y) => (seats || []).filter((x) => x.chamber === "senate" && x.seat_status === "serving" && (onBallot(x, y) ||
-    (x.how === "appointment" && x.senate_class === senateClassFor(y) && nextElectionYear(x.end_date) === y))).sort(byState);
+  const serving = (x) => x.start_date <= today && today < x.end_date;
+  const pastYear = (y) => generalElectionDate(y) < today;
+  const one = (list) => [...new Map(list.map((x) => [x.bioguide_id, x])).values()];
+  // A Senate seat is on the ballot when its holder's term ends that cycle, or when it belongs to that
+  // year's class even though its holder (an appointee) leaves earlier, after a special election. For an
+  // election that has passed, the terms that ended with it are listed; otherwise, today's holders.
+  const senateIn = (y) => one((seats || []).filter((x) => x.chamber === "senate" && (pastYear(y) || serving(x)) && (onBallot(x, y) ||
+    (x.how === "appointment" && x.senate_class === senateClassFor(y) && nextElectionYear(x.end_date) === y)))).sort(byState);
   const senate = senateIn(year);
   const held = (list) => Object.entries(list.reduce((m, x) => ({ ...m, [x.party]: (m[x.party] ?? 0) + 1 }), {})).sort((a, z) => z[1] - a[1]);
-  const house = (seats || []).filter((x) => x.chamber === "house" && x.seat_status === "serving" && onBallot(x, year)).sort(byState);
+  const house = one((seats || []).filter((x) => x.chamber === "house" && (past || serving(x)) && onBallot(x, year))).sort(byState);
   const houseShown = state ? house.filter((x) => x.state === state) : house;
+  // After an election, once new terms have begun: did the holder return, and (Senate) who holds the seat now.
+  // House districts can be redrawn between Congresses, so no House successor is named.
+  const newTermsBegin = `${year + 1}-01-03`;
+  // Only once the new terms are in the member data, so a day's delay in the source never reads as "did not return".
+  const outcomeKnown = past && today >= newTermsBegin && (seats || []).some((t) => t.start_date >= newTermsBegin && t.start_date <= `${year + 1}-03-01`);
+  const outcome = (x) => {
+    if (!outcomeKnown) return null;
+    const within = (t) => t.start_date >= x.end_date && t.start_date <= `${year + 1}-03-01`;
+    if ((seats || []).some((t) => t.bioguide_id === x.bioguide_id && t.chamber === x.chamber && within(t))) return { returned: true };
+    const next = x.chamber === "senate" && (seats || []).find((t) => t.chamber === "senate" && t.state === x.state && t.senate_class === x.senate_class && t.bioguide_id !== x.bioguide_id && within(t));
+    return { returned: false, next: next || null };
+  };
   const yours = [...senate, ...house].filter((x) => mine.has(x.bioguide_id));
   const supervisors = (local?.supervisors ?? []).filter((s) => localOnBallot(s.term_end, year));
   const councils = (local?.cities ?? []).map((c) => ({ ...c, up: (c.members ?? []).filter((m) => yearOfLabel(m.term_end_label) === year) })).filter((c) => c.up.length);
+
+  const Outcome = ({ x }) => {
+    const o = outcome(x);
+    if (!o) return null;
+    if (o.returned) return <span className="face-outcome">{tr("Re-elected", "Reelegido(a)")}</span>;
+    if (o.next) {
+      const n = (seats || []).find((t) => t.bioguide_id === o.next.bioguide_id);
+      return <span className="face-outcome">{tr("Seat now held by ", "Escaño ocupado ahora por ")}<Link to={`/member/${o.next.bioguide_id}`}>{n?.name ?? o.next.bioguide_id}</Link> <PartyName party={o.next.party} /></span>;
+    }
+    return <span className="face-outcome">{tr("Did not return", "No regresó")}</span>;
+  };
 
   const Holder = ({ x }) => (
     <>{x.name ? <Link to={`/member/${x.bioguide_id}`}>{x.name}</Link> : x.bioguide_id} <PartyName party={x.party} />
@@ -61,8 +93,10 @@ export default function UpForElection() {
     <main className="page wide">
       <h1>{tr(`On the ballot in ${year}`, `En la boleta en ${year}`)}<Ref id="src" text={<>{tr("Worked out from each official's term end date: Congress from the official member list (unitedstates/congress-legislators), Orange County from the Clerk of the Board and city websites. California's election cycles are set by the state constitution.", "Calculado a partir de la fecha de fin del período de cada funcionario: el Congreso según la lista oficial de miembros (unitedstates/congress-legislators) y el Condado de Orange según la Secretaría de la Junta y los sitios de las ciudades. Los ciclos electorales de California los fija la constitución del estado.")}</>} /></h1>
       <p className="lede">
-        {past
-          ? tr(`The general election was held on ${date(generalElectionDate(year))}. These seats were on the ballot; the people listed hold them until the new terms begin.`, `La elección general se celebró el ${date(generalElectionDate(year))}. Estos escaños estuvieron en la boleta; las personas indicadas los ocupan hasta que comiencen los nuevos períodos.`)
+        {past && outcomeKnown
+          ? tr(`The general election was held on ${date(generalElectionDate(year))}. These seats were on the ballot. Each shows whether the person who held it returned when the new terms began on ${date(newTermsBegin)}, and for the Senate, who holds it now.`, `La elección general se celebró el ${date(generalElectionDate(year))}. Estos escaños estuvieron en la boleta. Cada uno indica si quien lo ocupaba regresó cuando comenzaron los nuevos períodos el ${date(newTermsBegin)} y, en el Senado, quién lo ocupa ahora.`)
+          : past
+          ? tr(`The general election was held on ${date(generalElectionDate(year))}. These seats were on the ballot; the people listed hold them until the new terms begin on ${date(newTermsBegin)}. Who won each seat is shown here from that day, from the official member list. Until then, each state's election office publishes the results.`, `La elección general se celebró el ${date(generalElectionDate(year))}. Estos escaños estuvieron en la boleta; las personas indicadas los ocupan hasta que comiencen los nuevos períodos el ${date(newTermsBegin)}. Quién ganó cada escaño se mostrará aquí desde ese día, según la lista oficial de miembros. Hasta entonces, la oficina electoral de cada estado publica los resultados.`)
           : tr(`General election: ${date(generalElectionDate(year))}. These seats are on the ballot, listed with who holds them now. A seat on the ballot doesn't mean its holder is running.`, `Elección general: ${date(generalElectionDate(year))}. Estos escaños están en la boleta, con quién los ocupa ahora. Que un escaño esté en la boleta no significa que su titular se presente.`)}
       </p>
       {seats && <SeatChart years={years} year={year} counts={years.map((y) => [y, held(senateIn(y))])} onPick={(y) => set({ year: y, state: "" })} />}
@@ -88,12 +122,13 @@ export default function UpForElection() {
                   <li key={x.bioguide_id} className={`face ${partyClass(x.party).split(" ")[1]}`}>
                     <Link to={`/member/${x.bioguide_id}`}>
                       <span className="face-photo">
-                        <img src={`https://unitedstates.github.io/images/congress/225x275/${x.bioguide_id}.jpg`} alt="" width="112" height="137" loading="lazy" onError={(e) => { e.currentTarget.style.visibility = "hidden"; }} />
+                        <img src={`https://unitedstates.github.io/images/congress/225x275/${x.bioguide_id}.jpg`} alt="" width="112" height="137" loading="lazy" onError={noPhoto} />
                         <span className={partyClass(x.party)} title={x.party}>{partyLetter(x.party)}</span>
                       </span>
                       <span className="face-name">{x.name ?? x.bioguide_id}</span>
                     </Link>
                     <span className="face-meta">{stateName(x.state)}</span>
+                    <Outcome x={x} />
                     {x.how === "appointment" && <span className="face-meta">{x.end_date < `${year}-01-01` ? tr(`Appointed until a special election; term ends ${date(x.end_date)}`, `Designado(a) hasta una elección especial; el período termina el ${date(x.end_date)}`) : tr("Appointed", "Designado(a)")}</span>}
                   </li>
                 ))}</ul>
@@ -115,7 +150,7 @@ export default function UpForElection() {
                     {[...new Set(house.map((x) => x.state))].sort((a, z) => stateName(a).localeCompare(stateName(z))).map((s) => <option key={s} value={s}>{stateName(s)}</option>)}
                   </select>
                 </label>
-                <ul className="plain">{houseShown.map((x) => <li key={x.bioguide_id}>{seatLabel(x)}: <Holder x={x} /></li>)}</ul>
+                <ul className="plain">{houseShown.map((x) => <li key={x.bioguide_id}>{seatLabel(x)}: <Holder x={x} />{outcomeKnown && <> · <Outcome x={x} /></>}</li>)}</ul>
               </>
             )}
           </section>

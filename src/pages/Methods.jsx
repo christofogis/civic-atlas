@@ -157,6 +157,10 @@ export default function Methods() {
         a special election. House seats for the next election appear once the members elected before it take office.
         California's cycles (statewide offices in gubernatorial years, the state Senate's odd- and even-numbered districts
         in alternate elections) follow the state constitution; Orange County's come from each official's term dates.
+        After an election, once the new terms begin and appear in the official member list, each seat shows
+        whether the person who held it returned and, for the Senate, who holds it now. The House shows only whether
+        the member returned, because districts can be redrawn between Congresses. The site doesn't say anyone lost:
+        a holder may not have run. Missing portraits show a plain grey silhouette.
         Candidates who have filed are on the 2028 candidates page.
       </p>
 

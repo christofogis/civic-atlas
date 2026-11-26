@@ -1,3 +1,4 @@
+import { NO_PHOTO, noPhoto } from "../lib/photo.js";
 import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { db } from "../lib/db.js";
@@ -34,8 +35,8 @@ export default function StatePerson() {
   return (
     <main className="page wide">
       <p className="fine"><Link to="/">{tr("Home", "Inicio")}</Link> / {stateName(p.state)}</p>
-      <header className={p.image_url ? "page-head member-head" : "page-head"}>
-      {p.image_url && <img className="member-photo" src={p.image_url} alt={p.name} width="90" height="110" referrerPolicy="no-referrer" onError={(e) => { e.currentTarget.style.display = "none"; }} />}
+      <header className="page-head member-head">
+      <img className="member-photo" src={p.image_url || NO_PHOTO} alt={p.name} width="90" height="110" referrerPolicy="no-referrer" onError={noPhoto} />
       <h1>{p.name}<Ref id="src" text={<>
         {tr("Source: ", "Fuente: ")}<a href={`https://github.com/openstates/people/tree/main/data/${p.state.toLowerCase()}`} rel="noopener">Open States</a>
         {tr(" (public domain), compiled from state legislature and government websites; the photo, where shown, is the official one it links to, loaded from that website. Sources it lists: ", " (dominio público), recopilado de los sitios web de las legislaturas y gobiernos estatales; la foto, cuando aparece, es la oficial que enlaza, cargada desde ese sitio. Fuentes que cita: ")}
