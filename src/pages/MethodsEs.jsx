@@ -115,6 +115,16 @@ export default function MethodsEs() {
         redacta, y dice dónde cambió el texto, no qué efecto tiene un cambio.
       </p>
 
+      <h2 id="record">El historial de un miembro por fecha</h2>
+      <p>
+        "Historial por fecha" en la página de cada miembro muestra, del más reciente al más antiguo: las votaciones
+        nominales con la posición registrada del miembro y la redacción del secretario sobre la pregunta y el resultado;
+        los proyectos que presentó; sus proyectos que se convirtieron en ley; y las operaciones bursátiles que declaró,
+        con la fecha de la declaración. "Hechos principales" muestra los votos de aprobación final y de confirmación;
+        "Todas las votaciones" agrega enmiendas y votos de procedimiento. El historial de cada miembro usa las mismas
+        entradas con las mismas palabras, y cada una enlaza a su fuente.
+      </p>
+
       <h2 id="bill-parts">Todas las partes de un proyecto</h2>
       <p>
         La página de un proyecto muestra cada título y sección de su texto oficial más reciente de GovInfo, en orden,

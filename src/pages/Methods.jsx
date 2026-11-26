@@ -123,6 +123,16 @@ export default function Methods() {
         is computed, not written by anyone, and it says where the text changed, not what a change does.
       </p>
 
+      <h2 id="record">A member's record by date</h2>
+      <p>
+        "Record by date" on each member page lists, newest first: roll-call votes with the member's
+        recorded position and the clerk's wording of the question and result; bills the member introduced;
+        the member's bills that became law; and stock trades the member reported, with the date the report
+        was filed. "Main events" shows final-passage and confirmation votes; "Every roll call" adds
+        amendments and procedural votes. Every member's record uses the same entries in the same words,
+        and each links to its source.
+      </p>
+
       <h2 id="bill-parts">Every part of a bill</h2>
       <p>
         A bill's page lists every title and section of its newest official text from GovInfo, in order, with
