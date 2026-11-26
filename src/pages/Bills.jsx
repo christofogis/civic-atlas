@@ -9,6 +9,7 @@ import { billLabel, ordinal, partyTag, date } from "../lib/format.js";
 import { tr } from "../lib/lang.js";
 import { PartyTag } from "../components/PartyTag.jsx";
 import Clamp from "../components/Clamp.jsx";
+import { billTrack, trackShort } from "../../lib/billTrack.js";
 
 const SORTS = {
   action: { label: "Most recent action", es: "Acción más reciente", column: "latest_action_date" },
@@ -16,6 +17,16 @@ const SORTS = {
   lobbying: { label: "Most organizations lobbying", es: "Más organizaciones haciendo cabildeo", column: "lobbying_clients" },
 };
 const PAGE = 50;
+const STAGE = "congress,bill_type,number,title,introduced_date,reported_date,passed_house_date,failed_house_date,passed_senate_date,failed_senate_date,presented_date,vetoed_date,became_law_date,law_number";
+
+// Milestone dates for one page of rows, keyed "type-number" (bill_list doesn't carry them).
+async function loadStages(congress, rows) {
+  if (!rows.length) return {};
+  const { data, error } = await db.from("bills").select(STAGE).eq("congress", congress)
+    .or(rows.map((r) => `and(bill_type.eq.${r.bill_type},number.eq.${r.number})`).join(","));
+  if (error) return {};
+  return Object.fromEntries(data.map((b) => [`${b.bill_type}-${b.number}`, b]));
+}
 const CURRENT = congressOn();
 // Coverage starts with the 118th Congress.
 const CONGRESS_OPTIONS = Array.from({ length: CURRENT - 117 }, (_, i) => CURRENT - i);
@@ -27,6 +38,7 @@ export default function Bills() {
   const sort = SORTS[params.get("sort")] ? params.get("sort") : "action";
   const page = Math.max(0, Number(params.get("page")) || 0);
   const [state, setState] = useState({ status: "loading", rows: [] });
+  const [stages, setStages] = useState({});
   const set = (k, v) => {
     const n = new URLSearchParams(params);
     if (v) n.set(k, v); else n.delete(k);
@@ -43,7 +55,11 @@ export default function Bills() {
     if (issue) q = q.eq("policy_area", issue);
     q.order(SORTS[sort].column, { ascending: false, nullsFirst: false }).order("number")
       .range(page * PAGE, page * PAGE + PAGE - 1)
-      .then(({ data, error }) => setState(error ? { status: "error", rows: [] } : { status: "done", rows: data }));
+      .then(({ data, error }) => {
+        setState(error ? { status: "error", rows: [] } : { status: "done", rows: data });
+        // The stage line is extra; if it fails the rows still show.
+        if (!error) loadStages(congress, data).then(setStages, () => setStages({}));
+      });
   }, [congress, issue, sort, page]);
 
   return (
@@ -81,6 +97,7 @@ export default function Bills() {
                 <td>
                   <Link to={`/bill/${b.congress}/${b.bill_type}/${b.number}`}>{billLabel(b)}</Link> <Clamp lines={2}>{b.short_title ?? b.title}</Clamp>
                   {b.policy_area && <div className="fine">{areaName(b.policy_area)}</div>}
+                {stages[`${b.bill_type}-${b.number}`] && (() => { const l = trackShort(billTrack(stages[`${b.bill_type}-${b.number}`]), date); return <div className="fine stage-line">{tr(l.en, l.es)}</div>; })()}
                 </td>
                 <td data-label={tr("Sponsor:", "Patrocinador:")}>{b.sponsor_bioguide_id
                   ? <><Link to={`/member/${b.sponsor_bioguide_id}`}>{b.sponsor_name}</Link>{b.sponsor_party && <> <PartyTag p={{ party: b.sponsor_party, chamber: b.sponsor_chamber, state: b.sponsor_state, district: b.sponsor_district }} /></>}</>

@@ -141,6 +141,34 @@ export default function Methods() {
         summarized. A public law's text is read from the enrolled bill, which has the same words.
       </p>
 
+      <h2 id="bill-stage">Where a bill stands</h2>
+      <p>
+        The track at the top of a bill page is built from the bill's official action list in GovInfo Bill Status. Each
+        step is the first date the Library of Congress action code for it appears: introduced; reported by a committee
+        (5000 or 14000); passed or agreed to in the House (8000) or failed there (9000); the same in the Senate (17000,
+        18000); presented to the President (28000); vetoed (31000); became law (36000, only when the action says it became
+        a public or private law, not just that it was signed). The committee step also shows the date the bill was
+        referred, from the bill's committee list.
+      </p>
+      <p>
+        The steps depend on the kind of measure. A simple resolution (H.Res., S.Res.) needs only its own chamber. A
+        concurrent resolution needs both chambers and does not go to the President. A joint resolution whose official
+        title proposes an amendment to the Constitution goes to the states after both chambers pass it; state
+        ratification is not in the records we use, so that step has no date. Bills and other joint resolutions go to the
+        President.
+      </p>
+      <p>
+        Nothing is filled in by guesswork. When a later step is in the record but an earlier one's date is not, the
+        earlier step says "Date not in the record". When a bill moved on with no committee report in the record (a
+        committee can be discharged or bypassed), the committee step says so. A roll call is linked to a step only when
+        exactly one passage vote in that chamber falls on that day; many bills pass by voice vote, with no roll call. The
+        "Next" sentence names the chamber that would act next, and says a vote is scheduled only when the House floor
+        schedule or a committee markup lists the bill. For a bill from a past Congress that did not become law, the page
+        says the Congress ended without it becoming law: bills that are not enacted by the end of a Congress would have to
+        be introduced again. The fold "Steps and actions" shows every recorded date with its action code, and links to the
+        full list of actions at Congress.gov.
+      </p>
+
       <h2 id="photos">Photos</h2>
       <p>
         Members of Congress are shown with their official portraits, from the public-domain collection kept by the
