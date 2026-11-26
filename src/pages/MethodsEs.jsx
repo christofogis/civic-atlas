@@ -294,6 +294,13 @@ export default function MethodsEs() {
         por número; los asuntos para todos los distritos se cuentan aparte.
       </p>
       <p>
+        Lo que hizo la Junta viene del acta resumida de acciones de la Secretaría de las reuniones ordinarias recientes:
+        cada asunto, cada moción tal como se imprimió y las líneas de votación (a favor, en contra, abstenciones, ausentes,
+        excusados) tal como se registraron. Los conteos de votos de los supervisores suman esas líneas; un supervisor se
+        cuenta solo donde el acta lo nombra, así que una moción que menciona solo a parte de la Junta cuenta solo a los
+        nombrados. Aún no se leen las reuniones especiales cuyas actas usan otro formato.
+      </p>
+      <p>
         "Su semana" muestra lo que viene para los funcionarios de la dirección que buscó, con los mismos tipos de asuntos
         y la misma redacción para todos: audiencias de los comités en que están sus miembros del Congreso, la agenda del
         pleno de la Cámara, fechas estatales y del condado, y reuniones del concejo municipal. Se arma con los números de

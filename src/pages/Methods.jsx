@@ -299,6 +299,13 @@ export default function Methods() {
         district by number; items for all districts are counted separately.
       </p>
       <p>
+        What the Board did comes from the Clerk's summary action minutes of recent regular meetings: each item,
+        each motion as printed, and the vote lines (Ayes, Noes, Abstained, Absent, Excused) exactly as recorded.
+        The supervisors' vote counts add up those lines; a supervisor is counted only where the minutes name
+        them, so a motion that lists only part of the Board counts only those named. Special meetings whose
+        minutes use another layout aren't read yet.
+      </p>
+      <p>
         "Your week" lists what's coming up for the officials at the address you looked up, using the same
         kinds of items and the same wording for everyone: hearings of the committees your members of Congress
         sit on, the House floor schedule, state and county dates, and city council meetings. It is built from
