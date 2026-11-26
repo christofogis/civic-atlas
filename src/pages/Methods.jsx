@@ -321,6 +321,7 @@ export default function Methods() {
         <li><strong>Stock trades:</strong> Periodic Transaction Reports from the Clerk of the House and the Senate's electronic financial disclosure system.</li>
         <li><strong>Campaign finance:</strong> the Federal Election Commission, totals by two-year cycle.</li>
         <li><strong>Your district:</strong> Geocodio, using Census Bureau district boundaries. Your address is used only for the lookup and is never stored by us. When address suggestions are on, what you type in the address box is sent to Google Places to suggest matching addresses.</li>
+        <li><strong>Visits:</strong> Cloudflare Web Analytics counts page views and visits without cookies and without collecting personal data, so it can't tell who you are or whether you've visited before.</li>
       </ul>
       <p>
         Data is refreshed automatically every day (campaign finance weekly), and each section of a member

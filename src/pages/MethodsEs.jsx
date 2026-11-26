@@ -316,6 +316,7 @@ export default function MethodsEs() {
         <li><strong>Compraventa de acciones:</strong> Informes Periódicos de Transacciones del Secretario de la Cámara y del sistema electrónico de divulgación financiera del Senado.</li>
         <li><strong>Finanzas de campaña:</strong> la Comisión Federal de Elecciones, totales por ciclo de dos años.</li>
         <li><strong>Su distrito:</strong> Geocodio, con los límites de distritos de la Oficina del Censo. Su dirección se usa solo para la búsqueda y nunca la guardamos. Cuando las sugerencias de dirección están activas, lo que escribe en la casilla de dirección se envía a Google Places para sugerir direcciones.</li>
+        <li><strong>Visitas:</strong> Cloudflare Web Analytics cuenta páginas vistas y visitas sin cookies y sin recopilar datos personales, así que no puede saber quién es usted ni si ya visitó el sitio antes.</li>
       </ul>
       <p>
         Los datos se actualizan automáticamente cada día (las finanzas de campaña, cada semana), y cada sección de la página
