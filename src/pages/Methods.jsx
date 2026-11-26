@@ -137,8 +137,26 @@ export default function Methods() {
       <p>
         A bill's page lists every title and section of its newest official text from GovInfo, in order, with
         each section's own heading and its length in words, and opens any section's text in place. The search
-        shows which sections mention a word. Headings and text are the bill's own, in English; nothing is
-        summarized. A public law's text is read from the enrolled bill, which has the same words.
+        shows which sections mention a word. Headings and text are the bill's own, in English. A public law's
+        text is read from the enrolled bill, which has the same words.
+      </p>
+
+      <h2 id="section-summaries">AI summaries of bill sections</h2>
+      <p>
+        Some sections carry a short plain-language summary, labeled "AI-generated summary," with the section's
+        official text one tap away. The text is the record; the summary is a reading aid. The Congressional
+        Research Service's summary, where one exists, stays at the top of the bill's page.
+      </p>
+      <p>
+        Summaries are written ahead of time by Anthropic's Claude Haiku model from the section's text alone, with
+        the same written instructions for every bill: say what the section does, who must or may do what,
+        amounts and dates as printed; add no background; never describe purpose, effect, or who gains or loses
+        unless the text says so; use no words that judge. Each summary is then checked by a second request that
+        compares it with the text and lists any statement the text doesn't support. A flagged summary is
+        rewritten once with those problems named and checked again; if it still fails, it is not shown. Sections
+        under 40 words and tables of contents are not summarized. A summary belongs to one version of the text,
+        so a new version gets new summaries. Spanish summaries are written with the English ones and checked
+        against them.
       </p>
 
       <h2 id="hearings">Committee hearings and meetings</h2>
