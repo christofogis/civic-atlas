@@ -1,0 +1,18 @@
+{
+ "files": [
+  {
+   "year": 2022,
+   "file": "federal-2022.json",
+   "source": "Federal Election Commission",
+   "title": "Federal Elections 2022",
+   "retrieved": "2026-11-26"
+  },
+  {
+   "year": 2024,
+   "file": "federal-2024.json",
+   "source": "Clerk of the U.S. House of Representatives",
+   "title": "Statistics of the Presidential and Congressional Election of 2024",
+   "retrieved": "2026-11-26"
+  }
+ ]
+}
