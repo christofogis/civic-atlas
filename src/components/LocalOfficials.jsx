@@ -3,10 +3,13 @@ import LocalMeetings from "./LocalMeetings.jsx";
 import { Link } from "react-router-dom";
 import { date } from "../lib/format.js";
 import { tr } from "../lib/lang.js";
-import { councilParts, councilRole, loadLocal, officeName, roleName, rolesCurrent, seatUpdating, supervisorParts, termEnded } from "../lib/local.js";
+import { councilParts, councilRole, loadLocal, loadMinutes, officeName, roleName, rolesCurrent, seatUpdating, supervisorParts, termEnded } from "../lib/local.js";
 import Seat from "./Seat.jsx";
+import SupervisorRecord from "./SupervisorRecord.jsx";
 
-export function SupervisorCard({ s, county }) {
+// minutes: the Board's minutes as read (Orange County only); each card then shows that
+// supervisor's recorded votes.
+export function SupervisorCard({ s, county, minutes }) {
   if (termEnded(s)) {
     return (
       <li className="card pending">
@@ -21,6 +24,7 @@ export function SupervisorCard({ s, county }) {
       <h3><a href={s.website} rel="noopener">{s.name}</a></h3>
       <p className="meta">{tr("Nonpartisan office", "Cargo no partidista")}{s.term_end && <> · {tr("term ends", "el período termina el")} {date(s.term_end)}</>}</p>
       {s.phone && <p className="fine">{s.phone}</p>}
+      <SupervisorRecord minutes={minutes} name={s.name} />
     </li>
   );
 }
@@ -58,7 +62,9 @@ export function CouncilCard({ m, city }) {
 // County officials in the lookup results.
 export default function LocalOfficials({ local, approximate }) {
   const [data, setData] = useState(null);
+  const [minutes, setMinutes] = useState(null);
   useEffect(() => { if (local?.covered) loadLocal(local.id).then(setData).catch(() => {}); }, [local]);
+  useEffect(() => { if (local?.id === "ca-orange") loadMinutes().then(setMinutes); }, [local]);
   if (!local) return null;
   if (!local.covered) {
     return <p className="fine">{tr("County and city officials are on Civic Atlas for Orange County, California only, for now.", "Por ahora, los funcionarios de condado y ciudad están en Civic Atlas solo para el Condado de Orange, California.")}</p>;
@@ -102,7 +108,7 @@ export default function LocalOfficials({ local, approximate }) {
       <h2>{tr(`County: ${data.county}`, `Condado: ${data.county}`)}</h2>
       <p className="level-what">{tr("The Board of Supervisors sets the county budget and runs county services: public health, social services, jails, elections, and local services in unincorporated areas.", "La Junta de Supervisores aprueba el presupuesto del condado y administra sus servicios: salud pública, servicios sociales, cárceles, elecciones y servicios locales en zonas no incorporadas.")}</p>
       <ul className="cards">
-        {sup && <SupervisorCard s={sup} county={data.county} />}
+        {sup && <SupervisorCard s={sup} county={data.county} minutes={minutes} />}
         {data.officers.map((o) => <OfficerCard key={o.office} o={o} county={data.county} />)}
       </ul>
       <p className="fine">
