@@ -122,6 +122,23 @@ function Checks() {
   );
 }
 
+// How much of the plan's included database space is in use (Supabase Pro: 8 GB).
+function DatabaseSize() {
+  const [mb, setMb] = useState(null);
+  useEffect(() => {
+    db.rpc("database_size").then(({ data, error }) => setMb(error ? false : Math.round(Number(data) / 1048576)));
+  }, []);
+  if (mb === null) return null;
+  if (mb === false) return <p className="fine">{tr("Database size didn't load.", "El tamaño de la base de datos no se cargó.")}</p>;
+  const pct = Math.round((100 * mb) / 8192);
+  return (
+    <p>
+      {tr(`Database: ${mb.toLocaleString()} MB of 8,192 MB included in the plan (${pct}%).`, `Base de datos: ${mb.toLocaleString("es")} MB de 8.192 MB incluidos en el plan (${pct}%).`)}
+      {mb >= 6144 && <> <span className="status-flag warn">{tr("Nearing the limit", "Cerca del límite")}</span></>}
+    </p>
+  );
+}
+
 // Dates when records change and need updating, from the site's own data files.
 function ComingUp() {
   const [items, setItems] = useState(null);
@@ -168,6 +185,8 @@ export default function Status() {
           <Checks />
           <h3>{tr("Facts checked against their sources", "Datos verificados contra sus fuentes")}</h3>
           <AccuracyStatus />
+          <h3>{tr("Storage", "Almacenamiento")}</h3>
+          <DatabaseSize />
         </section>
         <section>
           <h2>{tr("Coming up", "Próximamente")}</h2>
