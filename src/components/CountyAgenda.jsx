@@ -37,7 +37,26 @@ export default function CountyAgenda({ district }) {
   if (data === null) return null;
   const today = new Intl.DateTimeFormat("en-CA", { timeZone: "America/Los_Angeles" }).format(new Date());
   const m = data && data.meetings.find((x) => x.date >= today && x.items.length);
-  if (!m) return null;
+  // What happened at recent meetings: the Clerk's minutes (with what the Board did on each item)
+  // and the video.
+  const past = data ? (data.previous ?? []).filter((p) => p.minutes_url || p.video_url).slice(0, 3) : [];
+  const recent = past.length > 0 && (
+    <div className="recent-meetings">
+      <h3>{tr("Recent meetings: what the Board did", "Reuniones recientes: lo que hizo la Junta")}</h3>
+      <ul className="bare">
+        {past.map((p) => (
+          <li key={p.date + p.time}>
+            <strong>{date(p.date)}</strong> <span className="fine" lang="en">{p.title}</span>
+            <div className="fine">
+              {p.minutes_url && <a href={p.minutes_url} rel="noopener">{tr("Minutes: each item's outcome and vote", "Acta: resultado y votación de cada asunto")}</a>}
+              {p.video_url && <>{p.minutes_url ? " · " : ""}<a href={p.video_url} rel="noopener">{tr("Video", "Video")}</a></>}
+            </div>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+  if (!m) return recent ? <section id="agenda" className="county-agenda">{recent}</section> : null;
   const shown = mine && district ? forDistrict(m.items, district) : m.items;
   const sections = [...new Set(shown.map((i) => i.section))];
   const own = district ? onlyDistrict(m.items, district).length : 0;
@@ -78,6 +97,7 @@ export default function CountyAgenda({ district }) {
           </div>
         ))}
       </details>
+      {recent}
     </section>
   );
 }
