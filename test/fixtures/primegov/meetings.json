@@ -1,0 +1,26 @@
+{
+ "_note": "Trimmed from {tenant}.primegov.com/api/v2/PublicPortal/ListUpcomingMeetings and ListArchivedMeetings (Nov 26, 2026), fields the reader uses only.",
+ "lakeforest": {"id": 2630, "title": "City Council - Regular Meeting", "dateTime": "2026-12-01T18:30:00", "committeeId": 1,
+   "location": "City Council Chambers, 100 Civic Center Drive, Lake Forest, California",
+   "documentList": [{"id": 16779, "templateId": 12225, "templateName": "HTML Full Agenda Packet", "compileOutputType": 3},
+                    {"id": 16777, "templateId": 12223, "templateName": "Agenda", "compileOutputType": 1},
+                    {"id": 16778, "templateId": 12225, "templateName": "Full Agenda Packet", "compileOutputType": 1}]},
+ "sealbeach": {"id": 1678, "title": "City Council Meeting", "dateTime": "2026-11-09T19:00:00", "committeeId": 1, "location": "",
+   "documentList": [{"id": 14001, "templateId": 8535, "templateName": "Agenda", "compileOutputType": 1},
+                    {"id": 14002, "templateId": 8537, "templateName": "HTML Packet", "compileOutputType": 3},
+                    {"id": 14003, "templateId": 8537, "templateName": "Packet", "compileOutputType": 1}]},
+ "santa_ana_cancelled": {"id": 5175, "title": "CANCELLED- Regular City Council Meeting", "dateTime": "2026-12-01T17:00:00", "committeeId": 1,
+   "location": "22 Civic Center Plaza Santa Ana, CA 92701",
+   "documentList": [{"id": 56390, "templateId": 25888, "templateName": "HTML Notice of Cancellation", "compileOutputType": 3},
+                    {"id": 56391, "templateId": 25888, "templateName": "Notice of Cancellation", "compileOutputType": 1}]},
+ "not_council": [
+   {"title": "Special Meeting of the Citizen-Council Olympic Advisory Ad Hoc Committee"},
+   {"title": "Regular City Council Meeting and Public Financing Authority Meeting- Versión en Español"},
+   {"title": "Planning Commission - Regular Meeting"},
+   {"title": "Fiscal Year 2025/26 Annual Development Impact Fee and Sewer Connection Fee report"}],
+ "council": [
+   {"title": "Council Closed Session"},
+   {"title": "3:15pm Closed Session, 5:00pm Regular City Council Meeting"},
+   {"title": "City Council - Regular Meeting"},
+   {"title": "CANCELLED- Regular City Council Meeting"}]
+}

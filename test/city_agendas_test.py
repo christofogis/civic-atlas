@@ -102,5 +102,100 @@ class Legistar(unittest.TestCase):
         self.assertEqual(items[0]["attachments"], [{"name": "Minutes", "url": "https://x.legistar.com/a.pdf"}])
 
 
+PG = os.path.join(ROOT, "test", "fixtures", "primegov")
+with open(os.path.join(PG, "meetings.json"), encoding="utf-8") as _f:
+    PGM = json.load(_f)
+
+
+def pg_page(tenant):
+    with open(os.path.join(PG, f"{tenant}.html"), encoding="utf-8") as f:
+        return f.read()
+
+
+class PrimeGovItems(unittest.TestCase):
+    """Saved, trimmed HTML agendas from each city's PrimeGov portal: same layout in all four."""
+
+    def items(self, tenant):
+        return ca.primegov_items(pg_page(tenant), tenant)
+
+    def test_same_filter(self):
+        # PrimeGov shows no file numbers, so only items with documents are kept; sections, roll
+        # call and items without documents (Santa Ana's ceremonial presentations) are not items.
+        for t in ["lagunabeachcity", "lakeforest", "santa-ana", "sealbeach"]:
+            items = self.items(t)
+            self.assertTrue(items, t)
+            for i in items:
+                self.assertTrue(i["attachments"], (t, i))
+                self.assertIsNone(i["file"])
+                self.assertNotIn(i["title"].upper(), {"ROLL CALL", "COUNCIL ROLL CALL", "PUBLIC HEARING", "CEREMONIAL PRESENTATIONS"})
+        sa = self.items("santa-ana")
+        self.assertEqual([i["number"] for i in sa], ["38."])
+        sb = [i["title"] for i in self.items("sealbeach")]
+        self.assertNotIn("Recognizing City Staff Veterans", sb)  # no documents
+        self.assertEqual(len(sb), 3)
+
+    def test_headings_from_sections(self):
+        lb = self.items("lagunabeachcity")
+        self.assertEqual([(i["number"], i["heading"]) for i in lb], [("1.", "E. PRESENTATIONS."), ("18.", "I. REGULAR BUSINESS.")])
+        self.assertEqual(self.items("lakeforest")[0]["heading"], "PUBLIC HEARING(S) (Item No. 12)")
+        self.assertEqual(self.items("santa-ana")[0]["heading"], "PUBLIC HEARING")
+        self.assertEqual(self.items("sealbeach")[-1]["heading"], "NEW BUSINESS")
+
+    def test_title_is_first_line_as_printed(self):
+        lf = self.items("lakeforest")[0]
+        self.assertEqual(lf["title"], "AUTHORIZING APPLICATION FOR PERMANENT LOCAL HOUSING ALLOCATION PROGRAM GRANT AND APPROVAL OF THE PROPOSED FIVE-YEAR PLAN")
+        self.assertEqual(self.items("santa-ana")[0]["title"], "Approve the Tax Equity Fiscal Responsibility Act Hearing for 1200 Main Apartments")
+        self.assertNotIn("Recommendations", self.items("lagunabeachcity")[0]["title"])
+
+    def test_attachment_links(self):
+        a = self.items("lakeforest")[0]["attachments"][0]
+        self.assertEqual(a["name"], "City Council Staff Report")
+        self.assertTrue(a["url"].startswith("https://lakeforest.primegov.com/api/compilemeetingattachmenthistory/historyattachment/?historyId="))
+        self.assertLessEqual(max(len(i["attachments"]) for i in self.items("santa-ana")), 6)
+
+    def test_placeholder_and_repeat_links_skipped(self):
+        page = ("<div class='meeting-item' data-itemid='1'><table><tr><td class='number-cell'>1.</td>"
+                "<td class='item-cell'><div class='agenda-item'><b>AN ITEM</b><br>Recommended action.</div>"
+                "<a href='/api/compilemeetingattachmenthistory/historyattachment/?historyId=a' title='Download Staff Report'>Staff Report</a>"
+                "<a href='/api/compilemeetingattachmenthistory/historyattachment/?historyId=a' title='Download Staff Report'>Staff Report</a>"
+                "<a href='/api/compilemeetingattachmenthistory/historyattachment/?historyId=${item.id}' title='Download ${item.name}'>x</a>"
+                "</td></tr></table></div>")
+        items = ca.primegov_items(page, "x")
+        self.assertEqual(len(items), 1)
+        self.assertEqual(items[0]["title"], "AN ITEM")
+        self.assertEqual([a["name"] for a in items[0]["attachments"]], ["Staff Report"])
+
+
+class PrimeGovMeetings(unittest.TestCase):
+    def test_meeting_fields_and_links(self):
+        m = ca.primegov_meeting(PGM["lakeforest"], "lakeforest", pg_page("lakeforest"))
+        self.assertEqual((m["date"], m["time"]), ("2026-12-01", "6:30 PM"))
+        self.assertEqual(m["body"], "City Council - Regular Meeting")
+        self.assertEqual(m["agenda_url"], "https://lakeforest.primegov.com/Public/CompiledDocument?meetingTemplateId=12223&compileOutputType=1")
+        self.assertEqual(m["meeting_url"], "https://lakeforest.primegov.com/Portal/Meeting?meetingTemplateId=12225")
+        self.assertEqual(set(m), {"body", "date", "time", "location", "agenda_url", "meeting_url", "agenda_status", "items"})
+        self.assertEqual(len(m["items"]), 1)
+
+    def test_packet_only_city_reads_packet_html(self):
+        pdf, htm = ca.pg_docs(PGM["sealbeach"])
+        self.assertEqual((pdf["templateId"], htm["templateId"]), (8535, 8537))
+        sb = ca.primegov_meeting(PGM["sealbeach"], "sealbeach", pg_page("sealbeach"))
+        self.assertIsNone(sb["location"])
+        self.assertEqual(sb["time"], "7:00 PM")
+
+    def test_cancellation_notice_is_not_an_agenda(self):
+        m = ca.primegov_meeting(PGM["santa_ana_cancelled"], "santa-ana", None)
+        self.assertIsNone(m["agenda_url"])
+        self.assertEqual(m["items"], [])
+        self.assertEqual(m["meeting_url"], "https://santa-ana.primegov.com/public/portal")
+        self.assertEqual(m["body"], "CANCELLED- Regular City Council Meeting")
+
+    def test_which_meetings_are_council(self):
+        for m in PGM["council"]:
+            self.assertTrue(ca.pg_is_council(m), m["title"])
+        for m in PGM["not_council"]:
+            self.assertFalse(ca.pg_is_council(m), m["title"])
+
+
 if __name__ == "__main__":
     unittest.main()
