@@ -115,6 +115,15 @@ export default function MethodsEs() {
         redacta, y dice dónde cambió el texto, no qué efecto tiene un cambio.
       </p>
 
+      <h2 id="bill-parts">Todas las partes de un proyecto</h2>
+      <p>
+        La página de un proyecto muestra cada título y sección de su texto oficial más reciente de GovInfo, en orden,
+        con el encabezado propio de cada sección y su extensión en palabras, y abre el texto de cualquier sección en el
+        mismo lugar. La búsqueda muestra qué secciones mencionan una palabra. Los encabezados y el texto son los del
+        proyecto, en inglés; no se resume nada. El texto de una ley pública se lee del proyecto aprobado por ambas
+        cámaras, que tiene las mismas palabras.
+      </p>
+
       <h2 id="hearings">Audiencias y reuniones de comités</h2>
       <p>
         Las audiencias, sesiones de enmiendas y reuniones de trabajo de ambas cámaras provienen de los registros de

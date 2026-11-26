@@ -123,6 +123,14 @@ export default function Methods() {
         is computed, not written by anyone, and it says where the text changed, not what a change does.
       </p>
 
+      <h2 id="bill-parts">Every part of a bill</h2>
+      <p>
+        A bill's page lists every title and section of its newest official text from GovInfo, in order, with
+        each section's own heading and its length in words, and opens any section's text in place. The search
+        shows which sections mention a word. Headings and text are the bill's own, in English; nothing is
+        summarized. A public law's text is read from the enrolled bill, which has the same words.
+      </p>
+
       <h2 id="hearings">Committee hearings and meetings</h2>
       <p>
         Hearings, markups and business meetings in both chambers come from Congress.gov's committee meeting records,
