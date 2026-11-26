@@ -25,6 +25,7 @@ const WAIT_MIN = arg("--wait") ? parseInt(arg("--wait"), 10) : 60;
 const MODEL = process.env.SUMMARY_MODEL || "claude-haiku-5-5";
 const JOB = "section-summaries";
 const MIN_WORDS = 40;          // shorter sections are shown as they are; a summary adds nothing
+const SKIP_HEADER = /table of contents/i;   // a list of headings; the page already shows them
 const MAX_CHARS = 300_000;     // longer sections are skipped and left for a person to read
 const MAX_REQUESTS = 20_000;   // per batch (the API allows 100,000)
 const API = "https://api.anthropic.com/v1/messages/batches";
@@ -185,7 +186,7 @@ async function send(db) {
     for (const s of sections) {
       const k = `${key}|${version.version_code}|${s.key}`;
       if (done.has(k)) continue;
-      if (s.words < MIN_WORDS) { skippedShort++; continue; }
+      if (s.words < MIN_WORDS || SKIP_HEADER.test(s.header)) { skippedShort++; continue; }
       if (s.text.length > MAX_CHARS) { skippedLong++; console.log(`${k}: ${s.words} words; too long, skipped`); continue; }
       const id = `s${requests.length}`;
       items[id] = { congress: bill.congress, bill_type: bill.bill_type, number: bill.number, version_code: version.version_code,
@@ -200,7 +201,7 @@ async function send(db) {
     billsDone++;
     console.log(`${key} (${version.version_code}): ${sections.length} sections, ${added} to summarize`);
   }
-  console.log(`${billsDone} bills, ${requests.length} sections to summarize; ${skippedShort} under ${MIN_WORDS} words left as printed; ${skippedLong} too long`);
+  console.log(`${billsDone} bills, ${requests.length} sections to summarize; ${skippedShort} under ${MIN_WORDS} words or tables of contents left as printed; ${skippedLong} too long`);
   if (!requests.length) return { sent: 0, batch: null };
   if (DRY) { console.log("dry run: first request:\n" + JSON.stringify(requests[0], null, 2).slice(0, 3000)); return { sent: 0, batch: null }; }
 
