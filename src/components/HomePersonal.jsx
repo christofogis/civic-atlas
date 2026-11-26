@@ -35,7 +35,7 @@ export default function HomePersonal({ saved, onForget }) {
       <h1>{tr("Your officials", "Sus funcionarios")}</h1>
       {result === null && <p className="fine">{tr("Loading…", "Cargando…")}</p>}
       {people.length > 0 && (
-        <ul className="plain rep-chips">
+        <ul className="bare rep-chips">
           {people.map((o) => (
             <li key={o.bioguide_id}>
               <Link to={`/member/${o.bioguide_id}`}>{o.name}</Link> <PartyTag p={o} />
@@ -46,7 +46,7 @@ export default function HomePersonal({ saved, onForget }) {
       )}
       <h2>{tr("Coming up for you", "Lo que viene para usted")}</h2>
       {items === null ? <p className="fine">{tr("Loading…", "Cargando…")}</p> : next.length === 0 ? <p>{tr("Nothing scheduled in the next few weeks.", "Nada programado en las próximas semanas.")}</p> : (
-        <ul className="plain next-up">
+        <ul className="bare next-up">
           {next.map((it) => (
             <li key={it.key}>
               <span className="next-date">{date(it.date)}</span>

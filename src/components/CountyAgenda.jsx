@@ -61,7 +61,7 @@ export default function CountyAgenda({ district }) {
         {sections.map((s) => (
           <div key={s}>
             <h3>{SECTION[s] ? tr(...SECTION[s]) : s}</h3>
-            <ul className="plain agenda-items">
+            <ul className="bare agenda-items">
               {shown.filter((i) => i.section === s).map((i) => (
                 <li key={i.number} lang="en">
                   <span className="item-no">{i.number}</span>

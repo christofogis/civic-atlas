@@ -100,7 +100,7 @@ export default function YourWeek() {
               <div className="subscribe">
                 <a className="button-primary" href={`webcal://${feed}`}>{tr("Subscribe in your calendar", "Suscribirse en su calendario")}</a>
                 <p className="fine">{tr("Your phone's calendar keeps this list up to date on its own: new hearings, agendas and meetings appear as they're posted, and each event links back here. The link holds only your district numbers.", "El calendario de su teléfono mantiene esta lista al día por sí solo: las nuevas audiencias, agendas y reuniones aparecen cuando se publican, y cada evento enlaza aquí. El enlace solo contiene los números de sus distritos.")}</p>
-                <ul className="plain fine">
+                <ul className="bare fine">
                   <li><button type="button" className="link" onClick={() => { navigator.clipboard?.writeText(`https://${feed}`).then(() => setCopied(true)); }}>{copied ? tr("Link copied", "Enlace copiado") : tr("Copy the link", "Copiar el enlace")}</button> {tr("(for Google Calendar: Other calendars, then From URL)", "(para Google Calendar: Otros calendarios, luego Desde URL)")}</li>
                   <li><button type="button" className="link" onClick={download}>{tr("Download once instead", "Descargar una vez")}</button></li>
                 </ul>

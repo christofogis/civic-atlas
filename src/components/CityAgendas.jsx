@@ -25,7 +25,7 @@ function Meeting({ m }) {
           {groups.map((g) => (
             <div key={g}>
               {g && <h4>{g}</h4>}
-              <ul className="plain agenda-items">
+              <ul className="bare agenda-items">
                 {m.items.filter((i) => (i.heading ?? "") === g).map((i, k) => (
                   <li key={`${i.file ?? ""}${k}`} lang="en">
                     <span className="item-no">{i.number ?? ""}</span>
@@ -59,7 +59,7 @@ export default function CityAgendas({ only }) {
       {cities.map(([name, c]) => (
         <div key={name}>
           <h4>{tr(`${name} City Council`, `Concejo Municipal de ${name}`)}</h4>
-          {c.meetings.length ? <ul className="plain">{c.meetings.map((m) => <Meeting key={m.date + m.time} m={m} />)}</ul>
+          {c.meetings.length ? <ul className="bare">{c.meetings.map((m) => <Meeting key={m.date + m.time} m={m} />)}</ul>
             : <p className="fine">{tr("No council meeting posted in the next 45 days.", "No hay reuniones del concejo publicadas en los próximos 45 días.")} <a href={c.source} rel="noopener">{tr("Calendar", "Calendario")}</a></p>}
         </div>
       ))}

@@ -106,7 +106,7 @@ function Checks() {
   if (runs === null) return <p>{tr("Loading…", "Cargando…")}</p>;
   if (!runs) return <p className="fine">{tr("GitHub's job history didn't load. ", "El historial de trabajos de GitHub no se cargó. ")}<a href={`https://github.com/${REPO}/actions`}>{tr("See it on GitHub", "Verlo en GitHub")}</a>.</p>;
   return (
-    <ul className="plain status-checks">
+    <ul className="bare status-checks">
       {CHECKS.map(([name, label]) => {
         const r = runs.find((x) => x.name === name);
         return (
