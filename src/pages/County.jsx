@@ -20,7 +20,7 @@ export default function County() {
     loadLocal(id).then((d) => { setData(d); document.title = `${d.county} · Civic Atlas`; }).catch(() => setData(null));
   }, [id]);
   if (data === undefined) return <main className="page"><p className="fine">{tr("Loading…", "Cargando…")}</p></main>;
-  if (data === null) return <main className="page"><h1>{tr("Not found", "No encontrado")}</h1><p><Link to="/">{tr("Look up your address", "Busque su dirección")}</Link></p></main>;
+  if (data === null) return <main className="page"><h1>{tr("County not found", "Condado no encontrado")}</h1><p><Link to="/">{tr("Look up your address", "Buscar su dirección")}</Link></p></main>;
   const notes = [
     { id: "sources", text: <>{tr(`Officials and terms are kept by hand from the county's own pages and checked against them weekly; last checked ${date(data.checked)}. Sources: `, `Los funcionarios y sus períodos se toman a mano de las páginas del condado y se comparan con ellas cada semana; última verificación: ${date(data.checked)}. Fuentes: `)}
       {data.sources.map((s, i) => <span key={s.url}>{i ? "; " : ""}<a href={s.url} rel="noopener">{s.label}</a></span>)}.</> },

@@ -37,7 +37,7 @@ export default function Hearing() {
   }, [id]);
 
   if (state.status === "loading") return <main className="page"><p>{tr("Loading…", "Cargando…")}</p></main>;
-  if (state.status === "missing") return <main className="page"><h1>{tr("Meeting not found", "Reunión no encontrada")}</h1><p>{tr("Committee meetings from the 118th Congress (2023) on are covered.", "Se incluyen las reuniones de comités desde el 118.º Congreso (2023).")} <Link to="/committees">{tr("Committees", "Comités")}</Link></p></main>;
+  if (state.status === "missing") return <main className="page"><h1>{tr("Meeting not found", "Reunión no encontrada")}</h1><p>{tr("Committee meetings from the 118th Congress (2023) on are covered.", "Se incluyen las reuniones de comités desde el 118.º Congreso (2023).")} <Link to="/committees">{tr("All committees", "Todos los comités")}</Link></p></main>;
   if (state.status === "error") return <main className="page"><p className="notice">{tr("Couldn't load this meeting right now. Try again shortly.", "No se pudo cargar esta reunión. Inténtelo de nuevo en un momento.")}</p></main>;
 
   const { m, committees, refs, bills } = state;

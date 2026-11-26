@@ -27,7 +27,7 @@ export default function StatePerson() {
   }, [id]);
 
   if (p === undefined) return <main className="page"><p className="fine">{tr("Loading…", "Cargando…")}</p></main>;
-  if (p === null) return <main className="page"><h1>{tr("Not found", "No encontrado")}</h1><p><Link to="/">{tr("Look up your address", "Busque su dirección")}</Link></p></main>;
+  if (p === null) return <main className="page"><h1>{tr("Official not found", "Funcionario no encontrado")}</h1><p><Link to="/">{tr("Look up your address", "Buscar su dirección")}</Link></p></main>;
 
   const now = roles.filter(current), upcoming = roles.filter((r) => r.start_date && r.start_date > today), past = roles.filter((r) => r.end_date && r.end_date < today);
   return (
