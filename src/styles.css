@@ -436,12 +436,24 @@ header.site .site-inner { position: relative; flex-wrap: nowrap; gap: 8px 14px; 
 .site-menu.open nav a { padding: 10px 0; font-size: 1rem; border-bottom: 1px solid var(--border); color: var(--text); white-space: normal; }
 .site-menu.open nav a:last-child { border-bottom: 0; }
 .site-menu.open nav a.active { font-weight: 600; border-bottom-color: var(--border); }
+.site-menu.open .menu-group { border-bottom: 1px solid var(--border); }
+.site-menu.open .menu-group:last-child { border-bottom: 0; }
+.site-menu.open .menu-group summary { list-style: none; cursor: pointer; padding: 10px 0; font-size: 1rem; font-weight: 600; display: flex; justify-content: space-between; align-items: center; }
+.site-menu.open .menu-group summary::-webkit-details-marker { display: none; }
+.site-menu.open .menu-group summary::after { content: ""; width: 7px; height: 7px; border-right: 1.7px solid var(--muted); border-bottom: 1.7px solid var(--muted); transform: rotate(45deg); margin: 0 4px 4px 0; transition: transform 0.15s; }
+.site-menu.open .menu-group[open] summary::after { transform: rotate(-135deg); margin-bottom: -2px; }
+.site-menu.open .menu-group a { display: block; padding: 8px 0 8px 14px; border-bottom: 0; font-size: 0.97rem; }
+.site-menu.open .menu-group[open] { padding-bottom: 6px; }
+.site-menu.open nav > a:nth-last-of-type(1) { border-bottom: 1px solid var(--border); }
+@media (prefers-reduced-motion: reduce) { .site-menu.open .menu-group summary::after { transition: none; } }
 .menu-search { display: none; }
 @media (max-width: 640px) {
   header.site .site-inner { gap: 6px 10px; }
   .header-search { display: none; }
   .site-menu.open { left: 0; width: 100%; border-radius: 0; border-left: 0; border-right: 0; padding: 6px 16px 16px; }
-  .site-menu.open nav a { padding: 12px 0; font-size: 1.05rem; }
+  .site-menu.open nav > a { padding: 12px 0; font-size: 1.05rem; }
+  .site-menu.open .menu-group summary { padding: 12px 0; font-size: 1.05rem; }
+  .site-menu.open .menu-group a { padding: 10px 0 10px 14px; }
   .site-menu.open .menu-search { display: block; margin: 12px 0 0; }
   .site-menu.open .menu-search input { width: 100%; padding: 11px 14px; font-size: 1rem; }
 }

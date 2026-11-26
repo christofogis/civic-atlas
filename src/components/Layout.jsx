@@ -25,6 +25,25 @@ const TITLES = {
   "/status": ["Site status", "Estado del sitio"], "/your-week": ["Your week", "Su semana"],
 };
 
+// The menu: the three things most visitors come for, then everything else in a few groups that open
+// and close. The group holding the current page starts open.
+const MENU_GROUPS = [
+  { id: "congress", title: ["Congress", "Congreso"], also: ["/member/", "/bill/", "/committee/", "/hearing/", "/topic/"], links: [
+    ["/members", "Members", "Miembros"], ["/bills", "Bills", "Proyectos de ley"], ["/topics", "Topics", "Temas"],
+    ["/committees", "Committees", "Comités"], ["/nominations", "Nominations", "Nominaciones"],
+    ["/compare", "Compare two members", "Comparar dos miembros"], ["/map", "Map", "Mapa"]] },
+  { id: "elections", title: ["Elections", "Elecciones"], links: [
+    ["/on-the-ballot", "On the ballot", "En la boleta"], ["/elections", "2028 candidates", "Candidatos 2028"],
+    ["/measures", "2028 ballot measures (CA)", "Medidas en la boleta 2028 (CA)"]] },
+  { id: "learn", title: ["Learn", "Aprender"], links: [
+    ["/government", "Three branches", "Los tres poderes"], ["/budget", "Federal budget", "Presupuesto federal"],
+    ["/glossary", "Glossary", "Glosario"], ["/quiz", "Quiz: do you vote like them?", "Cuestionario: ¿vota como ellos?"],
+    ["/story", "Look up a news story", "Buscar una noticia"]] },
+  { id: "about", title: ["About this site", "Sobre este sitio"], links: [
+    ["/methods", "How this site works", "Cómo funciona este sitio"], ["/corrections", "Corrections", "Correcciones"],
+    ["/status", "Site status", "Estado del sitio"]] },
+];
+
 export default function Layout() {
   const navigate = useNavigate();
   const location = useLocation();
@@ -83,19 +102,12 @@ export default function Layout() {
             <NavLink to="/" end>{t("Find your officials", "Sus funcionarios")}</NavLink>
             <NavLink to="/your-week">{t("Your week", "Su semana")}</NavLink>
             <NavLink to="/week">{t("This week in Congress", "Esta semana en el Congreso")}</NavLink>
-            <NavLink to="/map">{t("Map", "Mapa")}</NavLink>
-            <NavLink to="/members">{t("Members of Congress", "Miembros del Congreso")}</NavLink>
-            <NavLink to="/bills">{t("Bills", "Proyectos de ley")}</NavLink>
-            <NavLink to="/topics">{t("Topics", "Temas")}</NavLink>
-            <NavLink to="/committees">{t("Committees", "Comités")}</NavLink>
-            <NavLink to="/government">{t("Three branches", "Los tres poderes")}</NavLink>
-            <NavLink to="/budget">{t("Federal budget", "Presupuesto federal")}</NavLink>
-            <NavLink to="/measures">{t("2028 ballot measures (CA)", "Medidas en la boleta 2028 (CA)")}</NavLink>
-            <NavLink to="/on-the-ballot">{t("On the ballot", "En la boleta")}</NavLink>
-            <NavLink to="/elections">{t("2028 candidates", "Candidatos 2028")}</NavLink>
-            <NavLink to="/quiz">{t("Quiz: do you vote like them?", "Cuestionario: ¿vota como ellos?")}</NavLink>
-            <NavLink to="/methods">{t("How this site works", "Cómo funciona este sitio")}</NavLink>
-            <NavLink to="/status">{t("Site status", "Estado del sitio")}</NavLink>
+            {MENU_GROUPS.map((g) => (
+              <details key={g.id} className="menu-group" open={[...g.links.map(([to]) => to), ...(g.also ?? [])].some((to) => location.pathname.startsWith(to)) || undefined}>
+                <summary>{t(...g.title)}</summary>
+                {g.links.map(([to, en, es]) => <NavLink key={to} to={to}>{t(en, es)}</NavLink>)}
+              </details>
+            ))}
           </nav>
           {location.pathname !== "/search" && (
             <form onSubmit={submit} role="search" className="site-search menu-search">
@@ -121,18 +133,8 @@ export default function Layout() {
       <footer className="site-footer">
         <div className="site-inner">
           <Link to="/methods">{t("How this site works", "Cómo funciona este sitio")}</Link>
-          <Link to="/status">{t("Site status", "Estado del sitio")}</Link>
-          <Link to="/government">{t("Three branches", "Los tres poderes")}</Link>
-          <Link to="/budget">{t("Federal budget", "Presupuesto federal")}</Link>
-          <Link to="/glossary">{t("Glossary", "Glosario")}</Link>
           <Link to="/corrections">{t("Corrections", "Correcciones")}</Link>
-          <Link to="/compare">{t("Compare two members", "Comparar dos miembros")}</Link>
-          <Link to="/quiz">{t("Quiz", "Cuestionario")}</Link>
-          <Link to="/on-the-ballot">{t("On the ballot", "En la boleta")}</Link>
-          <Link to="/elections">{t("2028 candidates", "Candidatos 2028")}</Link>
-          <Link to="/measures">{t("2028 ballot measures (CA)", "Medidas en la boleta 2028 (CA)")}</Link>
-          <Link to="/nominations">{t("Nominations", "Nominaciones")}</Link>
-          <Link to="/story">{t("Look up a news story", "Buscar una noticia")}</Link>
+          <Link to="/status">{t("Site status", "Estado del sitio")}</Link>
           <ReportError />
         </div>
       </footer>
