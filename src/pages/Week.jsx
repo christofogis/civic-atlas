@@ -87,15 +87,21 @@ export default function Week() {
 
   const finals = votes.filter(isFinal).length;
   const up = upcoming;
-  const glance = [
-    up && (up.floorWeek
-      ? tr(`Coming up: ${up.floor} item${up.floor === 1 ? "" : "s"} on the House floor schedule for the week of ${date(up.floorWeek)}, and ${up.meetings.length} committee hearing${up.meetings.length === 1 ? "" : "s"} and meeting${up.meetings.length === 1 ? "" : "s"} in the next two weeks.`,
-        `Próximamente: ${up.floor} asunto${up.floor === 1 ? "" : "s"} en la agenda del pleno de la Cámara para la semana del ${date(up.floorWeek)}, y ${up.meetings.length} audiencia${up.meetings.length === 1 ? "" : "s"} y reuni${up.meetings.length === 1 ? "ón" : "ones"} de comités en las próximas dos semanas.`)
-      : tr(`The House hasn't posted its next floor schedule yet. ${up.meetings.length} committee hearings and meetings are scheduled in the next two weeks.`, `La Cámara aún no ha publicado su próxima agenda del pleno. Hay ${up.meetings.length} audiencias y reuniones de comités programadas en las próximas dos semanas.`)),
-    up?.convene && tr(`The ${up.convene.chamber === "senate" ? "Senate" : "House"} next meets ${date(up.convene.event_date)}.`, `${up.convene.chamber === "senate" ? "El Senado" : "La Cámara"} se reúne el ${date(up.convene.event_date)}.`),
-    !loading && votes.length > 0 && tr(`In the last week with votes (${date(state.from)} to ${date(state.to)}): ${votes.length} roll-call vote${votes.length === 1 ? "" : "s"}, ${finals} of them final; ${laws.length} bill${laws.length === 1 ? "" : "s"} became law; ${passed.length} passed the House or Senate.`,
-      `En la última semana con votaciones (${date(state.from)} al ${date(state.to)}): ${votes.length} votaci${votes.length === 1 ? "ón nominal" : "ones nominales"}, ${finals} final${finals === 1 ? "" : "es"}; ${laws.length} proyecto${laws.length === 1 ? "" : "s"} se convirti${laws.length === 1 ? "ó" : "eron"} en ley; ${passed.length} aprobado${passed.length === 1 ? "" : "s"} por la Cámara o el Senado.`),
-  ].filter(Boolean);
+  // "Nov 14–20" (or "Nov 28 – Dec 4") instead of two full dates.
+  const span = (a, z) => {
+    const d1 = new Date(`${a}T12:00:00Z`), d2 = new Date(`${z}T12:00:00Z`);
+    const loc = tr("en-US", "es-US");
+    const m = (d) => d.toLocaleDateString(loc, { month: "short", timeZone: "UTC" });
+    return d1.getUTCMonth() === d2.getUTCMonth() ? `${m(d1)} ${d1.getUTCDate()}–${d2.getUTCDate()}` : `${m(d1)} ${d1.getUTCDate()} – ${m(d2)} ${d2.getUTCDate()}`;
+  };
+  // What's next, then what happened: the laws by name, the rest as counts. The topics below hold the detail.
+  const next = up && [
+    up.convene && tr(`The ${up.convene.chamber === "senate" ? "Senate" : "House"} next meets ${date(up.convene.event_date)}.`, `${up.convene.chamber === "senate" ? "El Senado" : "La Cámara"} se reúne el ${date(up.convene.event_date)}.`),
+    up.floorWeek ? tr(`The House floor schedule for the week of ${date(up.floorWeek)} lists ${up.floor} item${up.floor === 1 ? "" : "s"}.`, `La agenda del pleno de la Cámara para la semana del ${date(up.floorWeek)} incluye ${up.floor} asunto${up.floor === 1 ? "" : "s"}.`)
+      : tr("The House hasn't posted its next floor schedule yet.", "La Cámara aún no ha publicado su próxima agenda del pleno."),
+  ].filter(Boolean).join(" ");
+  const happened = !loading && votes.length > 0 && state.from;
+
   const wait = tr("Loading…", "Cargando…");
   const myMeetings = up ? up.meetings.filter((e) => myCommittees.has(e.committee_id) || myCommittees.has(e.committee_id?.slice(0, 4))).length : 0;
 
@@ -103,8 +109,21 @@ export default function Week() {
     <main className="page wide">
       <h1>{tr("This week in Congress", "Esta semana en el Congreso")}</h1>
       <section className="glance week-glance">
-        <h2>{tr("At a glance", "En resumen")}</h2>
-        {glance.length ? <ul>{glance.map((l, i) => <li key={i}>{l}</li>)}</ul> : <p className="fine">{wait}</p>}
+        <h2>{tr("Next", "Lo próximo")}</h2>
+        <p>{next || tr("Loading…", "Cargando…")}</p>
+        <h2>{happened ? tr(`Last week with votes: ${span(state.from, state.to)}`, `Última semana con votaciones: ${span(state.from, state.to)}`) : tr("Last week with votes", "Última semana con votaciones")}</h2>
+        {!happened ? <p className="fine">{tr("Loading…", "Cargando…")}</p> : <>
+          {laws.length > 0 && (
+            <>
+              <p>{laws.length === 1 ? tr("This became law:", "Esto se convirtió en ley:") : tr(`These ${laws.length} became law:`, `Estos ${laws.length} se convirtieron en ley:`)}</p>
+              <ul className="bare glance-laws">
+                {laws.slice(0, 6).map((b) => <li key={`${b.bill_type}${b.number}`}>{billLink(b)} <span lang="en" className="clamp2-inline">{b.short_title ?? b.title}</span></li>)}
+              </ul>
+            </>
+          )}
+          <p>{tr(`${passed.length} bill${passed.length === 1 ? "" : "s"} passed the House or Senate, and there were ${votes.length} roll-call vote${votes.length === 1 ? "" : "s"}, ${finals} of them final.`,
+            `${passed.length} proyecto${passed.length === 1 ? "" : "s"} se aprobaron en la Cámara o el Senado, y hubo ${votes.length} votaci${votes.length === 1 ? "ón nominal" : "ones nominales"}, ${finals} final${finals === 1 ? "" : "es"}.`)}</p>
+        </>}
       </section>
 
       <p className="fold-hint">{tr("Tap a topic to see the details.", "Toque un tema para ver los detalles.")}</p>

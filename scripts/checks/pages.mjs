@@ -16,7 +16,7 @@ export const PAGES = [
   ["/committees", ["Committees", "Senate"]],
   ["/committee/SSFI", ["Members", "Bills referred", "Recent hearings and meetings", "chair:", "in the 119th Congress"]],
   ["/committee/SSFI#members", ["Majority", "Minority"]],
-  ["/week", ["This week in Congress", "At a glance", "Floor schedule", "Committee calendar", "Became law", "Passed a chamber", "Roll-call votes", "In the last week with votes"]],
+  ["/week", ["This week in Congress", "Next", "Last week with votes", "Floor schedule", "Committee calendar", "Became law", "Passed a chamber", "Roll-call votes", "roll-call vote"]],
   ["/week#floor", ["House floor"]],
   ["/week#committees", ["Week", "Month"]],
   ["/search?q=padilla", ["Alex Padilla"]],

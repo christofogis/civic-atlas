@@ -688,8 +688,8 @@ header.site .site-inner { position: relative; flex-wrap: nowrap; gap: 8px 14px; 
 @media print { .home-features { display: none; } }
 
 /* This week: reserve the summary's space so the topics below don't jump as its lines arrive. */
-.week-glance { min-height: 13rem; }
-@media (max-width: 640px) { .week-glance { min-height: 19rem; } }
+.week-glance { min-height: 17rem; }
+@media (max-width: 640px) { .week-glance { min-height: 26rem; } }
 
 /* Budget bars that open in place to show what's inside */
 .hbar-label .swatch { display: inline-block; width: 0.7rem; height: 0.7rem; border-radius: 2px; margin-right: 0.4rem; vertical-align: -1px; }
@@ -814,3 +814,7 @@ ol.bare { list-style: none; padding: 0; margin: 0; }
 }
 .cards.compact { max-width: 60rem; }
 .cards.compact > li.card { width: 100%; box-sizing: border-box; }
+.week-glance h2 { font-size: 1.05rem; margin: 1rem 0 0.35rem; }
+.week-glance h2:first-child { margin-top: 0; }
+.glance-laws li { padding: 0.3rem 0; border-bottom: 1px solid var(--border); }
+.glance-laws .clamp2-inline { display: -webkit-inline-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; vertical-align: top; }
