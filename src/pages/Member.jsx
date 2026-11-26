@@ -1,6 +1,6 @@
 import { Fold } from "../components/Fold.jsx";
 import { memberPage } from "../lib/memberPage.js";
-import { useEffect, useState } from "react";
+import { useEffect, useState, lazy, Suspense } from "react";
 import { voteKind, isFinal } from "../lib/voteKind.js";
 import { Link, useParams, useLocation, useNavigate } from "react-router-dom";
 import { db } from "../lib/db.js";
@@ -60,6 +60,9 @@ const one = (q) => q.then(({ data, error }) => { if (error) throw error; return 
 async function loadMember(id) {
   return memberPage(id);
 }
+
+// The record in date order, loaded when its topic opens.
+const MemberTimeline = lazy(() => import("../components/MemberTimeline.jsx"));
 
 const SECTION_DATA = {
   votes: async (id) => ({
@@ -215,7 +218,7 @@ function Contact({ term, member }) {
 // section's label carries a one-line summary of what's inside, so a reader can decide whether
 // to open it. Contents render only when open (faster, and the notes list matches what's shown).
 // #votes, #bills, #money and #trades open that section (old tab links keep working).
-const FOLDS = ["contact", "service", "committees", "votes", "bills", "money", "trades", "follow"];
+const FOLDS = ["record", "contact", "service", "committees", "votes", "bills", "money", "trades", "follow"];
 
 // A section's source goes in the page's notes, cited from its heading.
 const slug = (s) => String(s).toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
@@ -345,6 +348,10 @@ export default function Member() {
 
       <p className="fold-hint">{tr("Tap a topic to see the details and records.", "Toque un tema para ver los detalles y registros.")}</p>
       <div className="folds">
+      <Fold id="record" title={tr("Record by date", "Historial por fecha")} open={open.has("record")} onToggle={toggle}
+        summary={tr("Votes, bills introduced, bills that became law and reported stock trades, newest first", "Votos, proyectos presentados, proyectos que se convirtieron en ley y operaciones bursátiles declaradas, del más reciente al más antiguo")}>
+        <Suspense fallback={<p>{tr("Loading…", "Cargando…")}</p>}><MemberTimeline bioguide={bioguide} /></Suspense>
+      </Fold>
       {seat?.seat_status === "serving" && (
         <Fold id="contact" title={tr("Contact", "Contacto")} open={open.has("contact")} onToggle={toggle}
           summary={terms[0]?.phone ? tr(`Washington office: ${terms[0].phone}`, `Oficina en Washington: ${terms[0].phone}`) : tr("Office, email form and website", "Oficina, formulario de correo y sitio web")}>
