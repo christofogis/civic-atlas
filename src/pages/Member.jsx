@@ -394,20 +394,20 @@ export default function Member() {
             <button type="button" aria-pressed={!finalOnly} className={finalOnly ? "" : "on"} onClick={() => setFinalOnly(false)}>{tr("All votes", "Todos los votos")}</button>
             <button type="button" aria-pressed={finalOnly} className={finalOnly ? "on" : ""} onClick={() => setFinalOnly(true)}>{tr("Final votes only", "Solo votos finales")}</button>
           </div>
-          <table>
+          <table className="vote-table">
             <thead><tr><th>{tr("Date", "Fecha")}</th><th>{tr("Question", "Asunto")}</th><th>{tr("Vote", "Voto")}</th><th>{tr("Result", "Resultado")}</th></tr></thead>
             <tbody>
               {votes.filter((v) => !finalOnly || isFinal(v)).slice(0, 15).map((v) => (
                 <tr key={v.vote_id}>
-                  <td>{date(v.voted_at)}</td>
-                  <td>
+                  <td className="vt-date">{date(v.voted_at)}</td>
+                  <td className="vt-q">
                     <VoteMeaning v={v} />
                     <KindLabel v={v} />
                     <a href={v.source_url}>{v.question}</a>
                     {(v.document_name || v.description) && <div className="fine">{[v.document_name, v.description].filter(Boolean).join(" · ")}</div>}
                   </td>
-                  <td><Position v={v} position={v.vote_positions[0]?.position} /></td>
-                  <td>{v.result}</td>
+                  <td data-label={tr("Vote:", "Voto:")}><Position v={v} position={v.vote_positions[0]?.position} /></td>
+                  <td data-label={tr("Result:", "Resultado:")}>{v.result}</td>
                 </tr>
               ))}
             </tbody>

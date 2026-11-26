@@ -283,15 +283,15 @@ export default function Bill() {
         summary={votes.length ? tr(`${votes.length} recorded roll-call vote${votes.length === 1 ? "" : "s"}`, `${votes.length} votaci${votes.length === 1 ? "ón nominal registrada" : "ones nominales registradas"}`) : tr("No recorded roll-call votes", "No hay votaciones nominales registradas")}>
       <Section title={tr("Roll-call votes", "Votaciones nominales")} source={<>{tr("House Clerk and Senate.gov roll-call records.", "Registros de votaciones del Secretario de la Cámara y de Senate.gov.")} <Link to="/methods#vote-types">{tr("About vote types", "Sobre los tipos de votación")}</Link>.</>}>
         {votes.length === 0 ? <p>{tr("No recorded roll-call votes on this bill. Many bills pass by voice vote or never reach the floor.", "No hay votaciones nominales registradas sobre este proyecto. Muchos proyectos se aprueban a viva voz o nunca llegan al pleno.")}</p> : (
-          <table>
+          <table className="vote-table">
             <thead><tr><th>{tr("Date", "Fecha")}</th><th>{tr("Chamber", "Cámara")}</th><th>{tr("Question", "Asunto")}</th><th>{tr("Result", "Resultado")}</th><th>{tr("Yea–Nay", "Sí–No")}</th></tr></thead>
             <tbody>
               {votes.map((v) => (
                 <Fragment key={v.vote_id}>
                   <tr>
-                    <td>{date(v.voted_at)}</td>
+                    <td className="vt-date">{date(v.voted_at)}</td>
                     <td>{v.chamber === "house" ? tr("House", "Cámara") : tr("Senate", "Senado")}</td>
-                    <td>
+                    <td className="vt-q">
                       <VoteMeaning v={v} />
                       <a href={v.source_url}>{v.question}</a>
                       <div><button className="link fine" aria-expanded={openVote === v.vote_id}
@@ -299,10 +299,10 @@ export default function Bill() {
                         {openVote === v.vote_id ? tr("Hide how members voted", "Ocultar cómo votaron") : tr("How members voted", "Cómo votaron los miembros")}
                       </button></div>
                     </td>
-                    <td>{v.result}</td>
-                    <td>{v.yea_total}–{v.nay_total}</td>
+                    <td data-label={tr("Result:", "Resultado:")}>{v.result}</td>
+                    <td data-label={tr("Yea–Nay:", "Sí–No:")}>{v.yea_total}–{v.nay_total}</td>
                   </tr>
-                  {openVote === v.vote_id && <tr><td colSpan={5}><VoteBreakdown voteId={v.vote_id} /></td></tr>}
+                  {openVote === v.vote_id && <tr className="vt-detail"><td colSpan={5}><VoteBreakdown voteId={v.vote_id} /></td></tr>}
                 </Fragment>
               ))}
             </tbody>

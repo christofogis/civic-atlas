@@ -906,3 +906,16 @@ ol.bare { list-style: none; padding: 0; margin: 0; }
 .results-table .num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
 .ca-results details { margin: 14px 0; }
 .ca-results summary { cursor: pointer; font-weight: 600; }
+
+/* Roll-call tables on phones: each vote is a card. Date, vote and result on one line, then the
+   plain sentence and the official question full width. */
+@media (max-width: 640px) {
+  .vote-table thead { display: none; }
+  .vote-table, .vote-table tbody { display: block; }
+  .vote-table tr { display: flex; flex-wrap: wrap; align-items: baseline; gap: 0.15rem 0.9rem; padding: 0.8rem 0; border-bottom: 1px solid var(--border); }
+  .vote-table td { display: block; padding: 0; border: 0; font-size: 0.9rem; }
+  .vote-table td.vt-date { font-weight: 600; }
+  .vote-table td[data-label]::before { content: attr(data-label) " "; color: var(--muted); }
+  .vote-table td.vt-q { order: 9; flex-basis: 100%; margin-top: 0.35rem; font-size: 0.95rem; }
+  .vote-table tr.vt-detail td { flex-basis: 100%; }
+}

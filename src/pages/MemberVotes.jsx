@@ -133,14 +133,14 @@ export default function MemberVotes() {
             {tally.length > 0 && <>: {tally.map(([p, n]) => `${p} ${n}`).join(", ")}</>}.
           </p>
           {filtered.length > 0 && (
-            <table>
+            <table className="vote-table">
               <thead><tr><th>{tr("Date", "Fecha")}</th><th>{tr("Question", "Asunto")}</th><th>{tr("Vote", "Voto")}</th><th>{tr("Result", "Resultado")}</th></tr></thead>
               <tbody>
                 {filtered.slice(0, shown).map((v) => {
                   return (
                     <tr key={v.vote_id}>
-                      <td>{date(v.voted_at)}</td>
-                      <td>
+                      <td className="vt-date">{date(v.voted_at)}</td>
+                      <td className="vt-q">
                         <VoteMeaning v={v} />
                         <KindLabel v={v} />
                         <a href={v.source_url}>{v.question}</a>
@@ -150,8 +150,8 @@ export default function MemberVotes() {
                             : v.description}
                         </div>
                       </td>
-                      <td><Position v={v} position={v.position} /></td>
-                      <td>{v.result}</td>
+                      <td data-label={tr("Vote:", "Voto:")}><Position v={v} position={v.position} /></td>
+                      <td data-label={tr("Result:", "Resultado:")}>{v.result}</td>
                     </tr>
                   );
                 })}

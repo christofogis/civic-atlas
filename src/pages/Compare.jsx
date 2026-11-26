@@ -104,14 +104,14 @@ export default function Compare() {
                 <h2>{tr("Votes where they differed", "Votaciones en que votaron distinto")}</h2>
                 {result.differed.length === 0 ? <p>{tr("None.", "Ninguna.")}</p> : (
                   <>
-                    <table>
+                    <table className="vote-table">
                       <thead><tr><th>{tr("Date", "Fecha")}</th><th>{tr("Question", "Asunto")}</th><th>{short(ma)}</th><th>{short(mb)}</th></tr></thead>
                       <tbody>
                         {result.differed.slice(0, shown).map((v) => {
                           return (
                             <tr key={v.vote_id}>
-                              <td>{date(v.voted_at)}</td>
-                              <td>
+                              <td className="vt-date">{date(v.voted_at)}</td>
+                              <td className="vt-q">
                                 <VoteMeaning v={v} />
                                 <KindLabel v={v} />
                                 <a href={v.source_url}>{v.question}</a>
@@ -120,8 +120,8 @@ export default function Compare() {
                                   {" · "}{v.result}
                                 </div>
                               </td>
-                              <td>{v.a_position}</td>
-                              <td>{v.b_position}</td>
+                              <td data-label={`${short(ma)}:`}>{v.a_position}</td>
+                              <td data-label={`${short(mb)}:`}>{v.b_position}</td>
                             </tr>
                           );
                         })}
