@@ -1,5 +1,7 @@
 import LocalOfficials from "./LocalOfficials.jsx";
 import StateOfficialCard, { ExtraStatewideCards } from "./StateOfficialCard.jsx";
+
+const LEGISLATIVE = new Set(["upper", "lower", "legislature"]);
 import OfficialCard from "./OfficialCard.jsx";
 import ShareResults from "./ShareResults.jsx";
 import { stateName } from "../lib/format.js";
@@ -80,8 +82,13 @@ export default function LookupResults({ result, sectionRef, shared = false }) {
           <Fold id="level-state" title={t(`State: ${stateName(result.state)}`, `Estatal: ${stateName(result.state)}`)} summary={stateNames} open={open.has("level-state")} onToggle={toggle}>
             <p className="level-what">{t("The state legislature writes state laws and the state budget (schools, roads, health care, criminal law). The governor and other statewide officials run state government.",
               "La legislatura estatal redacta las leyes y el presupuesto del estado (escuelas, carreteras, salud, derecho penal). El gobernador y otros funcionarios estatales dirigen el gobierno del estado.")}<Ref id="state" /></p>
+            {/* Your own legislators as cards; the other state officials (statewide offices, Board of Equalization) as a compact list. */}
             <ul className="cards">
-              {result.state_officials.map((o) => <StateOfficialCard key={`${o.type}-${o.id}`} official={o} state={result.state} />)}
+              {result.state_officials.filter((o) => LEGISLATIVE.has(o.type)).map((o) => <StateOfficialCard key={`${o.type}-${o.id}`} official={o} state={result.state} />)}
+            </ul>
+            <h3 className="compact-head">{t("Other state officials", "Otros funcionarios estatales")}</h3>
+            <ul className="cards compact">
+              {result.state_officials.filter((o) => !LEGISLATIVE.has(o.type)).map((o) => <StateOfficialCard key={`${o.type}-${o.id}`} official={o} state={result.state} />)}
               <ExtraStatewideCards state={result.state} boe={result.state_districts?.boe ?? []} />
             </ul>
           </Fold>
