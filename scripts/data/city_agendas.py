@@ -372,9 +372,14 @@ def pg_docs(m):
 
 
 def pg_is_council(m):
+    """City council meetings: "City Council" in the title, or a title that starts with "Council"
+    (Seal Beach's "Council Closed Session"). Committees and commissions are not, even when their
+    name contains the word (Seal Beach's "Citizen-Council Olympic Advisory Ad Hoc Committee").
+    Santa Ana also posts each agenda again as "... Versión en Español"; records stay in English."""
     t = m.get("title") or ""
-    # Santa Ana also posts each agenda again as "... Versión en Español"; records stay in English.
-    return bool(re.search(r"council", t, re.I)) and not re.search(r"versi[oó]n en espa", t, re.I)
+    if re.search(r"committee|commission|versi[oó]n en espa", t, re.I):
+        return False
+    return bool(re.search(r"city council", t, re.I) or re.match(r"\s*council\b", t, re.I))
 
 
 def primegov_meeting(m, tenant, page=None):
