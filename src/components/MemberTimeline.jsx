@@ -44,8 +44,10 @@ function Entry({ e }) {
     const { v, k } = e;
     // Nominations are named by the clerk's description (the nominee and post), not the PN number;
     // other votes by the measure's number and its description.
-    const what = k.kind === "nomination" ? (v.description || v.document_name)
-      : [v.document_name, v.description].filter(Boolean).join(": ");
+    const desc = (v.description ?? "").replace(/^Confirmation:?\s*/i, "").trim();
+    const doc = (v.document_name ?? "").trim();
+    const what = k.kind === "nomination" ? (desc || doc)
+      : !desc ? doc : !doc || desc.toLowerCase().startsWith(doc.toLowerCase()) ? desc : `${doc}: ${desc}`;
     return (
       <>
         <span className="tl-kind">{tr("Vote", "Voto")}</span>
