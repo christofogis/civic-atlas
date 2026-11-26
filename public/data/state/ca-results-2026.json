@@ -1,0 +1,1606 @@
+{
+ "state": "CA",
+ "election": "2026-11-03",
+ "election_name": "November 3, 2026, General Election",
+ "status": "semi-official",
+ "updated": "2026-11-25T18:54:00-08:00",
+ "updated_text": "November 25, 2026, 6:54 p.m.",
+ "certified_on": null,
+ "certification_scheduled": "2026-12-11",
+ "retrieved": "2026-11-26T16:47:48+00:00",
+ "source": {
+  "name": "California Secretary of State",
+  "url": "https://api.sos.ca.gov/returns/",
+  "results_site": "https://electionresults.sos.ca.gov/",
+  "election_page": "https://www.sos.ca.gov/elections/upcoming-elections/general-election-november-3-2026",
+  "statement_of_vote": null
+ },
+ "note": "Counts and percentages as published by the California Secretary of State. Semi-official results change as counties count ballots; the certified Statement of Vote replaces them. Civic Atlas does not call races.",
+ "statewide": [
+  {
+   "office": "governor",
+   "source_url": "https://api.sos.ca.gov/returns/governor",
+   "race_title": "Governor - Statewide Results",
+   "reporting": "100% (23,860 of 23,860) precincts reporting",
+   "updated_text": "November 25, 2026, 6:54 p.m.",
+   "updated": "2026-11-25T18:54:00-08:00",
+   "candidates": [
+    {
+     "name": "Xavier Becerra",
+     "party": "Dem",
+     "votes": 8740676,
+     "percent": 65.7
+    },
+    {
+     "name": "Steve Hilton",
+     "party": "Rep",
+     "votes": 4571042,
+     "percent": 34.3
+    }
+   ]
+  },
+  {
+   "office": "lieutenant-governor",
+   "source_url": "https://api.sos.ca.gov/returns/lieutenant-governor",
+   "race_title": "Lieutenant Governor - Statewide Results",
+   "reporting": "100% (23,860 of 23,860) precincts reporting",
+   "updated_text": "November 25, 2026, 6:54 p.m.",
+   "updated": "2026-11-25T18:54:00-08:00",
+   "candidates": [
+    {
+     "name": "Fiona Ma",
+     "party": "Dem",
+     "votes": 8606014,
+     "percent": 65.6
+    },
+    {
+     "name": "Gloria Romero",
+     "party": "Rep",
+     "votes": 4518378,
+     "percent": 34.4
+    }
+   ]
+  },
+  {
+   "office": "secretary-of-state",
+   "source_url": "https://api.sos.ca.gov/returns/secretary-of-state",
+   "race_title": "Secretary of State - Statewide Results",
+   "reporting": "100% (23,860 of 23,860) precincts reporting",
+   "updated_text": "November 25, 2026, 6:54 p.m.",
+   "updated": "2026-11-25T18:54:00-08:00",
+   "candidates": [
+    {
+     "name": "Shirley N. Weber",
+     "party": "Dem",
+     "votes": 8729004,
+     "percent": 66.6
+    },
+    {
+     "name": "Donald P. (Don) Wagner",
+     "party": "Rep",
+     "votes": 4378060,
+     "percent": 33.4
+    }
+   ]
+  },
+  {
+   "office": "controller",
+   "source_url": "https://api.sos.ca.gov/returns/controller",
+   "race_title": "Controller - Statewide Results",
+   "reporting": "100% (23,860 of 23,860) precincts reporting",
+   "updated_text": "November 25, 2026, 6:54 p.m.",
+   "updated": "2026-11-25T18:54:00-08:00",
+   "candidates": [
+    {
+     "name": "Malia M. Cohen",
+     "party": "Dem",
+     "votes": 8551696,
+     "percent": 65.6
+    },
+    {
+     "name": "Herb W Morgan",
+     "party": "Rep",
+     "votes": 4487391,
+     "percent": 34.4
+    }
+   ]
+  },
+  {
+   "office": "treasurer",
+   "source_url": "https://api.sos.ca.gov/returns/treasurer",
+   "race_title": "Treasurer - Statewide Results",
+   "reporting": "100% (23,860 of 23,860) precincts reporting",
+   "updated_text": "November 25, 2026, 6:54 p.m.",
+   "updated": "2026-11-25T18:54:00-08:00",
+   "candidates": [
+    {
+     "name": "Eleni Kounalakis",
+     "party": "Dem",
+     "votes": 8566423,
+     "percent": 65.7
+    },
+    {
+     "name": "Jennifer Hawks",
+     "party": "Rep",
+     "votes": 4465129,
+     "percent": 34.3
+    }
+   ]
+  },
+  {
+   "office": "attorney-general",
+   "source_url": "https://api.sos.ca.gov/returns/attorney-general",
+   "race_title": "Attorney General - Statewide Results",
+   "reporting": "100% (23,860 of 23,860) precincts reporting",
+   "updated_text": "November 25, 2026, 6:54 p.m.",
+   "updated": "2026-11-25T18:54:00-08:00",
+   "candidates": [
+    {
+     "name": "Rob Bonta",
+     "party": "Dem",
+     "votes": 8578434,
+     "percent": 65.5
+    },
+    {
+     "name": "Michael E. Gates",
+     "party": "Rep",
+     "votes": 4515290,
+     "percent": 34.5
+    }
+   ]
+  },
+  {
+   "office": "insurance-commissioner",
+   "source_url": "https://api.sos.ca.gov/returns/insurance-commissioner",
+   "race_title": "Insurance Commissioner - Statewide Results",
+   "reporting": "100% (23,860 of 23,860) precincts reporting",
+   "updated_text": "November 25, 2026, 6:54 p.m.",
+   "updated": "2026-11-25T18:54:00-08:00",
+   "candidates": [
+    {
+     "name": "Ben Allen",
+     "party": "Dem",
+     "votes": 5206834,
+     "percent": 45.7
+    },
+    {
+     "name": "Jane Kim",
+     "party": "Dem",
+     "votes": 6197646,
+     "percent": 54.3
+    }
+   ]
+  },
+  {
+   "office": "superintendent-of-public-instruction",
+   "source_url": "https://api.sos.ca.gov/returns/superintendent-of-public-instruction",
+   "race_title": "Superintendent of Public Instruction - Statewide Results",
+   "reporting": "100% (23,860 of 23,860) precincts reporting",
+   "updated_text": "November 25, 2026, 6:54 p.m.",
+   "updated": "2026-11-25T18:54:00-08:00",
+   "candidates": [
+    {
+     "name": "Richard Barrera",
+     "party": "Non",
+     "votes": 6632963,
+     "percent": 59.0
+    },
+    {
+     "name": "Sonja Shaw",
+     "party": "Non",
+     "votes": 4602504,
+     "percent": 41.0
+    }
+   ]
+  }
+ ],
+ "boe": [
+  {
+   "district": 1,
+   "source_url": "https://api.sos.ca.gov/returns/board-of-equalization/district/1",
+   "race_title": "Board of Equalization District 1 - Districtwide Results",
+   "reporting": "100% (7,251 of 7,251) precincts reporting",
+   "updated_text": "November 25, 2026, 6:54 p.m.",
+   "updated": "2026-11-25T18:54:00-08:00",
+   "candidates": [
+    {
+     "name": "Nelson Esparza",
+     "party": "Dem",
+     "votes": 1672375,
+     "percent": 55.5
+    },
+    {
+     "name": "Shannon Grove",
+     "party": "Rep",
+     "votes": 1339603,
+     "percent": 44.5
+    }
+   ]
+  },
+  {
+   "district": 2,
+   "source_url": "https://api.sos.ca.gov/returns/board-of-equalization/district/2",
+   "race_title": "Board of Equalization District 2 - Districtwide Results",
+   "reporting": "100% (6,558 of 6,558) precincts reporting",
+   "updated_text": "November 25, 2026, 6:54 p.m.",
+   "updated": "2026-11-25T18:54:00-08:00",
+   "candidates": [
+    {
+     "name": "Sally J. Lieber",
+     "party": "Dem",
+     "votes": 1828948,
+     "percent": 59.5
+    },
+    {
+     "name": "John Pimentel",
+     "party": "Dem",
+     "votes": 1245928,
+     "percent": 40.5
+    }
+   ]
+  },
+  {
+   "district": 3,
+   "source_url": "https://api.sos.ca.gov/returns/board-of-equalization/district/3",
+   "race_title": "Board of Equalization District 3 - Districtwide Results",
+   "reporting": "100% (2,853 of 2,853) precincts reporting",
+   "updated_text": "November 25, 2026, 6:54 p.m.",
+   "updated": "2026-11-25T18:54:00-08:00",
+   "candidates": [
+    {
+     "name": "Mike Gipson",
+     "party": "Dem",
+     "votes": 1462485,
+     "percent": 56.6
+    },
+    {
+     "name": "Samuel P. Sukaton",
+     "party": "Dem",
+     "votes": 1121127,
+     "percent": 43.4
+    }
+   ]
+  },
+  {
+   "district": 4,
+   "source_url": "https://api.sos.ca.gov/returns/board-of-equalization/district/4",
+   "race_title": "Board of Equalization District 4 - Districtwide Results",
+   "reporting": "100% (7,198 of 7,198) precincts reporting",
+   "updated_text": "November 25, 2026, 6:54 p.m.",
+   "updated": "2026-11-25T18:54:00-08:00",
+   "candidates": [
+    {
+     "name": "Tom Umberg",
+     "party": "Dem",
+     "votes": 1961392,
+     "percent": 58.9
+    },
+    {
+     "name": "Denis Bilodeau",
+     "party": "Rep",
+     "votes": 1369995,
+     "percent": 41.1
+    }
+   ]
+  }
+ ],
+ "house": [
+  {
+   "district": 1,
+   "source_url": "https://api.sos.ca.gov/returns/us-rep/district/1",
+   "race_title": "U.S. House of Representatives District 1 - Districtwide Results",
+   "reporting": "100% (788 of 788) precincts reporting",
+   "updated_text": "November 25, 2026, 6:54 p.m.",
+   "updated": "2026-11-25T18:54:00-08:00",
+   "candidates": [
+    {
+     "name": "Mike McGuire",
+     "party": "Dem",
+     "votes": 171234,
+     "percent": 59.0
+    },
+    {
+     "name": "James Gallagher",
+     "party": "Rep",
+     "votes": 119093,
+     "percent": 41.0,
+     "bioguide_id": "G000607"
+    }
+   ]
+  },
+  {
+   "district": 2,
+   "source_url": "https://api.sos.ca.gov/returns/us-rep/district/2",
+   "race_title": "U.S. House of Representatives District 2 - Districtwide Results",
+   "reporting": "100% (595 of 595) precincts reporting",
+   "updated_text": "November 25, 2026, 6:54 p.m.",
+   "updated": "2026-11-25T18:54:00-08:00",
+   "candidates": [
+    {
+     "name": "Jared Huffman",
+     "party": "Dem",
+     "votes": 214892,
+     "percent": 66.8,
+     "bioguide_id": "H001068"
+    },
+    {
+     "name": "Robin Littau",
+     "party": "Rep",
+     "votes": 106990,
+     "percent": 33.2
+    }
+   ]
+  },
+  {
+   "district": 3,
+   "source_url": "https://api.sos.ca.gov/returns/us-rep/district/3",
+   "race_title": "U.S. House of Representatives District 3 - Districtwide Results",
+   "reporting": "100% (531 of 531) precincts reporting",
+   "updated_text": "November 25, 2026, 6:54 p.m.",
+   "updated": "2026-11-25T18:54:00-08:00",
+   "candidates": [
+    {
+     "name": "Ami Bera",
+     "party": "Dem",
+     "votes": 181779,
+     "percent": 58.8,
+     "bioguide_id": "B001287"
+    },
+    {
+     "name": "Robb Tucker",
+     "party": "Rep",
+     "votes": 127308,
+     "percent": 41.2
+    }
+   ]
+  },
+  {
+   "district": 4,
+   "source_url": "https://api.sos.ca.gov/returns/us-rep/district/4",
+   "race_title": "U.S. House of Representatives District 4 - Districtwide Results",
+   "reporting": "100% (500 of 500) precincts reporting",
+   "updated_text": "November 25, 2026, 6:54 p.m.",
+   "updated": "2026-11-25T18:54:00-08:00",
+   "candidates": [
+    {
+     "name": "Eric Jones",
+     "party": "Dem",
+     "votes": 136385,
+     "percent": 52.5
+    },
+    {
+     "name": "Mike Thompson",
+     "party": "Dem",
+     "votes": 123334,
+     "percent": 47.5,
+     "bioguide_id": "T000460"
+    }
+   ]
+  },
+  {
+   "district": 5,
+   "source_url": "https://api.sos.ca.gov/returns/us-rep/district/5",
+   "race_title": "U.S. House of Representatives District 5 - Districtwide Results",
+   "reporting": "100% (399 of 399) precincts reporting",
+   "updated_text": "November 25, 2026, 6:54 p.m.",
+   "updated": "2026-11-25T18:54:00-08:00",
+   "candidates": [
+    {
+     "name": "Michael Masuda",
+     "party": "Dem",
+     "votes": 131716,
+     "percent": 44.4
+    },
+    {
+     "name": "Tom McClintock",
+     "party": "Rep",
+     "votes": 164788,
+     "percent": 55.6,
+     "bioguide_id": "M001177"
+    }
+   ]
+  },
+  {
+   "district": 6,
+   "source_url": "https://api.sos.ca.gov/returns/us-rep/district/6",
+   "race_title": "U.S. House of Representatives District 6 - Districtwide Results",
+   "reporting": "100% (309 of 309) precincts reporting",
+   "updated_text": "November 25, 2026, 6:54 p.m.",
+   "updated": "2026-11-25T18:54:00-08:00",
+   "candidates": [
+    {
+     "name": "Richard Pan",
+     "party": "Dem",
+     "votes": 164074,
+     "percent": 58.9
+    },
+    {
+     "name": "Kevin Kiley",
+     "party": "NPP",
+     "votes": 114569,
+     "percent": 41.1,
+     "bioguide_id": "K000401"
+    }
+   ]
+  },
+  {
+   "district": 7,
+   "source_url": "https://api.sos.ca.gov/returns/us-rep/district/7",
+   "race_title": "U.S. House of Representatives District 7 - Districtwide Results",
+   "reporting": "100% (414 of 414) precincts reporting",
+   "updated_text": "November 25, 2026, 6:54 p.m.",
+   "updated": "2026-11-25T18:54:00-08:00",
+   "candidates": [
+    {
+     "name": "Doris Matsui",
+     "party": "Dem",
+     "votes": 133564,
+     "percent": 52.1,
+     "bioguide_id": "M001163"
+    },
+    {
+     "name": "Mai Vang",
+     "party": "Dem",
+     "votes": 122589,
+     "percent": 47.9
+    }
+   ]
+  },
+  {
+   "district": 8,
+   "source_url": "https://api.sos.ca.gov/returns/us-rep/district/8",
+   "race_title": "U.S. House of Representatives District 8 - Districtwide Results",
+   "reporting": "100% (396 of 396) precincts reporting",
+   "updated_text": "November 25, 2026, 6:54 p.m.",
+   "updated": "2026-11-25T18:54:00-08:00",
+   "candidates": [
+    {
+     "name": "John Garamendi",
+     "party": "Dem",
+     "votes": 192693,
+     "percent": 73.6,
+     "bioguide_id": "G000559"
+    },
+    {
+     "name": "Rudy Recile",
+     "party": "Rep",
+     "votes": 68960,
+     "percent": 26.4
+    }
+   ]
+  },
+  {
+   "district": 9,
+   "source_url": "https://api.sos.ca.gov/returns/us-rep/district/9",
+   "race_title": "U.S. House of Representatives District 9 - Districtwide Results",
+   "reporting": "100% (322 of 322) precincts reporting",
+   "updated_text": "November 25, 2026, 6:54 p.m.",
+   "updated": "2026-11-25T18:54:00-08:00",
+   "candidates": [
+    {
+     "name": "Josh Harder",
+     "party": "Dem",
+     "votes": 145395,
+     "percent": 67.3,
+     "bioguide_id": "H001090"
+    },
+    {
+     "name": "John McBride",
+     "party": "Rep",
+     "votes": 70686,
+     "percent": 32.7
+    }
+   ]
+  },
+  {
+   "district": 10,
+   "source_url": "https://api.sos.ca.gov/returns/us-rep/district/10",
+   "race_title": "U.S. House of Representatives District 10 - Districtwide Results",
+   "reporting": "100% (728 of 728) precincts reporting",
+   "updated_text": "November 25, 2026, 6:54 p.m.",
+   "updated": "2026-11-25T18:54:00-08:00",
+   "candidates": [
+    {
+     "name": "Mark DeSaulnier",
+     "party": "Dem",
+     "votes": 219927,
+     "percent": 69.8,
+     "bioguide_id": "D000623"
+    },
+    {
+     "name": "Jeff Frese",
+     "party": "Rep",
+     "votes": 95070,
+     "percent": 30.2
+    }
+   ]
+  },
+  {
+   "district": 11,
+   "source_url": "https://api.sos.ca.gov/returns/us-rep/district/11",
+   "race_title": "U.S. House of Representatives District 11 - Districtwide Results",
+   "reporting": "100% (453 of 453) precincts reporting",
+   "updated_text": "November 25, 2026, 6:54 p.m.",
+   "updated": "2026-11-25T18:54:00-08:00",
+   "candidates": [
+    {
+     "name": "Connie Chan",
+     "party": "Dem",
+     "votes": 141127,
+     "percent": 46.7
+    },
+    {
+     "name": "Scott Wiener",
+     "party": "Dem",
+     "votes": 161047,
+     "percent": 53.3
+    }
+   ]
+  },
+  {
+   "district": 12,
+   "source_url": "https://api.sos.ca.gov/returns/us-rep/district/12",
+   "race_title": "U.S. House of Representatives District 12 - Districtwide Results",
+   "reporting": "100% (190 of 190) precincts reporting",
+   "updated_text": "November 25, 2026, 6:54 p.m.",
+   "updated": "2026-11-25T18:54:00-08:00",
+   "candidates": [
+    {
+     "name": "Jamie Joyce",
+     "party": "Dem",
+     "votes": 50519,
+     "percent": 19.6
+    },
+    {
+     "name": "Lateefah Simon",
+     "party": "Dem",
+     "votes": 207333,
+     "percent": 80.4,
+     "bioguide_id": "S001231"
+    }
+   ]
+  },
+  {
+   "district": 13,
+   "source_url": "https://api.sos.ca.gov/returns/us-rep/district/13",
+   "race_title": "U.S. House of Representatives District 13 - Districtwide Results",
+   "reporting": "100% (974 of 974) precincts reporting",
+   "updated_text": "November 25, 2026, 6:54 p.m.",
+   "updated": "2026-11-25T18:54:00-08:00",
+   "candidates": [
+    {
+     "name": "Adam Gray",
+     "party": "Dem",
+     "votes": 110114,
+     "percent": 62.8,
+     "bioguide_id": "G000605"
+    },
+    {
+     "name": "Kevin Lincoln",
+     "party": "Rep",
+     "votes": 65105,
+     "percent": 37.2
+    }
+   ]
+  },
+  {
+   "district": 14,
+   "source_url": "https://api.sos.ca.gov/returns/us-rep/district/14",
+   "race_title": "U.S. House of Representatives District 14 - Districtwide Results",
+   "reporting": "100% (351 of 351) precincts reporting",
+   "updated_text": "November 25, 2026, 6:54 p.m.",
+   "updated": "2026-11-25T18:54:00-08:00",
+   "candidates": [
+    {
+     "name": "Melissa Hernandez",
+     "party": "Dem",
+     "votes": 90268,
+     "percent": 42.4
+    },
+    {
+     "name": "Aisha Wahab",
+     "party": "Dem",
+     "votes": 122451,
+     "percent": 57.6,
+     "bioguide_id": "W000832"
+    }
+   ]
+  },
+  {
+   "district": 15,
+   "source_url": "https://api.sos.ca.gov/returns/us-rep/district/15",
+   "race_title": "U.S. House of Representatives District 15 - Districtwide Results",
+   "reporting": "100% (299 of 299) precincts reporting",
+   "updated_text": "November 25, 2026, 6:54 p.m.",
+   "updated": "2026-11-25T18:54:00-08:00",
+   "candidates": [
+    {
+     "name": "Kevin Mullin",
+     "party": "Dem",
+     "votes": 197161,
+     "percent": 80.0,
+     "bioguide_id": "M001225"
+    },
+    {
+     "name": "Charles Hoelter",
+     "party": "Rep",
+     "votes": 49429,
+     "percent": 20.0
+    }
+   ]
+  },
+  {
+   "district": 16,
+   "source_url": "https://api.sos.ca.gov/returns/us-rep/district/16",
+   "race_title": "U.S. House of Representatives District 16 - Districtwide Results",
+   "reporting": "100% (337 of 337) precincts reporting",
+   "updated_text": "November 25, 2026, 6:54 p.m.",
+   "updated": "2026-11-25T18:54:00-08:00",
+   "candidates": [
+    {
+     "name": "Sam Liccardo",
+     "party": "Dem",
+     "votes": 219856,
+     "percent": 78.0,
+     "bioguide_id": "L000607"
+    },
+    {
+     "name": "Peter Sundin Soulé",
+     "party": "Rep",
+     "votes": 62051,
+     "percent": 22.0
+    }
+   ]
+  },
+  {
+   "district": 17,
+   "source_url": "https://api.sos.ca.gov/returns/us-rep/district/17",
+   "race_title": "U.S. House of Representatives District 17 - Districtwide Results",
+   "reporting": "100% (241 of 241) precincts reporting",
+   "updated_text": "November 25, 2026, 6:54 p.m.",
+   "updated": "2026-11-25T18:54:00-08:00",
+   "candidates": [
+    {
+     "name": "Ro Khanna",
+     "party": "Dem",
+     "votes": 154671,
+     "percent": 72.8,
+     "bioguide_id": "K000389"
+    },
+    {
+     "name": "Ritesh Tandon",
+     "party": "Rep",
+     "votes": 57881,
+     "percent": 27.2
+    }
+   ]
+  },
+  {
+   "district": 18,
+   "source_url": "https://api.sos.ca.gov/returns/us-rep/district/18",
+   "race_title": "U.S. House of Representatives District 18 - Districtwide Results",
+   "reporting": "100% (376 of 376) precincts reporting",
+   "updated_text": "November 25, 2026, 6:54 p.m.",
+   "updated": "2026-11-25T18:54:00-08:00",
+   "candidates": [
+    {
+     "name": "Zoe Lofgren",
+     "party": "Dem",
+     "votes": 146338,
+     "percent": 73.1,
+     "bioguide_id": "L000397"
+    },
+    {
+     "name": "Shane Lewis",
+     "party": "Rep",
+     "votes": 53841,
+     "percent": 26.9
+    }
+   ]
+  },
+  {
+   "district": 19,
+   "source_url": "https://api.sos.ca.gov/returns/us-rep/district/19",
+   "race_title": "U.S. House of Representatives District 19 - Districtwide Results",
+   "reporting": "100% (428 of 428) precincts reporting",
+   "updated_text": "November 25, 2026, 6:54 p.m.",
+   "updated": "2026-11-25T18:54:00-08:00",
+   "candidates": [
+    {
+     "name": "Jimmy Panetta",
+     "party": "Dem",
+     "votes": 225281,
+     "percent": 72.1,
+     "bioguide_id": "P000613"
+    },
+    {
+     "name": "Peter Coe Verbica",
+     "party": "Rep",
+     "votes": 87311,
+     "percent": 27.9
+    }
+   ]
+  },
+  {
+   "district": 20,
+   "source_url": "https://api.sos.ca.gov/returns/us-rep/district/20",
+   "race_title": "U.S. House of Representatives District 20 - Districtwide Results",
+   "reporting": "100% (764 of 764) precincts reporting",
+   "updated_text": "November 25, 2026, 6:54 p.m.",
+   "updated": "2026-11-25T18:54:00-08:00",
+   "candidates": [
+    {
+     "name": "Sandra Van Scotter",
+     "party": "Dem",
+     "votes": 98618,
+     "percent": 39.0
+    },
+    {
+     "name": "Vince Fong",
+     "party": "Rep",
+     "votes": 154387,
+     "percent": 61.0,
+     "bioguide_id": "F000480"
+    }
+   ]
+  },
+  {
+   "district": 21,
+   "source_url": "https://api.sos.ca.gov/returns/us-rep/district/21",
+   "race_title": "U.S. House of Representatives District 21 - Districtwide Results",
+   "reporting": "100% (323 of 323) precincts reporting",
+   "updated_text": "November 25, 2026, 6:54 p.m.",
+   "updated": "2026-11-25T18:54:00-08:00",
+   "candidates": [
+    {
+     "name": "Jim Costa",
+     "party": "Dem",
+     "votes": 109894,
+     "percent": 65.0,
+     "bioguide_id": "C001059"
+    },
+    {
+     "name": "Kyle Kirkland",
+     "party": "Rep",
+     "votes": 59097,
+     "percent": 35.0
+    }
+   ]
+  },
+  {
+   "district": 22,
+   "source_url": "https://api.sos.ca.gov/returns/us-rep/district/22",
+   "race_title": "U.S. House of Representatives District 22 - Districtwide Results",
+   "reporting": "100% (575 of 575) precincts reporting",
+   "updated_text": "November 25, 2026, 6:54 p.m.",
+   "updated": "2026-11-25T18:54:00-08:00",
+   "candidates": [
+    {
+     "name": "Randy Villegas",
+     "party": "Dem",
+     "votes": 103689,
+     "percent": 68.2
+    },
+    {
+     "name": "David G. Valadao",
+     "party": "Rep",
+     "votes": 48371,
+     "percent": 31.8,
+     "bioguide_id": "V000129"
+    }
+   ]
+  },
+  {
+   "district": 23,
+   "source_url": "https://api.sos.ca.gov/returns/us-rep/district/23",
+   "race_title": "U.S. House of Representatives District 23 - Districtwide Results",
+   "reporting": "100% (1,324 of 1,324) precincts reporting",
+   "updated_text": "November 25, 2026, 6:54 p.m.",
+   "updated": "2026-11-25T18:54:00-08:00",
+   "candidates": [
+    {
+     "name": "Tessa Lynn Hodge",
+     "party": "Dem",
+     "votes": 107332,
+     "percent": 49.3
+    },
+    {
+     "name": "Jay Obernolte",
+     "party": "Rep",
+     "votes": 110239,
+     "percent": 50.7,
+     "bioguide_id": "O000019"
+    }
+   ]
+  },
+  {
+   "district": 24,
+   "source_url": "https://api.sos.ca.gov/returns/us-rep/district/24",
+   "race_title": "U.S. House of Representatives District 24 - Districtwide Results",
+   "reporting": "100% (627 of 627) precincts reporting",
+   "updated_text": "November 25, 2026, 6:54 p.m.",
+   "updated": "2026-11-25T18:54:00-08:00",
+   "candidates": [
+    {
+     "name": "Salud Carbajal",
+     "party": "Dem",
+     "votes": 197176,
+     "percent": 66.4,
+     "bioguide_id": "C001112"
+    },
+    {
+     "name": "Bob Smith",
+     "party": "Rep",
+     "votes": 99639,
+     "percent": 33.6
+    }
+   ]
+  },
+  {
+   "district": 25,
+   "source_url": "https://api.sos.ca.gov/returns/us-rep/district/25",
+   "race_title": "U.S. House of Representatives District 25 - Districtwide Results",
+   "reporting": "100% (656 of 656) precincts reporting",
+   "updated_text": "November 25, 2026, 6:54 p.m.",
+   "updated": "2026-11-25T18:54:00-08:00",
+   "candidates": [
+    {
+     "name": "Raul Ruiz",
+     "party": "Dem",
+     "votes": 147805,
+     "percent": 66.1,
+     "bioguide_id": "R000599"
+    },
+    {
+     "name": "Joe Males",
+     "party": "Rep",
+     "votes": 75643,
+     "percent": 33.9
+    }
+   ]
+  },
+  {
+   "district": 26,
+   "source_url": "https://api.sos.ca.gov/returns/us-rep/district/26",
+   "race_title": "U.S. House of Representatives District 26 - Districtwide Results",
+   "reporting": "100% (1,087 of 1,087) precincts reporting",
+   "updated_text": "November 25, 2026, 6:54 p.m.",
+   "updated": "2026-11-25T18:54:00-08:00",
+   "candidates": [
+    {
+     "name": "Jacqui Irwin",
+     "party": "Dem",
+     "votes": 178906,
+     "percent": 63.5
+    },
+    {
+     "name": "Sam Gallucci",
+     "party": "Rep",
+     "votes": 102879,
+     "percent": 36.5
+    }
+   ]
+  },
+  {
+   "district": 27,
+   "source_url": "https://api.sos.ca.gov/returns/us-rep/district/27",
+   "race_title": "U.S. House of Representatives District 27 - Districtwide Results",
+   "reporting": "100% (378 of 378) precincts reporting",
+   "updated_text": "November 25, 2026, 6:54 p.m.",
+   "updated": "2026-11-25T18:54:00-08:00",
+   "candidates": [
+    {
+     "name": "George Whitesides",
+     "party": "Dem",
+     "votes": 149259,
+     "percent": 64.2,
+     "bioguide_id": "W000830"
+    },
+    {
+     "name": "Jason Gibbs",
+     "party": "Rep",
+     "votes": 83170,
+     "percent": 35.8
+    }
+   ]
+  },
+  {
+   "district": 28,
+   "source_url": "https://api.sos.ca.gov/returns/us-rep/district/28",
+   "race_title": "U.S. House of Representatives District 28 - Districtwide Results",
+   "reporting": "100% (391 of 391) precincts reporting",
+   "updated_text": "November 25, 2026, 6:54 p.m.",
+   "updated": "2026-11-25T18:54:00-08:00",
+   "candidates": [
+    {
+     "name": "Judy Chu",
+     "party": "Dem",
+     "votes": 181807,
+     "percent": 69.6,
+     "bioguide_id": "C001080"
+    },
+    {
+     "name": "April A. Verlato",
+     "party": "Rep",
+     "votes": 79427,
+     "percent": 30.4
+    }
+   ]
+  },
+  {
+   "district": 29,
+   "source_url": "https://api.sos.ca.gov/returns/us-rep/district/29",
+   "race_title": "U.S. House of Representatives District 29 - Districtwide Results",
+   "reporting": "100% (115 of 115) precincts reporting",
+   "updated_text": "November 25, 2026, 6:54 p.m.",
+   "updated": "2026-11-25T18:54:00-08:00",
+   "candidates": [
+    {
+     "name": "Angélica María Dueñas",
+     "party": "Dem",
+     "votes": 74834,
+     "percent": 42.7
+    },
+    {
+     "name": "Luz Maria Rivas",
+     "party": "Dem",
+     "votes": 100270,
+     "percent": 57.3,
+     "bioguide_id": "R000620"
+    }
+   ]
+  },
+  {
+   "district": 30,
+   "source_url": "https://api.sos.ca.gov/returns/us-rep/district/30",
+   "race_title": "U.S. House of Representatives District 30 - Districtwide Results",
+   "reporting": "100% (193 of 193) precincts reporting",
+   "updated_text": "November 25, 2026, 6:54 p.m.",
+   "updated": "2026-11-25T18:54:00-08:00",
+   "candidates": [
+    {
+     "name": "Laura Friedman",
+     "party": "Dem",
+     "votes": 201940,
+     "percent": 77.6,
+     "bioguide_id": "F000483"
+    },
+    {
+     "name": "Scott Alan Meyers",
+     "party": "Rep",
+     "votes": 58178,
+     "percent": 22.4
+    }
+   ]
+  },
+  {
+   "district": 31,
+   "source_url": "https://api.sos.ca.gov/returns/us-rep/district/31",
+   "race_title": "U.S. House of Representatives District 31 - Districtwide Results",
+   "reporting": "100% (360 of 360) precincts reporting",
+   "updated_text": "November 25, 2026, 6:54 p.m.",
+   "updated": "2026-11-25T18:54:00-08:00",
+   "candidates": [
+    {
+     "name": "Gil Cisneros",
+     "party": "Dem",
+     "votes": 158687,
+     "percent": 66.4
+    },
+    {
+     "name": "Eric Ching",
+     "party": "Rep",
+     "votes": 80245,
+     "percent": 33.6
+    }
+   ]
+  },
+  {
+   "district": 32,
+   "source_url": "https://api.sos.ca.gov/returns/us-rep/district/32",
+   "race_title": "U.S. House of Representatives District 32 - Districtwide Results",
+   "reporting": "100% (268 of 268) precincts reporting",
+   "updated_text": "November 25, 2026, 6:54 p.m.",
+   "updated": "2026-11-25T18:54:00-08:00",
+   "candidates": [
+    {
+     "name": "Brad Sherman",
+     "party": "Dem",
+     "votes": 185489,
+     "percent": 67.1,
+     "bioguide_id": "S000344"
+    },
+    {
+     "name": "Larry Thompson",
+     "party": "Rep",
+     "votes": 90847,
+     "percent": 32.9
+    }
+   ]
+  },
+  {
+   "district": 33,
+   "source_url": "https://api.sos.ca.gov/returns/us-rep/district/33",
+   "race_title": "U.S. House of Representatives District 33 - Districtwide Results",
+   "reporting": "100% (491 of 491) precincts reporting",
+   "updated_text": "November 25, 2026, 6:54 p.m.",
+   "updated": "2026-11-25T18:54:00-08:00",
+   "candidates": [
+    {
+     "name": "Pete Aguilar",
+     "party": "Dem",
+     "votes": 141703,
+     "percent": 69.1,
+     "bioguide_id": "A000371"
+    },
+    {
+     "name": "Stephanie M. Vargas",
+     "party": "Rep",
+     "votes": 63464,
+     "percent": 30.9
+    }
+   ]
+  },
+  {
+   "district": 34,
+   "source_url": "https://api.sos.ca.gov/returns/us-rep/district/34",
+   "race_title": "U.S. House of Representatives District 34 - Districtwide Results",
+   "reporting": "100% (116 of 116) precincts reporting",
+   "updated_text": "November 25, 2026, 6:54 p.m.",
+   "updated": "2026-11-25T18:54:00-08:00",
+   "candidates": [
+    {
+     "name": "Jimmy Gomez",
+     "party": "Dem",
+     "votes": 66117,
+     "percent": 37.8,
+     "bioguide_id": "G000585"
+    },
+    {
+     "name": "Angela Gonzales-Torres",
+     "party": "Dem",
+     "votes": 108812,
+     "percent": 62.2
+    }
+   ]
+  },
+  {
+   "district": 35,
+   "source_url": "https://api.sos.ca.gov/returns/us-rep/district/35",
+   "race_title": "U.S. House of Representatives District 35 - Districtwide Results",
+   "reporting": "100% (272 of 272) precincts reporting",
+   "updated_text": "November 25, 2026, 6:54 p.m.",
+   "updated": "2026-11-25T18:54:00-08:00",
+   "candidates": [
+    {
+     "name": "Norma J. Torres",
+     "party": "Dem",
+     "votes": 142173,
+     "percent": 66.9,
+     "bioguide_id": "T000474"
+    },
+    {
+     "name": "Mike Cargile",
+     "party": "Rep",
+     "votes": 70312,
+     "percent": 33.1
+    }
+   ]
+  },
+  {
+   "district": 36,
+   "source_url": "https://api.sos.ca.gov/returns/us-rep/district/36",
+   "race_title": "U.S. House of Representatives District 36 - Districtwide Results",
+   "reporting": "100% (156 of 156) precincts reporting",
+   "updated_text": "November 25, 2026, 6:54 p.m.",
+   "updated": "2026-11-25T18:54:00-08:00",
+   "candidates": [
+    {
+     "name": "Ted W. Lieu",
+     "party": "Dem",
+     "votes": 224272,
+     "percent": 73.0
+    },
+    {
+     "name": "Houston Brignano",
+     "party": "Rep",
+     "votes": 82805,
+     "percent": 27.0
+    }
+   ]
+  },
+  {
+   "district": 37,
+   "source_url": "https://api.sos.ca.gov/returns/us-rep/district/37",
+   "race_title": "U.S. House of Representatives District 37 - Districtwide Results",
+   "reporting": "100% (140 of 140) precincts reporting",
+   "updated_text": "November 25, 2026, 6:54 p.m.",
+   "updated": "2026-11-25T18:54:00-08:00",
+   "candidates": [
+    {
+     "name": "Sydney Kamlager-Dove",
+     "party": "Dem",
+     "votes": 111721,
+     "percent": 60.8,
+     "bioguide_id": "K000400"
+    },
+    {
+     "name": "Samantha Mota",
+     "party": "Dem",
+     "votes": 72089,
+     "percent": 39.2
+    }
+   ]
+  },
+  {
+   "district": 38,
+   "source_url": "https://api.sos.ca.gov/returns/us-rep/district/38",
+   "race_title": "U.S. House of Representatives District 38 - Districtwide Results",
+   "reporting": "100% (415 of 415) precincts reporting",
+   "updated_text": "November 25, 2026, 6:54 p.m.",
+   "updated": "2026-11-25T18:54:00-08:00",
+   "candidates": [
+    {
+     "name": "Hilda Solis",
+     "party": "Dem",
+     "votes": 145562,
+     "percent": 67.5
+    },
+    {
+     "name": "Pedro Antonio Casas",
+     "party": "Rep",
+     "votes": 70227,
+     "percent": 32.5
+    }
+   ]
+  },
+  {
+   "district": 39,
+   "source_url": "https://api.sos.ca.gov/returns/us-rep/district/39",
+   "race_title": "U.S. House of Representatives District 39 - Districtwide Results",
+   "reporting": "100% (210 of 210) precincts reporting",
+   "updated_text": "November 25, 2026, 6:54 p.m.",
+   "updated": "2026-11-25T18:54:00-08:00",
+   "candidates": [
+    {
+     "name": "Mark Takano",
+     "party": "Dem",
+     "votes": 138270,
+     "percent": 69.5,
+     "bioguide_id": "T000472"
+    },
+    {
+     "name": "Steve Manos",
+     "party": "Rep",
+     "votes": 60688,
+     "percent": 30.5
+    }
+   ]
+  },
+  {
+   "district": 40,
+   "source_url": "https://api.sos.ca.gov/returns/us-rep/district/40",
+   "race_title": "U.S. House of Representatives District 40 - Districtwide Results",
+   "reporting": "100% (558 of 558) precincts reporting",
+   "updated_text": "November 25, 2026, 6:54 p.m.",
+   "updated": "2026-11-25T18:54:00-08:00",
+   "candidates": [
+    {
+     "name": "Ken Calvert",
+     "party": "Rep",
+     "votes": 132518,
+     "percent": 52.5,
+     "bioguide_id": "C000059"
+    },
+    {
+     "name": "Young Kim",
+     "party": "Rep",
+     "votes": 120098,
+     "percent": 47.5,
+     "bioguide_id": "K000397"
+    }
+   ]
+  },
+  {
+   "district": 41,
+   "source_url": "https://api.sos.ca.gov/returns/us-rep/district/41",
+   "race_title": "U.S. House of Representatives District 41 - Districtwide Results",
+   "reporting": "100% (281 of 281) precincts reporting",
+   "updated_text": "November 25, 2026, 6:54 p.m.",
+   "updated": "2026-11-25T18:54:00-08:00",
+   "candidates": [
+    {
+     "name": "Linda Sánchez",
+     "party": "Dem",
+     "votes": 171374,
+     "percent": 67.6,
+     "bioguide_id": "S001156"
+    },
+    {
+     "name": "Mitch Clemmons",
+     "party": "Rep",
+     "votes": 82170,
+     "percent": 32.4
+    }
+   ]
+  },
+  {
+   "district": 42,
+   "source_url": "https://api.sos.ca.gov/returns/us-rep/district/42",
+   "race_title": "U.S. House of Representatives District 42 - Districtwide Results",
+   "reporting": "100% (402 of 402) precincts reporting",
+   "updated_text": "November 25, 2026, 6:54 p.m.",
+   "updated": "2026-11-25T18:54:00-08:00",
+   "candidates": [
+    {
+     "name": "Robert Garcia",
+     "party": "Dem",
+     "votes": 175590,
+     "percent": 62.0,
+     "bioguide_id": "G000598"
+    },
+    {
+     "name": "Brian Burley",
+     "party": "Rep",
+     "votes": 107781,
+     "percent": 38.0
+    }
+   ]
+  },
+  {
+   "district": 43,
+   "source_url": "https://api.sos.ca.gov/returns/us-rep/district/43",
+   "race_title": "U.S. House of Representatives District 43 - Districtwide Results",
+   "reporting": "100% (193 of 193) precincts reporting",
+   "updated_text": "November 25, 2026, 6:54 p.m.",
+   "updated": "2026-11-25T18:54:00-08:00",
+   "candidates": [
+    {
+     "name": "Maxine Waters",
+     "party": "Dem",
+     "votes": 156321,
+     "percent": 83.0,
+     "bioguide_id": "W000187"
+    },
+    {
+     "name": "Cristian Morales",
+     "party": "Rep",
+     "votes": 32078,
+     "percent": 17.0
+    }
+   ]
+  },
+  {
+   "district": 44,
+   "source_url": "https://api.sos.ca.gov/returns/us-rep/district/44",
+   "race_title": "U.S. House of Representatives District 44 - Districtwide Results",
+   "reporting": "100% (179 of 179) precincts reporting",
+   "updated_text": "November 25, 2026, 6:54 p.m.",
+   "updated": "2026-11-25T18:54:00-08:00",
+   "candidates": [
+    {
+     "name": "Nanette Diaz Barragan",
+     "party": "Dem",
+     "votes": 149015,
+     "percent": 81.8
+    },
+    {
+     "name": "Genevieve Angel",
+     "party": "Rep",
+     "votes": 33214,
+     "percent": 18.2
+    }
+   ]
+  },
+  {
+   "district": 45,
+   "source_url": "https://api.sos.ca.gov/returns/us-rep/district/45",
+   "race_title": "U.S. House of Representatives District 45 - Districtwide Results",
+   "reporting": "100% (424 of 424) precincts reporting",
+   "updated_text": "November 25, 2026, 6:54 p.m.",
+   "updated": "2026-11-25T18:54:00-08:00",
+   "candidates": [
+    {
+     "name": "Derek Tran",
+     "party": "Dem",
+     "votes": 152012,
+     "percent": 61.0,
+     "bioguide_id": "T000491"
+    },
+    {
+     "name": "Chuong V. Vo",
+     "party": "Rep",
+     "votes": 97111,
+     "percent": 39.0
+    }
+   ]
+  },
+  {
+   "district": 46,
+   "source_url": "https://api.sos.ca.gov/returns/us-rep/district/46",
+   "race_title": "U.S. House of Representatives District 46 - Districtwide Results",
+   "reporting": "100% (423 of 423) precincts reporting",
+   "updated_text": "November 25, 2026, 6:54 p.m.",
+   "updated": "2026-11-25T18:54:00-08:00",
+   "candidates": [
+    {
+     "name": "Lou Correa",
+     "party": "Dem",
+     "votes": 139833,
+     "percent": 71.6
+    },
+    {
+     "name": "David Pan",
+     "party": "Rep",
+     "votes": 55585,
+     "percent": 28.4
+    }
+   ]
+  },
+  {
+   "district": 47,
+   "source_url": "https://api.sos.ca.gov/returns/us-rep/district/47",
+   "race_title": "U.S. House of Representatives District 47 - Districtwide Results",
+   "reporting": "100% (561 of 561) precincts reporting",
+   "updated_text": "November 25, 2026, 6:54 p.m.",
+   "updated": "2026-11-25T18:54:00-08:00",
+   "candidates": [
+    {
+     "name": "Dave Min",
+     "party": "Dem",
+     "votes": 167221,
+     "percent": 58.6,
+     "bioguide_id": "M001241"
+    },
+    {
+     "name": "Jenny Rae Le Roux",
+     "party": "Rep",
+     "votes": 118186,
+     "percent": 41.4
+    }
+   ]
+  },
+  {
+   "district": 48,
+   "source_url": "https://api.sos.ca.gov/returns/us-rep/district/48",
+   "race_title": "U.S. House of Representatives District 48 - Districtwide Results",
+   "reporting": "100% (692 of 692) precincts reporting",
+   "updated_text": "November 25, 2026, 6:54 p.m.",
+   "updated": "2026-11-25T18:54:00-08:00",
+   "candidates": [
+    {
+     "name": "Marni von Wilpert",
+     "party": "Dem",
+     "votes": 168799,
+     "percent": 59.9
+    },
+    {
+     "name": "Jim Desmond",
+     "party": "Rep",
+     "votes": 113028,
+     "percent": 40.1
+    }
+   ]
+  },
+  {
+   "district": 49,
+   "source_url": "https://api.sos.ca.gov/returns/us-rep/district/49",
+   "race_title": "U.S. House of Representatives District 49 - Districtwide Results",
+   "reporting": "100% (699 of 699) precincts reporting",
+   "updated_text": "November 25, 2026, 6:54 p.m.",
+   "updated": "2026-11-25T18:54:00-08:00",
+   "candidates": [
+    {
+     "name": "Mike Levin",
+     "party": "Dem",
+     "votes": 193264,
+     "percent": 59.6,
+     "bioguide_id": "L000593"
+    },
+    {
+     "name": "Armen Kurdian",
+     "party": "Rep",
+     "votes": 131059,
+     "percent": 40.4
+    }
+   ]
+  },
+  {
+   "district": 50,
+   "source_url": "https://api.sos.ca.gov/returns/us-rep/district/50",
+   "race_title": "U.S. House of Representatives District 50 - Districtwide Results",
+   "reporting": "100% (713 of 713) precincts reporting",
+   "updated_text": "November 25, 2026, 6:54 p.m.",
+   "updated": "2026-11-25T18:54:00-08:00",
+   "candidates": [
+    {
+     "name": "Scott Peters",
+     "party": "Dem",
+     "votes": 198428,
+     "percent": 63.8,
+     "bioguide_id": "P000608"
+    },
+    {
+     "name": "Steve Cohen",
+     "party": "Rep",
+     "votes": 112625,
+     "percent": 36.2
+    }
+   ]
+  },
+  {
+   "district": 51,
+   "source_url": "https://api.sos.ca.gov/returns/us-rep/district/51",
+   "race_title": "U.S. House of Representatives District 51 - Districtwide Results",
+   "reporting": "100% (663 of 663) precincts reporting",
+   "updated_text": "November 25, 2026, 6:54 p.m.",
+   "updated": "2026-11-25T18:54:00-08:00",
+   "candidates": [
+    {
+     "name": "Sara Jacobs",
+     "party": "Dem",
+     "votes": 193292,
+     "percent": 66.3,
+     "bioguide_id": "J000305"
+    },
+    {
+     "name": "Ricardo Cabrera",
+     "party": "Rep",
+     "votes": 98394,
+     "percent": 33.7
+    }
+   ]
+  },
+  {
+   "district": 52,
+   "source_url": "https://api.sos.ca.gov/returns/us-rep/district/52",
+   "race_title": "U.S. House of Representatives District 52 - Districtwide Results",
+   "reporting": "100% (580 of 580) precincts reporting",
+   "updated_text": "November 25, 2026, 6:54 p.m.",
+   "updated": "2026-11-25T18:54:00-08:00",
+   "candidates": [
+    {
+     "name": "Juan Vargas",
+     "party": "Dem",
+     "votes": 159281,
+     "percent": 71.9,
+     "bioguide_id": "V000130"
+    },
+    {
+     "name": "Jeff Belle",
+     "party": "Rep",
+     "votes": 62384,
+     "percent": 28.1
+    }
+   ]
+  }
+ ],
+ "measures": [
+  {
+   "number": "1",
+   "title": "Authorizes Bonds For Housing Affordability Programs. Legislative Statute.",
+   "yes_votes": 7912244,
+   "yes_percent": 61.2,
+   "no_votes": 5013208,
+   "no_percent": 38.8,
+   "source_url": "https://api.sos.ca.gov/returns/ballot-measures"
+  },
+  {
+   "number": "2",
+   "title": "Increases State's Rainy Day Fund. Legislative Constitutional Amendment.",
+   "yes_votes": 7918710,
+   "yes_percent": 61.3,
+   "no_votes": 4994809,
+   "no_percent": 38.7,
+   "source_url": "https://api.sos.ca.gov/returns/ballot-measures"
+  },
+  {
+   "number": "3",
+   "title": "Provides Permanent Funding For Schools And Health Care By Extending Existing Tax On High Incomes. Initiative Constitutional Amendment.",
+   "yes_votes": 7933536,
+   "yes_percent": 60.9,
+   "no_votes": 5099455,
+   "no_percent": 39.1,
+   "source_url": "https://api.sos.ca.gov/returns/ballot-measures"
+  },
+  {
+   "number": "4",
+   "title": "Repeals Prohibition Against Public Funding Of Election Campaigns. Legislative Statute.",
+   "yes_votes": 6354181,
+   "yes_percent": 49.8,
+   "no_votes": 6399083,
+   "no_percent": 50.2,
+   "source_url": "https://api.sos.ca.gov/returns/ballot-measures"
+  },
+  {
+   "number": "5",
+   "title": "Changes Recall Election Process For Statewide Officers. Legislative Constitutional Amendment.",
+   "yes_votes": 6511022,
+   "yes_percent": 52.0,
+   "no_votes": 6021239,
+   "no_percent": 48.0,
+   "source_url": "https://api.sos.ca.gov/returns/ballot-measures"
+  },
+  {
+   "number": "37",
+   "title": "Creates Loan Program For Middle-Income Buyers Of Qualified New Homes. Initiative Statute.",
+   "yes_votes": 8041970,
+   "yes_percent": 62.6,
+   "no_votes": 4812020,
+   "no_percent": 37.4,
+   "source_url": "https://api.sos.ca.gov/returns/ballot-measures"
+  },
+  {
+   "number": "38",
+   "title": "Authorizes Bonds For Immunology Medical Research. Initiative Statute.",
+   "yes_votes": 6945930,
+   "yes_percent": 53.9,
+   "no_votes": 5938115,
+   "no_percent": 46.1,
+   "source_url": "https://api.sos.ca.gov/returns/ballot-measures"
+  },
+  {
+   "number": "39",
+   "title": "Prohibits Citizens From Voting Unless They Present Government-Issued Identification. Initiative Constitutional Amendment.",
+   "yes_votes": 5172758,
+   "yes_percent": 39.5,
+   "no_votes": 7937763,
+   "no_percent": 60.5,
+   "source_url": "https://api.sos.ca.gov/returns/ballot-measures"
+  },
+  {
+   "number": "40",
+   "title": "Imposes One-Time Tax On Certain Taxpayers. Initiative Constitutional Amendment And Statute.",
+   "yes_votes": 6298238,
+   "yes_percent": 48.0,
+   "no_votes": 6831957,
+   "no_percent": 52.0,
+   "source_url": "https://api.sos.ca.gov/returns/ballot-measures"
+  },
+  {
+   "number": "41",
+   "title": "Prohibits New State Taxes That Exclude Revenues From State Spending Limit. Requires Audits For New State Special Taxes. Initiative Constitutional Amendment.",
+   "yes_votes": 5766431,
+   "yes_percent": 44.7,
+   "no_votes": 7121626,
+   "no_percent": 55.3,
+   "source_url": "https://api.sos.ca.gov/returns/ballot-measures"
+  },
+  {
+   "number": "42",
+   "title": "Prohibits New State Personal Property Taxes And Certain Retroactive State Taxes. Initiative Constitutional Amendment.",
+   "yes_votes": 6656959,
+   "yes_percent": 51.2,
+   "no_votes": 6356934,
+   "no_percent": 48.8,
+   "source_url": "https://api.sos.ca.gov/returns/ballot-measures"
+  },
+  {
+   "number": "43",
+   "title": "Limits Voters' Ability To Raise Revenues For Local Government Services. Legislative Constitutional Amendment.",
+   "yes_votes": 5410588,
+   "yes_percent": 42.3,
+   "no_votes": 7388211,
+   "no_percent": 57.7,
+   "source_url": "https://api.sos.ca.gov/returns/ballot-measures"
+  },
+  {
+   "number": "44",
+   "title": "Requires Community Health Clinics Spend 90% Of Revenue On Program Services. Initiative Statute.",
+   "yes_votes": 2298191,
+   "yes_percent": 18.0,
+   "no_votes": 10475248,
+   "no_percent": 82.0,
+   "source_url": "https://api.sos.ca.gov/returns/ballot-measures"
+  },
+  {
+   "number": "45",
+   "title": "Modifies Environmental Review For Certain Projects. Initiative Statute.",
+   "yes_votes": 5542070,
+   "yes_percent": 43.5,
+   "no_votes": 7194874,
+   "no_percent": 56.5,
+   "source_url": "https://api.sos.ca.gov/returns/ballot-measures"
+  }
+ ]
+}
