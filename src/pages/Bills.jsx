@@ -73,7 +73,7 @@ export default function Bills() {
       {state.status === "loading" && state.rows.length === 0 && <p>{tr("Loading…", "Cargando…")}</p>}
       {state.rows.length === 0 && state.status === "done" && <p>{tr("No bills match.", "Ningún proyecto coincide.")}</p>}
       {state.rows.length > 0 && (
-        <table className={state.status === "loading" ? "dim" : ""}>
+        <table className={`bill-table${state.status === "loading" ? " dim" : ""}`}>
           <thead><tr><th>{tr("Bill", "Proyecto")}</th><th>{tr("Sponsor", "Patrocinador")}</th><th>{tr("Latest action", "Última acción")}</th>{sort === "lobbying" && <th>{tr("Lobbying", "Cabildeo")}</th>}</tr></thead>
           <tbody>
             {state.rows.map((b) => (
@@ -82,7 +82,7 @@ export default function Bills() {
                   <Link to={`/bill/${b.congress}/${b.bill_type}/${b.number}`}>{billLabel(b)}</Link> <Clamp lines={2}>{b.short_title ?? b.title}</Clamp>
                   {b.policy_area && <div className="fine">{areaName(b.policy_area)}</div>}
                 </td>
-                <td>{b.sponsor_bioguide_id
+                <td data-label={tr("Sponsor:", "Patrocinador:")}>{b.sponsor_bioguide_id
                   ? <><Link to={`/member/${b.sponsor_bioguide_id}`}>{b.sponsor_name}</Link>{b.sponsor_party && <> <PartyTag p={{ party: b.sponsor_party, chamber: b.sponsor_chamber, state: b.sponsor_state, district: b.sponsor_district }} /></>}</>
                   : ""}</td>
                 <td><span className="fine">{date(b.latest_action_date)}</span><div>{b.latest_action_text}</div></td>

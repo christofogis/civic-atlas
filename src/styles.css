@@ -775,3 +775,14 @@ header.site .site-inner { position: relative; flex-wrap: nowrap; gap: 8px 14px; 
 .other-address summary { cursor: pointer; color: var(--accent); }
 .other-address[open] summary { margin-bottom: 0.6rem; }
 @media (max-width: 640px) { .next-up li { grid-template-columns: 1fr; gap: 0.1rem; } .next-up .level-tag { justify-self: start; } }
+
+/* Bills list on phones: each bill as a stacked row instead of a squeezed three-column table */
+@media (max-width: 640px) {
+  .bill-table thead { display: none; }
+  .bill-table, .bill-table tbody { display: block; }
+  .bill-table tr { display: grid; grid-template-columns: 1fr; gap: 0.25rem; padding: 0.8rem 0; border-bottom: 1px solid var(--border); }
+  .bill-table td { display: block; padding: 0; border: 0; }
+  .bill-table td:nth-child(2)::before { content: attr(data-label) " "; color: var(--muted); font-size: 0.85rem; }
+  .bill-table td:nth-child(3) div { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; color: var(--muted); font-size: 0.92rem; }
+  .bill-table td:nth-child(3) .fine { display: inline; margin-right: 0.4rem; }
+}
