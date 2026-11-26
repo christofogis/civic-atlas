@@ -164,6 +164,25 @@ export default function Methods() {
         Candidates who have filed are on the 2028 candidates page.
       </p>
 
+      <h2 id="ca-results">California election results</h2>
+      <p>
+        Results for California's November 3, 2026 general election come from the California Secretary of State. While
+        counties count ballots, they are the semi-official results the Secretary of State publishes on
+        electionresults.sos.ca.gov, read twice a day from the same public data feed that site uses. Those numbers
+        change as counting continues, so each result shows when the Secretary of State last updated it. Counties finish
+        their official canvass by December 3, and the Secretary of State certifies the results on December 11, 2026 in
+        the Statement of Vote. Once the Statement of Vote's spreadsheets are posted and cover every race, the site adds
+        up their county totals, shows those in place of the semi-official numbers, and marks the results certified.
+      </p>
+      <p>
+        Covered: the eight statewide offices, the four Board of Equalization districts, the statewide ballot measures and
+        all 52 U.S. House districts (no U.S. Senate seat from California was on the 2026 ballot). Candidate names, party
+        and measure titles are shown as the Secretary of State prints them. Civic Atlas doesn't call races or mark
+        anyone as the winner; it shows each candidate's votes and percent. California used new congressional maps in
+        2026, so a member's page shows a 2026 race only when the name printed on the ballot matches the member's name
+        (ignoring capital letters and punctuation), never by district number alone.
+      </p>
+
       <h2 id="hearings">Committee hearings and meetings</h2>
       <p>
         Hearings, markups and business meetings in both chambers come from Congress.gov's committee meeting records,

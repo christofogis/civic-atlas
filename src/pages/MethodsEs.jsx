@@ -159,6 +159,28 @@ export default function MethodsEs() {
         Los candidatos inscritos están en la página de candidatos de 2028.
       </p>
 
+      <h2 id="ca-results">Resultados electorales de California</h2>
+      <p>
+        Los resultados de la elección general del 3 de noviembre de 2026 en California provienen de la Secretaría de
+        Estado de California. Mientras los condados cuentan las boletas, son los resultados semioficiales que la
+        Secretaría publica en electionresults.sos.ca.gov, leídos dos veces al día de la misma fuente pública de datos que
+        usa ese sitio. Esas cifras cambian a medida que continúa el conteo, por lo que cada resultado indica cuándo la
+        Secretaría lo actualizó por última vez. Los condados terminan su escrutinio oficial a más tardar el 3 de
+        diciembre, y la Secretaría certifica los resultados el 11 de diciembre de 2026 en la Declaración del Voto
+        (Statement of Vote). Cuando se publican las hojas de cálculo de la Declaración del Voto y abarcan todas las
+        contiendas, el sitio suma los totales de los condados, los muestra en lugar de las cifras semioficiales e indica
+        que los resultados están certificados.
+      </p>
+      <p>
+        Se incluyen los ocho cargos estatales, los cuatro distritos de la Junta de Igualación, las medidas estatales y los
+        52 distritos de California en la Cámara de EE. UU. (ningún escaño de California en el Senado de EE. UU. estuvo en
+        la boleta de 2026). Los nombres de los candidatos, el partido y los títulos de las medidas se muestran tal como
+        los publica la Secretaría de Estado, en inglés. Civic Atlas no declara ganadores; muestra los votos y el
+        porcentaje de cada candidato. California usó mapas congresionales nuevos en 2026, por lo que la página de un
+        miembro muestra una contienda de 2026 solo cuando el nombre impreso en la boleta coincide con el nombre del
+        miembro (sin tener en cuenta mayúsculas ni puntuación), nunca solo por el número de distrito.
+      </p>
+
       <h2 id="hearings">Audiencias y reuniones de comités</h2>
       <p>
         Las audiencias, sesiones de enmiendas y reuniones de trabajo de ambas cámaras provienen de los registros de
