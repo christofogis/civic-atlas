@@ -130,8 +130,26 @@ export default function MethodsEs() {
         La página de un proyecto muestra cada título y sección de su texto oficial más reciente de GovInfo, en orden,
         con el encabezado propio de cada sección y su extensión en palabras, y abre el texto de cualquier sección en el
         mismo lugar. La búsqueda muestra qué secciones mencionan una palabra. Los encabezados y el texto son los del
-        proyecto, en inglés; no se resume nada. El texto de una ley pública se lee del proyecto aprobado por ambas
-        cámaras, que tiene las mismas palabras.
+        proyecto, en inglés. El texto de una ley pública se lee del proyecto aprobado por ambas cámaras, que tiene
+        las mismas palabras.
+      </p>
+
+      <h2 id="section-summaries">Resúmenes de secciones hechos por IA</h2>
+      <p>
+        Algunas secciones tienen un resumen breve en lenguaje sencillo, marcado como "Resumen generado por IA", con el
+        texto oficial de la sección a un toque. El texto es el registro; el resumen es una ayuda para leerlo. El
+        resumen del Servicio de Investigación del Congreso, cuando existe, sigue arriba en la página del proyecto.
+      </p>
+      <p>
+        Los resúmenes se escriben de antemano con el modelo Claude Haiku de Anthropic, solo a partir del texto de la
+        sección y con las mismas instrucciones escritas para todos los proyectos: decir qué hace la sección, quién debe
+        o puede hacer qué, y los montos y fechas tal como están impresos; no agregar antecedentes; nunca describir el
+        propósito, el efecto ni quién gana o pierde, salvo que el texto lo diga; no usar palabras que juzguen. Luego
+        una segunda consulta compara cada resumen con el texto y enumera toda afirmación que el texto no respalde. Un
+        resumen señalado se reescribe una vez indicando esos problemas y se vuelve a verificar; si sigue fallando, no
+        se muestra. No se resumen las secciones de menos de 40 palabras ni los índices. Cada resumen corresponde a una
+        versión del texto, así que una versión nueva recibe resúmenes nuevos. Los resúmenes en español se escriben
+        junto con los de inglés y se verifican contra ellos.
       </p>
 
       <h2 id="photos">Fotos</h2>
