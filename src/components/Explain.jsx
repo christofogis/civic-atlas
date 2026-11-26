@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { GLOSSARY } from "../lib/glossary.js";
 import { voteKind, positionMeaning } from "../lib/voteKind.js";
 import { useLang } from "../lib/i18n.jsx";
@@ -14,6 +14,15 @@ function usePop() {
     document.addEventListener("pointerdown", away);
     document.addEventListener("keydown", esc);
     return () => { document.removeEventListener("pointerdown", away); document.removeEventListener("keydown", esc); };
+  }, [open]);
+  // Keep the card on screen: shift it left if it would run past the right edge.
+  useLayoutEffect(() => {
+    const pop = open && ref.current?.querySelector(".explain-pop");
+    if (!pop) return;
+    pop.style.left = "0px";
+    const r = pop.getBoundingClientRect();
+    const over = r.right - (document.documentElement.clientWidth - 12);
+    if (over > 0) pop.style.left = `${-Math.min(over, r.left - 12)}px`;
   }, [open]);
   return [open, setOpen, ref];
 }
