@@ -333,7 +333,8 @@ export default function Member() {
         <img className="member-photo" src={`https://unitedstates.github.io/images/congress/225x275/${m.bioguide_id}.jpg`} alt={name} width="90" height="110" fetchpriority="high" onError={(e) => { e.currentTarget.style.display = "none"; }} />
         <h1>{name}</h1>
         {seat?.seat_status === "serving" ? (
-          <p className="lede">{seatLabel(seat)} <PartyName party={seat.party} /> · {tr("Current term", "Período actual")} {date(seat.start_date)} – {date(seat.end_date)}</p>
+          <><p className="lede">{seatLabel(seat)}</p>
+          <p className="member-meta"><PartyName party={seat.party} /> · {tr("Current term", "Período actual")} {date(seat.start_date)} – {date(seat.end_date)}</p></>
         ) : (
           <p className="lede">{tr("Not currently serving. Most recent", "No está en el cargo. Último cargo")}: {seatLabel(latest)}, {date(latest.start_date)} – {date(latest.end_date)} <PartyName party={latest.party} /></p>
         )}

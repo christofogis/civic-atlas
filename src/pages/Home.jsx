@@ -1,13 +1,13 @@
 import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import LookupResults from "../components/LookupResults.jsx";
-import { saveDistricts } from "../lib/savedDistricts.js";
+import { saveDistricts, savedDistricts, forgetDistricts } from "../lib/savedDistricts.js";
 import Turnstile from "../components/Turnstile.jsx";
 import { TURNSTILE_SITE_KEY, GOOGLE_PLACES_KEY } from "../lib/config.js";
 import { stateName } from "../lib/format.js";
 import { useLang } from "../lib/i18n.jsx";
-import { rememberRepresentatives, myRepresentatives, representativesOutdated } from "../lib/myReps.js";
-import MyReps from "../components/MyReps.jsx";
+import { rememberRepresentatives, myRepresentatives, representativesOutdated, forgetRepresentatives } from "../lib/myReps.js";
+import HomePersonal from "../components/HomePersonal.jsx";
 import AddressInput from "../components/AddressInput.jsx";
 import HomeDashboard from "../components/HomeDashboard.jsx";
 import { BallotDrawing, MapDrawing, BranchesDrawing, WeekDrawing } from "../components/FeatureDrawings.jsx";
@@ -95,25 +95,15 @@ export default function Home() {
     }
   }
 
-  const features = [
-    ["/quiz", BallotDrawing, t("Do you vote like your representatives?", "¿Vota como sus representantes?"), t("Answer 10 real bills", "Responda sobre 10 proyectos reales")],
-    ["/map", MapDrawing, t("Explore the map", "Explore el mapa"), t("Districts down to your street", "Distritos hasta su calle")],
-    ["/government", BranchesDrawing, t("Three branches", "Los tres poderes"), t("Who does what, and who serves now", "Quién hace qué y quién sirve ahora")],
-    ["/week", WeekDrawing, t("This week in Congress", "Esta semana en el Congreso"), t("What's scheduled and what passed", "Lo programado y lo aprobado")],
-  ];
-
-  return (
-    <main className="page full home">
-      {/* Dashboard: the lookup and four ways in at the top; below, short tiles of what's coming
-          up, then the visitor's own officials if a lookup is remembered on this device. */}
-      <section className="home-top">
-      <div className="home-hero">
-        <h1>{t("Who represents you?", "¿Quién le representa?")}</h1>
-        <p className="home-promise">
-          {t("Enter your address to see everyone elected to represent it, in Congress, your state and (in Orange County, CA) your county and city, with their records from official sources.",
-            "Escriba su dirección para ver a todos los elegidos para representarla, en el Congreso, su estado y (en el Condado de Orange, CA) su condado y ciudad, con su historial según fuentes oficiales.")}
-        </p>
-
+  // A remembered lookup puts the visitor's own officials first; the address box moves behind a link.
+  const saved = savedDistricts();
+  const returning = mine.size > 0 && Boolean(saved) && status !== "done";
+  const forget = () => {
+    forgetRepresentatives(); forgetDistricts(); setMine(new Set()); setResult(null); setStatus("idle"); setAddress("");
+    requestAnimationFrame(() => { window.scrollTo({ top: 0 }); document.getElementById("address")?.focus(); });
+  };
+  const lookupForm = (
+    <>
       {representativesOutdated() && status === "idle" && (
         <p className="notice">{t("A new Congress has begun, and some House districts changed. Look up your address again to see your current officials.", "Comenzó un nuevo Congreso y algunos distritos de la Cámara cambiaron. Busque su dirección de nuevo para ver a sus funcionarios actuales.")}</p>
       )}
@@ -137,6 +127,38 @@ export default function Home() {
         </p>
       </form>
       {status === "error" && <p className="notice">{error}</p>}
+    </>
+  );
+
+  const features = [
+    ["/quiz", BallotDrawing, t("Do you vote like your representatives?", "¿Vota como sus representantes?"), t("Answer 10 real bills", "Responda sobre 10 proyectos reales")],
+    ["/map", MapDrawing, t("Explore the map", "Explore el mapa"), t("Districts down to your street", "Distritos hasta su calle")],
+    ["/government", BranchesDrawing, t("Three branches", "Los tres poderes"), t("Who does what, and who serves now", "Quién hace qué y quién sirve ahora")],
+    ["/week", WeekDrawing, t("This week in Congress", "Esta semana en el Congreso"), t("What's scheduled and what passed", "Lo programado y lo aprobado")],
+  ];
+
+  return (
+    <main className="page full home">
+      {/* Dashboard: the lookup and four ways in at the top; below, short tiles of what's coming
+          up, then the visitor's own officials if a lookup is remembered on this device. */}
+      <section className="home-top">
+      <div className="home-hero">
+        {returning && <HomePersonal saved={saved} onForget={forget} />}
+        {returning ? (
+          <details className="other-address" open={status !== "idle" || undefined}>
+            <summary>{t("Look up a different address", "Buscar otra dirección")}</summary>
+            {lookupForm}
+          </details>
+        ) : <>
+        <h1>{t("Who represents you?", "¿Quién le representa?")}</h1>
+        <p className="home-promise">
+          {t("Enter your address to see everyone elected to represent it, in Congress, your state and (in Orange County, CA) your county and city, with their records from official sources.",
+            "Escriba su dirección para ver a todos los elegidos para representarla, en el Congreso, su estado y (en el Condado de Orange, CA) su condado y ciudad, con su historial según fuentes oficiales.")}
+        </p>
+
+        {lookupForm}
+        </>}
+
       </div>
 
       <nav className="home-features" aria-label={t("Explore", "Explorar")}>
@@ -152,7 +174,6 @@ export default function Home() {
 
       {status === "done" && result && <LookupResults result={result} sectionRef={resultsRef} />}
       {status !== "done" && <HomeDashboard />}
-      {mine.size > 0 && status !== "done" && <MyReps ids={mine} onForget={() => { setMine(new Set()); setResult(null); setStatus("idle"); setAddress(""); }} />}
     </main>
   );
 }

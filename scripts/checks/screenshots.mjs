@@ -20,7 +20,11 @@ page.on("response", async (r) => { if (r.status() >= 400 && !r.url().includes("c
 page.on("pageerror", (e) => console.log(`PAGEERROR ${e.message}`));
 // A returning visitor: representatives remembered from an earlier lookup (California).
 await page.goto(BASE);
-await page.evaluate(() => localStorage.setItem("civic-atlas:my-reps", JSON.stringify(["P000145", "S001150"])));
+// A returning visitor: representatives and districts remembered from an earlier lookup (Los Alamitos, CA).
+await page.evaluate(() => {
+  localStorage.setItem("civic-atlas:my-reps", JSON.stringify({ c: 119, ids: ["P000145", "S001150", "T000491"] }));
+  localStorage.setItem("civic-atlas:my-districts", "st=CA&cg=119&cd=45&su=36&sl=70&bo=4&co=ca-orange&sd=1&pl=Los+Alamitos&pt=c&cc=1");
+});
 const TOKEN = process.env.LOOKUP_CHECK_TOKEN;
 if (TOKEN) {
   await page.route("**/api/lookup**", (route) => route.continue({ headers: { ...route.request().headers(), "x-check-token": TOKEN } }));
@@ -49,7 +53,7 @@ for (let path of PATHS) {
     await page.waitForSelector(".results", { timeout: 20000 }).catch(() => console.log("no results shown"));
     await page.waitForTimeout(2500);
   } else if (path.startsWith("fresh:")) {
-    await page.evaluate(() => localStorage.removeItem("civic-atlas:my-reps"));
+    await page.evaluate(() => { localStorage.removeItem("civic-atlas:my-reps"); localStorage.removeItem("civic-atlas:my-districts"); });
     await page.goto(BASE + path.slice(6), { waitUntil: "load" });
     await page.waitForTimeout(1500);
   } else {

@@ -11,8 +11,10 @@ export function PartyTag({ p }) {
   return <span className={partyClass(p.party)} title={partyName(p.party)}>{partyTag(p)}</span>;
 }
 
-// The party name as a badge, e.g. on a member's header line.
+// The party as its letter badge followed by its name ("D Democrat"), the same pattern as state
+// officials' cards, so every level reads alike.
 export function PartyName({ party }) {
   if (!party) return null;
-  return <span className={partyClass(party)}>{partyName(party)}</span>;
+  const name = partyName(party);
+  return <span className="party-name"><span className={partyClass(party)} aria-hidden="true">{party === "Democrat" ? "D" : party === "Republican" ? "R" : name.slice(0, 1)}</span> {name}</span>;
 }
