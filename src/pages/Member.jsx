@@ -66,6 +66,8 @@ async function loadMember(id) {
 
 // The record in date order, loaded when its topic opens.
 const MemberTimeline = lazy(() => import("../components/MemberTimeline.jsx"));
+// Official general-election results, loaded (with their data files) when Time in office opens.
+const ElectionResults = lazy(() => import("../components/ElectionResults.jsx"));
 
 const SECTION_DATA = {
   votes: async (id) => ({
@@ -564,6 +566,11 @@ export default function Member() {
             <li key={`${t.chamber}-${t.start_date}`}>{seatLabel(t)} <PartyName party={t.party} /> · {date(t.start_date)} – {date(t.end_date)}</li>
           ))}
         </ul>
+      </Section>
+      <Section title={tr("Election results", "Resultados electorales")} source={<>{tr("Certified results compiled by the FEC (Federal Elections) and, for years the FEC hasn't published yet, the House Clerk's election statistics.", "Resultados certificados recopilados por la FEC (Federal Elections) y, para los años que la FEC aún no ha publicado, las estadísticas electorales de la Secretaría de la Cámara.")} <Link to="/methods#election-results">{tr("How", "Cómo")}</Link></>}>
+        <Suspense fallback={<p>{tr("Loading…", "Cargando…")}</p>}>
+          <ElectionResults fecIds={m.fec_candidate_ids} />
+        </Suspense>
       </Section>
 
 

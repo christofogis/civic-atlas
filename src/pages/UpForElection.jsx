@@ -8,6 +8,8 @@ import { PartyName, partyClass } from "../components/PartyTag.jsx";
 import { partyName } from "../lib/format.js";
 import { NotesList, Ref } from "../components/Notes.jsx";
 import { myRepresentatives } from "../lib/myReps.js";
+import { resultsFor } from "../lib/results.js";
+import { shareOn, pctText } from "../../lib/electionResults.js";
 import { generalElectionDate, nextElectionYear, onBallot, senateClassFor, isGubernatorialYear, localOnBallot, yearOfLabel } from "../../lib/upForElection.js";
 
 // Which seats are on the ballot in a given general-election year, and who holds each one now.
@@ -25,6 +27,10 @@ export default function UpForElection() {
   const [seats, setSeats] = useState(null);
   const [local, setLocal] = useState(null);
   const mine = useMemo(() => myRepresentatives(), []);
+  // Official results for this year's election, once published (FEC or House Clerk), and each
+  // member's FEC candidate IDs to find the seat holder among the candidates.
+  const [results, setResults] = useState(null);
+  const [fecIds, setFecIds] = useState(null);
 
   useEffect(() => {
     Promise.all([
@@ -39,6 +45,17 @@ export default function UpForElection() {
     });
     fetch("/data/local/ca-orange.json").then((r) => r.json()).then(setLocal).catch(() => setLocal(false));
   }, []);
+
+  useEffect(() => {
+    let live = true;
+    setResults(null);
+    resultsFor(year).then((doc) => {
+      if (!live || !doc) return;
+      setResults(doc);
+      if (!fecIds) db.from("members").select("bioguide_id,fec_candidate_ids").then(({ data }) => live && setFecIds(new Map((data ?? []).map((x) => [x.bioguide_id, x.fec_candidate_ids]))));
+    }).catch(() => {});
+    return () => { live = false; };
+  }, [year]);
 
   const set = (patch) => setParams(Object.fromEntries(Object.entries({ year, state, ...patch }).filter(([, v]) => v)));
   const past = generalElectionDate(year) < today;
@@ -87,6 +104,18 @@ export default function UpForElection() {
     return <span className="face-outcome">{tr("Did not return", "No regresó")}</span>;
   };
 
+  // The holder's share in this year's general election, if they were a candidate in the results file.
+  const Share = ({ x, className }) => {
+    if (!results || !fecIds) return null;
+    const sh = shareOn(fecIds.get(x.bioguide_id), results, generalElectionDate(year), x.chamber === "senate" ? "S" : "H");
+    if (!sh) return null;
+    const special = sh.special ? tr(" (special election)", " (elección especial)") : "";
+    const text = sh.pct == null
+      ? tr(`Unopposed in ${year}, no vote count`, `Sin oposición en ${year}, sin recuento de votos`)
+      : tr(`${pctText(sh.pct)} in ${year}`, `${pctText(sh.pct)} en ${year}`);
+    return <span className={className}>{text}{special}</span>;
+  };
+
   const Holder = ({ x }) => (
     <>{x.name ? <Link to={`/member/${x.bioguide_id}`}>{x.name}</Link> : x.bioguide_id} <PartyName party={x.party} />
       {x.how === "appointment" && <span className="fine"> · {tr("appointed", "designado(a)")}</span>}</>
@@ -102,6 +131,14 @@ export default function UpForElection() {
           ? tr(`The general election was held on ${date(generalElectionDate(year))}. These seats were on the ballot; the people listed hold them until the new terms begin on ${date(newTermsBegin)}. Who won each seat is shown here from that day, from the official member list. Until then, each state's election office publishes the results.`, `La elección general se celebró el ${date(generalElectionDate(year))}. Estos escaños estuvieron en la boleta; las personas indicadas los ocupan hasta que comiencen los nuevos períodos el ${date(newTermsBegin)}. Quién ganó cada escaño se mostrará aquí desde ese día, según la lista oficial de miembros. Hasta entonces, la oficina electoral de cada estado publica los resultados.`)
           : tr(`General election: ${date(generalElectionDate(year))}. These seats are on the ballot, listed with who holds them now. A seat on the ballot doesn't mean its holder is running.`, `Elección general: ${date(generalElectionDate(year))}. Estos escaños están en la boleta, con quién los ocupa ahora. Que un escaño esté en la boleta no significa que su titular se presente.`)}
       </p>
+      {past && results && (
+        <p className="fine">
+          {tr(`Percentages are each holder's share of all votes in the ${year} general election for the seat, when they were a candidate, from `, `Los porcentajes son la proporción de todos los votos que obtuvo cada titular en la elección general de ${year} para el escaño, si fue candidato(a), según `)}
+          <a href={results.source.url}>{results.source.title}</a> ({results.source.publisher}).{" "}
+          {results.percent === "calculated" && tr("That source prints votes only; the percent is calculated from them.", "Esa fuente solo da votos; el porcentaje se calcula a partir de ellos.")}{" "}
+          <Link to="/methods#election-results">{tr("How", "Cómo")}</Link>
+        </p>
+      )}
       {seats && <SeatChart years={years} year={year} counts={years.map((y) => [y, held(senateIn(y))])} onPick={(y) => set({ year: y, state: "" })} />}
       <div className="tabs" role="group" aria-label={tr("Election year", "Año de la elección")}>
         {years.map((y) => <button key={y} type="button" className={y === year ? "on" : ""} aria-pressed={y === year} onClick={() => set({ year: y, state: "" })}>{y}</button>)}
@@ -131,6 +168,7 @@ export default function UpForElection() {
                       <span className="face-name">{x.name ?? x.bioguide_id}</span>
                     </Link>
                     <span className="face-meta">{stateName(x.state)}</span>
+                    <Share x={x} className="face-meta" />
                     <Outcome x={x} />
                     {x.how === "appointment" && <span className="face-meta">{x.end_date < `${year}-01-01` ? tr(`Appointed until a special election; term ends ${date(x.end_date)}`, `Designado(a) hasta una elección especial; el período termina el ${date(x.end_date)}`) : tr("Appointed", "Designado(a)")}</span>}
                   </li>
@@ -153,7 +191,7 @@ export default function UpForElection() {
                     {[...new Set(house.map((x) => x.state))].sort((a, z) => stateName(a).localeCompare(stateName(z))).map((s) => <option key={s} value={s}>{stateName(s)}</option>)}
                   </select>
                 </label>
-                <ul className="plain">{houseShown.map((x) => <li key={x.bioguide_id}>{seatLabel(x)}: <Holder x={x} />{outcomeKnown && <> · <Outcome x={x} /></>}</li>)}</ul>
+                <ul className="plain">{houseShown.map((x) => <li key={x.bioguide_id}>{seatLabel(x)}: <Holder x={x} />{results && fecIds && shareOn(fecIds.get(x.bioguide_id), results, generalElectionDate(year), "H") && <> · <Share x={x} /></>}{outcomeKnown && <> · <Outcome x={x} /></>}</li>)}</ul>
               </>
             )}
           </section>
