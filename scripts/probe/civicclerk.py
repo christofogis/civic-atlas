@@ -11,7 +11,7 @@ for t in ["fountainvalleyca", "lapalmaca", "lagunahillsca"]:
     for e in js(f"https://{t}.api.civicclerk.com/v1/Events?$filter={q}&$orderby=startDateTime&$top=10")["value"]:
         print("EV", t, e["id"], e.get("eventName"), "|", e.get("categoryName"), e.get("startDateTime"), "agendaId", e.get("agendaId"), "files", len(e.get("publishedFiles") or []))
     time.sleep(0.5)
-ev = js("https://lagunahillsca.api.civicclerk.com/v1/Events(843)") if True else None
+ev = js("https://lagunahillsca.api.civicclerk.com/v1/Events?$filter=id+eq+843")["value"][0]
 print("EVENTRAW", json.dumps(ev)[:4000])
 m = js("https://lagunahillsca.api.civicclerk.com/v1/Meetings/835")
 print("MEETINGRAW", json.dumps(m))
