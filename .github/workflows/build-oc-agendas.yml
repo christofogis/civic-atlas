@@ -26,11 +26,13 @@ jobs:
       - run: sudo apt-get install -y -qq poppler-utils >/dev/null && pip install --quiet pymupdf
       - name: Build
         run: python3 scripts/data/oc_agendas.py ${{ inputs.debug && '--debug' || '' }}
+      - name: Board of Supervisors minutes (what the Board did)
+        run: python3 scripts/data/oc_minutes.py
       - name: City councils (Legistar)
         run: python3 scripts/data/city_agendas.py
       - name: Commit
         run: |
           git config user.name "civic-atlas bot"
           git config user.email "christofogis@users.noreply.github.com"
-          git add public/data/local/ca-orange-agendas.json public/data/local/ca-orange-city-agendas.json
+          git add public/data/local/ca-orange-agendas.json public/data/local/ca-orange-city-agendas.json public/data/local/ca-orange-minutes.json
           git diff --cached --quiet || (git commit -m "Orange County agendas updated from the Clerk of the Board" && git pull --rebase -q && git push)
