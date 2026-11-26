@@ -1,0 +1,34 @@
+name: Build election results
+
+# Official general-election results for the U.S. Senate and House, from the FEC's Federal Elections
+# publications (or, until the FEC posts a year, the House Clerk's election statistics). Both come out
+# months after an election, so a monthly check is enough. Commits public/data/results/.
+on:
+  workflow_dispatch:
+    inputs:
+      years:
+        description: "Election years, space-separated (blank: every even year from 2022)"
+        required: false
+  schedule:
+    - cron: "37 14 9 * *"   # the 9th of each month, 7:37am Pacific
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - run: sudo apt-get install -y -qq poppler-utils >/dev/null
+      - name: Build
+        env:
+          YEARS: ${{ inputs.years }}
+        run: python3 scripts/data/election_results.py $(echo "$YEARS" | tr -cd '0-9 ')
+      - name: Commit
+        run: |
+          git config user.name "civic-atlas bot"
+          git config user.email "christofogis@users.noreply.github.com"
+          git add public/data/results
+          git diff --cached --quiet || (git commit -m "Election results updated from the FEC and House Clerk publications" && git pull --rebase -q && git push)
