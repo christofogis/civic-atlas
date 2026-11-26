@@ -1,0 +1,56 @@
+name: Bill section summaries (AI)
+
+# Plain-language summaries of each bill section, written by Claude through Anthropic's Batch API.
+# Manual only for now: summaries are stored unpublished until Chris has reviewed a test batch.
+# A daily schedule is added once they're approved.
+on:
+  workflow_dispatch:
+    inputs:
+      bills:
+        description: "Bills to summarize, e.g. 119-hr-1,119-s-2 (blank: bills that moved, newest first)"
+        type: string
+        default: ""
+      limit:
+        description: "Bills per run when no list is given"
+        type: string
+        default: "50"
+      wait:
+        description: "Minutes to wait for the batch before leaving it for the next run"
+        type: string
+        default: "90"
+      dry_run:
+        description: "Build the requests and print one; send nothing"
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+concurrency:
+  group: section-summaries
+  cancel-in-progress: false
+
+jobs:
+  summarize:
+    runs-on: ubuntu-latest
+    timeout-minutes: 150
+    env:
+      SUPABASE_URL: https://fkbzxaoeyrtzviyfzulq.supabase.co
+      SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+      ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Summarize
+        env:
+          BILLS: ${{ inputs.bills }}
+          LIMIT: ${{ inputs.limit || '50' }}
+          WAIT: ${{ inputs.wait || '90' }}
+          DRY_RUN: ${{ inputs.dry_run && '--dry-run' || '' }}
+        run: |
+          if [ -n "$BILLS" ]; then node scripts/ingest/section-summaries.mjs --bills "$BILLS" --wait "$WAIT" $DRY_RUN
+          else node scripts/ingest/section-summaries.mjs --limit "$LIMIT" --wait "$WAIT" $DRY_RUN; fi
