@@ -299,11 +299,15 @@ export default function Methods() {
         district by number; items for all districts are counted separately.
       </p>
       <p>
-        What the Board did comes from the Clerk's summary action minutes of recent regular meetings: each item,
-        each motion as printed, and the vote lines (Ayes, Noes, Abstained, Absent, Excused) exactly as recorded.
-        The supervisors' vote counts add up those lines; a supervisor is counted only where the minutes name
-        them, so a motion that lists only part of the Board counts only those named. Special meetings whose
-        minutes use another layout aren't read yet.
+        What the Board did comes from the Clerk's summary action minutes of recent regular and special meetings:
+        each item, each motion as printed, and the vote lines (Ayes, Noes, Abstained, Absent, Excused) exactly as
+        recorded. The supervisors' vote counts add up those lines; a supervisor is counted only where the minutes
+        name them, so a motion that lists only part of the Board counts only those named. Each supervisor's card
+        shows that supervisor's counts, the items behind every vote other than Aye, and how many motions list
+        only part of the Board without naming them. Some actions, often closed-session reports, describe a vote
+        in a sentence ("on a vote of 3 to 2, with ... voting yes") instead of vote lines. Those are shown as
+        printed and listed on every supervisor's card, but not counted, because counting them would mean
+        reading names out of a sentence.
       </p>
       <p>
         "Your week" lists what's coming up for the officials at the address you looked up, using the same
