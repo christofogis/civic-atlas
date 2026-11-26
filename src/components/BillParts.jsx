@@ -21,12 +21,19 @@ export default function BillParts({ congress, type, number }) {
     (async () => {
       const { data } = await db.from("bill_text_versions").select("version_code,seq,version_name,version_date,xml_url,full_text")
         .eq("congress", congress).eq("bill_type", type).eq("number", number).order("seq", { ascending: false });
-      const v = (data ?? []).find((x) => x.full_text !== false && x.xml_url);
-      if (!v) { if (live) setState({ status: "none" }); return; }
-      const res = await fetch(`/api/billxml?u=${encodeURIComponent(v.xml_url)}`);
-      if (!res.ok) throw new Error(String(res.status));
-      const sections = sectionsFromXml(await res.text());
-      if (live) setState(sections?.length ? { status: "done", v, sections } : { status: "none" });
+      // The newest bill-format text (a public law's text is the enrolled bill's, in another format),
+      // falling back to earlier versions if one can't be split into sections.
+      const versions = (data ?? []).filter((x) => x.full_text !== false && /\/xml\/BILLS-/.test(x.xml_url ?? ""));
+      for (const v of versions.slice(0, 3)) {
+        const res = await fetch(`/api/billxml?u=${encodeURIComponent(v.xml_url)}`);
+        if (!res.ok) continue;
+        const sections = sectionsFromXml(await res.text());
+        if (sections?.length > 1 || (sections?.length === 1 && versions.length === 1)) {
+          if (live) setState({ status: "done", v, sections });
+          return;
+        }
+      }
+      if (live) setState({ status: "none" });
     })().catch(() => live && setState({ status: "error" }));
     return () => { live = false; };
   }, [congress, type, number]);
