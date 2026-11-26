@@ -26,12 +26,12 @@ export default function Nominations() {
   useEffect(() => {
     setRows(null);
     db.from("nominations").select("*").eq("congress", congress).order("last_vote_at", { ascending: false }).limit(1000)
-      .then(({ data }) => setRows(data ?? []));
+      .then(({ data, error }) => setRows(error ? false : data ?? []));
   }, [congress]);
 
   const filtered = useMemo(() => {
     const t = q.trim().toLowerCase();
-    return (rows ?? []).filter((r) => !t || `${r.nominee} ${r.position}`.toLowerCase().includes(t));
+    return (rows || []).filter((r) => !t || `${r.nominee} ${r.position}`.toLowerCase().includes(t));
   }, [rows, q]);
 
   return (
@@ -51,7 +51,7 @@ export default function Nominations() {
           <input type="search" value={q} placeholder={tr("Name or position, e.g. judge", "Nombre o cargo, p. ej., judge (en inglés)")} onChange={(e) => set("q", e.target.value)} />
         </label>
       </div>
-      {!rows ? <p>{tr("Loading…", "Cargando…")}</p> : (
+      {rows === false ? <p className="notice">{tr("Couldn't load nominations right now.", "No se pudieron cargar las nominaciones en este momento.")}</p> : !rows ? <p>{tr("Loading…", "Cargando…")}</p> : (
         <>
           <p role="status">{tr(`${filtered.length.toLocaleString()} nomination${filtered.length === 1 ? "" : "s"} with a recorded vote.`, `${filtered.length.toLocaleString()} nominaci${filtered.length === 1 ? "ón" : "ones"} con votación registrada.`)}</p>
           <table>
