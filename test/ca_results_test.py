@@ -117,6 +117,10 @@ class Members(unittest.TestCase):
         self.assertEqual(m["derek tran"], "T000491")  # the synthetic senator of the same name isn't a House member
         self.assertNotIn("chuong v vo", m)            # Texas
         self.assertEqual(m["raul ruiz"], "R000599")   # no official full name: first and last
+        self.assertEqual(m["lou correa"], "C001110")  # nickname and last
+        self.assertEqual(m["ted w lieu"], "L000582")  # first, middle and last
+        self.assertEqual(m["ted lieu"], "L000582")
+        self.assertNotIn("pat smith", m)              # two members share it: links neither
 
     def test_link_by_name_not_district(self):
         house = [{"district": n, **cr.parse_race(DOCS[f"us-rep/district/{n}"])} for n in (29, 40, 45)]
@@ -127,9 +131,9 @@ class Members(unittest.TestCase):
         self.assertEqual(by[(40, "Young Kim")], "K000397")
         self.assertEqual(by[(45, "Derek Tran")], "T000491")
         self.assertIsNone(by[(45, "Chuong V. Vo")])
-        # "Angélica María Dueñas" isn't the member's displayed name exactly: left out.
+        # "Angélica María Dueñas" isn't any of the member's recorded names exactly: left out.
         self.assertIsNone(by[(29, "Angélica María Dueñas")])
-        self.assertIn("raul ruiz", unmatched)
+        self.assertIn("R000599", unmatched)
 
 
 class Certified(unittest.TestCase):

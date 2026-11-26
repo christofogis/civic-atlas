@@ -16,9 +16,10 @@ districts, and the statewide ballot measures. No U.S. Senate seat from Californi
 ballot (the API answers 500 for it). Candidates, party and measure titles are kept as published.
 Nobody is marked as winning: the SOS doesn't mark winners in either source.
 
-A House candidate is linked to a member of Congress only when the name as printed equals the name the
-site shows for a current California House member (official full name, else first and last name) after
-ignoring case and punctuation. Never by district number: California used new maps in 2026.
+A House candidate is linked to a member of Congress only when the name as printed equals one of a current
+California House member's recorded names (official full name; first and last; nickname and last; first,
+middle and last) after ignoring case and punctuation. Accented letters must match. Never by district
+number: California used new maps in 2026.
 """
 import io, json, os, re, sys, time, unicodedata, urllib.error, urllib.request, zipfile
 import xml.etree.ElementTree as ET
@@ -279,21 +280,35 @@ def norm(name):
     return " ".join(s.split())
 
 
+def name_forms(n):
+    """The member's name as the official record gives it: the official full name (what the site shows),
+    first and last, nickname and last, first, middle and last (suffix optional). Each is compared whole."""
+    last = n["last"]
+    forms = [n.get("official_full"), f"{n['first']} {last}"]
+    if n.get("nickname"):
+        forms.append(f"{n['nickname']} {last}")
+    if n.get("middle"):
+        forms.append(f"{n['first']} {n['middle']} {last}")
+    if n.get("suffix"):
+        forms += [f"{f} {n['suffix']}" for f in list(forms) if f]
+    return [f for f in forms if f]
+
+
 def ca_house_members(legislators):
-    """{normalized displayed name: bioguide} for current California House members; a name two members
-    share is dropped."""
-    out, seen = {}, set()
+    """{normalized name form: bioguide} for current California House members. A form two members share
+    is dropped, so it never links either of them."""
+    out, shared = {}, set()
     for m in legislators:
         t = m["terms"][-1]
         if t["type"] != "rep" or t["state"] != "CA":
             continue
-        n = m["name"]
-        shown = n.get("official_full") or f"{n['first']} {n['last']}"
-        k = norm(shown)
-        if k in seen:
-            out.pop(k, None)
-        seen.add(k)
-        out[k] = m["id"]["bioguide"]
+        b = m["id"]["bioguide"]
+        for k in {norm(f) for f in name_forms(m["name"])}:
+            if k in out and out[k] != b:
+                shared.add(k)
+            out[k] = b
+    for k in shared:
+        out.pop(k)
     return out
 
 
@@ -307,7 +322,7 @@ def link_members(house, members):
             if b and b not in found:
                 c["bioguide_id"] = b
                 found.add(b)
-    return sorted(k for k, b in members.items() if b not in found)
+    return sorted({b for b in members.values() if b not in found})
 
 
 # ---------- build ----------
@@ -381,9 +396,10 @@ def main():
     for d, n, b in linked:
         print(f"  CA-{d}: {n} -> {b}")
     if unmatched is not None:
-        print(f"Current California House members whose name isn't printed exactly on any 2026 ballot ({len(unmatched)}):")
-        for k in unmatched:
-            print("  ", k)
+        print(f"Current California House members not linked to any 2026 ballot name ({len(unmatched)}):")
+        names = {m["id"]["bioguide"]: m["name"].get("official_full") or f"{m['name']['first']} {m['name']['last']}" for m in legislators}
+        for b in unmatched:
+            print("  ", b, names.get(b))
     # Same numbers as last time: leave the file (and its retrieval time) alone.
     if prev and {k: v for k, v in prev.items() if k != "retrieved"} == {k: v for k, v in out.items() if k != "retrieved"}:
         print("No change.")

@@ -327,6 +327,72 @@
      "state": "TX"
     }
    ]
+  },
+  {
+   "id": {
+    "bioguide": "C001110"
+   },
+   "name": {
+    "first": "J.",
+    "last": "Correa",
+    "official_full": "J. Luis Correa",
+    "middle": "Luis",
+    "nickname": "Lou"
+   },
+   "terms": [
+    {
+     "type": "rep",
+     "state": "CA"
+    }
+   ]
+  },
+  {
+   "id": {
+    "bioguide": "L000582"
+   },
+   "name": {
+    "first": "Ted",
+    "last": "Lieu",
+    "official_full": "Ted Lieu",
+    "middle": "W."
+   },
+   "terms": [
+    {
+     "type": "rep",
+     "state": "CA"
+    }
+   ]
+  },
+  {
+   "id": {
+    "bioguide": "P000001"
+   },
+   "name": {
+    "first": "Pat",
+    "last": "Smith"
+   },
+   "terms": [
+    {
+     "type": "rep",
+     "state": "CA"
+    }
+   ]
+  },
+  {
+   "id": {
+    "bioguide": "P000002"
+   },
+   "name": {
+    "first": "Pat",
+    "last": "Smith",
+    "official_full": "Patricia Smith"
+   },
+   "terms": [
+    {
+     "type": "rep",
+     "state": "CA"
+    }
+   ]
   }
  ]
 }
