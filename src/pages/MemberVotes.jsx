@@ -91,7 +91,7 @@ export default function MemberVotes() {
   }, [filtered]);
 
   if (state.status === "missing") return <main className="page"><h1>{tr("Member not found", "Miembro no encontrado")}</h1><p><Link to="/">{tr("Back to search", "Volver a la búsqueda")}</Link></p></main>;
-  if (state.status === "error") return <main className="page"><p className="notice">{tr("Couldn't load votes right now. Try again shortly.", "No se pudieron cargar los votos. Inténtelo en un momento.")}</p></main>;
+  if (state.status === "error") return <main className="page"><p className="notice">{tr("Couldn't load votes right now. Try again shortly.", "No se pudieron cargar los votos. Inténtelo de nuevo en un momento.")}</p></main>;
   const name = member ? (member.official_full_name ?? `${member.first_name} ${member.last_name}`) : "";
 
   return (

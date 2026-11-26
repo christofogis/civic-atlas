@@ -22,7 +22,7 @@ export default function Officials() {
   return (
     <main className="page wide">
       <h1>{t("Elected officials", "Funcionarios electos")}</h1>
-      <p className="fine">{t("For the districts saved in this link. ", "Para los distritos guardados en este enlace. ")}<Link to="/">{t("Look up a different address", "Buscar otra dirección")}</Link></p>
+      <p className="fine">{t("For the districts saved in this link. ", "Para los distritos guardados en este enlace. ")}<Link to="/">{t("Look up another address", "Buscar otra dirección")}</Link></p>
       {error && <p className="notice">{error}</p>}
       {!result && !error && <p className="fine">{t("Loading…", "Cargando…")}</p>}
       {result && <LookupResults result={result} shared />}

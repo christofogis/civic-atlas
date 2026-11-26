@@ -18,8 +18,8 @@ const ERR_ES = {
   "Address lookup is not configured.": "La búsqueda de direcciones no está configurada.",
   "Please complete the verification and try again.": "Complete la verificación e inténtelo de nuevo.",
   "That address couldn't be found.": "No se encontró esa dirección.",
-  "The address service is unavailable. Try again shortly.": "El servicio de direcciones no está disponible. Inténtelo en un momento.",
-  "Couldn't load officials right now. Try again shortly.": "No se pudieron cargar los funcionarios. Inténtelo en un momento.",
+  "The address service is unavailable. Try again shortly.": "El servicio de direcciones no está disponible. Inténtelo de nuevo en un momento.",
+  "Couldn't load officials right now. Try again shortly.": "No se pudieron cargar los funcionarios. Inténtelo de nuevo en un momento.",
   "Lookup failed.": "La búsqueda falló.",
   "That location couldn't be used.": "No se pudo usar esa ubicación.",
 };
@@ -131,7 +131,7 @@ export default function Home() {
   );
 
   const features = [
-    ["/quiz", BallotDrawing, t("Do you vote like your representatives?", "¿Vota como sus representantes?"), t("Answer 10 real bills", "Responda sobre 10 proyectos reales")],
+    ["/quiz", BallotDrawing, t("Do you vote like your representatives?", "¿Vota usted como sus representantes?"), t("Answer 10 real bills", "Responda sobre 10 proyectos reales")],
     ["/map", MapDrawing, t("Explore the map", "Explore el mapa"), t("Districts down to your street", "Distritos hasta su calle")],
     ["/government", BranchesDrawing, t("Three branches", "Los tres poderes"), t("Who does what, and who serves now", "Quién hace qué y quién sirve ahora")],
     ["/week", WeekDrawing, t("This week in Congress", "Esta semana en el Congreso"), t("What's scheduled and what passed", "Lo programado y lo aprobado")],
@@ -146,7 +146,7 @@ export default function Home() {
         {returning && <HomePersonal saved={saved} onForget={forget} />}
         {returning ? (
           <details className="other-address" open={status !== "idle" || undefined}>
-            <summary>{t("Look up a different address", "Buscar otra dirección")}</summary>
+            <summary>{t("Look up another address", "Buscar otra dirección")}</summary>
             {lookupForm}
           </details>
         ) : <>

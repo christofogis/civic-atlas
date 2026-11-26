@@ -59,7 +59,7 @@ export default function Search() {
       </form>
 
       {state.status === "loading" && <p>{tr("Searching…", "Buscando…")}</p>}
-      {state.status === "error" && <p className="notice">{tr("Search isn't working right now. Try again shortly.", "La búsqueda no funciona en este momento. Inténtelo en un momento.")}</p>}
+      {state.status === "error" && <p className="notice">{tr("Search isn't working right now. Try again shortly.", "La búsqueda no funciona en este momento. Inténtelo de nuevo en un momento.")}</p>}
       {state.status === "done" && (
         <>
           <section className="section">
