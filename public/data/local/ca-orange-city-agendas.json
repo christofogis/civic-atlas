@@ -1,5 +1,5 @@
 {
- "built_at": "2026-11-25",
+ "built_at": "2026-11-26",
  "source": "Each city's Legistar agenda system (webapi.legistar.com)",
  "cities": {
   "Costa Mesa": {
@@ -53,7 +53,129 @@
   },
   "Huntington Beach": {
    "source": "https://huntingtonbeach.legistar.com/Calendar.aspx",
-   "meetings": []
+   "meetings": [
+    {
+     "body": "City Council/Public Financing Authority",
+     "date": "2026-12-01",
+     "time": "6:00 PM",
+     "location": "Council Chambers",
+     "agenda_url": "https://huntingtonbeach.legistar1.com/huntingtonbeach/meetings/2026/12/3968_A_City_Council_Public_Financing_Authority_26-12-01_City_Council_Public_Financing_Auth_Agenda.pdf",
+     "meeting_url": "https://huntingtonbeach.legistar.com/MeetingDetail.aspx?LEGID=3968&GID=716&G=E44B7601-4B58-4055-97F2-CA6D6CA860B6",
+     "agenda_status": "Final",
+     "items": [
+      {
+       "number": "1.",
+       "heading": "Invocation",
+       "title": "Huntington Beach Police and Fire Chaplain Roger Wing",
+       "file": "26-985",
+       "type": "Invocation",
+       "attachments": []
+      },
+      {
+       "number": "2.",
+       "heading": "Pledge Of Allegiance",
+       "title": "George Focht, American Legion Post 133",
+       "file": "26-998",
+       "type": "Pledge of Allegiance",
+       "attachments": []
+      },
+      {
+       "number": "3.",
+       "heading": "Awards And Presentations",
+       "title": "City 2026 Retrospect (or Comments) by Outgoing Mayor McKeon Don Ramsey “Citizen of the Year” Award Tony Noble “Volunteer of the Year” Award",
+       "file": "26-957",
+       "type": "Awards and Presentations",
+       "attachments": []
+      },
+      {
+       "number": "4.",
+       "heading": "Awards And Presentations",
+       "title": "Mayor Mckeon to present the Mayor’s HB Excellence Awards",
+       "file": "26-956",
+       "type": "Awards and Presentations",
+       "attachments": []
+      },
+      {
+       "number": "5.",
+       "heading": "Awards And Presentations",
+       "title": "Presentation of Gifts by Mayor McKeon to Colleagues",
+       "file": "26-958",
+       "type": "Awards and Presentations",
+       "attachments": []
+      },
+      {
+       "number": "6.",
+       "heading": "Awards And Presentations",
+       "title": "Special/Ceremonial Public Comments, including Presentations by Community Members to Outgoing Mayor McKeon and Council Woman Van Der Mark",
+       "file": "26-959",
+       "type": "Awards and Presentations",
+       "attachments": []
+      },
+      {
+       "number": "7.",
+       "heading": "City Clerk'S Report",
+       "title": "Adopt Resolution No. 2026-45 Reciting the Facts of the General Municipal Election of November 3, 2026, and Declaring Results",
+       "file": "26-960",
+       "type": "City Clerk's Report",
+       "attachments": [
+        {
+         "name": "Exhibit \"A\" to Resolution 2026-45",
+         "url": "https://huntingtonbeach.legistar1.com/huntingtonbeach/attachments/cffb0a6f-fdd4-4eed-a34d-c7b62b40206c.pdf"
+        },
+        {
+         "name": "Att #1 Resolution No. 2026-45",
+         "url": "https://huntingtonbeach.legistar1.com/huntingtonbeach/attachments/dae637e6-3f48-4cdd-a516-622288c42d97.pdf"
+        }
+       ]
+      },
+      {
+       "number": "8.",
+       "heading": "Administer Oaths Of Office",
+       "title": "Administer Oath of Office to Elected Members of the City Council",
+       "file": "26-962",
+       "type": "Consent Calendar",
+       "attachments": []
+      },
+      {
+       "number": "9.",
+       "heading": "Administer Oaths Of Office",
+       "title": "Administer Oath of Office to Elected City Attorney",
+       "file": "26-963",
+       "type": "Consent Calendar",
+       "attachments": []
+      },
+      {
+       "number": "10.",
+       "heading": "Conduct Election Of Mayor / Mayor Pro Tem",
+       "title": "Procedure for the election of Mayor and Mayor Pro Tem",
+       "file": "26-930",
+       "type": "Consent Calendar",
+       "attachments": [
+        {
+         "name": "Att #1 Resolution No. 6320",
+         "url": "https://huntingtonbeach.legistar1.com/huntingtonbeach/attachments/6ea2af00-a71a-4bb3-9252-3a4a71653846.pdf"
+        }
+       ]
+      },
+      {
+       "number": "11.",
+       "heading": "Conduct Election Of Mayor / Mayor Pro Tem",
+       "title": "City Clerk calls for motion to elect new Mayor Oath of Office administered to new Mayor Presentation of gavel by outgoing Mayor McKeon to new Mayor Presentation of gift by new Mayor to outgoing Mayor McKeon New Mayor presides",
+       "file": "26-971",
+       "type": "Consent Calendar",
+       "attachments": []
+      },
+      {
+       "number": "12.",
+       "heading": "Conduct Election Of Mayor / Mayor Pro Tem",
+       "title": "New Mayor calls for motion to elect new Mayor Pro Tempore Administer Oath of Office to new Mayor Pro Tempore",
+       "file": "26-961",
+       "type": "Consent Calendar",
+       "attachments": []
+      }
+     ]
+    }
+   ]
   },
   "Newport Beach": {
    "source": "https://newportbeach.legistar.com/Calendar.aspx",
