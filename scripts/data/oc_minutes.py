@@ -36,7 +36,9 @@ def get(url):
         return r.read()
 
 
-VOTE_IN_TEXT = re.compile(r"\bON A VOTE OF \w+ TO \w+")
+# "ON A VOTE OF 3 TO 2, WITH ... VOTING YES", "ON A VOTE OF 4-0 WITH SUPERVISOR ... ABSTAINING",
+# "THE BOARD UNANIMOUSLY APPROVED"
+VOTE_IN_TEXT = re.compile(r"\b(?:VOTE OF \w+(?:\s+TO\s+|\s*-\s*)\w+|VOTING (?:YES|NO)|ABSTAINING|UNANIMOUSLY)\b")
 
 
 def prose_action(s):
