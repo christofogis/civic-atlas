@@ -813,3 +813,4 @@ ol.bare { list-style: none; padding: 0; margin: 0; }
   .cards.compact > li.card .meta { grid-column: 1 / -1; }
 }
 .cards.compact { max-width: 60rem; }
+.cards.compact > li.card { width: 100%; box-sizing: border-box; }
