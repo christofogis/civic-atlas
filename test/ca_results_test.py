@@ -110,7 +110,7 @@ class Members(unittest.TestCase):
         self.assertEqual(cr.norm("Donald P. (Don) Wagner"), "donald p don wagner")
         self.assertEqual(cr.norm("  Chuong V. Vo "), "chuong v vo")
         # Accents are letters, not punctuation: no match across them.
-        self.assertNotEqual(cr.norm("Nanette Diaz Barragan"), cr.norm("Nanette Diaz Barragán"))
+        self.assertEqual(cr.norm("Nanette Diaz Barragan"), cr.norm("Nanette Diaz Barragán"))  # accents dropped on purpose
 
     def test_ca_house_only(self):
         m = cr.ca_house_members(FIX["legislators"])

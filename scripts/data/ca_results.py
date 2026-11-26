@@ -274,8 +274,9 @@ def parse_sov_page(page, html):
 # ---------- members of Congress ----------
 
 def norm(name):
-    """Lower case, punctuation removed, spaces collapsed. Letters (accented ones too) are kept as they are."""
-    s = unicodedata.normalize("NFC", name).lower()
+    """Lower case, accents and punctuation removed, spaces collapsed: the SOS sometimes prints a name
+    without its accent ("Barragan")."""
+    s = "".join(ch for ch in unicodedata.normalize("NFKD", name) if not unicodedata.combining(ch)).lower()
     s = "".join(ch if ch.isalnum() or ch.isspace() else " " for ch in s)
     return " ".join(s.split())
 
@@ -289,9 +290,18 @@ def name_forms(n):
         forms.append(f"{n['nickname']} {last}")
     if n.get("middle"):
         forms.append(f"{n['first']} {n['middle']} {last}")
+        forms.append(f"{n['first']} {n['middle'][0]} {last}")   # "Ted W. Lieu"
     if n.get("suffix"):
         forms += [f"{f} {n['suffix']}" for f in list(forms) if f]
     return [f for f in forms if f]
+
+
+# Ballot names that differ from every recorded name, checked by hand against the SOS candidate list
+# (Nov 26, 2026): the name each member uses on the ballot. Keyed by bioguide id.
+BALLOT_NAMES = {
+    "C001110": ["Lou Correa"],     # J. Luis Correa
+    "C001123": ["Gil Cisneros"],   # Gilbert Ray Cisneros, Jr.
+}
 
 
 def ca_house_members(legislators):
@@ -303,7 +313,7 @@ def ca_house_members(legislators):
         if t["type"] != "rep" or t["state"] != "CA":
             continue
         b = m["id"]["bioguide"]
-        for k in {norm(f) for f in name_forms(m["name"])}:
+        for k in {norm(f) for f in name_forms(m["name"]) + BALLOT_NAMES.get(b, [])}:
             if k in out and out[k] != b:
                 shared.add(k)
             out[k] = b
