@@ -67,7 +67,7 @@ export default function Bills() {
     <main className="page wide">
       <h1>{tr("Bills", "Proyectos de ley")}<Ref id="src" text={<>{tr(`Source: GovInfo Bill Status (Library of Congress); ${ordinal(congress)} Congress. Lobbying counts are organizations whose LD-2 reports name the bill`,
           `Fuente: GovInfo Bill Status (Biblioteca del Congreso); ${ordinal(congress)} Congreso. Los conteos de cabildeo son organizaciones cuyos informes LD-2 mencionan el proyecto`)}{" "}
-        (<Link to="/methods#lobbying">{tr("how they're counted", "cómo se cuentan")}</Link>).</>} /></h1>
+        (<Link to="/methods#lobbying">{tr("how they're counted", "cómo se cuentan")}</Link>). {tr("The Senate Office of Public Records can't vouch for data or analyses derived from these reports after they're retrieved.", "La Oficina de Registros Públicos del Senado no puede garantizar los datos ni los análisis derivados de estos informes después de obtenerlos.")}</>} /></h1>
       <div className="filters">
         <label>{tr("Congress", "Congreso")}{" "}
           <select value={congress} onChange={(e) => set("congress", e.target.value)}>

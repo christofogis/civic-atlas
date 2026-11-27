@@ -176,6 +176,7 @@ export default function Committee() {
         )}
         {bills.rows.length > shown && <p><button className="link" onClick={() => setShown(shown + PAGE)}>{tr("Show more", "Mostrar más")}</button></p>}
         {bills.count > bills.rows.length && <p className="fine">{tr("Showing the first 1,000.", "Se muestran los primeros 1,000.")}</p>}
+        {sort === "lobbying" && <p className="fine">{tr("Lobbying counts are organizations whose LD-2 reports, retrieved from LDA.gov, name the bill. The Senate Office of Public Records can't vouch for data or analyses derived from these reports after they're retrieved.", "Los conteos de cabildeo son organizaciones cuyos informes LD-2, obtenidos de LDA.gov, mencionan el proyecto. La Oficina de Registros Públicos del Senado no puede garantizar los datos ni los análisis derivados de estos informes después de obtenerlos.")} <Link to="/methods#lobbying">{tr("About this data", "Sobre estos datos")}</Link>.</p>}
       </section>
       </Fold>
       </div>

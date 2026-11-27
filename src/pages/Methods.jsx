@@ -426,6 +426,9 @@ export default function Methods() {
         to the Congress in session in the report's year, and only bills this site tracks are kept. A report
         that names a bill by title alone, without its number, isn't counted. When a report is amended, only the
         latest version is used.
+        Because only the number is read, a report that cites a bill by its number from an earlier Congress
+        (for example, a bill reintroduced under a new number) is matched to whatever bill has that number now.
+        Each listing links to the report, so the wording can be checked.
       </p>
       <p>
         A report lists the bill; it doesn't say whether the client supported or opposed it, or what was
