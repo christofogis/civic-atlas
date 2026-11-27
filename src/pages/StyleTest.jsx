@@ -8,7 +8,17 @@ import Portrait from "../components/Portrait.jsx";
 const P = (id) => `https://unitedstates.github.io/images/congress/225x275/${id}.jpg`;
 
 export default function StyleTest() {
-  const [mode, setMode] = useState("dark");
+  // Opens in the version named in the link (?v=light) or the last one picked here; dark otherwise.
+  const [mode, setModeState] = useState(() => {
+    const v = new URLSearchParams(window.location.search).get("v");
+    if (v === "light" || v === "dark") return v;
+    try { return localStorage.getItem("civic-atlas:style-test") || "dark"; } catch { return "dark"; }
+  });
+  const setMode = (m) => {
+    setModeState(m);
+    try { localStorage.setItem("civic-atlas:style-test", m); } catch { /* storage unavailable */ }
+    const url = new URL(window.location.href); url.searchParams.set("v", m); window.history.replaceState(null, "", url);
+  };
   useEffect(() => {
     const html = document.documentElement;
     html.classList.remove("slate", "slate-light");
