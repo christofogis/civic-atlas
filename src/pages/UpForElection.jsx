@@ -68,8 +68,9 @@ export default function UpForElection() {
   const serving = (x) => x.start_date <= today && today < x.end_date;
   const pastYear = (y) => generalElectionDate(y) < today;
   // For an election that has passed, only those still in office on election day: someone who left
-  // earlier (a resignation in the year before) wasn't the holder on that ballot.
-  const onElectionDay = (x, y) => x.start_date <= generalElectionDate(y) && x.end_date > generalElectionDate(y);
+  // earlier (a resignation in the year before) wasn't the holder on that ballot. An appointee's term
+  // ends on the day of the special election itself (Ricketts 2024, Moody 2026), so that day counts.
+  const onElectionDay = (x, y) => x.start_date <= generalElectionDate(y) && x.end_date >= generalElectionDate(y);
   const one = (list) => [...new Map(list.map((x) => [x.bioguide_id, x])).values()];
   // A Senate seat is on the ballot when its holder's term ends that cycle, or when it belongs to that
   // year's class even though its holder (an appointee) leaves earlier, after a special election. For an
