@@ -3,7 +3,7 @@ Prints only; writes nothing."""
 import http.cookiejar, re, subprocess, tempfile, time, urllib.parse, urllib.request
 
 UA = "civic-atlas audit probe"
-HOUSE = [("2025/20029034", "FCX"), ("2025/20018054", "UBER"), ("2025/20030902", "PLUG"), ("2025/20024346", "CRWD"),
+HOUSE = [("2025/20029026", "Palo Alto"), ("2025/20029034", "FCX"), ("2025/20018054", "UBER"), ("2025/20030902", "PLUG"), ("2025/20024346", "CRWD"),
          ("2026/20034660", "LMT"), ("2025/20029026", "PANW"), ("2025/20030461", "SMFNF"), ("2026/20034159", "TECH"),
          ("2025/20024346", "RMD")]
 SENATE = [("7ab0d2fd-19ea-459d-a1d9-3701e2cc8e93", "DELL"), ("9d3510cc-b11b-4777-a8a8-f0a58e886290", "Four Winds"),
@@ -17,7 +17,7 @@ def get(url, opener=None, data=None, headers=None):
         return r.read()
 
 tmp = tempfile.mkdtemp()
-for doc, tick in HOUSE:
+for doc, tick in HOUSE[:1]:
     try:
         pdf = f"{tmp}/{doc.replace('/', '_')}.pdf"
         open(pdf, "wb").write(get(f"https://disclosures-clerk.house.gov/public_disc/ptr-pdfs/{doc}.pdf"))
@@ -26,7 +26,7 @@ for doc, tick in HOUSE:
         head = " | ".join(l.strip() for l in lines[:12] if l.strip())[:400]
         print(f"\n### HOUSE {doc} ({tick}) header: {head}")
         for i, l in enumerate(lines):
-            if f"({tick})" in l:
+            if f"({tick})" in l or (" " in tick and tick in l):
                 print("\n".join("   " + x for x in lines[max(0, i - 1): i + 3]))
     except Exception as e:
         print("HOUSE", doc, "error", e)
@@ -40,8 +40,8 @@ try:
         {"Referer": "https://efdsearch.senate.gov/search/home/", "Content-Type": "application/x-www-form-urlencoded"})
 except Exception as e:
     print("agreement step:", e)
-for uid, tick in SENATE:
-    time.sleep(1)
+for uid, tick in [x for x in SENATE if x[1] in ("DELL", "TAP", "PYPL", "AVGO")]:
+    time.sleep(8)
     try:
         html = get(f"https://efdsearch.senate.gov/search/view/ptr/{uid}/", op).decode()
         title = re.sub(r"\s+", " ", re.sub(r"<[^>]+>", " ", (re.search(r"<h1[\s\S]*?</h1>", html) or re.search(r"<title>[\s\S]*?</title>", html)).group(0))).strip()
