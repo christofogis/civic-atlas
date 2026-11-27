@@ -40,6 +40,18 @@ export default function StateOfficialCard({ official, state }) {
   );
 }
 
+// A legislative district of the address with nobody listed in Open States: a vacancy, or a new member
+// not added yet. The district is shown only when it's a plain number ("10"), as the key is normalized.
+export function EmptySeatCard({ seat, state }) {
+  const district = /^\d+$/.test(seat.key) ? seat.key : null;
+  return (
+    <li className="card pending">
+      <Seat parts={stateOfficeParts({ type: seat.type, district }, state)} />
+      <p>{tr("No one is listed in this seat right now. It may be vacant, or a new member hasn't been added yet.", "Nadie figura en este escaño en este momento. Puede estar vacante, o aún no se ha agregado a un nuevo miembro.")}</p>
+    </li>
+  );
+}
+
 // California statewide offices that Open States doesn't list, from /data/state/ca-statewide.json.
 // Same card layout; the name links to the office's own website (there's no person page).
 export function ExtraStatewideCards({ state, boe = [] }) {

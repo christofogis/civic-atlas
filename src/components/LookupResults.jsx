@@ -1,5 +1,6 @@
 import LocalOfficials from "./LocalOfficials.jsx";
-import StateOfficialCard, { ExtraStatewideCards } from "./StateOfficialCard.jsx";
+import StateOfficialCard, { EmptySeatCard, ExtraStatewideCards } from "./StateOfficialCard.jsx";
+import { emptySeats } from "../../lib/stateleg.js";
 
 const LEGISLATIVE = new Set(["upper", "lower", "legislature"]);
 import OfficialCard from "./OfficialCard.jsx";
@@ -85,6 +86,7 @@ export default function LookupResults({ result, sectionRef, shared = false }) {
             {/* Your own legislators as cards; the other state officials (statewide offices, Board of Equalization) as a compact list. */}
             <ul className="cards">
               {result.state_officials.filter((o) => LEGISLATIVE.has(o.type)).map((o) => <StateOfficialCard key={`${o.type}-${o.id}`} official={o} state={result.state} />)}
+              {emptySeats(result.state, result.state_officials, result.state_districts).map((e) => <EmptySeatCard key={`empty-${e.type}-${e.key}`} seat={e} state={result.state} />)}
             </ul>
             <h3 className="compact-head">{t("Other state officials", "Otros funcionarios estatales")}</h3>
             <ul className="cards compact">

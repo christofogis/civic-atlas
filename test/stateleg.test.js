@@ -27,3 +27,12 @@ test("Geocodio stateleg field: current districts, largest overlap first", () => 
   assert.deepEqual(stateDistrictsFromGeocodio(json), { upper: ["36"], lower: ["70", "72"] });
   assert.deepEqual(stateDistrictsFromGeocodio({ results: [{}] }), { upper: [], lower: [] });
 });
+
+test("empty legislative seats are the address's districts with no one listed", async () => {
+  const { emptySeats } = await import("../lib/stateleg.js");
+  const officials = [{ type: "lower", district: "70" }, { type: "governor", district: null }];
+  assert.deepEqual(emptySeats("CA", officials, { upper: ["10"], lower: ["70"] }), [{ type: "upper", key: "10" }]);
+  assert.deepEqual(emptySeats("CA", [...officials, { type: "upper", district: "010" }], { upper: ["10"], lower: ["70"] }), []);
+  assert.deepEqual(emptySeats("NE", [], { upper: ["5"], lower: [] }), [{ type: "legislature", key: "5" }]);
+  assert.deepEqual(emptySeats("CA", officials, undefined), []);
+});
