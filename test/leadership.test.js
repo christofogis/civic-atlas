@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { isCurrentRole, currentRoles, ballotTally, speakerElections, isChamberPost, todayEastern } from "../lib/leadership.js";
+import { isCurrentRole, currentRoles, ballotTally, speakerElections, isChamberPost, todayEastern, isSpeakerElection, tallyByVote } from "../lib/leadership.js";
 import { mapLeadership } from "../scripts/ingest/members.mjs";
 
 const role = (bioguide_id, chamber, title, start_date, end_date = null) => ({ bioguide_id, chamber, title, start_date, end_date });
@@ -103,4 +103,28 @@ test("leadership roles from the legislators file: verbatim, deduplicated, open e
     { bioguide_id: "J000299", chamber: "house", title: "Speaker of the House", start_date: "2023-10-25", end_date: "2025-01-03" },
     { bioguide_id: "J000299", chamber: "house", title: "Speaker of the House", start_date: "2025-01-03", end_date: null },
   ]);
+});
+
+test("Speaker election questions are recognized as the Clerk words them", () => {
+  assert.equal(isSpeakerElection("Election of the Speaker"), true);
+  assert.equal(isSpeakerElection(" Election of the Speaker "), true);
+  assert.equal(isSpeakerElection("On Passage"), false);
+  assert.equal(isSpeakerElection(null), false);
+});
+
+test("tallies by vote: the Clerk's top name is not a majority unless it has more than half of named votes", () => {
+  const rows = [
+    { vote_id: "h1", position: "McCarthy", position_category: "other", votes: 203 },
+    { vote_id: "h1", position: "Jeffries", position_category: "other", votes: 212 },
+    { vote_id: "h1", position: "Biggs", position_category: "other", votes: 10 },
+    { vote_id: "h1", position: "Present", position_category: "present", votes: 0 },
+    { vote_id: "h2", position: "McCarthy", position_category: "other", votes: 216 },
+    { vote_id: "h2", position: "Jeffries", position_category: "other", votes: 212 },
+    { vote_id: "h2", position: "Present", position_category: "present", votes: 6 },
+  ];
+  const m = tallyByVote(rows);
+  assert.equal(m.get("h1").majority, null); // top name (Jeffries, 212) of 425 cast; needs 213
+  assert.equal(m.get("h1").needed, 213);
+  assert.equal(m.get("h2").majority, "McCarthy"); // 216 of 428 named votes; Present not counted
+  assert.equal(m.get("h2").cast, 428);
 });

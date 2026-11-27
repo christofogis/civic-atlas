@@ -6,6 +6,7 @@ import AtAGlance from "../components/AtAGlance.jsx";
 import { tr } from "../lib/lang.js";
 import { PartyName } from "../components/PartyTag.jsx";
 import { servedInCongress } from "../../lib/congress.js";
+import VoteResult from "../components/VoteResult.jsx";
 
 const TERRITORIES = new Set(["DC", "PR", "GU", "VI", "AS", "MP"]);
 const SITE = typeof window !== "undefined" ? window.location.origin : "";
@@ -59,7 +60,7 @@ export default function EmbedMember() {
           <ul className="plain">
             {votes.map((v) => (
               <li key={v.vote_id}>
-                <strong>{v.position}</strong> · {v.document_name && !v.question?.includes(v.document_name) ? `${v.document_name}: ` : ""}{v.question} · <span className="fine">{v.result}, {date(v.voted_at)}</span>
+                <strong>{v.position}</strong> · {v.document_name && !v.question?.includes(v.document_name) ? `${v.document_name}: ` : ""}{v.question} · <span className="fine"><VoteResult v={v} plain />, {date(v.voted_at)}</span>
               </li>
             ))}
           </ul>

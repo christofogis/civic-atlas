@@ -13,6 +13,7 @@ import CommitteeCalendar from "../components/CommitteeCalendar.jsx";
 import { tr } from "../lib/lang.js";
 import { Fold, useFolds } from "../components/Fold.jsx";
 import Clamp from "../components/Clamp.jsx";
+import VoteResult from "../components/VoteResult.jsx";
 
 const DAY = 86400000;
 const iso = (d) => d.toISOString().slice(0, 10);
@@ -177,7 +178,7 @@ export default function Week() {
                         <KindLabel v={v} /> <a href={v.source_url}>{v.question}</a>
                         <div className="fine">{v.bill_type ? billLink({ congress: v.bill_congress, bill_type: v.bill_type, number: v.bill_number }) : <LinkedText text={v.description} congress={congressOn(new Date(v.voted_at))} />}</div>
                       </td>
-                      <td>{v.result}<div className="fine">{v.yea_total}–{v.nay_total}</div></td>
+                      <td><VoteResult v={v} /><div className="fine">{v.yea_total}–{v.nay_total}</div></td>
                       {mine.size > 0 && <td className="fine">{positions.filter((p) => p.vote_id === v.vote_id).map((p) => <div key={p.bioguide_id}><Link to={`/member/${p.bioguide_id}`}>{p.name}</Link>: <Position v={v} position={p.position} /></div>)}</td>}
                     </tr>
                   ))}

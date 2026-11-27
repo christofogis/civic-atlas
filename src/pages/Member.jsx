@@ -23,6 +23,7 @@ import { PartyName } from "../components/PartyTag.jsx";
 import { CandidateTable } from "./Elections.jsx";
 import { useCaResults, ResultsStatus, RaceResult, PartyKey } from "../components/CaResults.jsx";
 import { decodeEntities } from "../../lib/ptr.js";
+import VoteResult from "../components/VoteResult.jsx";
 
 const BIOGUIDE = /^[A-Z][0-9]{6}$/;
 const TERRITORIES = new Set(["DC", "PR", "GU", "VI", "AS", "MP"]);
@@ -416,7 +417,7 @@ export default function Member() {
                     {(v.document_name || v.description) && <div className="fine"><LinkedText text={[v.document_name, v.description].filter(Boolean).join(" · ")} congress={congressOn(new Date(v.voted_at))} /></div>}
                   </td>
                   <td data-label={tr("Vote:", "Voto:")}><Position v={v} position={v.vote_positions[0]?.position} /></td>
-                  <td data-label={tr("Result:", "Resultado:")}>{v.result}</td>
+                  <td data-label={tr("Result:", "Resultado:")}><VoteResult v={v} /></td>
                 </tr>
               ))}
             </tbody>
