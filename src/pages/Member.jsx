@@ -1,3 +1,5 @@
+import { congressOn } from "../../lib/congress.js";
+import LinkedText from "../components/LinkedText.jsx";
 import Portrait from "../components/Portrait.jsx";
 import { noPhoto } from "../lib/photo.js";
 import { Fold } from "../components/Fold.jsx";
@@ -405,7 +407,7 @@ export default function Member() {
                     <VoteMeaning v={v} />
                     <KindLabel v={v} />
                     <a href={v.source_url}>{v.question}</a>
-                    {(v.document_name || v.description) && <div className="fine">{[v.document_name, v.description].filter(Boolean).join(" · ")}</div>}
+                    {(v.document_name || v.description) && <div className="fine"><LinkedText text={[v.document_name, v.description].filter(Boolean).join(" · ")} congress={congressOn(new Date(v.voted_at))} /></div>}
                   </td>
                   <td data-label={tr("Vote:", "Voto:")}><Position v={v} position={v.vote_positions[0]?.position} /></td>
                   <td data-label={tr("Result:", "Resultado:")}>{v.result}</td>

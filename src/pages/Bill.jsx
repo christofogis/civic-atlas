@@ -1,3 +1,5 @@
+import { topicSlug } from "../lib/policyAreas.js";
+import LinkedText from "../components/LinkedText.jsx";
 import { Fold, useFolds } from "../components/Fold.jsx";
 import { Fragment, useEffect, useState, lazy, Suspense } from "react";
 import { Link, useParams } from "react-router-dom";
@@ -141,7 +143,7 @@ function BillRecord({ b, referrals, source }) {
           </ul>
         </>
       )}
-      {b.latest_action_text && <p>{tr("Latest action", "Última acción")} ({date(b.latest_action_date)}): {b.latest_action_text}</p>}
+      {b.latest_action_text && <p>{tr("Latest action", "Última acción")} ({date(b.latest_action_date)}): <LinkedText text={b.latest_action_text} congress={b.congress} /></p>}
       <p><a href={`${b.source_url}/all-actions`}>{tr("Every action on this bill at Congress.gov", "Todas las acciones sobre este proyecto en Congress.gov (en inglés)")}</a></p>
     </Section>
   );
@@ -202,8 +204,8 @@ export default function Bill() {
         <dl className="facts">
           {sponsor && <><dt>{tr("Sponsor", "Patrocinador")}</dt><dd>{person(sponsor)}</dd></>}
           <dt>{tr("Introduced", "Presentado")}</dt><dd>{date(b.introduced_date)}</dd>
-          {b.policy_area && <><dt>{tr("Policy area", "Área de política")}</dt><dd>{areaName(b.policy_area)}</dd></>}
-          {b.latest_action_text && <><dt>{tr("Latest action", "Última acción")}</dt><dd>{date(b.latest_action_date)}<div className="fine-plain">{b.latest_action_text}</div></dd></>}
+          {b.policy_area && <><dt>{tr("Policy area", "Área de política")}</dt><dd><Link to={`/topic/${topicSlug(b.policy_area)}?congress=${b.congress}`}>{areaName(b.policy_area)}</Link></dd></>}
+          {b.latest_action_text && <><dt>{tr("Latest action", "Última acción")}</dt><dd>{date(b.latest_action_date)}<div className="fine-plain"><LinkedText text={b.latest_action_text} congress={b.congress} /></div></dd></>}
         </dl>
         <p className="fine"><a href={b.source_url}>{tr("Full text, actions and history at Congress.gov", "Texto completo, acciones e historial en Congress.gov (en inglés)")}</a></p>
         <Follow feed={`/api/feed/bill/${b.congress}/${b.bill_type}/${b.number}`} />
@@ -232,7 +234,7 @@ export default function Bill() {
 
       <Section title={tr("Summary", "Resumen")} source={<>{tr("Congressional Research Service, via GovInfo Bill Status.", "Servicio de Investigación del Congreso, vía GovInfo Bill Status. Los resúmenes se publican solo en inglés.")} <Explain id="crs-summary">{tr("About these summaries", "Sobre estos resúmenes")}</Explain></>}>
         {b.crs_summary
-          ? <p><Clamp lines={6}>{b.crs_summary}</Clamp></p>
+          ? <p><Clamp lines={6}><LinkedText text={b.crs_summary} congress={b.congress} /></Clamp></p>
           : <p>{tr("The Congressional Research Service hasn't published a summary of this bill yet. The bill text is at Congress.gov.", "El Servicio de Investigación del Congreso todavía no ha publicado un resumen de este proyecto. El texto está en Congress.gov.")}</p>}
       </Section>
 

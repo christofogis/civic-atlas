@@ -1,3 +1,5 @@
+import { congressOn } from "../../lib/congress.js";
+import LinkedText from "../components/LinkedText.jsx";
 import { NotesList, Ref } from "../components/Notes.jsx";
 import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
@@ -173,7 +175,7 @@ export default function Week() {
                       <td>
                         <VoteMeaning v={v} />
                         <KindLabel v={v} /> <a href={v.source_url}>{v.question}</a>
-                        <div className="fine">{v.bill_type ? billLink({ congress: v.bill_congress, bill_type: v.bill_type, number: v.bill_number }) : v.description}</div>
+                        <div className="fine">{v.bill_type ? billLink({ congress: v.bill_congress, bill_type: v.bill_type, number: v.bill_number }) : <LinkedText text={v.description} congress={v.congress} />}</div>
                       </td>
                       <td>{v.result}<div className="fine">{v.yea_total}–{v.nay_total}</div></td>
                       {mine.size > 0 && <td className="fine">{positions.filter((p) => p.vote_id === v.vote_id).map((p) => <div key={p.bioguide_id}><Link to={`/member/${p.bioguide_id}`}>{p.name}</Link>: <Position v={v} position={p.position} /></div>)}</td>}

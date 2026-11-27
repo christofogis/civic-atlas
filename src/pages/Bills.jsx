@@ -1,3 +1,4 @@
+import { topicSlug } from "../lib/policyAreas.js";
 import { NotesList, Ref } from "../components/Notes.jsx";
 import { useEffect, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
@@ -96,7 +97,7 @@ export default function Bills() {
               <tr key={`${b.bill_type}-${b.number}`}>
                 <td>
                   <Link to={`/bill/${b.congress}/${b.bill_type}/${b.number}`}>{billLabel(b)}</Link> <Clamp lines={2}>{b.short_title ?? b.title}</Clamp>
-                  {b.policy_area && <div className="fine">{areaName(b.policy_area)}</div>}
+                  {b.policy_area && <div className="fine"><Link to={`/topic/${topicSlug(b.policy_area)}?congress=${b.congress}`}>{areaName(b.policy_area)}</Link></div>}
                 {stages[`${b.bill_type}-${b.number}`] && (() => { const l = trackShort(billTrack(stages[`${b.bill_type}-${b.number}`]), date); return <div className="fine stage-line">{tr(l.en, l.es)}</div>; })()}
                 </td>
                 <td data-label={tr("Sponsor:", "Patrocinador:")}>{b.sponsor_bioguide_id

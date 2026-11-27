@@ -1,3 +1,4 @@
+import LinkedText from "../components/LinkedText.jsx";
 import { NotesList, Ref } from "../components/Notes.jsx";
 import { useEffect, useMemo, useState } from "react";
 import { Link, useParams, useSearchParams } from "react-router-dom";
@@ -147,7 +148,7 @@ export default function MemberVotes() {
                         <div className="fine">
                           {v.bill_type
                             ? <><Link to={`/bill/${v.bill_congress}/${v.bill_type}/${v.bill_number}`}>{billLabel({ bill_type: v.bill_type, number: v.bill_number })}</Link>{v.bill_title && <> · {v.bill_title}</>}{v.policy_area && <> · {areaName(v.policy_area)}</>}</>
-                            : v.description}
+                            : <LinkedText text={v.description} congress={v.congress} />}
                         </div>
                       </td>
                       <td data-label={tr("Vote:", "Voto:")}><Position v={v} position={v.position} /></td>

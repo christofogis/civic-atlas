@@ -115,7 +115,7 @@ function IssueSection({ issue, mine }) {
   return (
     <section className="section issue-section">
       <h2>{tr(issue.en, issue.es)}</h2>
-      <p className="fine">{tr("Official topic: ", "Tema oficial: ")}{issue.areas.map((a, i) => <span key={a}>{i > 0 && ", "}{areaName(a)}</span>)}</p>
+      <p className="fine">{tr("Official topic: ", "Tema oficial: ")}{issue.areas.map((a, i) => <span key={a}>{i > 0 && ", "}<Link to={`/topic/${topicSlug(a)}`}>{areaName(a)}</Link></span>)}</p>
       {state.status === "loading" && <p>{tr("Loading…", "Cargando…")}</p>}
       {state.status === "error" && <p className="notice">{tr("Couldn't load this issue right now.", "No se pudo cargar este tema en este momento.")}</p>}
       {state.status === "done" && (
