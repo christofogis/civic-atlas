@@ -2,5 +2,7 @@ User-agent: *
 Allow: /
 Disallow: /api/
 Disallow: /embed/
+Disallow: /account
+Disallow: /unsubscribe
 
 Sitemap: https://civic-atlas-cub.pages.dev/sitemap.xml

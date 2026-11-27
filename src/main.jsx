@@ -60,6 +60,8 @@ const County = lazy(() => import("./pages/County.jsx"));
 const StatePerson = lazy(() => import("./pages/StatePerson.jsx"));
 const EmbedMember = lazy(() => import("./pages/EmbedMember.jsx"));
 const MapPage = lazy(() => import("./pages/MapPage.jsx"));
+const Account = lazy(() => import("./pages/Account.jsx"));
+const Unsubscribe = lazy(() => import("./pages/Unsubscribe.jsx"));
 const NotFound = lazy(() => import("./pages/NotFound.jsx"));
 
 createRoot(document.getElementById("root")).render(
@@ -105,6 +107,8 @@ createRoot(document.getElementById("root")).render(
         <Route path="/methods" element={<Methods />} />
         <Route path="/status" element={<Status />} />
         <Route path="/your-week" element={<YourWeek />} />
+        <Route path="/account" element={<Account />} />
+        <Route path="/unsubscribe" element={<Unsubscribe />} />
         <Route path="*" element={<NotFound />} />
         </Route>
       </Routes>

@@ -1,5 +1,6 @@
 import AccuracyStatus from "../components/AccuracyStatus.jsx";
 import { Link } from "react-router-dom";
+import { ACCOUNTS_ENABLED, AUTH_GOOGLE_ENABLED } from "../lib/config.js";
 
 // Spanish version of the methods page. Keep in step with Methods.jsx: same sections, same ids.
 export default function MethodsEs() {
@@ -58,7 +59,10 @@ export default function MethodsEs() {
       </ul>
       <p>
         El partido se toma a la fecha en que se presentó el proyecto (para el patrocinador) o en que se copatrocinó
-        (para el copatrocinador); los independientes cuentan con el partido con el que se agrupan. Los copatrocinios
+        (para el copatrocinador); los independientes cuentan con el partido con el que se agrupan. Cuando un miembro
+        cambió de partido durante un período, se usa el partido de esa fecha, según las fechas del conjunto de datos
+        congress-legislators (las mismas fechas aparecen en la lista de períodos de la página del miembro y junto a los
+        nombres en las páginas de proyectos). Los copatrocinios
         retirados no cuentan. Las tasas no se muestran con menos de 20 proyectos copatrocinados o 10 presentados.
         El copatrocinio refleja apoyo a la presentación de un proyecto, no cómo vota el miembro después.
       </p>
@@ -173,7 +177,7 @@ export default function MethodsEs() {
       <p>
         Algunas secciones tienen un resumen breve en lenguaje sencillo, marcado como "Resumen generado por IA", con el
         texto oficial de la sección a un toque. El texto es el registro; el resumen es una ayuda para leerlo. El
-        resumen del Servicio de Investigación del Congreso, cuando existe, sigue arriba en la página del proyecto.
+        resumen del Servicio de Investigación del Congreso, cuando existe, sigue cerca del inicio de la página del proyecto.
       </p>
       <p>
         Los resúmenes se escriben de antemano con el modelo Claude Haiku de Anthropic, solo a partir del texto de la
@@ -185,6 +189,35 @@ export default function MethodsEs() {
         se muestra. No se resumen las secciones de menos de 40 palabras ni los índices. Cada resumen corresponde a una
         versión del texto, así que una versión nueva recibe resúmenes nuevos. Los resúmenes en español se escriben
         junto con los de inglés y se verifican contra ellos.
+      </p>
+
+      <h2 id="bill-summaries">Resúmenes de proyectos en lenguaje sencillo hechos por IA</h2>
+      <p>
+        Cuando el Servicio de Investigación del Congreso (CRS) ha publicado un resumen de un proyecto, el sitio puede
+        mostrar también una versión breve: una oración sobre lo que hace el proyecto y, cuando hace varias cosas
+        distintas, hasta cuatro puntos cortos. Aparece como "En pocas palabras" en la página del proyecto, en el
+        cuestionario y como una línea bajo el título oficial en las listas, siempre marcada como escrita por IA, con
+        el resumen del CRS y el texto oficial a un toque. Los títulos oficiales se muestran tal como se publicaron.
+      </p>
+      <p>
+        Se escriben de antemano con el modelo Claude Haiku de Anthropic, solo a partir del resumen del CRS (la versión
+        más reciente que el CRS ha publicado) y con las mismas instrucciones escritas para todos los proyectos:
+        palabras sencillas, a un nivel de lectura de octavo grado aproximadamente; quién debe o puede hacer qué, y los
+        montos y fechas tal como los indica el resumen del CRS; sin números de sección ni citas legales; sin
+        antecedentes ni datos externos; nunca el propósito, la intención, el efecto, el costo ni quién gana o pierde,
+        salvo que el propio resumen del CRS lo indique; sin palabras que juzguen. Luego una segunda consulta compara
+        cada uno con el resumen del CRS y enumera todo dato agregado, toda omisión que cambie el sentido, toda
+        afirmación de intención o impacto, toda palabra que juzgue y toda cita legal. Un resumen señalado se reescribe
+        una vez indicando esos problemas y se vuelve a verificar; si sigue fallando, no se muestra. Solo se muestran
+        los resúmenes que pasan la verificación. Las versiones en español se escriben junto con las de inglés y se
+        verifican contra ellas.
+      </p>
+      <p>
+        Cada resumen está ligado al texto exacto del CRS del que se escribió. Cuando el CRS publica un resumen nuevo
+        (por ejemplo, después de que un proyecto se aprueba en una cámara), la versión breve anterior deja de
+        mostrarse y se escribe y verifica una nueva. Los proyectos sin resumen del CRS no reciben uno. Incluye: los
+        proyectos con votación nominal, los que se convirtieron en ley y los que aparecen en Esta semana, desde el
+        118.º Congreso (2023).
       </p>
 
       <h2 id="bill-stage">En qué etapa está un proyecto</h2>
@@ -518,6 +551,48 @@ export default function MethodsEs() {
         distrito guardados en su dispositivo o incluidos en el enlace de la página, nunca con una dirección. El archivo de
         calendario se crea en su navegador.
       </p>
+
+      {/* Shown once accounts are on (src/lib/config.js), so this page describes the live site. */}
+      {ACCOUNTS_ENABLED && <>
+      <h2 id="accounts">Cuentas (opcionales)</h2>
+      <p>
+        Todo en este sitio funciona sin una cuenta. Una cuenta le permite ver en cualquier dispositivo los funcionarios y
+        proyectos de ley que guarde, y elegir qué actualizaciones por correo desea. Inicia sesión con un enlace o un código que
+        se envía a su correo{AUTH_GOOGLE_ENABLED ? ", o con Google" : ""}; no hay contraseña. La página de su cuenta tiene un
+        botón para descargar todo lo que se describe abajo y otro para eliminarlo.
+      </p>
+      <p>Lo que guarda una cuenta, en la base de datos Supabase del sitio:</p>
+      <ul className="plain">
+        <li><strong>Registro de inicio de sesión:</strong> su correo electrónico, cuándo se creó la cuenta y cuándo inició sesión
+          por última vez. Si inicia sesión con Google, también lo que Google comparte para iniciar sesión: el ID de su cuenta de
+          Google, su nombre, su correo y el enlace a su foto de perfil.</li>
+        <li><strong>Lo que usted guarda:</strong> los identificadores de los funcionarios y proyectos que decida guardar y, si
+          lo desea, los distritos de una búsqueda: solo el estado y los números de distrito. Su dirección nunca se guarda, con
+          o sin cuenta.</li>
+        <li><strong>Opciones de correo:</strong> el correo semanal de votos, las novedades de proyectos y las fechas de
+          elecciones (cada una desactivada hasta que usted la active), el estado para las fechas de elecciones, el idioma de los
+          correos, y un registro de cada vez que activó o desactivó una y desde dónde (la página de su cuenta o un enlace para
+          cancelar la suscripción).</li>
+      </ul>
+      <p>
+        Solo usted puede ver o cambiar lo que guardó y sus opciones; la base de datos se lo niega a cualquier otra persona. El
+        operador del sitio puede verlos en el panel de la base de datos, y no se comparten, no se venden ni se usan para nada
+        distinto de lo que usted eligió. Mientras tenga la sesión iniciada, su navegador guarda la sesión en su almacenamiento
+        local; al cerrar la sesión se borra. Una cuenta no trae cookies, anuncios ni rastreo, y las visitas se cuentan de la
+        misma forma anónima que antes.
+      </p>
+      <p>
+        Todavía no se envían correos. Cuando empiecen, recibirá solo los que haya activado, en el idioma que eligió, y cada uno
+        tendrá un enlace para dejar de recibirlo sin iniciar sesión. Los correos de inicio de sesión los envía el servicio de
+        correo de Supabase.
+      </p>
+      <p>
+        <strong>Eliminar:</strong> "Eliminar mi cuenta", en la página de su cuenta, borra de inmediato de la base de datos la
+        cuenta y todo lo guardado con ella. Pueden quedar copias en las copias de seguridad diarias de la base de datos por un
+        máximo de 7 días; después desaparecen. Lo que su navegador recuerda por su cuenta (su última búsqueda) se queda hasta
+        que lo borre en la página principal.
+      </p>
+      </>}
 
       <h2>De dónde vienen los datos</h2>
       <ul className="plain">

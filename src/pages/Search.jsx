@@ -7,6 +7,8 @@ import { extractBillRefs } from "../../lib/billrefs.js";
 import { tr } from "../lib/lang.js";
 import { PartyTag } from "../components/PartyTag.jsx";
 import Clamp from "../components/Clamp.jsx";
+import { PlainLead } from "../components/PlainSummary.jsx";
+import { usePlainSummaries } from "../lib/plainSummaries.js";
 
 const BILL_COLUMNS = "congress,bill_type,number,title,short_title,latest_action_date,policy_area,sponsor_name";
 
@@ -37,6 +39,7 @@ export default function Search() {
   const q = params.get("q") ?? "";
   const [input, setInput] = useState(q);
   const [state, setState] = useState({ status: "idle" });
+  const plain = usePlainSummaries(state.bills ?? []);
 
   useEffect(() => {
     setInput(q);
@@ -83,6 +86,7 @@ export default function Search() {
                   <li key={`${b.congress}-${b.bill_type}-${b.number}`}>
                     <Link to={`/bill/${b.congress}/${b.bill_type}/${b.number}`}>{billLabel(b)}</Link>{" "}
                     <span className="fine">({ordinal(b.congress)})</span> <Clamp lines={2}>{b.short_title ?? b.title}</Clamp>
+                    <PlainLead map={plain} bill={b} />
                     <div className="fine">{[b.sponsor_name && `${tr("Sponsor", "Patrocinador")}: ${b.sponsor_name}`, b.policy_area, b.latest_action_date && `${tr("Latest action", "Última acción")} ${date(b.latest_action_date)}`].filter(Boolean).join(" · ")}</div>
                   </li>
                 ))}

@@ -9,6 +9,7 @@ import { stateOfficeLabel } from "../lib/stateOffices.js";
 import { StatePartyTag } from "../components/StateOfficialCard.jsx";
 import { NotesList, Ref } from "../components/Notes.jsx";
 import { calendarChecks, calendarStale, isCurrentStateRole, rosterFor } from "../../lib/stateleg.js";
+import SaveToggle from "../components/SaveToggle.jsx";
 
 // A state legislator or statewide official: current office, contact details, past roles.
 // Data: Open States (openstates/people, public domain), compiled from state legislature sites.
@@ -56,6 +57,7 @@ export default function StatePerson() {
         {[...new Map(p.sources.map((u) => [host(u), u])).values()].map((u, i) => <span key={u}>{i ? ", " : ""}<a href={u} rel="noopener">{host(u)}</a></span>)}.
       </>} /></h1>
       {!p.active && <p className="meta">{tr("No longer in office", "Ya no ocupa el cargo")}</p>}
+      <SaveToggle official={p.id} />
       </header>
       <div className="split">
         <div className="split-main">
