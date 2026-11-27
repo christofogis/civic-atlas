@@ -997,7 +997,9 @@ html.slate body { background: var(--bg); }
 .sl-stat > div { color: #c3ced8; }
 .sl-src { display: block; color: var(--faint); font-size: 0.82rem; margin-top: 4px; }
 .sl-stats-row { display: flex; gap: 32px; flex-wrap: wrap; }
-.sl-stats-row strong { display: block; font-size: 1.9rem; }
+/* One rule for figures: every headline number is the accent green, the same weight and digits,
+   boxed or not. Dates, counts inside sentences and body text stay in the text color. */
+.sl-stats-row strong { display: block; font-size: 1.9rem; color: var(--accent); font-weight: 700; font-variant-numeric: tabular-nums; }
 .sl-stats-row span { color: var(--muted); font-size: 0.85rem; }
 .sl-track { list-style: none; margin: 0; padding: 0 0 0 14px; border-left: 2px solid var(--accent); display: grid; gap: 6px; }
 .sl-track span { color: var(--muted); font-size: 0.88rem; margin-left: 6px; }
