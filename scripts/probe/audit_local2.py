@@ -6,7 +6,11 @@ runpy.run_path("scripts/data/oc_minutes.py", run_name="__main__")
 d = json.load(open("public/data/local/ca-orange-minutes.json"))
 for m in d["meetings"]:
     print("MEET", m["date"], len(m["items"]), [(i["number"], len(i["actions"])) for i in m["items"] if len(i["actions"]) > 1 or i["number"].startswith("S")])
-print("JSONSTART"); print(json.dumps(d, ensure_ascii=False)); print("JSONEND")
+import base64
+b = base64.b64encode(json.dumps(d, ensure_ascii=False).encode()).decode()
+print("JSONSTART")
+for i in range(0, len(b), 400): print("B64 " + b[i:i+400])
+print("JSONEND")
 
 UA = {"User-Agent": "Mozilla/5.0 (civic-atlas audit probe; github.com/christofogis/civic-atlas)"}
 def get(u):
