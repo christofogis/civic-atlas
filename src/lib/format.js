@@ -35,8 +35,14 @@ export function seatParts(s) {
 }
 export const seatLabel = (s) => seatParts(s).join(", ");
 
+// A plain date (YYYY-MM-DD) is shown as written. A timestamp (a roll call's voted_at) is shown as the
+// day in Washington, where the vote was taken: a 9 p.m. Eastern vote is stored as the next day in UTC,
+// and a 1 a.m. Eastern vote would read as the day before to a reader on Pacific time.
 export const date = (d) =>
-  d ? new Date(d.length === 10 ? `${d}T12:00:00Z` : d).toLocaleDateString(locale(), { year: "numeric", month: "short", day: "numeric" }) : "";
+  d ? new Date(d.length === 10 ? `${d}T12:00:00Z` : d).toLocaleDateString(locale(), { year: "numeric", month: "short", day: "numeric", timeZone: d.length === 10 ? "UTC" : "America/New_York" }) : "";
+
+// A timestamp's day in Washington, as YYYY-MM-DD (never slice an ISO timestamp: that is the UTC day).
+export const easternDay = (ts) => (ts ? new Intl.DateTimeFormat("en-CA", { timeZone: "America/New_York" }).format(new Date(ts)) : "");
 
 export const money = (n) =>
   n == null ? "—" : n.toLocaleString("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 0 });

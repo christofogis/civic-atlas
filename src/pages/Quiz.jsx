@@ -152,7 +152,7 @@ export default function Quiz() {
         <p className="fine">
           {seen.size > 0 && !seen.has(q.key) && <><span className="status-flag ok">{tr("New since your last visit", "Nuevo desde su última visita")}</span>{" "}</>}
           {billLabel(b)}{b.law_number ? tr(` · became ${b.law_number}`, ` · se convirtió en ${b.law_number}`) : ""}
-          {Object.values(q.votes)[0]?.voted_at && <> · {tr("voted", "votado el")} {date(Object.values(q.votes)[0].voted_at.slice(0, 10))}</>}
+          {Object.values(q.votes)[0]?.voted_at && <> · {tr("voted", "votado el")} {date(Object.values(q.votes)[0].voted_at)}</>}
         </p>
         <h2>{b.short_title ?? b.title}</h2>
         <Summary text={b.crs_summary} />

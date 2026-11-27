@@ -5,7 +5,7 @@ import { Link, useParams, useSearchParams } from "react-router-dom";
 import { db } from "../lib/db.js";
 import DownloadCsv from "../components/DownloadCsv.jsx";
 import { KindLabel, Position, VoteMeaning } from "../components/Explain.jsx";
-import { date, billLabel, ordinal } from "../lib/format.js";
+import { date, easternDay, billLabel, ordinal } from "../lib/format.js";
 import { voteKind, isFinal } from "../lib/voteKind.js";
 import { areaName } from "../lib/policyAreas.js";
 import { tr } from "../lib/lang.js";
@@ -160,7 +160,7 @@ export default function MemberVotes() {
             </table>
           )}
           <DownloadCsv rows={filtered} filename={`votes-${bioguide}-${congress}`} columns={[
-            ["Date", (v) => v.voted_at?.slice(0, 10)], ["Chamber", (v) => v.chamber], ["Question", (v) => v.question],
+            ["Date", (v) => easternDay(v.voted_at)], ["Chamber", (v) => v.chamber], ["Question", (v) => v.question],
             ["Bill", (v) => (v.bill_type ? `${v.bill_type.toUpperCase()} ${v.bill_number}` : "")], ["Bill title", (v) => v.bill_title],
             ["Issue", (v) => v.policy_area], ["Vote", (v) => v.position], ["Result", (v) => v.result], ["Source", (v) => v.source_url],
           ]} />

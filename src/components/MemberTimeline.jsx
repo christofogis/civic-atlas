@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { db } from "../lib/db.js";
-import { billLabel, date } from "../lib/format.js";
+import { billLabel, date, easternDay } from "../lib/format.js";
 import { tr } from "../lib/lang.js";
 import { voteKind } from "../lib/voteKind.js";
 import { VoteMeaning } from "./Explain.jsx";
@@ -32,7 +32,7 @@ async function loadWindow(id, from, to) {
   const out = [];
   for (const v of votes.data) {
     const k = voteKind(v);
-    out.push({ date: v.voted_at.slice(0, 10), type: "vote", main: ["passage", "nomination"].includes(k.kind), v, k });
+    out.push({ date: easternDay(v.voted_at), type: "vote", main: ["passage", "nomination"].includes(k.kind), v, k });
   }
   for (const b of bills.data) out.push({ date: b.introduced_date, type: "bill", main: true, b });
   for (const b of laws.data) out.push({ date: b.became_law_date, type: "law", main: true, b });

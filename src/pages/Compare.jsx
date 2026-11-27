@@ -3,7 +3,7 @@ import { Link, useSearchParams } from "react-router-dom";
 import { db } from "../lib/db.js";
 import DownloadCsv from "../components/DownloadCsv.jsx";
 import { KindLabel, VoteMeaning } from "../components/Explain.jsx";
-import { billLabel, ordinal, partyTag, date } from "../lib/format.js";
+import { billLabel, ordinal, partyTag, date, easternDay } from "../lib/format.js";
 import { tr } from "../lib/lang.js";
 import { PartyTag } from "../components/PartyTag.jsx";
 
@@ -128,7 +128,7 @@ export default function Compare() {
                       </tbody>
                     </table>
                     <DownloadCsv rows={result.differed} filename={`votes-differed-${a}-${b}`} columns={[
-                      ["Date", (v) => v.voted_at?.slice(0, 10)], ["Chamber", (v) => v.chamber], ["Question", (v) => v.question],
+                      ["Date", (v) => easternDay(v.voted_at)], ["Chamber", (v) => v.chamber], ["Question", (v) => v.question],
                       ["Bill", (v) => (v.bill_type ? `${v.bill_type.toUpperCase()} ${v.bill_number}` : "")], ["Result", (v) => v.result],
                       [ma?.name ?? a, (v) => v.a_position], [mb?.name ?? b, (v) => v.b_position], ["Source", (v) => v.source_url],
                     ]} />
