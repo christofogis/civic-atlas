@@ -1,5 +1,5 @@
 {
- "built_at": "2026-11-26",
+ "built_at": "2026-11-27",
  "source": "Each city's agenda system: Legistar (webapi.legistar.com), CivicClerk (api.civicclerk.com) or PrimeGov (primegov.com)",
  "cities": {
   "Costa Mesa": {
@@ -134,12 +134,12 @@
        "type": "City Clerk's Report",
        "attachments": [
         {
-         "name": "Exhibit \"A\" to Resolution 2026-45",
-         "url": "https://huntingtonbeach.legistar1.com/huntingtonbeach/attachments/cffb0a6f-fdd4-4eed-a34d-c7b62b40206c.pdf"
-        },
-        {
          "name": "Att #1 Resolution No. 2026-45",
          "url": "https://huntingtonbeach.legistar1.com/huntingtonbeach/attachments/dae637e6-3f48-4cdd-a516-622288c42d97.pdf"
+        },
+        {
+         "name": "Exhibit \"A\" to Resolution No. 2026-45",
+         "url": "https://huntingtonbeach.legistar1.com/huntingtonbeach/attachments/f319570f-31f4-4c3a-83aa-058b35589862.pdf"
         }
        ]
       },
