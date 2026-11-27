@@ -5,6 +5,7 @@ import { date, seatLabel, partyName } from "../lib/format.js";
 import AtAGlance from "../components/AtAGlance.jsx";
 import { tr } from "../lib/lang.js";
 import { PartyName } from "../components/PartyTag.jsx";
+import { servedInCongress } from "../../lib/congress.js";
 
 const TERRITORIES = new Set(["DC", "PR", "GU", "VI", "AS", "MP"]);
 const SITE = typeof window !== "undefined" ? window.location.origin : "";
@@ -49,7 +50,7 @@ export default function EmbedMember() {
       <p className="fine">
         {seat?.seat_status === "serving" ? <>{seatLabel(seat)} <PartyName party={seat.party} /></> : latest ? <>{tr("Former member", "Exmiembro")} · {seatLabel(latest)} <PartyName party={latest.party} /></> : ""}
       </p>
-      <AtAGlance terms={terms} voteStats={d.voteStats} medians={d.medians} billStats={d.billStats} laws={d.laws}
+      <AtAGlance terms={terms} voteStats={d.voteStats.filter((s) => servedInCongress(terms, s.chamber, s.congress))} medians={d.medians} billStats={d.billStats} laws={d.laws}
         finance={d.finance} bySize={d.bySize} tradeSummary={d.tradeSummary} delegate={latest?.chamber === "house" && TERRITORIES.has(latest.state)}
         note={tr("Filled in from official records, in the same words for every member.", "Redactado a partir de registros oficiales, con las mismas palabras para cada miembro.")} />
       {votes.length > 0 && (

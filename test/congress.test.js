@@ -34,3 +34,14 @@ test("next election and when seats are up", () => {
   assert.equal(seatNextUp("senate", 1, now), 2030);
   assert.equal(seatNextUp("senate", 2, now), 2032);
 });
+
+test("servedInCongress: only Congresses a term overlaps, in that chamber", async () => {
+  const { servedInCongress } = await import("../lib/congress.js");
+  const gaetz = [{ chamber: "house", start_date: "2023-01-03", end_date: "2024-11-13" }];
+  assert.equal(servedInCongress(gaetz, "house", 118), true);
+  assert.equal(servedInCongress(gaetz, "house", 119), false); // listed on the 2025 opening quorum call only
+  const vance = [{ chamber: "senate", start_date: "2023-01-03", end_date: "2025-01-09" }];
+  assert.equal(servedInCongress(vance, "senate", 119), true);
+  assert.equal(servedInCongress(vance, "house", 119), false);
+  assert.equal(servedInCongress([{ chamber: "house", start_date: "2023-01-03", end_date: "2025-01-03" }], "house", 119), false);
+});

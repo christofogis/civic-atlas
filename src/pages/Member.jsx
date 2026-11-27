@@ -9,7 +9,7 @@ import { useEffect, useState, lazy, Suspense } from "react";
 import { voteKind, isFinal } from "../lib/voteKind.js";
 import { Link, useParams, useLocation, useNavigate } from "react-router-dom";
 import { db } from "../lib/db.js";
-import { seatNextUp, nextElectionYear } from "../../lib/congress.js";
+import { seatNextUp, nextElectionYear, servedInCongress } from "../../lib/congress.js";
 import AtAGlance from "../components/AtAGlance.jsx";
 import EmbedCode from "../components/EmbedCode.jsx";
 import Scale from "../components/Scale.jsx";
@@ -293,7 +293,9 @@ export default function Member() {
   if (state.status === "error") return <main className="page"><p className="notice">{tr("Couldn't load this page right now. Try again shortly.", "No se pudo cargar esta página. Inténtelo de nuevo en un momento.")}</p></main>;
 
   const loaded = Object.assign({}, ...Object.values(more).filter((v) => typeof v === "object"));
-  const { member: m, terms, seat, memberships, votes = [], bills = [], sponsoredCount = 0, cosponsoredCount = 0, finance, freshness, voteStats, medians, billStats, billMedians = [], trades = [], filings: scannedFilings = [], tradeSummary: ts, bySize, byState = [], employers = [], pacs = [], outside = [], laws, candidacies } = { ...state.data, ...loaded };
+  const { member: m, terms, seat, memberships, votes = [], bills = [], sponsoredCount = 0, cosponsoredCount = 0, finance, freshness, voteStats: allVoteStats, medians, billStats, billMedians = [], trades = [], filings: scannedFilings = [], tradeSummary: ts, bySize, byState = [], employers = [], pacs = [], outside = [], laws, candidacies } = { ...state.data, ...loaded };
+  // Only Congresses the member served in (see servedInCongress).
+  const voteStats = allVoteStats.filter((s) => servedInCongress(terms, s.chamber, s.congress));
   const sectionStatus = (id) => (typeof more[id] === "string" ? more[id] : more[id] ? undefined : "loading");
   // Finance detail is shown for the most recent cycle with detail on file.
   // Cycles with detail on file, newest first; the visitor can switch between them.
