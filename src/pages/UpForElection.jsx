@@ -216,6 +216,7 @@ export default function UpForElection() {
                 <>
                   <h3>{tr("Board of Supervisors", "Junta de Supervisores")}</h3>
                   <ul className="plain">{supervisors.map((s) => <li key={s.district}>{tr(`District ${s.district}`, `Distrito ${s.district}`)}: {s.name} · {tr("term ends", "fin del período")} {date(s.term_end)}</li>)}</ul>
+                  <p className="fine">{tr(`Supervisor seats are nonpartisan. A candidate who wins a majority in the June ${year} primary is elected then; only seats where no one did go on to the November ballot. The Registrar's results show which.`, `Los cargos de supervisor son no partidistas. Quien obtiene la mayoría en la primaria de junio de ${year} queda elegido; solo los cargos donde nadie la obtuvo pasan a la boleta de noviembre. Los resultados del Registro de Votantes muestran cuáles.`)}</p>
                 </>
               )}
               {councils.map((c) => (
