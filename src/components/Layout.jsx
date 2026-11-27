@@ -6,6 +6,7 @@ import { NotesProvider } from "./Notes.jsx";
 import ThemeSwitch from "./ThemeSwitch.jsx";
 import SearchSuggest from "./SearchSuggest.jsx";
 import { useLang } from "../lib/i18n.jsx";
+import { useAccount } from "../lib/auth.js";
 
 // Site header on every page: name, main sections, and a search box for members and bills.
 const TITLES = {
@@ -26,6 +27,7 @@ const TITLES = {
   "/bill": ["Bill", "Proyecto de ley"], "/methods": ["How this site works", "Cómo funciona este sitio"],
   "/status": ["Site status", "Estado del sitio"], "/your-week": ["Your week", "Su semana"],
   "/first-time-voter": ["First time voting?", "¿Va a votar por primera vez?"],
+  "/account": ["Your account", "Su cuenta"], "/unsubscribe": ["Unsubscribe", "Cancelar suscripción"],
 };
 
 // The menu: the three things most visitors come for, then everything else in a few groups that open
@@ -60,6 +62,9 @@ export default function Layout() {
   const location = useLocation();
   const [q, setQ] = useState("");
   const { lang, setLang, t } = useLang();
+  // Accounts are optional; the link says "Sign in" until someone is signed in on this browser.
+  const account = useAccount();
+  const accountLabel = account.status === "signedIn" ? t("Your account", "Su cuenta") : t("Sign in", "Iniciar sesión");
   // On phones the sections and search fold behind a Menu button; it closes on every page change.
   const [menuOpen, setMenuOpen] = useState(false);
   useEffect(() => setMenuOpen(false), [location.pathname, location.search]);
@@ -119,6 +124,7 @@ export default function Layout() {
                 {g.links.map(([to, en, es]) => <NavLink key={to} to={to}>{t(en, es)}</NavLink>)}
               </details>
             ))}
+            {account.status !== "off" && <div className="menu-account"><NavLink to="/account">{accountLabel}</NavLink></div>}
           </nav>
           {location.pathname !== "/search" && (
             <form onSubmit={submit} role="search" className="site-search menu-search">
@@ -128,6 +134,7 @@ export default function Layout() {
             </form>
           )}
           </div>
+          {account.status !== "off" && <NavLink to="/account" className="account-link">{accountLabel}</NavLink>}
           <button type="button" className="link lang-switch" lang={lang === "es" ? "en" : "es"} onClick={() => setLang(lang === "es" ? "en" : "es")}>
             {lang === "es" ? "English" : "Español"}
           </button>

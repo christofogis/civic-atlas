@@ -20,6 +20,7 @@ import Follow from "../components/Follow.jsx";
 import { Explain, VoteMeaning } from "../components/Explain.jsx";
 import { PartyTag } from "../components/PartyTag.jsx";
 import { PlainSummary } from "../components/PlainSummary.jsx";
+import SaveToggle from "../components/SaveToggle.jsx";
 
 const TYPES = new Set(["hr", "s", "hres", "sres", "hjres", "sjres", "hconres", "sconres"]);
 const LOBBY_PREVIEW = 40;
@@ -218,6 +219,7 @@ export default function Bill() {
         </dl>
         <p className="fine"><a href={b.source_url}>{tr("Full text, actions and history at Congress.gov", "Texto completo, acciones e historial en Congress.gov (en inglés)")}</a></p>
         <Follow feed={`/api/feed/bill/${b.congress}/${b.bill_type}/${b.number}`} />
+        <SaveToggle bill={{ congress: b.congress, type: b.bill_type, number: b.number }} />
       {scheduled.length > 0 && (
         <div className="notice-box">
           <strong>{tr("Scheduled", "Programado")}</strong>

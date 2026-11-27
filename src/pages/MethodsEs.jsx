@@ -1,5 +1,6 @@
 import AccuracyStatus from "../components/AccuracyStatus.jsx";
 import { Link } from "react-router-dom";
+import { ACCOUNTS_ENABLED, AUTH_GOOGLE_ENABLED } from "../lib/config.js";
 
 // Spanish version of the methods page. Keep in step with Methods.jsx: same sections, same ids.
 export default function MethodsEs() {
@@ -547,6 +548,48 @@ export default function MethodsEs() {
         distrito guardados en su dispositivo o incluidos en el enlace de la página, nunca con una dirección. El archivo de
         calendario se crea en su navegador.
       </p>
+
+      {/* Shown once accounts are on (src/lib/config.js), so this page describes the live site. */}
+      {ACCOUNTS_ENABLED && <>
+      <h2 id="accounts">Cuentas (opcionales)</h2>
+      <p>
+        Todo en este sitio funciona sin una cuenta. Una cuenta le permite ver en cualquier dispositivo los funcionarios y
+        proyectos de ley que guarde, y elegir qué actualizaciones por correo desea. Inicia sesión con un enlace o un código que
+        se envía a su correo{AUTH_GOOGLE_ENABLED ? ", o con Google" : ""}; no hay contraseña. La página de su cuenta tiene un
+        botón para descargar todo lo que se describe abajo y otro para eliminarlo.
+      </p>
+      <p>Lo que guarda una cuenta, en la base de datos Supabase del sitio:</p>
+      <ul className="plain">
+        <li><strong>Registro de inicio de sesión:</strong> su correo electrónico, cuándo se creó la cuenta y cuándo inició sesión
+          por última vez. Si inicia sesión con Google, también lo que Google comparte para iniciar sesión: el ID de su cuenta de
+          Google, su nombre, su correo y el enlace a su foto de perfil.</li>
+        <li><strong>Lo que usted guarda:</strong> los identificadores de los funcionarios y proyectos que decida guardar y, si
+          lo desea, los distritos de una búsqueda: solo el estado y los números de distrito. Su dirección nunca se guarda, con
+          o sin cuenta.</li>
+        <li><strong>Opciones de correo:</strong> el correo semanal de votos, las novedades de proyectos y las fechas de
+          elecciones (cada una desactivada hasta que usted la active), el estado para las fechas de elecciones, el idioma de los
+          correos, y un registro de cada vez que activó o desactivó una y desde dónde (la página de su cuenta o un enlace para
+          cancelar la suscripción).</li>
+      </ul>
+      <p>
+        Solo usted puede ver o cambiar lo que guardó y sus opciones; la base de datos se lo niega a cualquier otra persona. El
+        operador del sitio puede verlos en el panel de la base de datos, y no se comparten, no se venden ni se usan para nada
+        distinto de lo que usted eligió. Mientras tenga la sesión iniciada, su navegador guarda la sesión en su almacenamiento
+        local; al cerrar la sesión se borra. Una cuenta no trae cookies, anuncios ni rastreo, y las visitas se cuentan de la
+        misma forma anónima que antes.
+      </p>
+      <p>
+        Todavía no se envían correos. Cuando empiecen, recibirá solo los que haya activado, en el idioma que eligió, y cada uno
+        tendrá un enlace para dejar de recibirlo sin iniciar sesión. Los correos de inicio de sesión los envía el servicio de
+        correo de Supabase.
+      </p>
+      <p>
+        <strong>Eliminar:</strong> "Eliminar mi cuenta", en la página de su cuenta, borra de inmediato de la base de datos la
+        cuenta y todo lo guardado con ella. Pueden quedar copias en las copias de seguridad diarias de la base de datos por un
+        máximo de 7 días; después desaparecen. Lo que su navegador recuerda por su cuenta (su última búsqueda) se queda hasta
+        que lo borre en la página principal.
+      </p>
+      </>}
 
       <h2>De dónde vienen los datos</h2>
       <ul className="plain">
