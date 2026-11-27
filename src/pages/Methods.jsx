@@ -180,7 +180,7 @@ export default function Methods() {
       <p>
         Some sections carry a short plain-language summary, labeled "AI-generated summary," with the section's
         official text one tap away. The text is the record; the summary is a reading aid. The Congressional
-        Research Service's summary, where one exists, stays at the top of the bill's page.
+        Research Service's summary, where one exists, stays near the top of the bill's page.
       </p>
       <p>
         Summaries are written ahead of time by Anthropic's Claude Haiku model from the section's text alone, with
@@ -192,6 +192,32 @@ export default function Methods() {
         under 40 words and tables of contents are not summarized. A summary belongs to one version of the text,
         so a new version gets new summaries. Spanish summaries are written with the English ones and checked
         against them.
+      </p>
+
+      <h2 id="bill-summaries">AI plain-language summaries of bills</h2>
+      <p>
+        Where the Congressional Research Service (CRS) has published a summary of a bill, the site may also show a
+        short version: one sentence on what the bill does and, when it does several distinct things, up to four
+        short points. It appears as "In short" on the bill's page, on the quiz, and as one line under the official
+        title in lists, always marked as written by AI, with the CRS summary and the official text one tap away.
+        Official titles are shown as published.
+      </p>
+      <p>
+        These are written ahead of time by Anthropic's Claude Haiku model from the CRS summary alone (the latest
+        version CRS has published), with the same written instructions for every bill: plain words at about an
+        8th-grade reading level; who must or may do what, amounts and dates as the CRS summary states them; no
+        section numbers or legal citations; no background or outside facts; never purpose, intent, effect, cost,
+        or who gains or loses unless the CRS summary itself reports it; no words that judge. A second request then
+        compares each one with the CRS summary and lists any added fact, any omission that changes the meaning,
+        any statement of intent or impact, any judging word, and any legal citation. A flagged summary is rewritten
+        once with those problems named and checked again; if it still fails, it is not shown. Only summaries that
+        pass are shown. Spanish versions are written with the English ones and checked against them.
+      </p>
+      <p>
+        Each summary is tied to the exact CRS text it was written from. When CRS publishes a new summary (for
+        example, after a bill passes a chamber), the old short version is no longer shown and a new one is written
+        and checked. Bills without a CRS summary don't get one. Covered: bills with a roll-call vote, bills that
+        became law, and bills on This week, from the 118th Congress (2023) on.
       </p>
 
       <h2 id="bill-stage">Where a bill stands</h2>
