@@ -11,6 +11,7 @@ import { NotesList, Ref } from "../components/Notes.jsx";
 import { myRepresentatives } from "../lib/myReps.js";
 import { useCaResults, ResultsStatus, RaceResult, MeasureResult, PartyKey, OFFICE_TITLES } from "../components/CaResults.jsx";
 import { resultsFor } from "../lib/results.js";
+import { byElection, electionNameEs } from "../../lib/measures.js";
 import { shareOn, pctText } from "../../lib/electionResults.js";
 import { generalElectionDate, nextElectionYear, onBallot, senateClassFor, isGubernatorialYear, localOnBallot, yearOfLabel } from "../../lib/upForElection.js";
 
@@ -28,6 +29,7 @@ export default function UpForElection() {
   const state = (params.get("state") ?? "").toUpperCase();
   const [seats, setSeats] = useState(null);
   const [local, setLocal] = useState(null);
+  const [measures, setMeasures] = useState(null);
   const mine = useMemo(() => myRepresentatives(), []);
   const caResults = useCaResults();
   // Official results for this year's election, once published (FEC or House Clerk), and each
@@ -47,6 +49,7 @@ export default function UpForElection() {
       setSeats((s.data ?? []).map((x) => ({ ...x, name: names.get(x.bioguide_id) })));
     });
     fetch("/data/local/ca-orange.json").then((r) => r.json()).then(setLocal).catch(() => setLocal(false));
+    fetch("/data/measures/ca-2028.json").then((r) => r.json()).then(setMeasures).catch(() => {});
   }, []);
 
   useEffect(() => {
@@ -206,6 +209,7 @@ export default function UpForElection() {
                 ? tr("State Senate: the 20 even-numbered districts.", "Senado estatal: los 20 distritos con número par.")
                 : tr("State Senate: the 20 odd-numbered districts.", "Senado estatal: los 20 distritos con número impar.")}</li>
             </ul>
+            {measures && <CaMeasures groups={byElection(measures).filter((e) => e.date.startsWith(`${year}-`))} />}
             {caResults && caResults.election.startsWith(`${year}-`) && <CaResultsBlock data={caResults} />}
           </section>
 
@@ -232,6 +236,28 @@ export default function UpForElection() {
       )}
       <NotesList />
     </main>
+  );
+}
+
+// Statewide measures on this year's California ballots so far, by election, each linked to its entry
+// on the Measures page. Titles as the official lists print them.
+function CaMeasures({ groups }) {
+  if (!groups.length) return null;
+  return (
+    <div id="ca-measures">
+      <h3>{tr("Statewide ballot measures so far", "Medidas estatales en la boleta hasta ahora")}</h3>
+      {groups.map((e) => (
+        <div key={e.date}>
+          <p><strong>{tr(e.name, electionNameEs(e, date))}</strong></p>
+          <ul className="plain">
+            {e.measures.map((m) => (
+              <li key={m.id}><Link to={`/measures#${m.id}`}>{m.label}</Link>: <span lang="en">{m.title}</span>
+                {m.status === "eligible" && <span className="fine"> · {tr("eligible, not yet certified", "elegible, aún no certificada")}</span>}</li>
+            ))}
+          </ul>
+        </div>
+      ))}
+    </div>
   );
 }
 

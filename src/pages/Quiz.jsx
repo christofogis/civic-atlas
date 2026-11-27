@@ -7,6 +7,9 @@ import { myRepresentatives } from "../lib/myReps.js";
 import { congressOn } from "../../lib/congress.js";
 import { tr } from "../lib/lang.js";
 import { PartyTag } from "../components/PartyTag.jsx";
+import Clamp from "../components/Clamp.jsx";
+import { PlainSummary } from "../components/PlainSummary.jsx";
+import { fetchPlainSummaries, plainKey } from "../lib/plainSummaries.js";
 
 const QUESTIONS = 10;
 const MIN_SHARE = 0.1;   // each side needs at least 10% of the votes, so the vote was contested
@@ -35,11 +38,14 @@ async function loadQuestions() {
   const candidates = [...byBill.values()].slice(0, 40);
   const bills = await Promise.all(candidates.map(async (c) => {
     const [cg, t, n] = c.key.split("-");
-    const { data } = await db.from("bills").select("congress,bill_type,number,title,short_title,crs_summary,law_number")
+    const { data } = await db.from("bills").select("congress,bill_type,number,title,short_title,crs_summary,law_number,source_url")
       .eq("congress", cg).eq("bill_type", t).eq("number", n).maybeSingle();
     return data?.crs_summary ? { ...c, bill: data } : null;
   }));
-  return bills.filter(Boolean).slice(0, QUESTIONS);
+  const qs = bills.filter(Boolean).slice(0, QUESTIONS);
+  // Short AI summaries where one has been published; the CRS text stays one tap away.
+  const plain = await fetchPlainSummaries(qs.map((q) => q.bill)).catch(() => new Map());
+  return qs.map((q) => ({ ...q, plain: plain.get(plainKey(q.bill.congress, q.bill.bill_type, q.bill.number)) ?? null }));
 }
 
 async function loadPositions(voteIds) {
@@ -49,10 +55,21 @@ async function loadPositions(voteIds) {
   return rows.flat();
 }
 
-function Summary({ text }) {
-  const [open, setOpen] = useState(false);
-  if (text.length <= 500) return <p>{text}</p>;
-  return <p>{open ? text : `${text.slice(0, 480).replace(/\s+\S*$/, "")}… `}<button className="link" onClick={() => setOpen(!open)}>{open ? tr("Show less", "Mostrar menos") : tr("Read more", "Leer más")}</button></p>;
+// The short AI summary first, with the CRS summary it was checked against behind "Official summary";
+// without a published AI summary, the CRS text cut to a few lines with "more".
+function Summary({ q }) {
+  const b = q.bill;
+  const crsId = `crs-${q.key}`;
+  if (!q.plain) return <p lang="en"><Clamp lines={3}>{b.crs_summary}</Clamp></p>;
+  return (
+    <>
+      <PlainSummary row={q.plain} bill={b} crsHref={`#${crsId}`} />
+      <details className="crs-official" id={crsId}>
+        <summary>{tr("Official summary (CRS)", "Resumen oficial (CRS, en inglés)")}</summary>
+        <p lang="en">{b.crs_summary}</p>
+      </details>
+    </>
+  );
 }
 
 // Bills already asked about on this device, so a returning visitor can see which questions are
@@ -147,7 +164,7 @@ export default function Quiz() {
         return <p>{n ? tr(`${n} of these ${qs.length} questions are new since your last visit: Congress has taken more final votes.`, `${n} de estas ${qs.length} preguntas son nuevas desde su última visita: el Congreso ha tomado más votaciones finales.`)
           : tr("No new final votes since your last visit; these are the same questions.", "No hay nuevas votaciones finales desde su última visita; son las mismas preguntas.")}</p>;
       })()}
-      <p className="fine">{tr(`Question ${step + 1} of ${qs.length}. Answer the way you would have voted; party labels are shown only at the end.`, `Pregunta ${step + 1} de ${qs.length}. Responda como habría votado; los partidos se muestran solo al final. Los resúmenes están en inglés.`)}</p>
+      <p className="fine">{tr(`Question ${step + 1} of ${qs.length}. Answer the way you would have voted; party labels are shown only at the end.`, `Pregunta ${step + 1} de ${qs.length}. Responda como habría votado; los partidos se muestran solo al final.`)}</p>
       <section className="quiz-card">
         <p className="fine">
           {seen.size > 0 && !seen.has(q.key) && <><span className="status-flag ok">{tr("New since your last visit", "Nuevo desde su última visita")}</span>{" "}</>}
@@ -155,8 +172,8 @@ export default function Quiz() {
           {Object.values(q.votes)[0]?.voted_at && <> · {tr("voted", "votado el")} {date(Object.values(q.votes)[0].voted_at)}</>}
         </p>
         <h2>{b.short_title ?? b.title}</h2>
-        <Summary text={b.crs_summary} />
-        <p className="fine">{tr("Summary by the Congressional Research Service.", "Resumen del Servicio de Investigación del Congreso.")} <Link to={`/bill/${b.congress}/${b.bill_type}/${b.number}`} target="_blank">{tr("Bill page", "Página del proyecto")}</Link></p>
+        <Summary q={q} key={q.key} />
+        <p className="fine">{!q.plain && <>{tr("Summary by the Congressional Research Service.", "Resumen del Servicio de Investigación del Congreso, en inglés.")} </>}<Link to={`/bill/${b.congress}/${b.bill_type}/${b.number}`} target="_blank">{tr("Bill page", "Página del proyecto")}</Link></p>
         <p>{tr("Would you have voted for it?", "¿Habría votado a favor?")}</p>
         <div className="quiz-buttons">
           <button type="button" onClick={() => choose("yes")}>{tr("Yes", "Sí")}</button>

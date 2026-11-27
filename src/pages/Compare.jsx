@@ -7,6 +7,8 @@ import { billLabel, ordinal, partyTag, date, easternDay } from "../lib/format.js
 import { tr } from "../lib/lang.js";
 import { PartyTag } from "../components/PartyTag.jsx";
 import VoteResult from "../components/VoteResult.jsx";
+import { PlainLead } from "../components/PlainSummary.jsx";
+import { usePlainSummaries, voteBill } from "../lib/plainSummaries.js";
 
 const BIOGUIDE = /^[A-Z][0-9]{6}$/;
 const pct = (n, d) => (d ? `${Math.round((1000 * n) / d) / 10}%` : "—");
@@ -45,6 +47,7 @@ export default function Compare() {
   const [members, setMembers] = useState([]);
   const [result, setResult] = useState({ status: "idle" });
   const [shown, setShown] = useState(50);
+  const plain = usePlainSummaries(result.status === "done" ? result.differed.slice(0, shown).map(voteBill).filter(Boolean) : []);
   const pick = (k, id) => { const n = new URLSearchParams(params); n.set(k, id); setParams(n, { replace: true }); };
 
   useEffect(() => {
@@ -120,6 +123,7 @@ export default function Compare() {
                                   {v.bill_type ? <Link to={`/bill/${v.bill_congress}/${v.bill_type}/${v.bill_number}`}>{billLabel({ bill_type: v.bill_type, number: v.bill_number })}</Link> : v.description}
                                   {" · "}<VoteResult v={v} />
                                 </div>
+                                <PlainLead map={plain} bill={voteBill(v)} />
                               </td>
                               <td data-label={`${short(ma)}:`}>{v.a_position}</td>
                               <td data-label={`${short(mb)}:`}>{v.b_position}</td>

@@ -20,10 +20,14 @@ import { tr } from "../lib/lang.js";
 import { ballotYearFor, generalElectionDate } from "../../lib/upForElection.js";
 import { NotesList, NotesProvider, Ref } from "../components/Notes.jsx";
 import { PartyName } from "../components/PartyTag.jsx";
+import { termPartyPeriods } from "../../lib/partyPeriods.js";
 import { CandidateTable } from "./Elections.jsx";
 import { useCaResults, ResultsStatus, RaceResult, PartyKey } from "../components/CaResults.jsx";
 import { decodeEntities } from "../../lib/ptr.js";
 import VoteResult from "../components/VoteResult.jsx";
+import { PlainLead } from "../components/PlainSummary.jsx";
+import { usePlainSummaries, voteBill } from "../lib/plainSummaries.js";
+import SaveToggle from "../components/SaveToggle.jsx";
 
 const BIOGUIDE = /^[A-Z][0-9]{6}$/;
 const TERRITORIES = new Set(["DC", "PR", "GU", "VI", "AS", "MP"]);
@@ -80,7 +84,7 @@ const SECTION_DATA = {
   votes: async (id) => ({
     // member_votes starts from the member's positions (indexed), so this stays fast.
     votes: await one(db.from("member_votes")
-      .select("vote_id,chamber,question,result,voted_at,description,document_name,source_url,position,bill_type,bill_number,yea_total,nay_total,required,amendment_ref")
+      .select("vote_id,chamber,question,result,voted_at,description,document_name,source_url,position,bill_congress,bill_type,bill_number,yea_total,nay_total,required,amendment_ref")
       .eq("bioguide_id", id).order("voted_at", { ascending: false }).limit(120))
       .then((rows) => rows.map((v) => ({ ...v, vote_positions: [{ position: v.position }] }))),
   }),
@@ -319,6 +323,8 @@ export default function Member() {
     const m = state.data?.member;
     if (m) document.title = `${m.official_full_name ?? `${m.first_name} ${m.last_name}`} · Civic Atlas`;
   }, [state.data]);
+  // AI one-line summaries for the sponsored bills and the bills voted on, once those sections load.
+  const plain = usePlainSummaries([...(more.bills?.bills ?? []), ...(more.votes?.votes ?? []).map(voteBill).filter(Boolean)]);
   if (state.status === "loading") return <main className="page"><p>{tr("Loading…", "Cargando…")}</p></main>;
   if (state.status === "missing") return <main className="page"><h1>{tr("Member not found", "Miembro no encontrado")}</h1><p><Link to="/">{tr("Back to search", "Volver a la búsqueda")}</Link></p></main>;
   if (state.status === "error") return <main className="page"><p className="notice">{tr("Couldn't load this page right now. Try again shortly.", "No se pudo cargar esta página. Inténtelo de nuevo en un momento.")}</p></main>;
@@ -387,6 +393,7 @@ export default function Member() {
         ) : (
           <p className="lede">{tr("Not currently serving. Most recent", "No está en el cargo. Último cargo")}: {seatLabel(latest)}, {date(latest.start_date)} – {date(latest.end_date)} <PartyName party={latest.party} /></p>
         )}
+        <SaveToggle official={m.bioguide_id} />
       </header>
 
       <AtAGlance terms={terms} voteStats={voteStats} medians={medians} billStats={billStats} laws={laws}
@@ -443,6 +450,7 @@ export default function Member() {
                     <KindLabel v={v} />
                     <a href={v.source_url} lang="en">{v.question}</a>
                     {(v.document_name || v.description) && <div className="fine"><LinkedText text={[v.document_name, v.description].filter(Boolean).join(" · ")} congress={congressOn(new Date(v.voted_at))} /></div>}
+                    <PlainLead map={plain} bill={voteBill(v)} />
                   </td>
                   <td data-label={tr("Vote:", "Voto:")}><Position v={v} position={v.vote_positions[0]?.position} /></td>
                   <td data-label={tr("Result:", "Resultado:")}><VoteResult v={v} /></td>
@@ -487,6 +495,7 @@ export default function Member() {
             {bills.map((b) => (
               <li key={`${b.congress}-${b.bill_type}-${b.number}`}>
                 <Link to={`/bill/${b.congress}/${b.bill_type}/${b.number}`}>{billLabel(b)}</Link> ({ordinal(b.congress)}) · <span lang="en">{b.short_title ?? b.title}</span>{b.law_number && <> · <strong>{b.law_number}</strong></>}
+                <PlainLead map={plain} bill={b} />
                 <div className="fine">{tr("Introduced", "Presentado el")} {date(b.introduced_date)}{b.latest_action_text && <> · {tr("Latest action", "Última acción")} {date(b.latest_action_date)}: <span lang="en">{b.latest_action_text}</span></>}</div>
               </li>
             ))}
@@ -604,7 +613,7 @@ export default function Member() {
         {terms.some((t) => t.chamber === "house" && t.state === "CA") && <CaHouseResult bioguide={m.bioguide_id} />}
         <ul className="plain">
           {terms.map((t) => (
-            <li key={`${t.chamber}-${t.start_date}`}>{seatLabel(t)} <PartyName party={t.party} /> · {date(t.start_date)} – {date(t.end_date)}</li>
+            <li key={`${t.chamber}-${t.start_date}`}><TermLine t={t} /></li>
           ))}
         </ul>
       </Section>
@@ -627,6 +636,22 @@ export default function Member() {
       <NotesList />
     </main>
     </NotesProvider>
+  );
+}
+
+// One term: seat, party, dates. When the member changed party during the term (the source lists
+// each stretch), every stretch is given with its dates, the last one "from" its start: "Democrat,
+// Jan 3, 2019 – May 31, 2024; Independent from May 31, 2024". Same wording for every member.
+function TermLine({ t }) {
+  const periods = termPartyPeriods(t);
+  if (periods.length === 1) return <>{seatLabel(t)} <PartyName party={periods[0].party} /> · {date(t.start_date)} – {date(t.end_date)}</>;
+  return (
+    <>{seatLabel(t)} · {date(t.start_date)} – {date(t.end_date)} · {periods.map((p, i) => (
+      <span key={p.start_date}>{i ? "; " : ""}<PartyName party={p.party} />
+        {i === periods.length - 1
+          ? tr(` from ${date(p.start_date)}`, ` desde el ${date(p.start_date)}`)
+          : `, ${date(p.start_date)} – ${date(p.end_date)}`}</span>
+    ))}</>
   );
 }
 

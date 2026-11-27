@@ -8,6 +8,7 @@ import { clock, weekIcs, weekItems } from "../../lib/yourWeek.js";
 import MyReps from "../components/MyReps.jsx";
 import { StatePartyTag, statePersonPath } from "../components/StateOfficialCard.jsx";
 import { NotesList, Ref } from "../components/Notes.jsx";
+import { nextElection } from "../../lib/measures.js";
 
 // "Your week": everything coming up for the officials from the visitor's last lookup, at every
 // level, on one list (and as a calendar file), followed by what their members of Congress did in
@@ -39,7 +40,7 @@ export default function YourWeek() {
 
   const [election, setElection] = useState(null);
   useEffect(() => {
-    if (params.get("st") === "CA") fetch("/data/measures/ca-2028.json").then((r) => r.json()).then((m) => setElection(m.election)).catch(() => {});
+    if (params.get("st") === "CA") fetch("/data/measures/ca-2028.json").then((r) => r.json()).then((m) => setElection(nextElection(m, new Date().toISOString().slice(0, 10))?.date ?? null)).catch(() => {});
   }, [params]);
 
   if (!saved) {

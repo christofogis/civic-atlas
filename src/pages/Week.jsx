@@ -14,6 +14,8 @@ import { tr } from "../lib/lang.js";
 import { Fold, useFolds } from "../components/Fold.jsx";
 import Clamp from "../components/Clamp.jsx";
 import VoteResult from "../components/VoteResult.jsx";
+import { PlainLead } from "../components/PlainSummary.jsx";
+import { usePlainSummaries } from "../lib/plainSummaries.js";
 
 const DAY = 86400000;
 const iso = (d) => d.toISOString().slice(0, 10);
@@ -22,6 +24,7 @@ const iso = (d) => d.toISOString().slice(0, 10);
 // recorded vote, with the visitor's representatives' positions if they looked them up.
 export default function Week() {
   const [state, setState] = useState({ status: "loading" });
+  const plain = usePlainSummaries([...(state.laws ?? []), ...(state.passed ?? [])]);
   const [allVotes, setAllVotes] = useState(false);
   const mine = useMemo(() => myRepresentatives(), []);
   const [upcoming, setUpcoming] = useState(null);
@@ -143,7 +146,7 @@ export default function Week() {
         summary={loading ? wait : tr(`${laws.length} in the last week with votes${vetoed.length ? `; ${vetoed.length} vetoed` : ""}`, `${laws.length} en la última semana con votaciones${vetoed.length ? `; ${vetoed.length} vetados` : ""}`)}>
           <section className="section">
             {laws.length === 0 ? <p>{tr("None this week.", "Ninguno esta semana.")}</p> : (
-              <ul className="bare items">{laws.map((b) => <li key={`${b.bill_type}${b.number}`} className="item"><span className="item-head">{billLink(b)} <span className="fine">· {b.law_number} · {tr("signed", "firmado el")} {date(b.became_law_date)}</span></span><Clamp lines={2}>{b.short_title ?? b.title}</Clamp></li>)}</ul>
+              <ul className="bare items">{laws.map((b) => <li key={`${b.bill_type}${b.number}`} className="item"><span className="item-head">{billLink(b)} <span className="fine">· {b.law_number} · {tr("signed", "firmado el")} {date(b.became_law_date)}</span></span><Clamp lines={2}>{b.short_title ?? b.title}</Clamp><PlainLead map={plain} bill={b} /></li>)}</ul>
             )}
             {vetoed.length > 0 && <p>{tr("Vetoed", "Vetados")}: {vetoed.map((b, i) => <span key={b.number}>{i ? "; " : ""}{billLink(b)} <span lang="en">{b.short_title ?? b.title}</span> ({date(b.vetoed_date)})</span>)}</p>}
           </section>
@@ -152,7 +155,7 @@ export default function Week() {
         summary={loading ? wait : tr(`${passed.length} passed the House or Senate in the last week with votes`, `${passed.length} aprobados por la Cámara o el Senado en la última semana con votaciones`)}>
           <section className="section">
             {passed.length === 0 ? <p>{tr("None this week.", "Ninguno esta semana.")}</p> : (
-              <ul className="bare items">{passed.map((b) => <li key={`${b.bill_type}${b.number}`} className="item"><span className="item-head">{billLink(b)} <span className="fine">· {tr("passed the", "aprobado por:")} {passedWhere(b)}</span></span><Clamp lines={2}>{b.short_title ?? b.title}</Clamp></li>)}</ul>
+              <ul className="bare items">{passed.map((b) => <li key={`${b.bill_type}${b.number}`} className="item"><span className="item-head">{billLink(b)} <span className="fine">· {tr("passed the", "aprobado por:")} {passedWhere(b)}</span></span><Clamp lines={2}>{b.short_title ?? b.title}</Clamp><PlainLead map={plain} bill={b} /></li>)}</ul>
             )}
             <p className="fine">{tr("Includes bills and resolutions passed by voice vote, which have no roll call.", "Incluye proyectos y resoluciones aprobados a viva voz, que no tienen votación nominal.")}</p>
           </section>

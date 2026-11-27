@@ -1,0 +1,65 @@
+name: Bill plain summaries (AI)
+
+# Short plain-language summaries of whole bills (one sentence and up to four points), written by
+# Claude through Anthropic's Batch API from each bill's CRS summary, checked before publishing.
+# Daily after the evening votes and bills runs: bills that newly got a roll-call vote, became law
+# or appear on /week, newest first, plus a redo of any whose CRS summary changed.
+on:
+  schedule:
+    - cron: "7 2 * * *"   # 6:07pm PST / 7:07pm PDT, after the 4:47pm votes and 5:23pm bills runs
+  workflow_dispatch:
+    inputs:
+      bills:
+        description: "Bills to summarize, e.g. 119-hr-1,119-s-2 (blank: voted on, became law or on /week, newest first)"
+        type: string
+        default: ""
+      limit:
+        description: "New summaries per run when no list is given"
+        type: string
+        default: "100"
+      wait:
+        description: "Minutes to wait for the batch before leaving it for the next run"
+        type: string
+        default: "90"
+      redo:
+        description: "Summarize again and replace existing summaries (after the instructions change)"
+        type: boolean
+        default: false
+      dry_run:
+        description: "Build the requests, print one and a cost estimate; send nothing, write nothing"
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+concurrency:
+  group: bill-summaries
+  cancel-in-progress: false
+
+jobs:
+  summarize:
+    runs-on: ubuntu-latest
+    timeout-minutes: 240
+    env:
+      SUPABASE_URL: https://fkbzxaoeyrtzviyfzulq.supabase.co
+      SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+      # A dry run never calls the API, so it gets no key.
+      ANTHROPIC_API_KEY: ${{ !inputs.dry_run && secrets.ANTHROPIC_API_KEY || '' }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Summarize
+        env:
+          BILLS: ${{ inputs.bills }}
+          LIMIT: ${{ inputs.limit || '100' }}
+          WAIT: ${{ inputs.wait || '90' }}
+          DRY_RUN: ${{ inputs.dry_run && '--dry-run' || '' }}
+          REDO: ${{ inputs.redo && '--redo' || '' }}
+        run: |
+          if [ -n "$BILLS" ]; then node scripts/ingest/bill-summaries.mjs --bills "$BILLS" --wait "$WAIT" $DRY_RUN $REDO
+          else node scripts/ingest/bill-summaries.mjs --limit "$LIMIT" --wait "$WAIT" $DRY_RUN $REDO; fi

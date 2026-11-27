@@ -3,6 +3,7 @@ import AccuracyStatus from "../components/AccuracyStatus.jsx";
 import { Link, useLocation } from "react-router-dom";
 import { getLang } from "../lib/lang.js";
 import MethodsEs from "./MethodsEs.jsx";
+import { ACCOUNTS_ENABLED, AUTH_GOOGLE_ENABLED } from "../lib/config.js";
 
 // How every number on the site is produced. Keep this in step with the code:
 // supabase/migrations/*_member_vote_stats.sql and scripts/ingest/*.
@@ -68,7 +69,9 @@ export default function Methods() {
       </ul>
       <p>
         Party is taken as of the date the bill was introduced (for the sponsor) or cosponsored (for the
-        cosponsor); independents count with the party they caucus with. Withdrawn cosponsorships don't
+        cosponsor); independents count with the party they caucus with. When a member changed party during
+        a term, the party on that date is used, from the dates listed in the congress-legislators dataset
+        (the same dates appear in the member page's list of terms and beside names on bill pages). Withdrawn cosponsorships don't
         count. Rates aren't shown below 20 cosponsored or 10 introduced bills. Cosponsorship reflects
         support for introducing a bill, not how a member later votes on it.
       </p>
@@ -180,7 +183,7 @@ export default function Methods() {
       <p>
         Some sections carry a short plain-language summary, labeled "AI-generated summary," with the section's
         official text one tap away. The text is the record; the summary is a reading aid. The Congressional
-        Research Service's summary, where one exists, stays at the top of the bill's page.
+        Research Service's summary, where one exists, stays near the top of the bill's page.
       </p>
       <p>
         Summaries are written ahead of time by Anthropic's Claude Haiku model from the section's text alone, with
@@ -192,6 +195,32 @@ export default function Methods() {
         under 40 words and tables of contents are not summarized. A summary belongs to one version of the text,
         so a new version gets new summaries. Spanish summaries are written with the English ones and checked
         against them.
+      </p>
+
+      <h2 id="bill-summaries">AI plain-language summaries of bills</h2>
+      <p>
+        Where the Congressional Research Service (CRS) has published a summary of a bill, the site may also show a
+        short version: one sentence on what the bill does and, when it does several distinct things, up to four
+        short points. It appears as "In short" on the bill's page, on the quiz, and as one line under the official
+        title in lists, always marked as written by AI, with the CRS summary and the official text one tap away.
+        Official titles are shown as published.
+      </p>
+      <p>
+        These are written ahead of time by Anthropic's Claude Haiku model from the CRS summary alone (the latest
+        version CRS has published), with the same written instructions for every bill: plain words at about an
+        8th-grade reading level; who must or may do what, amounts and dates as the CRS summary states them; no
+        section numbers or legal citations; no background or outside facts; never purpose, intent, effect, cost,
+        or who gains or loses unless the CRS summary itself reports it; no words that judge. A second request then
+        compares each one with the CRS summary and lists any added fact, any omission that changes the meaning,
+        any statement of intent or impact, any judging word, and any legal citation. A flagged summary is rewritten
+        once with those problems named and checked again; if it still fails, it is not shown. Only summaries that
+        pass are shown. Spanish versions are written with the English ones and checked against them.
+      </p>
+      <p>
+        Each summary is tied to the exact CRS text it was written from. When CRS publishes a new summary (for
+        example, after a bill passes a chamber), the old short version is no longer shown and a new one is written
+        and checked. Bills without a CRS summary don't get one. Covered: bills with a roll-call vote, bills that
+        became law, and bills on This week, from the 118th Congress (2023) on.
       </p>
 
       <h2 id="bill-stage">Where a bill stands</h2>
@@ -509,6 +538,42 @@ export default function Methods() {
         district numbers saved on your device or carried in the page's link, never from an address. The
         calendar file is made in your browser.
       </p>
+
+      {/* Shown once accounts are on (src/lib/config.js), so this page describes the live site. */}
+      {ACCOUNTS_ENABLED && <>
+      <h2 id="accounts">Accounts (optional)</h2>
+      <p>
+        Everything on this site works without an account. An account lets you keep the officials and bills you save
+        on any device and choose which email updates you want. You sign in with a link or code sent to your email
+        {AUTH_GOOGLE_ENABLED ? ", or with Google" : ""}; there is no password. Your account page has
+        a button to download everything below and a button to delete it.
+      </p>
+      <p>What an account stores, in the site's Supabase database:</p>
+      <ul className="plain">
+        <li><strong>Sign-in record:</strong> your email address, when the account was made and when you last signed in. If you
+          sign in with Google, also what Google shares for sign-in: your Google account ID, name, email and profile picture link.</li>
+        <li><strong>What you save:</strong> the IDs of officials and bills you choose to save and, if you choose, the districts
+          from a lookup: the state and district numbers only. Your street address is never stored, with or without an account.</li>
+        <li><strong>Email choices:</strong> the weekly votes email, bill updates and election dates (each off until you turn it
+          on), the state for election dates, the email language, and a record of each time you turned one on or off and
+          where (your account page or an unsubscribe link).</li>
+      </ul>
+      <p>
+        Only you can read or change your saved items and choices; the database refuses everyone else. The site's operator can
+        see them in the database's own dashboard, and they are not shared, sold or used for anything other than what you
+        chose. While you're signed in, your browser keeps the sign-in session in its local storage; signing out removes it.
+        No cookies, ads or tracking come with an account, and visits are counted the same anonymous way as before.
+      </p>
+      <p>
+        No emails are sent yet. When they start, you will get only the ones you turned on, in the language you chose, and each
+        will have a link that stops it without signing in. Sign-in emails are sent by Supabase's email service.
+      </p>
+      <p>
+        <strong>Deleting:</strong> "Delete my account" on your account page removes the account and everything saved with it
+        from the database at once. Copies can remain in the database's daily backups for up to 7 days, after which they are gone.
+        What your browser remembers on its own (your last lookup) stays until you clear it on the home page.
+      </p>
+      </>}
 
       <h2>Where the data comes from</h2>
       <ul className="plain">

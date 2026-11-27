@@ -45,6 +45,7 @@ const NO_SOCIAL = { social_x: null, social_facebook: null, social_youtube: null,
 export function mapLegislators(legislators, social = new Map()) {
   const members = [];
   const terms = [];
+  const periods = [];
   for (const m of legislators) {
     const id = m.id;
     members.push({
@@ -85,10 +86,23 @@ export function mapLegislators(legislators, social = new Map()) {
         address: t.address ?? null,
         contact_form: t.contact_form ?? null,
       });
+      periods.push(...mapPartyPeriods(id.bioguide, house ? "house" : "senate", t));
     }
   }
-  return { members, terms, roles: mapLeadership(legislators) };
+  return { members, terms, periods, roles: mapLeadership(legislators) };
 }
+
+// A term's party_affiliations (listed only when the member changed party during the term), one
+// row per stretch, dates as the source gives them. The term's own `party` is the last one listed,
+// so a term without this list had one party throughout and gets no rows.
+export function mapPartyPeriods(bioguide_id, chamber, t) {
+  return (t.party_affiliations ?? []).filter((p) => p.start && p.end && p.party).map((p) => ({
+    bioguide_id, chamber, term_start_date: t.start,
+    start_date: p.start, end_date: p.end, party: p.party, caucus: p.caucus ?? null,
+  }));
+}
+export const periodKey = (p) => `${p.bioguide_id}|${p.chamber}|${p.term_start_date}|${p.start_date}`;
+const PERIOD_FIELDS = ["end_date", "party", "caucus"];
 
 // Leadership posts (Speaker, floor leaders, whips, conference officers), title verbatim.
 // The same title starting on the same day twice for one member is one row.
@@ -143,14 +157,14 @@ async function main() {
     .filter((m) => m.terms.at(-1).end >= HISTORY_FROM);
   const social = mapSocial(await load("legislators-social-media.yaml", arg("--dir")));
   const mapped = mapLegislators([...current, ...recentFormer], social);
-  const { members, terms } = mapped;
+  const { members, terms, periods } = mapped;
   const corrections = JSON.parse(readFileSync(new URL("../../data/corrections/leadership.json", import.meta.url), "utf8")).corrections;
   const { roles, retired } = applyLeadershipCorrections(mapped.roles, corrections);
   for (const c of retired) console.log(`correction no longer needed (dataset has it; delete from data/corrections/leadership.json): ${c.action} ${c.bioguide_id} ${c.title}`);
-  console.log(`source: ${current.length} current + ${recentFormer.length} former members, ${terms.length} terms, ${roles.length} leadership roles`);
+  console.log(`source: ${current.length} current + ${recentFormer.length} former members, ${terms.length} terms (${periods.length} party periods), ${roles.length} leadership roles`);
 
   if (dryRun) {
-    if (arg("--out")) writeFileSync(arg("--out"), JSON.stringify({ members, terms, roles }));
+    if (arg("--out")) writeFileSync(arg("--out"), JSON.stringify({ members, terms, periods, roles }));
     console.log("dry run: nothing written");
     return;
   }
@@ -178,14 +192,15 @@ async function main() {
     await upsertBatches(db, "terms", termWrites, "bioguide_id,chamber,start_date");
 
     const leadership = await syncLeadership(db, roles);
+    const party = await syncPartyPeriods(db, periods);
 
     const inserted =
       memberWrites.filter((m) => !existingMembers.has(m.bioguide_id)).length +
-      termWrites.filter((t) => !existingTerms.has(termKey(t))).length + leadership.inserted;
+      termWrites.filter((t) => !existingTerms.has(termKey(t))).length + leadership.inserted + party.inserted;
     return {
       rows_inserted: inserted,
-      rows_updated: memberWrites.length + termWrites.length + leadership.written - inserted,
-      rows_deleted: leadership.deleted,
+      rows_updated: memberWrites.length + termWrites.length + leadership.written + party.written - inserted,
+      rows_deleted: leadership.deleted + party.deleted,
     };
   });
   console.log(`done: ${counts.rows_inserted} inserted, ${counts.rows_updated} updated`);
@@ -213,6 +228,30 @@ async function syncLeadership(db, roles) {
   }
   const inserted = writes.filter((r) => !existing.has(roleKey(r))).length;
   console.log(`leadership roles: ${inserted} inserted, ${writes.length - inserted} updated, ${stale.length} deleted`);
+  return { inserted, written: writes.length, deleted: stale.length };
+}
+
+// Mirror the source's party_affiliations (after terms: each row references its term). A row the
+// source no longer lists is deleted, the same rule as leadership roles.
+async function syncPartyPeriods(db, periods) {
+  const { error: missing } = await db.from("term_party_periods").select("bioguide_id").limit(1);
+  if (missing && !/schema cache|does not exist/i.test(missing.message)) throw new Error(`read term_party_periods: ${missing.message}`);
+  if (missing) {
+    console.warn(`term_party_periods skipped: ${String(missing.message).slice(0, 120)}`);
+    return { inserted: 0, written: 0, deleted: 0 };
+  }
+  const existing = new Map((await fetchAll(db, "term_party_periods", "bioguide_id,chamber,term_start_date,start_date,end_date,party,caucus")).map((r) => [periodKey(r), r]));
+  const writes = periods.filter((p) => !existing.has(periodKey(p)) || changed(p, existing.get(periodKey(p)), PERIOD_FIELDS));
+  await upsertBatches(db, "term_party_periods", writes, "bioguide_id,chamber,term_start_date,start_date");
+  const keep = new Set(periods.map(periodKey));
+  const stale = [...existing.values()].filter((r) => !keep.has(periodKey(r)));
+  for (const r of stale) {
+    const { error } = await db.from("term_party_periods").delete()
+      .eq("bioguide_id", r.bioguide_id).eq("chamber", r.chamber).eq("term_start_date", r.term_start_date).eq("start_date", r.start_date);
+    if (error) throw new Error(`delete term_party_periods: ${error.message}`);
+  }
+  const inserted = writes.filter((p) => !existing.has(periodKey(p))).length;
+  console.log(`party periods: ${inserted} inserted, ${writes.length - inserted} updated, ${stale.length} deleted`);
   return { inserted, written: writes.length, deleted: stale.length };
 }
 

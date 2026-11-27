@@ -61,7 +61,7 @@ export default function FirstTimeVoter() {
             `La próxima elección general es el ${date(generalElectionDate(year))}. Vea qué escaños están en la boleta y quién los ocupa ahora.`)}</p>
           <p><Link className="button-primary" to={`/on-the-ballot?year=${year}`}>{t(`On the ballot in ${year}`, `En la boleta en ${year}`)}</Link></p>
           {state === "CA" && year === 2028 && (
-            <p className="fine"><Link to="/measures">{t("California's 2028 ballot measures", "Medidas en la boleta de California en 2028")}</Link></p>
+            <p className="fine"><Link to="/measures">{t("California's 2028 ballot measures: March 7 primary and November 7 general election", "Medidas en la boleta de California en 2028: primaria del 7 de marzo y elección general del 7 de noviembre")}</Link></p>
           )}
         </li>
 
