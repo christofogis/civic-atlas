@@ -223,6 +223,18 @@ export default function MethodsEs() {
         Los candidatos inscritos están en la página de candidatos de 2028.
       </p>
 
+      <h2 id="first-time-voter">¿Va a votar por primera vez?</h2>
+      <p>
+        La página ¿Va a votar por primera vez? da tres pasos: inscribirse, conocer su boleta y saber quién le representa.
+        Solo afirma lo que no cambia de un estado a otro: la Enmienda 26 fija la edad para votar en 18 años para los
+        ciudadanos de EE. UU. Las fechas límite, las reglas de identificación y las edades de preinscripción varían según el
+        estado y cambian, así que la página no las enumera; enlaza a vote.gov, el sitio de inscripción del gobierno de
+        EE. UU., que lleva a la oficina electoral de cada estado. Para quienes visitan desde California (según una búsqueda
+        guardada en este dispositivo) también enlaza a las páginas de la Secretaría de Estado para inscribirse en línea,
+        consultar el estado de la inscripción y preinscribirse. Se comprobó que esos enlaces respondían en noviembre de
+        2026. Los enlaces propios de otros estados se agregarán solo desde fuentes oficiales.
+      </p>
+
       <h2 id="ca-results">Resultados electorales de California</h2>
       <p>
         Los resultados de la elección general del 3 de noviembre de 2026 en California provienen de la Secretaría de

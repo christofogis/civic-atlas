@@ -227,6 +227,17 @@ export default function Methods() {
         Candidates who have filed are on the 2028 candidates page.
       </p>
 
+      <h2 id="first-time-voter">First time voting?</h2>
+      <p>
+        The First time voting page gives three steps: register, know your ballot, know who represents you. It states only
+        what doesn't vary from state to state: the 26th Amendment sets the voting age at 18 for U.S. citizens. Deadlines,
+        ID rules and pre-registration ages differ by state and change, so the page doesn't list them; it links to vote.gov,
+        the U.S. government's registration site, which leads to every state's election office. For California visitors
+        (from a lookup saved on this device) it also links to the Secretary of State's online registration, registration
+        status and pre-registration pages. Those links were checked to respond in November 2026. Other states' own links
+        will be added only from official sources.
+      </p>
+
       <h2 id="ca-results">California election results</h2>
       <p>
         Results for California's November 3, 2026 general election come from the California Secretary of State. While
