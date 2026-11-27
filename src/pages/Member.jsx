@@ -131,9 +131,10 @@ function ByStateShare({ home, rows }) {
         <span className="share-in" style={{ width: `${pct}%` }} />
       </div>
       <table>
+        <caption className="visually-hidden">{tr("Where itemized donors live", "Dónde viven los donantes detallados")}</caption>
         <tbody>
-          <tr><td>{tr(`From ${stateName(home)}`, `De ${stateName(home)}`)}</td><td>{money(inState)}</td><td>{pct}%</td></tr>
-          <tr><td>{tr("From other states and abroad", "De otros estados y del extranjero")}</td><td>{money(total - inState)}</td><td>{100 - pct}%</td></tr>
+          <tr><th scope="row" className="row-head">{tr(`From ${stateName(home)}`, `De ${stateName(home)}`)}</th><td>{money(inState)}</td><td>{pct}%</td></tr>
+          <tr><th scope="row" className="row-head">{tr("From other states and abroad", "De otros estados y del extranjero")}</th><td>{money(total - inState)}</td><td>{100 - pct}%</td></tr>
         </tbody>
       </table>
       {top.length > 0 && <p className="fine">{tr("Largest other states: ", "Otros estados con más: ")}{top.map((r) => `${stateName(r.state)} ${money(Number(r.total))}`).join(", ")}.</p>}
@@ -188,9 +189,10 @@ function FinanceDetail({ cycle, bySize, byState, home, employers, pacs, outside,
         <>
           <h4>{tr("Individual contributions by size", "Contribuciones individuales por monto")}</h4>
           <table>
+            <caption className="visually-hidden">{tr("Individual contributions by size", "Contribuciones individuales por monto")}</caption>
             <tbody>
               {[...bySize].sort((a, b) => a.size_bucket - b.size_bucket).map((r) => (
-                <tr key={r.size_bucket}><td>{SIZE_LABEL()[r.size_bucket] ?? `$${r.size_bucket}+`}</td><td>{money(Number(r.total))}</td><td>{sizeTotal ? `${Math.round((100 * Number(r.total)) / sizeTotal)}%` : ""}</td></tr>
+                <tr key={r.size_bucket}><th scope="row" className="row-head">{SIZE_LABEL()[r.size_bucket] ?? `$${r.size_bucket}+`}</th><td>{money(Number(r.total))}</td><td>{sizeTotal ? `${Math.round((100 * Number(r.total)) / sizeTotal)}%` : ""}</td></tr>
               ))}
             </tbody>
           </table>
@@ -439,7 +441,7 @@ export default function Member() {
                   <td className="vt-q">
                     <VoteMeaning v={v} />
                     <KindLabel v={v} />
-                    <a href={v.source_url}>{v.question}</a>
+                    <a href={v.source_url} lang="en">{v.question}</a>
                     {(v.document_name || v.description) && <div className="fine"><LinkedText text={[v.document_name, v.description].filter(Boolean).join(" · ")} congress={congressOn(new Date(v.voted_at))} /></div>}
                   </td>
                   <td data-label={tr("Vote:", "Voto:")}><Position v={v} position={v.vote_positions[0]?.position} /></td>
@@ -484,8 +486,8 @@ export default function Member() {
           <ul className="plain">
             {bills.map((b) => (
               <li key={`${b.congress}-${b.bill_type}-${b.number}`}>
-                <Link to={`/bill/${b.congress}/${b.bill_type}/${b.number}`}>{billLabel(b)}</Link> ({ordinal(b.congress)}) · {b.short_title ?? b.title}{b.law_number && <> · <strong>{b.law_number}</strong></>}
-                <div className="fine">{tr("Introduced", "Presentado el")} {date(b.introduced_date)}{b.latest_action_text && <> · {tr("Latest action", "Última acción")} {date(b.latest_action_date)}: {b.latest_action_text}</>}</div>
+                <Link to={`/bill/${b.congress}/${b.bill_type}/${b.number}`}>{billLabel(b)}</Link> ({ordinal(b.congress)}) · <span lang="en">{b.short_title ?? b.title}</span>{b.law_number && <> · <strong>{b.law_number}</strong></>}
+                <div className="fine">{tr("Introduced", "Presentado el")} {date(b.introduced_date)}{b.latest_action_text && <> · {tr("Latest action", "Última acción")} {date(b.latest_action_date)}: <span lang="en">{b.latest_action_text}</span></>}</div>
               </li>
             ))}
           </ul>
