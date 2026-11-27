@@ -46,7 +46,7 @@ export default function EmbedMember() {
   const latest = terms[0];
   const name = m.official_full_name ?? `${m.first_name} ${m.last_name}`;
   return (
-    <div className="embed">
+    <main className="embed">
       <h1><a href={full} target="_blank" rel="noopener">{name}</a></h1>
       <p className="fine">
         {seat?.seat_status === "serving" ? <>{seatLabel(seat)} <PartyName party={seat.party} /></> : latest ? <>{tr("Former member", "Exmiembro")} · {seatLabel(latest)} <PartyName party={latest.party} /></> : ""}
@@ -69,6 +69,6 @@ export default function EmbedMember() {
       <p className="fine embed-foot">
         <a href={full} target="_blank" rel="noopener">{tr("Full record: votes, bills, money and trades", "Registro completo: votos, proyectos, dinero y acciones")}</a> · {tr("From official sources, via Civic Atlas", "De fuentes oficiales, vía Civic Atlas")}
       </p>
-    </div>
+    </main>
   );
 }

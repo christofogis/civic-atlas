@@ -83,7 +83,7 @@ export default function Committee() {
     <main className="page wide">
       <p className="fine"><Link to="/committees">{tr("Committees", "Comités")}</Link>{c.parent && <> · <Link to={`/committee/${c.parent.committee_id}`}>{c.parent.name}</Link></>}</p>
       <h1>{c.chamber === "joint" || /^(house|senate)\b/i.test(c.name) ? c.name : `${chamberName} ${c.name}`}</h1>
-      {c.url && <p className="fine"><a href={c.url}>{tr("Committee website", "Sitio web del comité (en inglés)")}</a></p>}
+      {c.url && <p className="fine"><a className="tap" href={c.url}>{tr("Committee website", "Sitio web del comité (en inglés)")}</a></p>}
       <Follow calendar={`/api/calendar/committee/${c.committee_id}`} />
 
       <p className="fold-hint">{tr("Tap a topic to see the details.", "Toque un tema para ver los detalles.")}</p>

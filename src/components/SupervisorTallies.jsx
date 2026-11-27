@@ -21,7 +21,7 @@ export default function SupervisorTallies({ minutes }) {
       <p className="fine">{tr(`From the minutes of ${meetings.length} recent meetings (${date(meetings.at(-1).date)} to ${date(meetings[0].date)}). Each count is a vote line in the minutes that names the supervisor.`, `De las actas de ${meetings.length} reuniones recientes (${date(meetings.at(-1).date)} al ${date(meetings[0].date)}). Cada conteo es una línea de votación del acta que nombra al supervisor.`)}{inText > 0 && " " + tr(`${inText} ${inText === 1 ? "action describes" : "actions describe"} a vote in a sentence instead of vote lines and ${inText === 1 ? "isn't" : "aren't"} counted; each supervisor's card lists ${inText === 1 ? "it" : "them"}.`, `${inText} ${inText === 1 ? "acción describe" : "acciones describen"} una votación en una oración en lugar de líneas de votación y no se ${inText === 1 ? "cuenta" : "cuentan"}; la tarjeta de cada supervisor ${inText === 1 ? "la menciona" : "las menciona"}.`)}</p>
       <div className="table-scroll">
         <table>
-          <thead><tr><th>{tr("Supervisor", "Supervisor")}</th>{KINDS.map(([k, en, es]) => <th key={k}>{tr(en, es)}</th>)}<th /></tr></thead>
+          <thead><tr><th>{tr("Supervisor", "Supervisor")}</th>{KINDS.map(([k, en, es]) => <th key={k}>{tr(en, es)}</th>)}<th><span className="visually-hidden">{tr("Other items", "Otros asuntos")}</span></th></tr></thead>
           <tbody>
             {list.map((r) => (
               <tr key={r.name}>

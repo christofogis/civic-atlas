@@ -301,6 +301,7 @@ button.link { background: none; border: 0; padding: 0; color: var(--accent); tex
 button.kind { background: none; cursor: pointer; font-family: inherit; line-height: inherit; }
 /* Small text buttons get a larger invisible tap area (at least 24px tall, WCAG 2.5.8) without
    changing how they look: an empty layer around the button that takes the clicks. */
+a.tap { display: inline-block; padding-block: 3px; }   /* a lone small link: 24px tall */
 button.kind, .lang-switch, .cal-nav > button.link { position: relative; }
 button.kind::after, .lang-switch::after, .cal-nav > button.link::after { content: ""; position: absolute; inset: -5px -4px; }
 .explain { position: relative; }
@@ -812,7 +813,7 @@ header.site .site-inner { position: relative; flex-wrap: nowrap; gap: 8px 14px; 
 .status-table td, .status-table th { vertical-align: top; }
 .status-flag { display: inline-block; font-size: 0.8rem; font-weight: 600; padding: 0.05rem 0.45rem; border-radius: 999px; border: 1px solid var(--border-strong); }
 .status-flag.ok { border-color: var(--chart-in); }
-.status-flag.warn { border-color: var(--chart-deficit); color: var(--chart-deficit); }
+.status-flag.warn { border-color: var(--chart-deficit); color: var(--text); }   /* the word says it; chart red is too light for small text (4.2:1) */
 .status-checks li { margin: 0.35rem 0; }
 .status-page section { margin: 2rem 0; }
 
