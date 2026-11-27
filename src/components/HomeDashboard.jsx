@@ -6,6 +6,7 @@ import { tr } from "../lib/lang.js";
 import { loadLocal } from "../lib/local.js";
 import { savedDistricts } from "../lib/savedDistricts.js";
 import { listedDates, ruleDates } from "../../lib/localMeetings.js";
+import { byElection } from "../../lib/measures.js";
 
 // "At a glance" on the home page: what's coming up in Congress, the visitor's next local meetings
 // and ballot (from the districts saved by their last lookup, never an address), and the latest
@@ -88,13 +89,19 @@ function BallotTile() {
   const [m, setM] = useState(null);
   useEffect(() => { fetch("/data/measures/ca-2028.json").then((r) => r.json()).then(setM).catch(() => {}); }, []);
   if (!m) return null;
-  const n = (s) => m.measures.filter((x) => x.status === s).length;
+  const today = new Date().toISOString().slice(0, 10);
+  const elections = byElection(m).filter((e) => e.date >= today);
+  if (!elections.length) return null;
+  const n = (e, s) => e.measures.filter((x) => x.status === s).length;
+  // One line per election, the same wording for each: measures qualified, and eligible ones not yet certified.
   return (
-    <Tile title={tr("On your next statewide ballot", "En su próxima boleta estatal")} to="/measures" linkText={tr("California ballot measures", "Medidas en la boleta de California")}>
-      <p><span className="fig">{date(m.election)}</span></p>
+    <Tile title={tr("On your next statewide ballots", "En sus próximas boletas estatales")} to="/measures" linkText={tr("California ballot measures", "Medidas en la boleta de California")}>
       <ul className="glance-figures">
-        <li><span className="fig">{n("qualified")}</span> {tr("measure qualified so far", "medida calificada hasta ahora")}</li>
-        <li><span className="fig">{n("eligible")}</span> {tr("more eligible, not yet certified", "más elegibles, aún no certificadas")}</li>
+        {elections.map((e) => (
+          <li key={e.date}><span className="fig">{date(e.date)}</span>{" "}
+            {tr(`${n(e, "qualified")} measure${n(e, "qualified") === 1 ? "" : "s"} qualified so far`, `${n(e, "qualified")} medida${n(e, "qualified") === 1 ? " calificada" : "s calificadas"} hasta ahora`)}
+            {n(e, "eligible") > 0 && tr(`; ${n(e, "eligible")} more eligible, not yet certified`, `; ${n(e, "eligible")} más elegible${n(e, "eligible") === 1 ? "" : "s"}, aún no certificada${n(e, "eligible") === 1 ? "" : "s"}`)}</li>
+        ))}
       </ul>
     </Tile>
   );
