@@ -934,3 +934,25 @@ ol.bare { list-style: none; padding: 0; margin: 0; }
 .voter-steps h2 { margin: 2px 0 6px; font-size: 1.2rem; }
 .voter-steps p { margin: 0 0 10px; }
 .voter-steps .cards { margin: 0 0 10px; }
+/* Issues you care about */
+.issue-chips { display: flex; flex-wrap: wrap; gap: 0.5rem; margin: 0.4rem 0 0.5rem; }
+.issue-chip { font: inherit; font-size: 0.95rem; padding: 0.45rem 0.9rem; min-height: 44px; border: 1px solid var(--border-strong); border-radius: 999px;
+  background: var(--bg); color: var(--text); cursor: pointer; text-align: left; }
+.issue-chip:hover { border-color: var(--accent); }
+.issue-chip[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: var(--on-accent); }
+.issue-chip[aria-pressed="true"]::before { content: "✓ "; }
+.issue-chip[aria-disabled="true"] { color: var(--faint); border-style: dashed; cursor: default; }
+.more-topics { margin: 0.6rem 0 1rem; }
+.more-topics summary { cursor: pointer; color: var(--accent); }
+.more-topics-list { columns: 2 16rem; margin: 0.5rem 0 0; }
+.more-topics-list li { padding: 0.2rem 0; break-inside: avoid; }
+.issue-section h2 { margin-bottom: 0.2rem; }
+.issue-section h3 { font-size: 1rem; margin: 1.1rem 0 0.3rem; }
+.issue-line { font-size: 1.05rem; margin: 0.6rem 0; }
+.issue-list > li { padding: 0.55rem 0; border-bottom: 1px solid var(--border); overflow-wrap: anywhere; }
+.my-votes { margin: 0.35rem 0 0; padding-left: 0.7rem; border-left: 3px solid var(--mark); }
+.my-votes li { padding: 0.1rem 0; }
+.issue-more { display: flex; flex-wrap: wrap; gap: 0.4rem 1.2rem; margin-top: 0.8rem; }
+.issues-card { margin: 1.2rem 0 0; padding: 12px 14px; border: 1px solid var(--border); border-radius: 10px; }
+.issues-card strong { display: block; font-weight: 600; }
+.issues-card p { margin: 0.2rem 0 0; font-size: 0.9rem; color: var(--muted); }

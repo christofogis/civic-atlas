@@ -124,6 +124,24 @@ export default function Methods() {
         the Speaker or motions about chamber procedure, are grouped as "Other votes".
       </p>
 
+      <h2 id="issues">Issues you care about</h2>
+      <p>
+        The issues page uses everyday names, such as "Jobs and pay", for the Library of Congress policy areas
+        described above. Each name stands for one or two official policy areas (for example, "Environment and
+        energy" covers "Environmental Protection" and "Energy"), and the page shows which ones under each issue.
+        Policy areas without an everyday name are listed under "More topics" with their official names. The
+        names describe a subject only; they don't say what a bill on it would do.
+      </p>
+      <p>
+        The one-line counts come from the official records, for the last 30 days. A bill counts as having moved
+        if a step on its track happened in those days: reported by a committee, a vote in the House or Senate
+        (passed or failed), sent to the President, signed into law or vetoed. Being introduced isn't counted.
+        Roll-call votes are recorded votes on bills in those policy areas, as described above. Bills the Library
+        of Congress hasn't yet assigned a policy area aren't in any issue. If you looked up your address on this
+        device, each vote also shows how your members of Congress voted, as the clerk recorded it. Your picks are
+        saved on your device only.
+      </p>
+
       <h2 id="text-versions">What changed between bill versions</h2>
       <p>
         Each time a bill moves a step, the Government Publishing Office prints a new official version. For each

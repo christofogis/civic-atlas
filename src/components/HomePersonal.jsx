@@ -5,6 +5,7 @@ import { tr } from "../lib/lang.js";
 import { rest } from "../../lib/rest.js";
 import { weekItems } from "../../lib/yourWeek.js";
 import { PartyTag } from "./PartyTag.jsx";
+import IssuesCard from "./IssuesCard.jsx";
 
 // The top of the home page for someone who has looked up an address on this device: their members
 // of Congress and the next few things coming up for them at every level, with a way into "Your
@@ -60,6 +61,7 @@ export default function HomePersonal({ saved, onForget }) {
         <Link className="button-primary" to="/your-week">{tr("See your week", "Ver su semana")}</Link>
         <Link to={`/officials?${saved}`}>{tr("All your officials: federal, state and local", "Todos sus funcionarios: federales, estatales y locales")}</Link>
       </p>
+      <IssuesCard />
       <p className="fine">
         {tr("Remembered on this device from your last lookup (district numbers only, never your address). ", "Guardado en este dispositivo desde su última búsqueda (solo números de distrito, nunca su dirección). ")}
         <button type="button" className="link fine" onClick={onForget}>{tr("Forget it", "Olvidarlo")}</button>

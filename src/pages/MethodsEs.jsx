@@ -114,6 +114,24 @@ export default function MethodsEs() {
         como la elección del Presidente de la Cámara o mociones sobre el procedimiento, se agrupan como "Otras votaciones".
       </p>
 
+      <h2 id="issues">Los temas que le importan</h2>
+      <p>
+        La página de temas usa nombres cotidianos, como "Empleo y salarios", para las áreas de política de la
+        Biblioteca del Congreso descritas arriba. Cada nombre corresponde a una o dos áreas oficiales (por ejemplo,
+        "Medio ambiente y energía" incluye "Protección ambiental" y "Energía"), y la página muestra cuáles bajo cada
+        tema. Las áreas sin nombre cotidiano aparecen en "Más temas" con sus nombres oficiales. Los nombres describen
+        solo un asunto; no dicen lo que haría un proyecto sobre él.
+      </p>
+      <p>
+        Las cifras de una línea vienen de los registros oficiales, de los últimos 30 días. Un proyecto cuenta como
+        que avanzó si en esos días ocurrió un paso de su trámite: informado por un comité, una votación en la Cámara
+        o el Senado (aprobado o rechazado), enviado al Presidente, firmado como ley o vetado. Su presentación no
+        cuenta. Las votaciones nominales son votos registrados sobre proyectos de esas áreas, como se describe arriba.
+        Los proyectos a los que la Biblioteca del Congreso aún no asigna un área no están en ningún tema. Si buscó su
+        dirección en este dispositivo, cada votación muestra también cómo votaron sus miembros del Congreso, tal como
+        lo registró el secretario. Sus temas elegidos se guardan solo en su dispositivo.
+      </p>
+
       <h2 id="text-versions">Qué cambió entre versiones de un proyecto</h2>
       <p>
         Cada vez que un proyecto avanza un paso, la Oficina de Publicaciones del Gobierno imprime una nueva versión oficial.

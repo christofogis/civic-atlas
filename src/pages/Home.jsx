@@ -10,6 +10,7 @@ import { rememberRepresentatives, myRepresentatives, representativesOutdated, fo
 import HomePersonal from "../components/HomePersonal.jsx";
 import AddressInput from "../components/AddressInput.jsx";
 import HomeDashboard from "../components/HomeDashboard.jsx";
+import IssuesCard from "../components/IssuesCard.jsx";
 import { BallotDrawing, MapDrawing, BranchesDrawing, WeekDrawing } from "../components/FeatureDrawings.jsx";
 
 // Lookup errors come from /api/lookup in English; these are their Spanish versions.
@@ -158,6 +159,7 @@ export default function Home() {
 
         {lookupForm}
         <p className="fine first-voter-link"><Link to="/first-time-voter">{t("First time voting? Three steps to get ready", "¿Va a votar por primera vez? Tres pasos para prepararse")}</Link></p>
+        {status !== "done" && <IssuesCard />}
         </>}
 
       </div>

@@ -13,6 +13,7 @@ const TITLES = {
   "/bills": ["Bills", "Proyectos de ley"], "/compare": ["Compare two members", "Comparar dos miembros"],
   "/week": ["This week in Congress", "Esta semana en el Congreso"], "/glossary": ["Glossary", "Glosario"],
   "/quiz": ["Quiz", "Cuestionario"], "/topics": ["Topics", "Temas"], "/topic": ["Topic", "Tema"],
+  "/issues": ["Issues you care about", "Los temas que le importan"],
   "/elections": ["2028 candidates", "Candidatos de 2028"], "/on-the-ballot": ["On the ballot", "En la boleta"], "/corrections": ["Corrections", "Correcciones"],
   "/nominations": ["Nominations", "Nominaciones"], "/story": ["Look up a news story", "Buscar una noticia"],
   "/hearing": ["Hearing", "Audiencia"], "/map": ["Map", "Mapa"],
@@ -30,7 +31,7 @@ const TITLES = {
 // and close. The group holding the current page starts open.
 const MENU_GROUPS = [
   { id: "congress", title: ["Congress", "Congreso"], also: ["/member/", "/bill/", "/committee/", "/hearing/", "/topic/"], links: [
-    ["/members", "Members", "Miembros"], ["/bills", "Bills", "Proyectos de ley"], ["/topics", "Topics", "Temas"],
+    ["/members", "Members", "Miembros"], ["/bills", "Bills", "Proyectos de ley"], ["/issues", "Your issues", "Sus temas"], ["/topics", "Topics", "Temas"],
     ["/committees", "Committees", "Comités"], ["/nominations", "Nominations", "Nominaciones"],
     ["/compare", "Compare two members", "Comparar dos miembros"], ["/map", "Map", "Mapa"]] },
   { id: "elections", title: ["Elections", "Elecciones"], links: [
