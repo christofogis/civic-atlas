@@ -52,8 +52,8 @@ export default function AtAGlance({ terms, voteStats, medians, billStats, laws, 
     const total = cycleSizes.reduce((n, b) => n + Number(b.total), 0);
     const small = cycleSizes.filter((b) => b.size_bucket === 0).reduce((n, b) => n + Number(b.total), 0);
     lines.push(<>
-      {tr(`Raised ${money(Number(f.receipts))} for the ${f.cycle} election cycle`, `Recaudó ${money(Number(f.receipts))} para el ciclo electoral ${f.cycle}`)}{f.coverage_end_date ? <>{tr(", through ", ", hasta el ")}{date(f.coverage_end_date)}</> : null}.
-      {total > 0 && <> {tr(`${pct(small, total)} of contributions from individuals came in amounts `, `El ${pct(small, total)} de las contribuciones de personas fue en montos `)}<Explain id="small-dollar">{tr("under $200", "de menos de $200")}</Explain>.</>}
+      {tr(`Raised ${money(Number(f.receipts))} in the ${f.cycle - 1}–${f.cycle} election cycle`, `Recaudó ${money(Number(f.receipts))} en el ciclo electoral ${f.cycle - 1}–${f.cycle}`)}{f.coverage_end_date ? <>{tr(", through ", ", hasta el ")}{date(f.coverage_end_date)}</> : null}.
+      {total > 0 && <> {tr(`${pct(small, total)} of contributions from individuals came in amounts `, `El ${pct(small, total)} de las contribuciones de personas fue en montos `)}<Explain id="small-dollar">{tr("of $200 or less", "de $200 o menos")}</Explain>.</>}
     </>);
   }
 

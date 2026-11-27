@@ -16,7 +16,10 @@ const PAUSE_MS = 3800;
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 const money = (v) => (v == null || v === "" ? null : Number(v));
 // Entries donors write in the employer field that don't name an employer. Listed on /methods.
-const NOT_AN_EMPLOYER = /^(|N\/?A|NULL|NONE|RETIRED|SELF|SELF[- ]?EMPLOYED|NOT EMPLOYED|UNEMPLOYED|HOMEMAKER|STUDENT|INFORMATION REQUESTED.*|REQUESTED|ENTREPRENEUR)$/i;
+// Compared with punctuation and spaces removed, so "SELF - EMPLOYED" and "RETIRED." match; common
+// misspellings of self-employed ("SELF EMPLYED", "SELF-EMPOLOYED") are caught by the SELFE...D pattern.
+const NOT_AN_EMPLOYER_WORDS = /^(|NA|NULL|NONE|RETIRED|NARETIRED|SELF|SELFE[A-Z]{3,7}D|NOTEMPLOYED|UNEMPLOYED|HOMEMAKER|STUDENT|INFORMATIONREQUESTED.*|REQUESTED|ENTREPRENEUR)$/;
+const NOT_AN_EMPLOYER = { test: (s) => NOT_AN_EMPLOYER_WORDS.test(String(s).toUpperCase().replace(/[^A-Z]/g, "")) };
 
 // Shared pacer: request *starts* are spaced PAUSE_MS apart across all workers, so slow FEC
 // responses overlap without exceeding the hourly limit.

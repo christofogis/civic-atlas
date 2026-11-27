@@ -22,6 +22,7 @@ import { NotesList, NotesProvider, Ref } from "../components/Notes.jsx";
 import { PartyName } from "../components/PartyTag.jsx";
 import { CandidateTable } from "./Elections.jsx";
 import { useCaResults, ResultsStatus, RaceResult, PartyKey } from "../components/CaResults.jsx";
+import { decodeEntities } from "../../lib/ptr.js";
 
 const BIOGUIDE = /^[A-Z][0-9]{6}$/;
 const TERRITORIES = new Set(["DC", "PR", "GU", "VI", "AS", "MP"]);
@@ -111,7 +112,7 @@ const SECTION_DATA = {
   },
 };
 
-const SIZE_LABEL = () => ({ 0: tr("Under $200", "Menos de $200"), 200: "$200–$499", 500: "$500–$999", 1000: "$1,000–$1,999", 2000: tr("$2,000 and over", "$2,000 o más") });
+const SIZE_LABEL = () => ({ 0: tr("$200 and under", "$200 o menos"), 200: "$200.01–$499", 500: "$500–$999", 1000: "$1,000–$1,999", 2000: tr("$2,000 and over", "$2,000 o más") });
 
 // Where the money came from in one cycle: size of individual gifts, donors' employers, PACs,
 // and outside groups' spending. All figures are FEC aggregates; no donor is named.
@@ -172,9 +173,10 @@ function FinanceDetail({ cycle, bySize, byState, home, employers, pacs, outside,
       )}
       {pacs.length > 0 && (
         <>
-          <h4>{tr("PACs and other committees giving the most", "PAC y otros comités que más donaron")}</h4>
+          <h4>{tr("Large contributions from PACs and other committees", "Contribuciones grandes de PAC y otros comités")}</h4>
+          <p className="fine">{tr("Committees among the campaign's 100 largest single contributions from other committees, with what each gave in those contributions. Many committees give the same legal maximum, and one that gave in smaller amounts may not appear, so this is not a full ranking.", "Comités entre las 100 contribuciones individuales más grandes que la campaña recibió de otros comités, con lo que cada uno dio en esas contribuciones. Muchos comités dan el mismo máximo legal, y uno que dio montos menores puede no aparecer, así que no es una clasificación completa.")}</p>
           <ol className="plain">
-            {pacs.slice(0, 10).map((p) => <li key={p.rank}><a href={`https://www.fec.gov/data/committee/${p.contributor_committee_id}/`}>{p.contributor_name}</a> · {money(Number(p.total))}</li>)}
+            {pacs.slice(0, 10).map((p) => <li key={p.rank}>{/^C\d{8}$/.test(p.contributor_committee_id) ? <a href={`https://www.fec.gov/data/committee/${p.contributor_committee_id}/`}>{p.contributor_name}</a> : p.contributor_name} · {money(Number(p.total))}</li>)}
           </ol>
         </>
       )}
@@ -333,7 +335,7 @@ export default function Member() {
       ? tr(`Serves on ${fullCommittees.length} committee${fullCommittees.length === 1 ? "" : "s"}`, `Forma parte de ${fullCommittees.length} comité${fullCommittees.length === 1 ? "" : "s"}`)
       : tr("No committee assignments on record", "No hay asignaciones a comités registradas"),
     money: raised
-      ? tr(`Raised ${money(Number(raised.receipts))} for the ${raised.cycle} election`, `Recaudó ${money(Number(raised.receipts))} para la elección de ${raised.cycle}`)
+      ? tr(`Raised ${money(Number(raised.receipts))} in the ${raised.cycle - 1}–${raised.cycle} election cycle`, `Recaudó ${money(Number(raised.receipts))} en el ciclo electoral ${raised.cycle - 1}–${raised.cycle}`)
       : tr("No FEC filings on record", "No hay declaraciones ante la FEC registradas"),
     trades: ts
       ? tr(`${ts.trades.toLocaleString()} transaction${ts.trades === 1 ? "" : "s"} reported since 2025`, `${ts.trades.toLocaleString()} transacci${ts.trades === 1 ? "ón informada" : "ones informadas"} desde 2025`)
@@ -534,7 +536,7 @@ export default function Member() {
                   {trades.map((t) => (
                     <tr key={`${t.filing_id}-${t.row_num}`}>
                       <td>{date(t.transaction_date)}</td>
-                      <td>{t.ticker ? <><strong>{t.ticker}</strong> · </> : null}{t.asset_name}</td>
+                      <td>{t.ticker ? <><strong>{t.ticker}</strong> · </> : null}{decodeEntities(t.asset_name).replace(/\s+/g, " ")}</td>
                       <td>{t.transaction_type}</td>
                       <td>{t.amount_text}</td>
                       <td>{t.owner}</td>

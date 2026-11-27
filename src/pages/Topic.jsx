@@ -87,7 +87,7 @@ export default function Topic() {
             {state.lobbied.length === 0 ? <p>{tr("No lobbying reports name bills on this topic yet.", "Ningún informe de cabildeo menciona todavía proyectos sobre este tema.")}</p> : (
               <ul className="bare items">{state.lobbied.map((b) => <li key={b.number + b.bill_type} className="item"><span className="item-head">{link(b)} <span className="fine">· {b.lobbying_clients.toLocaleString()} {tr("organizations", "organizaciones")}</span></span><Clamp lines={2}>{b.short_title ?? b.title}</Clamp></li>)}</ul>
             )}
-            <p className="fine">{tr("From LD-2 lobbying reports that name the bill. A listing doesn't say whether the organization supported or opposed it.", "De informes de cabildeo LD-2 que mencionan el proyecto. La mención no dice si la organización lo apoyaba o se oponía.")}</p>
+            <p className="fine">{tr("From LD-2 lobbying reports that name the bill. A listing doesn't say whether the organization supported or opposed it. The Senate Office of Public Records can't vouch for data or analyses derived from these reports after they're retrieved.", "De informes de cabildeo LD-2 que mencionan el proyecto. La mención no dice si la organización lo apoyaba o se oponía. La Oficina de Registros Públicos del Senado no puede garantizar los datos ni los análisis derivados de estos informes después de obtenerlos.")}</p>
           </section>
 
           <section className="section">
