@@ -481,7 +481,14 @@ header.site .site-inner { position: relative; flex-wrap: nowrap; gap: 8px 14px; 
 .site-menu.open nav > a:nth-last-of-type(1) { border-bottom: 1px solid var(--border); }
 @media (prefers-reduced-motion: reduce) { .site-menu.open .menu-group summary::after { transition: none; } }
 .menu-search { display: none; }
+/* Sign in / Your account: in the header on wider screens, in the menu on phones. */
+.account-link { font-size: 0.85rem; white-space: nowrap; color: var(--muted); text-decoration: none; }
+.account-link:hover, .account-link.active { color: var(--text); }
+.menu-account { display: none; }
 @media (max-width: 640px) {
+  .account-link { display: none; }
+  .site-menu.open .menu-account { display: block; border-top: 1px solid var(--border); }
+  .site-menu.open .menu-account a { display: block; padding: 12px 0; font-size: 1.05rem; color: var(--text); text-decoration: none; }
   header.site .site-inner { gap: 6px 10px; }
   .header-search { display: none; }
   .site-menu.open { left: 0; width: 100%; border-radius: 0; border-left: 0; border-right: 0; padding: 6px 16px 16px; }
@@ -1049,3 +1056,20 @@ html.slate body { background: var(--bg); }
   .sl-stat { flex-direction: column; align-items: flex-start; gap: 4px; }
   .sl-stat strong { min-width: 0; }
 }
+
+/* ---- Account (optional sign-in). Neutral colors only: red and blue mean party on this site. */
+.account-form { margin: 20px 0 8px; max-width: 34rem; }
+.account-form label { display: block; font-weight: 600; margin-bottom: 8px; }
+.account-form input { min-width: 0; }
+.account-google { margin: 18px 0; }
+.button-outline, .button-danger { padding: 10px 18px; font: inherit; font-size: 0.95rem; border: 1px solid var(--border-strong); border-radius: 8px; background: var(--bg); color: var(--text); cursor: pointer; }
+.button-outline:hover, .button-danger:hover { background: var(--surface); }
+.button-danger { font-weight: 600; }
+.account-prefs { border: 0; padding: 0; margin: 8px 0 0; display: grid; gap: 10px; }
+.account-prefs > label { display: flex; gap: 8px; align-items: baseline; }
+.account-prefs .account-sub { padding-left: 26px; }
+.account-lang label { margin-right: 14px; }
+.account-list li { overflow-wrap: anywhere; }
+.save-toggle { font-size: 0.85rem; margin: 6px 0 0; }
+.save-toggle button { padding: 4px 12px; font: inherit; border: 1px solid var(--border-strong); border-radius: 999px; background: var(--bg); color: var(--text); cursor: pointer; }
+.save-toggle button[aria-pressed="true"] { background: var(--accent-soft); border-color: var(--accent); }
