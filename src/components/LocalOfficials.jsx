@@ -3,7 +3,7 @@ import LocalMeetings from "./LocalMeetings.jsx";
 import { Link } from "react-router-dom";
 import { date } from "../lib/format.js";
 import { tr } from "../lib/lang.js";
-import { councilParts, councilRole, loadLocal, loadMinutes, officeName, roleName, rolesCurrent, seatUpdating, supervisorParts, termEnded } from "../lib/local.js";
+import { councilParts, councilRole, countyEs, loadLocal, loadMinutes, officeName, roleName, rolesCurrent, seatUpdating, supervisorParts, termEnded } from "../lib/local.js";
 import Seat from "./Seat.jsx";
 import SupervisorRecord from "./SupervisorRecord.jsx";
 
@@ -32,7 +32,7 @@ export function SupervisorCard({ s, county, minutes }) {
 export function OfficerCard({ o, county }) {
   return (
     <li className="card">
-      <Seat parts={[officeName(o.office), county]} />
+      <Seat parts={[officeName(o.office), tr(county, countyEs(county))]} />
       <h3>{o.name}</h3>
       <p className="meta">{tr("Nonpartisan office · elected countywide", "Cargo no partidista · elegido en todo el condado")}</p>
     </li>
@@ -105,14 +105,14 @@ export default function LocalOfficials({ local, approximate }) {
             : tr("This address is in an unincorporated area. It has no city council; the county Board of Supervisors makes local decisions here.", "Esta dirección está en una zona no incorporada. No tiene concejo municipal; la Junta de Supervisores del condado toma las decisiones locales aquí.")}</p>
         </>
       )}
-      <h2>{tr(`County: ${data.county}`, `Condado: ${data.county}`)}</h2>
+      <h2>{tr(`County: ${data.county}`, `Condado: ${data.county.replace(/ County$/, "")}`)}</h2>
       <p className="level-what">{tr("The Board of Supervisors sets the county budget and runs county services: public health, social services, jails, elections, and local services in unincorporated areas.", "La Junta de Supervisores aprueba el presupuesto del condado y administra sus servicios: salud pública, servicios sociales, cárceles, elecciones y servicios locales en zonas no incorporadas.")}</p>
       <ul className="cards">
         {sup && <SupervisorCard s={sup} county={data.county} minutes={minutes} />}
         {data.officers.map((o) => <OfficerCard key={o.office} o={o} county={data.county} />)}
       </ul>
       <p className="fine">
-        <Link to={`/local/${local.id}`}>{tr(`All ${data.county} officials`, `Todos los funcionarios del ${data.county}`)}</Link>
+        <Link to={`/local/${local.id}`}>{tr(`All ${data.county} officials`, `Todos los funcionarios del ${countyEs(data.county)}`)}</Link>
       </p>
       <LocalMeetings data={data} city={city} count={2} />
     </>

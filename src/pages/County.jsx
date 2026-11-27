@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { date } from "../lib/format.js";
 import { tr } from "../lib/lang.js";
-import { loadLocal, loadMinutes } from "../lib/local.js";
+import { countyEs, loadLocal, loadMinutes } from "../lib/local.js";
 import { CouncilCard, OfficerCard, SupervisorCard } from "../components/LocalOfficials.jsx";
 import LocalMeetings from "../components/LocalMeetings.jsx";
 import CountyAgenda from "../components/CountyAgenda.jsx";
@@ -35,7 +35,7 @@ export default function County() {
     <NotesProvider notes={notes}>
     <main className="page wide">
       <p className="fine"><Link to="/">{tr("Home", "Inicio")}</Link> / California</p>
-      <h1>{data.county}<Ref id="sources" /></h1>
+      <h1>{tr(data.county, countyEs(data.county))}<Ref id="sources" /></h1>
       <p className="lede">
         {tr("A five-member Board of Supervisors, each elected by one district, sets the county budget and policy and runs county services, including in unincorporated areas. Six more officials are elected countywide. All county offices in California are nonpartisan.",
           "Una Junta de Supervisores de cinco miembros, cada uno elegido por un distrito, aprueba el presupuesto y las políticas del condado y administra sus servicios, incluso en las zonas no incorporadas. Otros seis funcionarios se eligen en todo el condado. En California, todos los cargos de condado son no partidistas.")}
