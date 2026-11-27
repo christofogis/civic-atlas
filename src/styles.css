@@ -1073,3 +1073,5 @@ html.slate body { background: var(--bg); }
 .save-toggle { font-size: 0.85rem; margin: 6px 0 0; }
 .save-toggle button { padding: 4px 12px; font: inherit; border: 1px solid var(--border-strong); border-radius: 999px; background: var(--bg); color: var(--text); cursor: pointer; }
 .save-toggle button[aria-pressed="true"] { background: var(--accent-soft); border-color: var(--accent); }
+.account button.link { text-align: left; }
+.account-list button.link { margin-left: 6px; }
