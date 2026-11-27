@@ -157,6 +157,7 @@ export default function Home() {
         </p>
 
         {lookupForm}
+        <p className="fine first-voter-link"><Link to="/first-time-voter">{t("First time voting? Three steps to get ready", "¿Va a votar por primera vez? Tres pasos para prepararse")}</Link></p>
         </>}
 
       </div>
