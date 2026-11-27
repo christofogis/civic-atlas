@@ -1,6 +1,6 @@
 import { db } from "./db.js";
 import { congressOn } from "../../lib/congress.js";
-import { parseBillQuery, numberPrefixRanges, rangesFilter, congressesSince118, prefixTsquery } from "./suggest.js";
+import { parseBillQuery, numberPrefixRanges, rangesFilter, congressesSince118, prefixTsquery, rankBills, wordsOf } from "./suggest.js";
 
 // Data for the header search suggestions. Members and full committees are small lists (about 700
 // and 50 rows), loaded once per visit when the box is first focused and matched in the browser, so
@@ -57,9 +57,9 @@ export async function fetchBills(q, signal) {
   const words = async (tsq) => {
     const { data, error } = await db.from("bills").select(BILL_COLUMNS)
       .textSearch("search", tsq, { config: "english" })
-      .order("latest_action_date", { ascending: false, nullsFirst: false }).limit(5).abortSignal(signal);
+      .order("latest_action_date", { ascending: false, nullsFirst: false }).limit(25).abortSignal(signal);
     if (error) throw error;
-    return data;
+    return rankBills(data, q, 5);
   };
   const tsq = prefixTsquery(q);
   if (!tsq) return { byNumber: false, bills: [] };
@@ -69,4 +69,23 @@ export async function fetchBills(q, signal) {
   const shorter = prefixTsquery(q, { trim: 2 });
   if (!bills.length && shorter && shorter !== tsq) bills = await words(shorter);
   return { byNumber: false, bills };
+}
+
+// State officials (every state alike) whose name contains each typed word, with their current
+// office. Uses the trigram index on state_people.name.
+export async function fetchStatePeople(q, signal) {
+  const words = wordsOf(q).filter((w) => w.length >= 2).slice(0, 3);
+  if (!words.length || words.join("").length < 3) return [];
+  let query = db.from("state_people").select("id,name,state,party").eq("active", true);
+  for (const w of words) query = query.ilike("name", `%${w.replace(/[%_\\]/g, "")}%`);
+  const { data: people, error } = await query.order("name").limit(4).abortSignal(signal);
+  if (error) throw error;
+  if (!people.length) return [];
+  const today = new Date().toISOString().slice(0, 10);
+  const { data: roles, error: e2 } = await db.from("state_roles").select("person_id,type,district,start_date,end_date")
+    .in("person_id", people.map((p) => p.id)).abortSignal(signal);
+  if (e2) throw e2;
+  const current = (id) => (roles ?? []).filter((r) => r.person_id === id && (!r.end_date || r.end_date >= today))
+    .sort((a, b) => (b.start_date ?? "").localeCompare(a.start_date ?? ""))[0] ?? null;
+  return people.map((p) => ({ ...p, role: current(p.id) }));
 }

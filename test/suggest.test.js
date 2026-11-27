@@ -92,3 +92,14 @@ test("highlighting bolds the typed start of each word, keeping accents as writte
   assert.equal(highlightParts(nfd, "jose")[0].text, "José");
   assert.equal(fold("Núñez"), "nunez");
 });
+
+import { rankBills } from "../src/lib/suggest.js";
+test("rankBills puts short titles that start with the words first", () => {
+  const bills = [
+    { number: 1, short_title: "Fair Premiums for Farmers Act" },
+    { number: 2, short_title: null, title: "To help farmers" },
+    { number: 3, short_title: "Farm, Food, and National Security Act of 2026" },
+  ];
+  assert.deepEqual(rankBills(bills, "farm").map((b) => b.number), [3, 1, 2]);
+  assert.deepEqual(rankBills(bills, "farm bill").map((b) => b.number), [3, 1, 2]);
+});

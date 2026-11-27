@@ -5,7 +5,9 @@ import { PartyTag } from "./PartyTag.jsx";
 import { billLabel, ordinal } from "../lib/format.js";
 import { POLICY_AREAS, areaName, topicSlug } from "../lib/policyAreas.js";
 import { matchMembers, matchByWords, pickRows, highlightParts, parseBillQuery } from "../lib/suggest.js";
-import { loadDirectory, loadCommittees, fetchBills } from "../lib/suggestData.js";
+import { loadDirectory, loadCommittees, fetchBills, fetchStatePeople } from "../lib/suggestData.js";
+import { StatePartyTag, statePersonPath } from "./StateOfficialCard.jsx";
+import { stateOfficeLabel } from "../lib/stateOffices.js";
 
 // The header search box with suggestions underneath, like Wikipedia's: members, bills, committees,
 // topics and site pages that match what's typed, from our own data. Enter with no row chosen still
@@ -55,6 +57,17 @@ export default function SearchSuggest({ id, value, onValueChange, pages, ariaLab
     return () => { clearTimeout(timer); ctl.abort(); };
   }, [q, showing]);
 
+  // State officials: same pacing, words only.
+  const [statePeople, setStatePeople] = useState({ q: "", people: [] });
+  useEffect(() => {
+    if (!showing || parseBillQuery(q)) return undefined;
+    const ctl = new AbortController();
+    const timer = setTimeout(() => {
+      fetchStatePeople(q, ctl.signal).then((people) => setStatePeople({ q, people }), () => { if (!ctl.signal.aborted) setStatePeople({ q, people: [] }); });
+    }, DEBOUNCE_MS);
+    return () => { clearTimeout(timer); ctl.abort(); };
+  }, [q, showing]);
+
   const groups = useMemo(() => {
     if (!showing) return [];
     const isNumber = !!parseBillQuery(q);
@@ -62,6 +75,7 @@ export default function SearchSuggest({ id, value, onValueChange, pages, ariaLab
     const fresh = bills.q === q || !!parseBillQuery(bills.q) === isNumber;
     const billRows = (fresh ? bills.bills : []).map((b) => ({ key: `b-${b.congress}-${b.bill_type}-${b.number}`, href: `/bill/${b.congress}/${b.bill_type}/${b.number}`, kind: "bill", b }));
     const memberRows = isNumber ? [] : matchMembers(dir, q, MAX_ROWS).map((m) => ({ key: `m-${m.bioguide_id}`, href: `/member/${m.bioguide_id}`, kind: "member", m }));
+    const stateRows = isNumber || statePeople.q !== q ? [] : statePeople.people.map((p) => ({ key: `s-${p.id}`, href: statePersonPath(p.id), kind: "state", p }));
     const committeeRows = isNumber ? [] : matchByWords(comms, q, (c) => c.name, 3).map((c) => ({ key: `c-${c.committee_id}`, href: `/committee/${c.committee_id}`, kind: "committee", c }));
     const topicRows = isNumber ? [] : matchByWords(POLICY_AREAS, q, areaName, 2).map((a) => ({ key: `t-${a}`, href: `/topic/${topicSlug(a)}`, kind: "topic", label: areaName(a) }));
     const pageRows = isNumber ? [] : matchByWords(pages, q, (p) => t(...p.title), 2).map((p) => ({ key: `p-${p.to}`, href: p.to, kind: "page", label: t(...p.title) }));
@@ -70,11 +84,12 @@ export default function SearchSuggest({ id, value, onValueChange, pages, ariaLab
       ...(isNumber ? [billGroup] : []),
       { key: "members", title: t("Members of Congress", "Miembros del Congreso"), items: memberRows },
       ...(isNumber ? [] : [billGroup]),
+      { key: "state", title: t("State officials", "Funcionarios estatales"), items: stateRows },
       { key: "committees", title: t("Committees", "Comités"), items: committeeRows },
       { key: "topics", title: t("Topics", "Temas"), items: topicRows },
       { key: "pages", title: t("Pages", "Páginas"), items: pageRows },
     ], MAX_ROWS);
-  }, [showing, q, dir, comms, bills, pages, lang]);
+  }, [showing, q, dir, comms, bills, statePeople, pages, lang]);
 
   const options = useMemo(() => [
     ...groups.flatMap((g) => g.items),
@@ -137,6 +152,10 @@ export default function SearchSuggest({ id, value, onValueChange, pages, ariaLab
           <span className="suggest-num"><BillNumber bill={opt.b} typed={bills.ref} /></span>
           <span className="suggest-title"> · {bills.byNumber ? (opt.b.short_title ?? opt.b.title) : <Marked text={opt.b.short_title ?? opt.b.title} q={q} />}</span>
           <span className="suggest-meta"> ({ordinal(opt.b.congress)})</span>
+        </>}
+        {opt.kind === "state" && <>
+          <span className="suggest-main"><Marked text={opt.p.name} q={q} /></span> <StatePartyTag party={opt.p.party} />{" "}
+          <span className="suggest-meta">{opt.p.role ? stateOfficeLabel(opt.p.role, opt.p.state) : opt.p.state}</span>
         </>}
         {opt.kind === "committee" && <>
           <span className="suggest-main"><Marked text={opt.c.name} q={q} /></span>{" "}
