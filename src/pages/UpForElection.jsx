@@ -310,18 +310,18 @@ function SeatChart({ years, year, counts, onPick }) {
         <strong>{tr("Senate seats on the ballot, by party of the senator who holds each seat now", "Escaños del Senado en la boleta, según el partido de quien ocupa cada escaño ahora")}</strong>
         <span className="seat-legend">{parties.map((p) => <span key={p}><span className={partyClass(p)}>{partyLetter(p)}</span> {partyName(p)}</span>)}</span>
       </figcaption>
-      {/* A group of buttons, one per election year, each named with its counts (an image role here
-          would hide the buttons from screen readers). The bars inside are drawn for sight only. */}
+      {/* A group of buttons, one per election year (an image role here would hide the buttons from
+          screen readers). Each count carries its party name, hidden, so a button reads
+          "22 Republican, 13 Democrat, 2028": the visible numbers and year, in order. */}
       <div className="seat-bars" role="group" aria-label={tr("Choose an election year", "Elija un año de elección")}>
         {shown.map(([y, c]) => (
-          <button key={y} type="button" className={`seat-cluster${y === year ? " on" : ""}`} onClick={() => onPick(y)} aria-pressed={y === year}
-            aria-label={`${y}: ${c.map(([p, n]) => `${n} ${partyName(p)}`).join(", ")}`}>
+          <button key={y} type="button" className={`seat-cluster${y === year ? " on" : ""}`} onClick={() => onPick(y)} aria-pressed={y === year}>
             <span className="seat-cluster-bars">
               {parties.map((p) => {
                 const n = c.find(([q]) => q === p)?.[1] ?? 0;
                 return (
                   <span key={p} className="seat-bar-wrap" title={`${y}: ${n} ${partyName(p)}`}>
-                    <span className="seat-count">{n}</span>
+                    <span className="seat-count">{n}<span className="visually-hidden"> {partyName(p)},</span></span>
                     <span className={`seat-bar ${partyClass(p).split(" ")[1]}`} style={{ height: `${(n / max) * 100}%` }} />
                   </span>
                 );

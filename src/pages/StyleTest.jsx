@@ -27,6 +27,7 @@ export default function StyleTest() {
 
   return (
     <main className="page wide slate-test">
+      <h1 className="visually-hidden">{tr("Style test", "Prueba de estilo")}</h1>
       <p className="fine">{tr("Style test: the new look in dark and light. The dark colors are now the site's dark mode; the light version is shown only here until it's approved.", "Prueba de estilo: el nuevo aspecto en oscuro y claro. Los colores oscuros ya son el modo oscuro del sitio; la versión clara se muestra solo aquí hasta que se apruebe.")}</p>
       <nav className="tabs" aria-label={tr("Version", "Versión")}>
         <Link to="?v=dark" replace className={mode === "dark" ? "on" : ""} aria-current={mode === "dark" ? "page" : undefined}>{tr("Dark", "Oscuro")}</Link>
