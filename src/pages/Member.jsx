@@ -340,7 +340,8 @@ export default function Member() {
   const subsByParent = (pid) => committees.filter((c) => c.committee.parent_id === pid);
   const fresh = Object.fromEntries(freshness.map((f) => [f.job, f.last_success_at]));
   const updated = (job) => (fresh[job] ? tr(` Updated ${date(fresh[job])}.`, ` Actualizado el ${date(fresh[job])}.`) : "");
-  const voteJob = Object.keys(fresh).find((j) => j.startsWith("votes-"));
+  // The latest Congress's vote job (votes-120 from Jan 3, 2027; votes-119 and votes-118 stay in the log).
+  const voteJob = Object.keys(fresh).filter((j) => /^votes-\d+$/.test(j)).sort().at(-1);
 
   // One-line summaries for each section's label: same wording for every member, from the records.
   const pctOf = (n, d) => `${Math.round((100 * n) / d)}%`;
@@ -382,6 +383,12 @@ export default function Member() {
           <p className="member-meta">{tr("Current term", "Período actual")} {date(seat.start_date)} – {date(seat.end_date)}</p>
           <BallotLine seat={seat} />
           <RaceFilers seat={seat} upIn={upIn} mode="line" /></>
+        ) : seat?.seat_status === "pending_update" ? (
+          // The term ended (Jan 3 for a Congress) and the member list doesn't have the seat's next
+          // term yet: don't say whether this member is serving, either way.
+          <><p className="lede">{seatLabel(seat)}</p>
+          <p className="member-meta">{tr(`Term ${date(seat.start_date)} – ${date(seat.end_date)}. A new term for this seat began on ${date(seat.end_date)}; information is being updated.`,
+            `Período ${date(seat.start_date)} – ${date(seat.end_date)}. Un nuevo período para este escaño comenzó el ${date(seat.end_date)}; la información se está actualizando.`)}</p></>
         ) : (
           <p className="lede">{tr("Not currently serving. Most recent", "No está en el cargo. Último cargo")}: {seatLabel(latest)}, {date(latest.start_date)} – {date(latest.end_date)} <PartyName party={latest.party} /></p>
         )}
