@@ -61,7 +61,7 @@ for (let path of PATHS) {
     await page.waitForTimeout(1500);
   }
   await page.waitForFunction(() => !/Loading|Cargando/.test(document.body.innerText), null, { timeout: 20000 }).catch(() => {});
-  if (click) { await page.locator(click[1]).first().click().catch((e) => console.log("click failed:", e.message)); await page.waitForTimeout(300); }
+  if (click) { await page.locator(click[1]).first().click().catch((e) => console.log("click failed:", e.message)); await page.waitForLoadState("networkidle").catch(() => {}); await page.waitForTimeout(1200); }
   // "path>>selector": start the shot at that element (for sections far down a long page).
   const start = path.includes(">>") ? await page.locator(path.split(">>")[1]).first().boundingBox().catch(() => null) : null;
   // Very tall pages can't be captured whole; cap the height.
