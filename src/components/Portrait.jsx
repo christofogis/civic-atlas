@@ -17,7 +17,7 @@ export default function Portrait({ src, party, alt = "", size = "large", classNa
   return (
     <span className={`portrait portrait-${size} party-${p.kind}-frame ${className}`.trim()}>
       <img src={src || NO_PHOTO} alt={alt} onError={noPhoto} {...img} />
-      {p.letter && <span className={`party party-${p.kind}`} title={title}>{p.letter}</span>}
+      {p.letter && <span className={`party party-${p.kind}`} title={title}><span aria-hidden="true">{p.letter}</span><span className="visually-hidden">{title}</span></span>}
     </span>
   );
 }

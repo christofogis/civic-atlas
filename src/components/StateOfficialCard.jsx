@@ -31,8 +31,7 @@ export default function StateOfficialCard({ official, state }) {
       <Portrait className="member-photo small" size="small" party={official.party} src={official.image} alt={official.name} width="60" height="73" loading="lazy" referrerPolicy="no-referrer" />
       <h3><Link to={statePersonPath(official.id)}>{official.name}</Link></h3>
       <p className="meta">
-        <StatePartyTag party={official.party} /> {official.party}
-        {official.start_date && <> · {tr("In this office since", "En este cargo desde el")} {date(official.start_date)}</>}
+        {official.start_date && <>{tr("In this office since", "En este cargo desde el")} {date(official.start_date)}</>}
       </p>
       {official.phone && <p className="fine card-phone"><a href={`tel:${official.phone.replace(/[^\d+]/g, "")}`}>{official.phone}</a></p>}
     </li>

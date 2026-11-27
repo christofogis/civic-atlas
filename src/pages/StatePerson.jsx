@@ -43,7 +43,7 @@ export default function StatePerson() {
         {tr(" (public domain), compiled from state legislature and government websites; the photo, where shown, is the official one it links to, loaded from that website. Sources it lists: ", " (dominio público), recopilado de los sitios web de las legislaturas y gobiernos estatales; la foto, cuando aparece, es la oficial que enlaza, cargada desde ese sitio. Fuentes que cita: ")}
         {[...new Map(p.sources.map((u) => [host(u), u])).values()].map((u, i) => <span key={u}>{i ? ", " : ""}<a href={u} rel="noopener">{host(u)}</a></span>)}.
       </>} /></h1>
-      <p className="meta"><StatePartyTag party={p.party} /> {p.party}{!p.active && <> · {tr("No longer in office", "Ya no ocupa el cargo")}</>}</p>
+      {!p.active && <p className="meta">{tr("No longer in office", "Ya no ocupa el cargo")}</p>}
       </header>
       <div className="split">
         <div className="split-main">

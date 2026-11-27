@@ -344,7 +344,7 @@ export default function Member() {
         <h1>{name}</h1>
         {seat?.seat_status === "serving" ? (
           <><p className="lede">{seatLabel(seat)}</p>
-          <p className="member-meta"><PartyName party={seat.party} /> · {tr("Current term", "Período actual")} {date(seat.start_date)} – {date(seat.end_date)}</p>
+          <p className="member-meta">{tr("Current term", "Período actual")} {date(seat.start_date)} – {date(seat.end_date)}</p>
           <BallotLine seat={seat} />
           <RaceFilers seat={seat} upIn={upIn} mode="line" /></>
         ) : (
