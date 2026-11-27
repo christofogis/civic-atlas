@@ -302,8 +302,8 @@ button.kind { background: none; cursor: pointer; font-family: inherit; line-heig
 /* Small text buttons get a larger invisible tap area (at least 24px tall, WCAG 2.5.8) without
    changing how they look: an empty layer around the button that takes the clicks. */
 a.tap { display: inline-block; padding-block: 3px; }   /* a lone small link: 24px tall */
-button.kind, .lang-switch, .cal-nav > button.link { position: relative; }
-button.kind::after, .lang-switch::after, .cal-nav > button.link::after { content: ""; position: absolute; inset: -5px -4px; }
+button.kind, .lang-switch, .account-link, .ai-tag, .cal-nav > button.link { position: relative; }
+button.kind::after, .lang-switch::after, .account-link::after, .ai-tag::after, .cal-nav > button.link::after { content: ""; position: absolute; inset: -5px -4px; }
 .explain { position: relative; }
 /* The (i) button's tap area is 25px (WCAG 2.5.8) while the icon stays 15px: padding, offset by negative margins so lines don't shift. */
 .explain-i { display: inline-flex; align-items: center; justify-content: center; background: none; border: 0; padding: 5px; margin: -3px -3px -3px -1px; color: var(--muted); cursor: pointer; vertical-align: -2px; border-radius: 50%; }

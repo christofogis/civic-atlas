@@ -154,7 +154,7 @@ function SignedIn({ account }) {
           <div className="account-lang" role="radiogroup" aria-label={t("Email language", "Idioma de los correos")}>
             {t("Email language", "Idioma de los correos")}:{" "}
             <label><input type="radio" name="email-lang" checked={prefs.language === "en"} onChange={() => change({ language: "en" })} /> English</label>{" "}
-            <label><input type="radio" name="email-lang" checked={prefs.language === "es"} onChange={() => change({ language: "es" })} /> Español</label>
+            <label lang="es"><input type="radio" name="email-lang" checked={prefs.language === "es"} onChange={() => change({ language: "es" })} /> Español</label>
           </div>
           <p className="fine">{t("All are off until you turn them on. Each email will have a link to stop it, no sign-in needed. When you turn one on or off, the time is recorded.",
             "Todas están desactivadas hasta que usted las active. Cada correo tendrá un enlace para dejar de recibirlo, sin iniciar sesión. Cuando activa o desactiva una, se registra la hora.")}</p>

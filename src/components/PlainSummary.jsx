@@ -38,7 +38,7 @@ export function PlainLead({ map, bill }) {
   return (
     <span className="plain-lead">
       <Link to="/methods#bill-summaries" className="ai-tag" title={tr("Plain-language summary by AI, checked against the CRS summary", "Resumen en lenguaje sencillo hecho por IA, verificado contra el resumen del CRS")}
-        aria-label={tr("AI summary:", "Resumen por IA:")}>{tr("AI", "IA")}</Link>{" "}
+        aria-label={tr("AI summary: how it's made", "Resumen por IA: cómo se hace")}>{tr("AI", "IA")}</Link>{" "}
       <span lang={lang}>{lead}</span>
     </span>
   );
