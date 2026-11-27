@@ -426,9 +426,15 @@ export default function Methods() {
         to the Congress in session in the report's year, and only bills this site tracks are kept. A report
         that names a bill by title alone, without its number, isn't counted. When a report is amended, only the
         latest version is used.
-        Because only the number is read, a report that cites a bill by its number from an earlier Congress
-        (for example, a bill reintroduced under a new number) is matched to whatever bill has that number now.
-        Each listing links to the report, so the wording can be checked.
+        A report sometimes cites a bill by its number from an earlier Congress (for example, "Equality Act
+        (H.R. 5 / S. 393)" in a 2023 report, numbers the Equality Act had in 2021–2022). When the report writes
+        a bill's name right next to its number, that name is compared with the short and official titles of
+        the bill that has the number in the report's Congress; if they plainly differ, the number isn't
+        linked to that bill. The comparison ignores capitalization, punctuation, "the" and a trailing year,
+        and accepts a name that is contained in a title or shares most of its words. When no name is written
+        next to the number, the number alone decides, so a report that cites an earlier Congress's number
+        without a name can still be matched to whatever bill has that number now. Each listing links to the
+        report, so the wording can be checked.
       </p>
       <p>
         A report lists the bill; it doesn't say whether the client supported or opposed it, or what was

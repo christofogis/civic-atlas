@@ -7,10 +7,18 @@
 // LDA.gov returns 25 filings per page. Without an API key it allows 15 requests a minute
 // (~75 minutes per quarter of ~27,000 filings); with LDA_API_KEY, 120 a minute.
 // Each report's free-text "specific lobbying issues" is scanned for bill numbers; the Congress
-// comes from the filing year, and only bills already in `bills` are kept.
+// comes from the filing year, and only bills already in `bills` are kept. When the text writes a
+// bill's name next to its number ("Equality Act (H.R. 5)"), the name must fit that bill's short or
+// official title, or the number isn't linked: a number from an earlier Congress would otherwise
+// link to the unrelated bill that has it now.
+//
+// Re-checking stored links (after a change to these rules): re-read whole quarters, e.g.
+//   node scripts/ingest/lobbying.mjs --quarters 2023-1,2023-2,2023-3,2023-4
+// Each filing read replaces its stored bill links, and a filing left with none is removed, so
+// running a quarter again is safe and brings old rows in line with the current rules.
 // Amendments: per registrant, client, year and quarter, only the latest-posted report is kept.
 import { getClient, fetchAll, upsertBatches, withRun } from "./lib.mjs";
-import { extractBillRefs, congressForYear } from "../../lib/billrefs.js";
+import { extractBillRefs, congressForYear, billRefTitles, titleMatches } from "../../lib/billrefs.js";
 
 const BASE = "https://lda.gov/api/v1/filings/";
 const KEY = process.env.LDA_API_KEY;
@@ -68,10 +76,17 @@ function parse(f, tracked) {
     const former = (a.lobbyists ?? []).map((l) => ({
       name: personName(l.lobbyist), position: String(l.covered_position ?? "").replace(/\s+/g, " ").trim(),
     })).filter((l) => l.name && l.position && !NO_POSITION.test(l.position));
+    const names = billRefTitles(a.description);
     for (const ref of extractBillRefs(a.description)) {
       const k = `${congress}|${ref.bill_type}|${ref.number}`;
       stats.refs++;
       if (!tracked.has(k)) { stats.untracked++; continue; }
+      const name = names.get(`${ref.bill_type}${ref.number}`);
+      if (name && !titleMatches(name, tracked.get(k))) {
+        stats.nameMismatch++;
+        if (stats.nameMismatch <= 20) console.log(`  not linked: "${name}" next to ${ref.bill_type}${ref.number}; ${congress}th Congress bill is "${tracked.get(k).filter(Boolean)[0]}"`);
+        continue;
+      }
       if (!byBill.has(k)) byBill.set(k, { filing_uuid: f.filing_uuid, congress, ...ref });
       for (const l of former) {
         const ck = `${k}|${l.name}`;
@@ -95,7 +110,7 @@ const NO_POSITION = /^(n\/?a|none|no|not applicable|-+|\.)$/i;
 const personName = (p) => [p?.first_name, p?.middle_name, p?.last_name, p?.suffix]
   .map((x) => String(x ?? "").trim()).filter(Boolean).join(" ");
 
-const stats = { refs: 0, untracked: 0, skipped: 0 };
+const stats = { refs: 0, untracked: 0, nameMismatch: 0, skipped: 0 };
 const keyOf = (r) => `${r.registrant_id}|${r.client_id}|${r.filing_year}|${r.filing_period}`;
 
 // Apply one page of parsed filings: newest version per key wins, against the database too.
@@ -159,8 +174,8 @@ async function apply(db, parsed, counts) {
 }
 
 async function run(db, counts) {
-  const bills = await fetchAll(db, "bills", "congress, bill_type, number");
-  const tracked = new Set(bills.map((b) => `${b.congress}|${b.bill_type}|${b.number}`));
+  const bills = await fetchAll(db, "bills", "congress, bill_type, number, short_title, title");
+  const tracked = new Map(bills.map((b) => [`${b.congress}|${b.bill_type}|${b.number}`, [b.short_title, b.title]]));
   console.log(`${tracked.size} tracked bills; ${KEY ? "API key" : "no API key (15 requests/minute)"}`);
 
   const quarters = arg("--quarters");
@@ -189,7 +204,7 @@ async function run(db, counts) {
       if (seen % 2500 < 25) console.log(`  ${seen} read, ${counts.rows_inserted} kept, ${counts.rows_deleted} superseded`);
     }
   }
-  console.log(`bill numbers found: ${stats.refs} (${stats.untracked} not in our bills table); non-LD-2 skipped: ${stats.skipped}`);
+  console.log(`bill numbers found: ${stats.refs} (${stats.untracked} not in our bills table, ${stats.nameMismatch} next to a name that doesn't fit the bill); non-LD-2 skipped: ${stats.skipped}`);
   if (!DRY) {
     const { data: n, error } = await db.rpc("refresh_bill_lobbying_totals");
     if (error) throw new Error(`refresh lobbying totals: ${error.message}`);

@@ -435,9 +435,15 @@ export default function MethodsEs() {
         con el Congreso en funciones en el año del informe, y solo se conservan los proyectos que este sitio sigue. Un informe
         que nombra un proyecto solo por su título, sin número, no se cuenta. Cuando un informe se enmienda, solo se usa la
         versión más reciente.
-        Como solo se lee el número, un informe que cita un proyecto con su número de un Congreso anterior (por ejemplo,
-        un proyecto presentado de nuevo con otro número) se empareja con el proyecto que hoy tiene ese número. Cada
-        mención enlaza al informe, para que se pueda comprobar el texto.
+        A veces un informe cita un proyecto con su número de un Congreso anterior (por ejemplo, "Equality Act
+        (H.R. 5 / S. 393)" en un informe de 2023, números que la Equality Act tuvo en 2021–2022). Cuando el informe
+        escribe el nombre de un proyecto junto a su número, ese nombre se compara con los títulos corto y oficial del
+        proyecto que tiene ese número en el Congreso del año del informe; si son claramente distintos, el número no se
+        enlaza a ese proyecto. La comparación no tiene en cuenta mayúsculas, puntuación, "the" ni un año al final, y
+        acepta un nombre contenido en un título o que comparte la mayoría de sus palabras. Cuando no hay un nombre
+        junto al número, decide solo el número, así que un informe que cita sin nombre un número de un Congreso
+        anterior todavía puede emparejarse con el proyecto que hoy tiene ese número. Cada mención enlaza al informe,
+        para que se pueda comprobar el texto.
       </p>
       <p>
         Un informe menciona el proyecto; no dice si el cliente lo apoyaba o se oponía, ni qué pidió. Los informes declaran
