@@ -11,6 +11,10 @@ on:
         description: "Viewport width"
         type: string
         default: "390"
+      a11y_audit:
+        description: "Instead of screenshots: full accessibility audit (every route, light and dark, 390 and 1280px)"
+        type: boolean
+        default: false
 
 permissions:
   contents: read
@@ -18,7 +22,7 @@ permissions:
 jobs:
   shoot:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 45
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -27,6 +31,9 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npx playwright install --with-deps chromium
-      - env:
+      - if: ${{ inputs.a11y_audit }}
+        run: node scripts/checks/a11y-audit.mjs https://civic-atlas-cub.pages.dev --best-practice
+      - if: ${{ !inputs.a11y_audit }}
+        env:
           LOOKUP_CHECK_TOKEN: ${{ secrets.LOOKUP_CHECK_TOKEN }}
         run: node scripts/checks/screenshots.mjs https://civic-atlas-cub.pages.dev "${{ inputs.paths }}" "${{ inputs.width }}"
