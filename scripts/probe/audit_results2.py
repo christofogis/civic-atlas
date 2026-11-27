@@ -11,4 +11,4 @@ for y, names in WANT.items():
         for i, l in enumerate(lines):
             if n in l:
                 print(f"--- {y} {n} @{i}")
-                print("\n".join("   " + x.rstrip()[:160] for x in lines[max(0, i - 2): i + 8]))
+                print("\n".join("   " + (x.split("...")[0].strip()[:45] + " | " + x.rstrip()[-45:].strip()) for x in lines[max(0, i - 2): i + 7]))
