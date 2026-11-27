@@ -1,5 +1,5 @@
-import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { useEffect } from "react";
+import { Link, useSearchParams } from "react-router-dom";
 import { tr } from "../lib/lang.js";
 import Portrait from "../components/Portrait.jsx";
 
@@ -8,17 +8,10 @@ import Portrait from "../components/Portrait.jsx";
 const P = (id) => `https://unitedstates.github.io/images/congress/225x275/${id}.jpg`;
 
 export default function StyleTest() {
-  // Opens in the version named in the link (?v=light) or the last one picked here; dark otherwise.
-  const [mode, setModeState] = useState(() => {
-    const v = new URLSearchParams(window.location.search).get("v");
-    if (v === "light" || v === "dark") return v;
-    try { return localStorage.getItem("civic-atlas:style-test") || "dark"; } catch { return "dark"; }
-  });
-  const setMode = (m) => {
-    setModeState(m);
-    try { localStorage.setItem("civic-atlas:style-test", m); } catch { /* storage unavailable */ }
-    const url = new URL(window.location.href); url.searchParams.set("v", m); window.history.replaceState(null, "", url);
-  };
+  // The version comes from the link only (?v=light, otherwise dark), so a tap, a reload and a
+  // shared link always agree. Each switch is an ordinary link, which works the same in every browser.
+  const [params] = useSearchParams();
+  const mode = params.get("v") === "light" ? "light" : "dark";
   useEffect(() => {
     const html = document.documentElement;
     html.classList.remove("slate", "slate-light");
@@ -35,10 +28,10 @@ export default function StyleTest() {
   return (
     <main className="page wide slate-test">
       <p className="fine">{tr("Style test: the new look in dark and light. The dark colors are now the site's dark mode; the light version is shown only here until it's approved.", "Prueba de estilo: el nuevo aspecto en oscuro y claro. Los colores oscuros ya son el modo oscuro del sitio; la versión clara se muestra solo aquí hasta que se apruebe.")}</p>
-      <div className="tabs" role="group" aria-label={tr("Version", "Versión")}>
-        <button type="button" className={mode === "dark" ? "on" : ""} aria-pressed={mode === "dark"} onClick={() => setMode("dark")}>{tr("Dark", "Oscuro")}</button>
-        <button type="button" className={mode === "light" ? "on" : ""} aria-pressed={mode === "light"} onClick={() => setMode("light")}>{tr("Light", "Claro")}</button>
-      </div>
+      <nav className="tabs" aria-label={tr("Version", "Versión")}>
+        <Link to="?v=dark" replace className={mode === "dark" ? "on" : ""} aria-current={mode === "dark" ? "page" : undefined}>{tr("Dark", "Oscuro")}</Link>
+        <Link to="?v=light" replace className={mode === "light" ? "on" : ""} aria-current={mode === "light" ? "page" : undefined}>{tr("Light", "Claro")}</Link>
+      </nav>
 
       <section className="sl-card">
         <span className="sl-pill sl-mono"><span className="sl-dot" />{tr("Your member of Congress", "Su miembro del Congreso")}</span>

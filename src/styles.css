@@ -220,6 +220,8 @@ button.link { background: none; border: 0; padding: 0; color: var(--accent); tex
 .party-d-frame { --frame: #1f4e9c; } .party-r-frame { --frame: #b42318; } .party-other-frame { --frame: #5b6470; }
 .member-photo.small { float: left; margin: 2px 12px 4px 0; border-radius: 6px; }
 .tabs { clear: both; display: flex; gap: 6px; margin: 18px 0 8px; border-bottom: 1px solid var(--border); overflow-x: auto; scrollbar-width: none; }
+.tabs a { border-bottom: 2px solid transparent; padding: 10px 12px 9px; font-weight: 500; color: var(--muted); text-decoration: none; white-space: nowrap; }
+.tabs a.on { color: var(--text); border-bottom-color: var(--accent); }
 .tabs button { background: none; border: 0; border-bottom: 2px solid transparent; padding: 10px 12px 9px; font: inherit; font-weight: 500; color: var(--muted); cursor: pointer; white-space: nowrap; }
 .tabs button.on { color: var(--text); border-bottom-color: var(--accent); }
 .tabs button:hover { color: var(--text); }
