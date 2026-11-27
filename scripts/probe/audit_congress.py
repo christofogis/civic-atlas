@@ -27,6 +27,8 @@ BILLS = """119-hr-6639 119-hr-5077 118-hr-9633 119-hr-9228 119-hr-410 119-s-5086
 118-hres-757""".split()
 
 SECTION = sys.argv[1] if len(sys.argv) > 1 else "all"
+if SECTION == "rerun":  # second pass: members/committees with paging fixed, plus the edge-case roll calls
+    VOTES = "house-119-1-1 house-119-2-130 house-119-2-131 house-118-1-243 senate-119-2-64 house-118-1-521".split()
 
 
 def fetch(url, tries=3):
@@ -40,6 +42,16 @@ def fetch(url, tries=3):
                 print("  FETCH FAIL", url, e)
                 return None
             time.sleep(2)
+
+
+def api_all(path):
+    out, off = [], 0
+    while True:
+        rows = api(f"{path}&limit=1000&offset={off}")
+        out += rows
+        if len(rows) < 1000:
+            return out
+        off += 1000
 
 
 def api(path):
@@ -197,7 +209,8 @@ def audit_members():
     for x in terms:
         if x["start_date"] <= "2026-11-27":
             tmap[x["bioguide_id"]] = x
-    cms = api("committee_memberships?select=committee_id,bioguide_id,side,rank,title&limit=5000")
+    cms = api_all("committee_memberships?select=committee_id,bioguide_id,side,rank,title&order=committee_id,bioguide_id")
+    print("committee_memberships rows read:", len(cms))
     ourcom = {}
     for r in cms:
         ourcom.setdefault(r["bioguide_id"], {})[r["committee_id"]] = r
@@ -242,7 +255,7 @@ def audit_members():
         b = t(m, "bioguide_id"); sids.add(b)
         o = smap.get(b)
         party = pmap.get(t(m, "party"), t(m, "party"))
-        cls = int(re.sub(r"\D", "", t(m, "class", "0")) or 0)
+        cls = {"I": 1, "II": 2, "III": 3}.get(t(m, "class", "").replace("Class", "").strip(), 0)
         if not o:
             print(f"  MISSING current senate term {b} {t(m,'last_name')}"); tally[("member.term", False)] += 1; continue
         check("member.term", (o["state"], o["party"], o["senate_class"]) == (t(m, "state"), party, cls),
@@ -261,12 +274,14 @@ def audit_members():
         raw = fetch(f"https://www.senate.gov/general/committee_membership/committee_memberships_{cid}.xml")
         if not raw:
             continue
+        if cid == scoms[0]["committee_id"]:
+            print("   senate committee xml head:", raw[:600])
         try:
             cd = ET.fromstring(raw)
         except ET.ParseError:
             print("  parse fail", cid); continue
         src = set()
-        for mem in cd.findall("committee/members/member"):
+        for mem in cd.iter("member"):
             nm = mem.find("name")
             ln = t(nm, "last"); st = t(mem, "state")
             b = key2bio.get((ln, st))
@@ -281,11 +296,11 @@ def audit_members():
         time.sleep(0.3)
 
 
-if SECTION in ("all", "votes"):
+if SECTION in ("all", "votes", "rerun"):
     audit_votes()
 if SECTION in ("all", "bills"):
     audit_bills()
-if SECTION in ("all", "members"):
+if SECTION in ("all", "members", "rerun"):
     audit_members()
 print("\nTALLY")
 for (k, ok), n in sorted(tally.items()):
