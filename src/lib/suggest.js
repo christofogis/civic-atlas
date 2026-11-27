@@ -165,7 +165,8 @@ export function highlightParts(text, q) {
   return parts.length ? parts : [{ text: s, match: false }];
 }
 
-// Bills found by title words, best match first: a short title that starts with what's typed, then
+// Bills found by title words, best match first: a short title whose first words are exactly what's
+// typed, then one that starts with it, then
 // one where every typed word starts a word of the short title, then the rest; most recent action
 // first within each. "farm" puts the Farm, Food, and National Security Act above newer bills that
 // only mention farmers in a long official title.
@@ -174,6 +175,7 @@ export function rankBills(bills, q, limit = 5) {
   const score = (b) => {
     const st = wordsOf(b.short_title ?? "");
     if (!qw.length || !st.length) return 0;
+    if (qw.every((w, i) => st[i] === w)) return 3;
     if (qw.every((w, i) => st[i]?.startsWith(w))) return 2;
     return prefixMatch(st, qw) ? 1 : 0;
   };

@@ -59,15 +59,27 @@ export async function fetchBills(q, signal) {
       .textSearch("search", tsq, { config: "english" })
       .order("latest_action_date", { ascending: false, nullsFirst: false }).limit(25).abortSignal(signal);
     if (error) throw error;
-    return rankBills(data, q, 5);
+    return data;
   };
   const tsq = prefixTsquery(q);
   if (!tsq) return { byNumber: false, bills: [] };
-  let bills = await words(tsq);
+  // Short titles that start with what's typed (trigram index on short_title), so the bill a
+  // title names comes up even when newer bills mention the word.
+  const lead = wordsOf(q).join(" ").replace(/[%_\\]/g, "");
+  const startsQ = lead.length >= 3
+    ? db.from("bills").select(BILL_COLUMNS).ilike("short_title", `${lead}%`)
+      .order("latest_action_date", { ascending: false, nullsFirst: false }).limit(20).abortSignal(signal)
+    : null;
+  const [found, starts] = await Promise.all([words(tsq), startsQ]);
+  const seen = new Set();
+  let bills = rankBills([...(starts?.data ?? []), ...found].filter((b) => {
+    const k = `${b.congress}-${b.bill_type}-${b.number}`;
+    return seen.has(k) ? false : seen.add(k);
+  }), q, 5);
   // The English stemmer can make an unfinished word miss ("securi" vs the stored "secur"): one
   // more try with it shortened.
   const shorter = prefixTsquery(q, { trim: 2 });
-  if (!bills.length && shorter && shorter !== tsq) bills = await words(shorter);
+  if (!bills.length && shorter && shorter !== tsq) bills = rankBills(await words(shorter), q, 5);
   return { byNumber: false, bills };
 }
 

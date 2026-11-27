@@ -142,7 +142,7 @@ export default function SearchSuggest({ id, value, onValueChange, pages, ariaLab
     n += 1;
     const i = n;
     return (
-      <div key={opt.key} id={optionId(i)} role="option" aria-selected={i === active} className={`suggest-option${opt.kind === "search" ? " suggest-search" : ""}${i === active ? " active" : ""}`}
+      <div key={opt.key} id={optionId(i)} role="option" aria-selected={i === active} className={`suggest-option kind-${opt.kind}${opt.kind === "search" ? " suggest-search" : ""}${i === active ? " active" : ""}`}
         onMouseDown={(e) => e.preventDefault()} onClick={() => go(opt)} onMouseMove={() => active !== i && setActive(i)}>
         {opt.kind === "member" && <>
           <span className="suggest-main"><Marked text={opt.m.name} q={q} /></span> <PartyTag p={opt.m} />{" "}
