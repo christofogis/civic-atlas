@@ -1,6 +1,6 @@
 name: Ingest FEC detail
 
-# Donations by size, top donor employers, largest committee (PAC) contributions, and outside
+# Donations by size, top donor employers, committee (PAC) contributions (FEC bulk file), and outside
 # spending, per serving member. Aggregates only; no individual donor names are stored.
 on:
   schedule:

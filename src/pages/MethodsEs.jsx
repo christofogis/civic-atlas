@@ -387,7 +387,7 @@ export default function MethodsEs() {
         <li><strong>Dónde viven los donantes detallados:</strong> contribuciones detalladas de personas, separadas por el estado de la dirección del donante (totales por estado de la FEC). Solo se detallan los donantes que dan más de $200 en el ciclo, así que las donaciones pequeñas no se incluyen, y la dirección es donde vive el donante, no donde trabaja. Las direcciones militares y del extranjero cuentan como fuera del estado del miembro.</li>
         <li><strong>Contribuciones por monto:</strong> dinero de personas, agrupado según el monto de cada donación. Las donaciones de menos de $200 no tienen que detallarse, así que se muestran como un solo total.</li>
         <li><strong>Empleadores de los donantes:</strong> los empleadores que las personas donantes escribieron en sus formularios, ordenados por total. Las empresas no pueden contribuir directamente a campañas federales; estas son donaciones de personas. Las entradas que no nombran un empleador (Retired, Self-employed, Not employed, Homemaker, Student, Information requested, N/A y vacías) se excluyen de la lista.</li>
-        <li><strong>PAC y otros comités:</strong> contribuciones informadas como provenientes de otros comités políticos, ordenadas por total entre las 100 contribuciones de ese tipo más grandes de la campaña. No se incluyen las transferencias entre los propios comités de un candidato. Los límites federales mantienen las donaciones de cada comité en unos pocos miles de dólares por elección.</li>
+        <li><strong>PAC y otros comités:</strong> los comités (PAC, comités de partido y comités de otros candidatos) que más dieron a la campaña en el ciclo, con el total de cada uno. Los totales provienen del archivo masivo de la FEC de contribuciones de comités a candidatos, según lo informa el comité donante, y se actualizan cada semana; la página indica la fecha en que la FEC actualizó el archivo por última vez. Se cuentan: contribuciones directas y en especie (tipos de transacción 24K y 24Z de la FEC) a los comités principal o autorizados del candidato, incluidas las partidas de memorando que el comité donante anota para la campaña, como recomienda la FEC para sus datos masivos. Se restan los reembolsos y las contribuciones anuladas que el comité donante informa como montos negativos; un reembolso que la campaña hizo y que el donante aún no ha informado no se resta. No se cuentan: gastos independientes (que aparecen en gasto externo), gastos coordinados de partido, donaciones a un comité conjunto de recaudación o a un PAC de liderazgo, partidas descritas como contribuciones asignadas (earmarks: dinero de personas que pasa por el comité, no del propio comité), ni transferencias entre los propios comités de un candidato. Como las cifras son los informes de los comités donantes, pueden diferir de los ingresos que informa la campaña por cuestiones de fechas. Los límites federales mantienen las donaciones de cada comité en unos pocos miles de dólares por elección, así que muchos comités empatan; los empates se listan en orden alfabético.</li>
         <li><strong>Gasto externo:</strong> dinero que gastan grupos como los super PAC para apoyar al candidato u oponerse a él sin coordinar con la campaña, según lo informado a la FEC.</li>
       </ul>
       <p>Aquí no se nombra a ningún donante individual, y las reglas de la FEC prohíben usar los nombres de donantes para pedir contribuciones o con fines comerciales.</p>
@@ -435,9 +435,15 @@ export default function MethodsEs() {
         con el Congreso en funciones en el año del informe, y solo se conservan los proyectos que este sitio sigue. Un informe
         que nombra un proyecto solo por su título, sin número, no se cuenta. Cuando un informe se enmienda, solo se usa la
         versión más reciente.
-        Como solo se lee el número, un informe que cita un proyecto con su número de un Congreso anterior (por ejemplo,
-        un proyecto presentado de nuevo con otro número) se empareja con el proyecto que hoy tiene ese número. Cada
-        mención enlaza al informe, para que se pueda comprobar el texto.
+        A veces un informe cita un proyecto con su número de un Congreso anterior (por ejemplo, "Equality Act
+        (H.R. 5 / S. 393)" en un informe de 2023, números que la Equality Act tuvo en 2021–2022). Cuando el informe
+        escribe el nombre de un proyecto junto a su número, ese nombre se compara con los títulos corto y oficial del
+        proyecto que tiene ese número en el Congreso del año del informe; si son claramente distintos, el número no se
+        enlaza a ese proyecto. La comparación no tiene en cuenta mayúsculas, puntuación, "the" ni un año al final, y
+        acepta un nombre contenido en un título o que comparte la mayoría de sus palabras. Cuando no hay un nombre
+        junto al número, decide solo el número, así que un informe que cita sin nombre un número de un Congreso
+        anterior todavía puede emparejarse con el proyecto que hoy tiene ese número. Cada mención enlaza al informe,
+        para que se pueda comprobar el texto.
       </p>
       <p>
         Un informe menciona el proyecto; no dice si el cliente lo apoyaba o se oponía, ni qué pidió. Los informes declaran

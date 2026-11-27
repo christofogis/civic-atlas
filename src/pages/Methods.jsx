@@ -377,7 +377,7 @@ export default function Methods() {
         <li><strong>Contributions by size:</strong> money from individuals, grouped by the size of each gift. Gifts under $200 don't have to be itemized, so they're shown as one total.</li>
         <li><strong>Where itemized donors live:</strong> itemized contributions from individuals, split by the state in the donor's address (FEC's by-state totals). Only donors giving more than $200 in the cycle are itemized, so small-dollar money isn't included, and an address is where the donor lives, not where they work. Military and overseas addresses count as outside the member's state.</li>
         <li><strong>Donors' employers:</strong> the employers individual donors wrote on their forms, ranked by total. Companies can't contribute directly to federal campaigns; these are gifts from people. Entries that don't name an employer (Retired, Self-employed, Not employed, Homemaker, Student, Information requested, N/A and blanks) are left out of the ranking.</li>
-        <li><strong>PACs and other committees:</strong> contributions reported as coming from other political committees, ranked by total among the campaign's 100 largest such contributions. Transfers between a candidate's own committees are not included. Federal limits keep each committee's giving to a few thousand dollars per election.</li>
+        <li><strong>PACs and other committees:</strong> the committees (PACs, party committees and other candidates' committees) that gave the most to the campaign in the cycle, with each one's total. Totals come from the FEC's bulk file of contributions from committees to candidates, as reported by the giving committee, and are refreshed weekly; the page gives the date the FEC last updated the file. Counted: direct contributions and in-kind contributions (FEC transaction types 24K and 24Z) to the candidate's principal or authorized committees, including memo entries the giving committee lists for the campaign, as the FEC advises for its bulk data. Refunds and voided contributions that the giving committee reports as negative entries are subtracted; a refund the campaign made that the giver hasn't reported yet is not. Not counted: independent expenditures (listed under outside spending), party coordinated expenditures, gifts to a joint fundraising committee or leadership PAC, entries described as earmarks (individuals' contributions passed through the committee, not its own), and transfers between a candidate's own committees. Because the figures are the giving committees' reports, they can differ from the campaign's own receipts by timing. Federal limits keep each committee's giving to a few thousand dollars per election, so many committees tie; ties are listed alphabetically.</li>
         <li><strong>Outside spending:</strong> money spent by groups such as super PACs to support or oppose the candidate without coordinating with the campaign, as reported to the FEC.</li>
       </ul>
       <p>No individual donor is named here, and FEC rules bar using donor names for soliciting contributions or commercial purposes.</p>
@@ -426,9 +426,15 @@ export default function Methods() {
         to the Congress in session in the report's year, and only bills this site tracks are kept. A report
         that names a bill by title alone, without its number, isn't counted. When a report is amended, only the
         latest version is used.
-        Because only the number is read, a report that cites a bill by its number from an earlier Congress
-        (for example, a bill reintroduced under a new number) is matched to whatever bill has that number now.
-        Each listing links to the report, so the wording can be checked.
+        A report sometimes cites a bill by its number from an earlier Congress (for example, "Equality Act
+        (H.R. 5 / S. 393)" in a 2023 report, numbers the Equality Act had in 2021–2022). When the report writes
+        a bill's name right next to its number, that name is compared with the short and official titles of
+        the bill that has the number in the report's Congress; if they plainly differ, the number isn't
+        linked to that bill. The comparison ignores capitalization, punctuation, "the" and a trailing year,
+        and accepts a name that is contained in a title or shares most of its words. When no name is written
+        next to the number, the number alone decides, so a report that cites an earlier Congress's number
+        without a name can still be matched to whatever bill has that number now. Each listing links to the
+        report, so the wording can be checked.
       </p>
       <p>
         A report lists the bill; it doesn't say whether the client supported or opposed it, or what was

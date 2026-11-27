@@ -23,6 +23,7 @@ import { PartyName } from "../components/PartyTag.jsx";
 import { CandidateTable } from "./Elections.jsx";
 import { useCaResults, ResultsStatus, RaceResult, PartyKey } from "../components/CaResults.jsx";
 import { decodeEntities } from "../../lib/ptr.js";
+import VoteResult from "../components/VoteResult.jsx";
 
 const BIOGUIDE = /^[A-Z][0-9]{6}$/;
 const TERRITORIES = new Set(["DC", "PR", "GU", "VI", "AS", "MP"]);
@@ -141,6 +142,40 @@ function ByStateShare({ home, rows }) {
   );
 }
 
+// Committees (PACs, party and candidate committees) that gave the most to the campaign in one
+// cycle. Rows with a source_date are net totals per giving committee from the FEC bulk file
+// (scripts/ingest/fec-pas2.mjs); rows without one were written by the earlier method, which read
+// only the 100 largest single contributions, and keep that method's wording until replaced.
+function CommitteeGivers({ cycle, pacs }) {
+  const rows = [...pacs].sort((a, z) => Number(z.total) - Number(a.total) || a.contributor_name.localeCompare(z.contributor_name));
+  const asOf = rows.every((p) => p.source_date) ? rows.map((p) => p.source_date).sort().at(-1) : null;
+  const shown = rows.slice(0, 10);
+  const tied = rows.length > 10 ? rows.slice(10).filter((p) => Number(p.total) === Number(shown.at(-1).total)).length : 0;
+  const name = (p) => /^C\d{8}$/.test(p.contributor_committee_id) ? <a href={`https://www.fec.gov/data/committee/${p.contributor_committee_id}/`}>{p.contributor_name}</a> : p.contributor_name;
+  const bulk = <a href="https://www.fec.gov/campaign-finance-data/contributions-committees-candidates-file-description/">{tr("contributions from committees to candidates", "contribuciones de comités a candidatos")}</a>;
+  if (!asOf) {
+    return (
+      <>
+        <h4>{tr("Large contributions from PACs and other committees", "Contribuciones grandes de PAC y otros comités")}</h4>
+        <p className="fine">{tr("Committees among the campaign's 100 largest single contributions from other committees, with what each gave in those contributions. Many committees give the same legal maximum, and one that gave in smaller amounts may not appear, so this is not a full ranking.", "Comités entre las 100 contribuciones individuales más grandes que la campaña recibió de otros comités, con lo que cada uno dio en esas contribuciones. Muchos comités dan el mismo máximo legal, y uno que dio montos menores puede no aparecer, así que no es una clasificación completa.")}</p>
+        <ol className="plain">{shown.map((p) => <li key={`${p.fec_candidate_id}-${p.rank}`}>{name(p)} · {money(Number(p.total))}</li>)}</ol>
+      </>
+    );
+  }
+  return (
+    <>
+      <h4>{tr("PACs and other committees that gave the most", "PAC y otros comités que más dieron")}</h4>
+      <p className="fine">
+        {tr(`Net amounts each committee reported giving to the campaign's own committees in the ${cycle} cycle, from the FEC's file of `, `Montos netos que cada comité reportó haber dado a los comités de la propia campaña en el ciclo ${cycle}, del archivo de la FEC de `)}
+        {bulk}{tr(` updated ${date(asOf)}. `, ` actualizado el ${date(asOf)}. `)}
+        {tr("Includes in-kind gifts, less refunds the giving committee reported; outside spending is listed separately below.", "Incluye donaciones en especie, menos los reembolsos que reportó el comité donante; el gasto externo aparece aparte, más abajo.")}
+      </p>
+      <ol className="plain">{shown.map((p) => <li key={`${p.fec_candidate_id}-${p.rank}`}>{name(p)} · {money(Number(p.total))}</li>)}</ol>
+      {tied > 0 && <p className="fine">{tr(`${tied} more ${tied === 1 ? "committee" : "committees"} also gave ${money(Number(shown.at(-1).total))}. Ties are listed alphabetically.`, `${tied} ${tied === 1 ? "comité más también dio" : "comités más también dieron"} ${money(Number(shown.at(-1).total))}. Los empates se listan en orden alfabético.`)}</p>}
+    </>
+  );
+}
+
 function FinanceDetail({ cycle, bySize, byState, home, employers, pacs, outside, fecId }) {
   const sizeTotal = bySize.reduce((a, r) => a + Number(r.total ?? 0), 0);
   const support = outside.filter((o) => o.support_oppose === "support");
@@ -171,15 +206,7 @@ function FinanceDetail({ cycle, bySize, byState, home, employers, pacs, outside,
           </ol>
         </>
       )}
-      {pacs.length > 0 && (
-        <>
-          <h4>{tr("Large contributions from PACs and other committees", "Contribuciones grandes de PAC y otros comités")}</h4>
-          <p className="fine">{tr("Committees among the campaign's 100 largest single contributions from other committees, with what each gave in those contributions. Many committees give the same legal maximum, and one that gave in smaller amounts may not appear, so this is not a full ranking.", "Comités entre las 100 contribuciones individuales más grandes que la campaña recibió de otros comités, con lo que cada uno dio en esas contribuciones. Muchos comités dan el mismo máximo legal, y uno que dio montos menores puede no aparecer, así que no es una clasificación completa.")}</p>
-          <ol className="plain">
-            {pacs.slice(0, 10).map((p) => <li key={p.rank}>{/^C\d{8}$/.test(p.contributor_committee_id) ? <a href={`https://www.fec.gov/data/committee/${p.contributor_committee_id}/`}>{p.contributor_name}</a> : p.contributor_name} · {money(Number(p.total))}</li>)}
-          </ol>
-        </>
-      )}
+      {pacs.length > 0 && <CommitteeGivers cycle={cycle} pacs={pacs} />}
       {outside.length > 0 && (
         <>
           <h4>{tr("Outside spending", "Gasto externo")}</h4>
@@ -416,7 +443,7 @@ export default function Member() {
                     {(v.document_name || v.description) && <div className="fine"><LinkedText text={[v.document_name, v.description].filter(Boolean).join(" · ")} congress={congressOn(new Date(v.voted_at))} /></div>}
                   </td>
                   <td data-label={tr("Vote:", "Voto:")}><Position v={v} position={v.vote_positions[0]?.position} /></td>
-                  <td data-label={tr("Result:", "Resultado:")}>{v.result}</td>
+                  <td data-label={tr("Result:", "Resultado:")}><VoteResult v={v} /></td>
                 </tr>
               ))}
             </tbody>

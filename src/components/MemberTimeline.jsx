@@ -6,6 +6,7 @@ import { tr } from "../lib/lang.js";
 import { voteKind } from "../lib/voteKind.js";
 import { VoteMeaning } from "./Explain.jsx";
 import { decodeEntities } from "../../lib/ptr.js";
+import VoteResult from "./VoteResult.jsx";
 
 // A member's record in date order: roll-call votes (their recorded position, the clerk's wording),
 // bills they introduced, their bills that became law, and stock trades they reported. Every member
@@ -56,7 +57,7 @@ function Entry({ e }) {
         <span>
           <VoteMeaning v={v} showFallback />
           <strong lang="en">{v.position}</strong>{" "}{tr("on", "en")} {k.label.toLowerCase()}{what && <>: <span lang="en" className="clamp2-inline">{what}</span></>}
-          <span className="fine"> · <span lang="en">{v.result}</span> · <a href={v.source_url} rel="noopener">{tr("Roll call", "Votación")}</a></span>
+          <span className="fine"> · <VoteResult v={v} /> · <a href={v.source_url} rel="noopener">{tr("Roll call", "Votación")}</a></span>
         </span>
       </>
     );

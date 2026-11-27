@@ -9,6 +9,7 @@ import { date, easternDay, billLabel, ordinal } from "../lib/format.js";
 import { voteKind, isFinal } from "../lib/voteKind.js";
 import { areaName } from "../lib/policyAreas.js";
 import { tr } from "../lib/lang.js";
+import VoteResult from "../components/VoteResult.jsx";
 
 const BIOGUIDE = /^[A-Z][0-9]{6}$/;
 const PAGE = 50;
@@ -152,7 +153,7 @@ export default function MemberVotes() {
                         </div>
                       </td>
                       <td data-label={tr("Vote:", "Voto:")}><Position v={v} position={v.position} /></td>
-                      <td data-label={tr("Result:", "Resultado:")}>{v.result}</td>
+                      <td data-label={tr("Result:", "Resultado:")}><VoteResult v={v} /></td>
                     </tr>
                   );
                 })}

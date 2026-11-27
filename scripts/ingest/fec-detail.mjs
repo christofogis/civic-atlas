@@ -2,14 +2,16 @@
 // individual donor names are stored):
 //   - individual contributions by size            /schedules/schedule_a/by_size/by_candidate/
 //   - top employers of individual donors          /schedules/schedule_a/by_employer/
-//   - largest contributions from committees (PACs) /schedules/schedule_a/?is_individual=false
+//   - committees (PACs etc.) that gave the most    FEC bulk file pas2{yy}.zip (see fec-pas2.mjs)
 //   - outside spending for or against             /schedules/schedule_e/by_candidate/
 //   - itemized individual contributions by state  /schedules/schedule_a/by_state/by_candidate/
-// Needs DATA_GOV_API_KEY. Paced under OpenFEC's ~1,000 calls/hour; runs weekly.
+// Needs DATA_GOV_API_KEY. Paced under OpenFEC's ~1,000 calls/hour; runs weekly. The bulk files
+// need no key and `unzip` on the PATH.
 //
 //   node scripts/ingest/fec-detail.mjs                    # serving members, latest cycle with money
 //   node scripts/ingest/fec-detail.mjs --probe C001055    # print raw fields for one member, write nothing
 import { getClient, fetchAll, upsertBatches, withRun } from "./lib.mjs";
+import { committeeGifts, rankGivers } from "./fec-pas2.mjs";
 
 const API = "https://api.open.fec.gov/v1";
 const PAUSE_MS = 3800;
@@ -61,34 +63,13 @@ async function detail(candId, cycle, bioguide, key, probe) {
     size_bucket: Number(r.size), total: money(r.total), contributions: r.count ?? null,
   }));
 
-  let employers = [], committeesIn = [];
+  let employers = [];
   if (committee) {
     const emp = await getJson("/schedules/schedule_a/by_employer/", { committee_id: committee, cycle, sort: "-total", per_page: 40 }, key);
     show("by employer", emp);
     employers = (emp?.results ?? []).filter((r) => !NOT_AN_EMPLOYER.test(String(r.employer ?? "").trim())).slice(0, 15).map((r, i) => ({
       fec_candidate_id: candId, cycle, bioguide_id: bioguide, rank: i + 1,
       employer: String(r.employer ?? "").trim() || "(blank)", total: money(r.total), contributions: r.count ?? null,
-    }));
-
-    // Form 3 line 11C: contributions from other political committees (PACs). This leaves out
-    // transfers from the member's own fundraising committees (line 12), loans and party money.
-    const pac = await getJson("/schedules/schedule_a/", {
-      committee_id: committee, two_year_transaction_period: cycle, line_number: "F3-11C",
-      sort: "-contribution_receipt_amount", per_page: 100,
-    }, key);
-    show("committee contributions", pac);
-    const sums = new Map();
-    if (probe) console.log("line numbers seen:", [...new Set((pac?.results ?? []).map((r) => r.line_number))].join(","));
-    for (const r of pac?.results ?? []) {
-      const id = r.contributor_committee_id ?? r.contributor_id ?? r.contributor_name;
-      if (!id) continue;
-      const cur = sums.get(id) ?? { name: r.contributor_name, amount: 0, n: 0 };
-      cur.amount += Number(r.contribution_receipt_amount ?? 0); cur.n++;
-      sums.set(id, cur);
-    }
-    committeesIn = [...sums].sort((a, b) => b[1].amount - a[1].amount).slice(0, 15).map(([id, v], i) => ({
-      fec_candidate_id: candId, cycle, bioguide_id: bioguide, rank: i + 1,
-      contributor_committee_id: String(id), contributor_name: v.name, total: v.amount, contributions: v.n,
     }));
   }
 
@@ -113,7 +94,7 @@ async function detail(candId, cycle, bioguide, key, probe) {
   }
   const byState = [...byStateMap].map(([state, v]) => ({ fec_candidate_id: candId, cycle, bioguide_id: bioguide, state, total: v.total, contributions: v.n }));
 
-  return { committee, bySize, employers, committeesIn, outside, byState };
+  return { committee, bySize, employers, outside, byState };
 }
 
 async function main() {
@@ -135,12 +116,35 @@ async function main() {
   let work = [...latest.values()];
 
   const probe = arg("--probe");
+  if (probe) work = work.filter((w) => w.bioguide_id === probe).slice(0, 1);
+
+  // Committee contributions come from the FEC bulk file for each cycle in the work list: true
+  // totals per giving committee, read in one pass instead of one API call per member.
+  const gifts = new Map();
+  for (const cycle of [...new Set(work.map((w) => w.cycle))].sort()) {
+    try {
+      gifts.set(cycle, await committeeGifts(cycle, work.filter((w) => w.cycle === cycle).map((w) => w.fec_candidate_id)));
+    } catch (err) {
+      // Keep the rows already stored for this cycle rather than blanking them.
+      console.log(`pas2 ${cycle}: ${err.message}; committee contributions for this cycle left as they were`);
+    }
+  }
+  // null when the cycle's bulk file couldn't be read.
+  const committeesIn = (w) => {
+    const g = gifts.get(w.cycle);
+    if (!g) return null;
+    return rankGivers(g.totals.get(w.fec_candidate_id), g.names).map((v, i) => ({
+      fec_candidate_id: w.fec_candidate_id, cycle: w.cycle, bioguide_id: w.bioguide_id, rank: i + 1,
+      contributor_committee_id: v.id, contributor_name: v.name, total: v.cents / 100, contributions: v.contributions,
+      source_date: g.asOf,
+    }));
+  };
+
   if (probe) {
-    work = work.filter((w) => w.bioguide_id === probe).slice(0, 1);
     if (!work.length) throw new Error(`no FEC totals on file for ${probe}`);
     const d = await detail(work[0].fec_candidate_id, work[0].cycle, probe, key, true);
     console.log("\nmapped:", JSON.stringify({ committee: d.committee, bySize: d.bySize.length, employers: d.employers.slice(0, 3),
-      committeesIn: d.committeesIn.slice(0, 3), outside: d.outside.slice(0, 3), byState: d.byState.sort((a, z) => z.total - a.total).slice(0, 5) }, null, 1));
+      committeesIn: committeesIn(work[0])?.slice(0, 12), outside: d.outside.slice(0, 3), byState: d.byState.sort((a, z) => z.total - a.total).slice(0, 5) }, null, 1));
     return;
   }
 
@@ -153,19 +157,29 @@ async function main() {
   await withRun(db, "fec-detail", async () => {
     console.log(`candidate IDs: ${work.length} (${work.filter((w) => !have.has(w.fec_candidate_id)).length} without detail yet)`);
     let n = 0, rows = 0, i = 0;
+    // Committee contributions for everyone first: they come from the bulk file already read, so
+    // they don't wait on the paced API calls below. Replace each candidate-cycle's rows.
+    for (const w of work) {
+      const list = committeesIn(w);
+      if (!list) continue;
+      const { error } = await db.from("finance_committee_contributions").delete().eq("fec_candidate_id", w.fec_candidate_id).eq("cycle", w.cycle);
+      if (error) throw new Error(`clear finance_committee_contributions: ${error.message}`);
+      await upsertBatches(db, "finance_committee_contributions", list, "fec_candidate_id,cycle,rank");
+      rows += list.length;
+    }
+    console.log(`committee contributions: ${rows} rows for ${work.length} candidate IDs`);
     const one = async (w) => {
       const d = await detail(w.fec_candidate_id, w.cycle, w.bioguide_id, key, false);
       // Replace this candidate-cycle's rows: rankings change from week to week.
-      for (const t of ["finance_by_size", "finance_top_employers", "finance_committee_contributions", "outside_spending", "finance_by_state"]) {
+      for (const t of ["finance_by_size", "finance_top_employers", "outside_spending", "finance_by_state"]) {
         const { error } = await db.from(t).delete().eq("fec_candidate_id", w.fec_candidate_id).eq("cycle", w.cycle);
         if (error) throw new Error(`clear ${t}: ${error.message}`);
       }
       await upsertBatches(db, "finance_by_size", d.bySize, "fec_candidate_id,cycle,size_bucket");
       await upsertBatches(db, "finance_top_employers", d.employers, "fec_candidate_id,cycle,rank");
-      await upsertBatches(db, "finance_committee_contributions", d.committeesIn, "fec_candidate_id,cycle,rank");
       await upsertBatches(db, "outside_spending", d.outside, "fec_candidate_id,cycle,committee_id,support_oppose");
       await upsertBatches(db, "finance_by_state", d.byState, "fec_candidate_id,cycle,state");
-      rows += d.bySize.length + d.employers.length + d.committeesIn.length + d.outside.length + d.byState.length;
+      rows += d.bySize.length + d.employers.length + d.outside.length + d.byState.length;
       if (++n % 50 === 0) console.log(`  ${n}/${work.length}`);
     };
     await Promise.all(Array.from({ length: 3 }, async () => { while (i < work.length) await one(work[i++]); }));

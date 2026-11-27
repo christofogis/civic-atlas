@@ -6,6 +6,7 @@ import { KindLabel, VoteMeaning } from "../components/Explain.jsx";
 import { billLabel, ordinal, partyTag, date, easternDay } from "../lib/format.js";
 import { tr } from "../lib/lang.js";
 import { PartyTag } from "../components/PartyTag.jsx";
+import VoteResult from "../components/VoteResult.jsx";
 
 const BIOGUIDE = /^[A-Z][0-9]{6}$/;
 const pct = (n, d) => (d ? `${Math.round((1000 * n) / d) / 10}%` : "—");
@@ -117,7 +118,7 @@ export default function Compare() {
                                 <a href={v.source_url}>{v.question}</a>
                                 <div className="fine">
                                   {v.bill_type ? <Link to={`/bill/${v.bill_congress}/${v.bill_type}/${v.bill_number}`}>{billLabel({ bill_type: v.bill_type, number: v.bill_number })}</Link> : v.description}
-                                  {" · "}{v.result}
+                                  {" · "}<VoteResult v={v} />
                                 </div>
                               </td>
                               <td data-label={`${short(ma)}:`}>{v.a_position}</td>
