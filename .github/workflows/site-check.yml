@@ -32,7 +32,7 @@ jobs:
       - run: npm ci
       - run: npx playwright install --with-deps chromium
       - run: node scripts/checks/site.mjs "${{ inputs.base_url || 'https://civic-atlas-cub.pages.dev' }}"
-      - name: Accessibility (axe, WCAG 2.1 AA)
+      - name: Accessibility (axe, WCAG 2.2 AA; key pages in dark mode too)
         if: always()
         run: node scripts/checks/a11y.mjs "${{ inputs.base_url || 'https://civic-atlas-cub.pages.dev' }}" ${{ inputs.a11y_report && '--report' || '' }}
       - name: Address lookups (federal and state officials)

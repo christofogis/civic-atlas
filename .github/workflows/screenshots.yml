@@ -15,6 +15,10 @@ on:
         description: "Instead of screenshots: full accessibility audit (every route, light and dark, 390 and 1280px)"
         type: boolean
         default: false
+      base_url:
+        description: "Site URL (e.g. a branch preview)"
+        type: string
+        default: "https://civic-atlas-cub.pages.dev"
 
 permissions:
   contents: read
@@ -32,8 +36,8 @@ jobs:
       - run: npm ci
       - run: npx playwright install --with-deps chromium
       - if: ${{ inputs.a11y_audit }}
-        run: node scripts/checks/a11y-audit.mjs https://civic-atlas-cub.pages.dev --best-practice
+        run: node scripts/checks/a11y-audit.mjs "${{ inputs.base_url }}" --best-practice
       - if: ${{ !inputs.a11y_audit }}
         env:
           LOOKUP_CHECK_TOKEN: ${{ secrets.LOOKUP_CHECK_TOKEN }}
-        run: node scripts/checks/screenshots.mjs https://civic-atlas-cub.pages.dev "${{ inputs.paths }}" "${{ inputs.width }}"
+        run: node scripts/checks/screenshots.mjs "${{ inputs.base_url }}" "${{ inputs.paths }}" "${{ inputs.width }}"
