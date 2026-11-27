@@ -1108,3 +1108,15 @@ html.slate body { background: var(--bg); }
 .save-toggle button[aria-pressed="true"] { background: var(--accent-soft); border-color: var(--accent); }
 .account button.link { text-align: left; }
 .account-list button.link { margin-left: 6px; }
+
+/* Whole tile or card is the link (Chris, Nov 27, 2026): the main link's hit area is stretched over
+   the card, so a tap anywhere opens it. Other links and controls inside stay on top and keep working. */
+.glance-tile, .cards > .card { position: relative; }
+.glance-tile .glance-link a::after,
+.cards > .card > h3 > a::after { content: ""; position: absolute; inset: 0; border-radius: inherit; }
+.glance-tile :is(a, button, summary, input, select):not(.glance-link a),
+.cards > .card :is(a, button, summary, input, select, details):not(h3 > a) { position: relative; z-index: 1; }
+.glance-tile:has(.glance-link a):hover, .cards > .card:has(> h3 > a):hover { border-color: var(--accent); cursor: pointer; }
+.glance-tile .glance-link a:focus-visible, .cards > .card > h3 > a:focus-visible { outline: none; }
+.glance-tile .glance-link a:focus-visible::after,
+.cards > .card > h3 > a:focus-visible::after { outline: 2px solid var(--accent); outline-offset: 2px; }
