@@ -8,7 +8,7 @@ import VoteBreakdown from "../components/VoteBreakdown.jsx";
 import { date, ordinal } from "../lib/format.js";
 import { tr } from "../lib/lang.js";
 import { congressOn } from "../../lib/congress.js";
-import { currentRoles, isChamberPost, speakerElections, todayEastern } from "../../lib/leadership.js";
+import { congressStart, currentRoles, isChamberPost, leadershipPending, speakerElections, todayEastern } from "../../lib/leadership.js";
 
 const CURRENT = congressOn();
 const photo = (id) => `https://unitedstates.github.io/images/congress/225x275/${id}.jpg`;
@@ -45,6 +45,9 @@ export default function Leadership() {
       setState({
         status: "done",
         roles: now,
+        // Chambers with no post on record yet for the Congress in session (the source catches up
+        // with a new Congress some days after Jan 3).
+        pending: new Set(roles.error ? [] : CHAMBERS.map(([c]) => c).filter((c) => leadershipPending(roles.data, c, today))),
         people: new Map((people ?? []).map((p) => [p.bioguide_id, p])),
         elections: votes.error || tallies.error ? null : speakerElections(votes.data ?? [], byVote),
         committees: committees.error || posts.error ? null : committees.data ?? [],
@@ -55,7 +58,7 @@ export default function Leadership() {
 
   if (state.status === "loading") return <main className="page"><h1>{tr("Congressional leadership", "Liderazgo del Congreso")}</h1><p>{tr("Loading…", "Cargando…")}</p></main>;
   if (state.status === "error") return <main className="page"><h1>{tr("Congressional leadership", "Liderazgo del Congreso")}</h1><p className="notice">{tr("Couldn't load leadership right now.", "No se pudo cargar el liderazgo en este momento.")}</p></main>;
-  const { roles, people, elections, committees, committeePosts, committeeCongress } = state;
+  const { roles, pending, people, elections, committees, committeePosts, committeeCongress } = state;
 
   return (
     <main className="page wide">
@@ -77,7 +80,11 @@ export default function Leadership() {
           return (
             <section key={chamber} className="section">
               <h3>{label()}</h3>
-              {list.length === 0 ? <p className="fine">{tr("No current posts on record.", "No hay cargos actuales registrados.")}</p> : <>
+              {list.length === 0 ? (pending.has(chamber)
+                ? <p className="notice">{tr(`The ${ordinal(CURRENT)} Congress began on ${date(congressStart(CURRENT))}. Leadership posts for it aren't in the source data yet; they appear here once it records them. Until then, see the official list: `,
+                    `El ${ordinal(CURRENT)} Congreso comenzó el ${date(congressStart(CURRENT))}. Los cargos de liderazgo de este Congreso aún no están en los datos de la fuente; aparecerán aquí cuando se registren. Mientras tanto, consulte la lista oficial: `)}
+                    <a href={chamber === "house" ? "https://www.house.gov/leadership" : "https://www.senate.gov/senators/leadership.htm"}>{chamber === "house" ? "house.gov/leadership" : "senate.gov"}</a>.</p>
+                : <p className="fine">{tr("No current posts on record.", "No hay cargos actuales registrados.")}</p>) : <>
                 <ul className="cards">{posts.map((r) => <LeaderCard key={`${r.bioguide_id}-${r.title}`} role={r} person={people.get(r.bioguide_id)} />)}</ul>
                 {party.length > 0 && (
                   <details>
@@ -103,6 +110,10 @@ export default function Leadership() {
         : tr("Committee leaders", "Líderes de comités")}<Ref id="src-committees" text={<>{tr(
         "Source: committee rosters from unitedstates/congress-legislators, compiled from the House and Senate committee websites. Full committees only; titles (Chair, Chairman, Ranking Member) as published.",
         "Fuente: listas de comités de unitedstates/congress-legislators, compiladas de los sitios web de los comités de la Cámara y el Senado. Solo comités en pleno; títulos (Chair, Chairman, Ranking Member) tal como se publican.")}</>} /></h2>
+      {committees && committeeCongress && committeeCongress < CURRENT && (
+        <p className="notice">{tr(`The ${ordinal(CURRENT)} Congress began on ${date(congressStart(CURRENT))}. Its committee assignments aren't in the source data yet, so these are the ${ordinal(committeeCongress)} Congress's committee leaders.`,
+          `El ${ordinal(CURRENT)} Congreso comenzó el ${date(congressStart(CURRENT))}. Sus asignaciones a comités aún no están en los datos de la fuente, así que estos son los líderes de comités del ${ordinal(committeeCongress)} Congreso.`)}</p>
+      )}
       {!committees ? <p className="notice">{tr("Committee leaders aren't available right now.", "Los líderes de comités no están disponibles en este momento.")}</p> : (
         <CommitteeLeaders committees={committees} posts={committeePosts} people={people} />
       )}

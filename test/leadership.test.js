@@ -11,7 +11,11 @@ test("a role is current from its start until the day before its end", () => {
   assert.equal(isCurrentRole(r, "2025-01-03"), true);
   assert.equal(isCurrentRole(r, "2027-01-02"), true);
   assert.equal(isCurrentRole(r, "2027-01-03"), false);
-  assert.equal(isCurrentRole(role("A", "house", "X", "2025-01-03"), "2030-01-01"), true); // no end listed
+  assert.equal(isCurrentRole(role("A", "house", "X", "2025-01-03"), "2026-12-31"), true); // no end listed
+  // ...but an open-ended post from an earlier Congress isn't current once a new Congress begins.
+  assert.equal(isCurrentRole(role("A", "house", "X", "2025-01-03"), "2027-01-03"), false);
+  assert.equal(isCurrentRole(role("A", "house", "X", "2026-04-15"), "2027-01-04"), false);
+  assert.equal(isCurrentRole(role("A", "house", "X", "2027-01-03"), "2027-01-04"), true);
   assert.equal(isCurrentRole({ title: "X" }, "2025-01-01"), false);
 });
 
