@@ -2,6 +2,8 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { db } from "../lib/db.js";
 import { date } from "../lib/format.js";
+import { congressOn } from "../../lib/congress.js";
+import { firstMondayOfDecember } from "../../lib/stateleg.js";
 import { tr } from "../lib/lang.js";
 import AccuracyStatus from "../components/AccuracyStatus.jsx";
 import { NotesList, NotesProvider, Ref } from "../components/Notes.jsx";
@@ -10,13 +12,17 @@ import { NotesList, NotesProvider, Ref } from "../components/Notes.jsx";
 // coming up when records need updating. Everything here is already public (the ingest log, the
 // GitHub job history); nothing about visitors or addresses.
 const REPO = "christofogis/civic-atlas";
+const CURRENT = congressOn();
+// Labels are [English, Spanish] pairs picked at render time, so the ordinal is spelled per language here.
+const th = (n) => n + (["th", "st", "nd", "rd"][((n % 100) - 20) % 10] || ["th", "st", "nd", "rd"][n % 100] || "th");
 
 // Each data job in the ingest log: what it updates, how often it runs, and when it counts as late
 // (GitHub can start scheduled jobs hours late, so the margin is generous).
 const JOBS = [
   ["members", ["Members of Congress and their terms", "Miembros del Congreso y sus períodos"], "2x", 30],
   ["committees", ["Committees and their members", "Comités y sus miembros"], "2x", 30],
-  ["votes-119", ["Roll-call votes, 119th Congress", "Votaciones nominales, 119.º Congreso"], "2x", 30],
+  // The Congress in session by date: votes-120 from Jan 3, 2027 (the job names its run by Congress).
+  [`votes-${CURRENT}`, [`Roll-call votes, ${th(CURRENT)} Congress`, `Votaciones nominales, ${CURRENT}.º Congreso`], "2x", 30],
   ["bills", ["Bills, sponsors and actions", "Proyectos, patrocinadores y acciones"], "2x", 30],
   ["bill-text", ["Bill text versions", "Versiones del texto de los proyectos"], "2x", 30],
   ["schedule", ["House floor schedule", "Agenda del pleno de la Cámara"], "2x", 30],
@@ -28,7 +34,8 @@ const JOBS = [
   ["fec-summaries", ["Campaign finance totals", "Totales de finanzas de campaña"], "weekly", 8.5 * 24],
   ["fec-candidates", ["Campaign finance candidates", "Candidatos en finanzas de campaña"], "weekly", 8.5 * 24],
   ["fec-detail", ["Campaign finance detail (donor sizes, employers, PACs)", "Detalle de finanzas de campaña (tamaño de donaciones, empleadores, PAC)"], "weekly", 8.5 * 24],
-  ["votes-118", ["Roll-call votes, 118th Congress (complete)", "Votaciones nominales, 118.º Congreso (completo)"], "done", null],
+  ...Array.from({ length: CURRENT - 118 }, (_, i) => CURRENT - 1 - i).map((c) =>
+    [`votes-${c}`, [`Roll-call votes, ${th(c)} Congress (complete)`, `Votaciones nominales, ${c}.º Congreso (completo)`], "done", null]),
 ];
 const OFTEN = { "2x": ["Twice a day", "Dos veces al día"], weekly: ["Weekly", "Cada semana"], done: ["No longer updated", "Ya no se actualiza"] };
 
@@ -147,7 +154,8 @@ function ComingUp() {
       fetch("/data/state/ca-statewide.json").then((r) => r.json()).catch(() => null),
       fetch("/data/local/ca-orange.json").then((r) => r.json()).catch(() => null),
     ]).then(([st, oc]) => {
-      const list = [["2027-01-03", tr("The 120th Congress begins: new House and Senate terms, and new district lines in nine states", "Comienza el 120.º Congreso: nuevos períodos en la Cámara y el Senado, y nuevos distritos en nueve estados")]];
+      const list = [["2027-01-03", tr("The 120th Congress begins: new House and Senate terms, and new district lines in nine states", "Comienza el 120.º Congreso: nuevos períodos en la Cámara y el Senado, y nuevos distritos en nueve estados")],
+        [firstMondayOfDecember(2026), tr("New terms for the California Assembly and the even-numbered state Senate districts", "Nuevos períodos para la Asamblea de California y los distritos pares del Senado estatal")]];
       if (st?.seat_change_by) list.push([st.seat_change_by, tr("New terms for California's statewide offices and Board of Equalization; certified results due from the Secretary of State", "Nuevos períodos para los cargos estatales de California y la Junta de Igualación; resultados certificados del Secretario de Estado")]);
       const sup = (oc?.supervisors ?? []).filter((s) => s.term_end && s.term_end >= new Date().toISOString().slice(0, 10));
       const soon = [...new Set(sup.map((s) => s.term_end))].sort()[0];

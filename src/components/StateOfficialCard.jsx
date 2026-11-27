@@ -18,10 +18,21 @@ export const statePersonPath = (id) => `/state/person/${id.replace(/^ocd-person\
 // One state official in the lookup results. Same layout as federal cards, for every party.
 export default function StateOfficialCard({ official, state }) {
   if (official.updating) {
+    const roster = official.roster && (
+      <p className="fine"><a href={official.roster} rel="noopener">{tr("Current members: the chamber's official roster", "Miembros actuales: la lista oficial de la cámara")}</a></p>
+    );
     return (
       <li className="card pending">
         <Seat parts={stateOfficeParts(official, state)} />
-        <p>{tr(`A new term began on ${date(official.term_ended)}. Information for this office is being updated.`, `Un nuevo período comenzó el ${date(official.term_ended)}. La información de este cargo se está actualizando.`)}</p>
+        {official.term_began ? (
+          <p>{tr(`New term began ${date(official.term_began)}; data updating. The member list we use (Open States) hasn't been updated for the new term yet.`,
+            `Comenzó un nuevo período el ${date(official.term_began)}; datos en actualización. La lista de miembros que usamos (Open States) aún no se ha actualizado para el nuevo período.`)}</p>
+        ) : official.type === "upper" || official.type === "lower" || official.type === "legislature" ? (
+          <p>{tr(`The term on record for this seat ended on ${date(official.term_ended)}. Information for this seat is being updated.`, `El período registrado para este escaño terminó el ${date(official.term_ended)}. La información de este escaño se está actualizando.`)}</p>
+        ) : (
+          <p>{tr(`A new term began on ${date(official.term_ended)}. Information for this office is being updated.`, `Un nuevo período comenzó el ${date(official.term_ended)}. La información de este cargo se está actualizando.`)}</p>
+        )}
+        {roster}
       </li>
     );
   }

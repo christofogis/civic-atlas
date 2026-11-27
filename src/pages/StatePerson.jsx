@@ -8,18 +8,21 @@ import { tr } from "../lib/lang.js";
 import { stateOfficeLabel } from "../lib/stateOffices.js";
 import { StatePartyTag } from "../components/StateOfficialCard.jsx";
 import { NotesList, Ref } from "../components/Notes.jsx";
+import { calendarChecks, calendarStale, isCurrentStateRole, rosterFor } from "../../lib/stateleg.js";
 import SaveToggle from "../components/SaveToggle.jsx";
 
 // A state legislator or statewide official: current office, contact details, past roles.
 // Data: Open States (openstates/people, public domain), compiled from state legislature sites.
 const today = new Date().toISOString().slice(0, 10);
-const current = (r) => (!r.start_date || r.start_date <= today) && (!r.end_date || r.end_date >= today);
+const current = (r) => isCurrentStateRole(r, today);
 const host = (u) => { try { return new URL(u).hostname.replace(/^www\./, ""); } catch { return u; } };
 
 export default function StatePerson() {
   const { id } = useParams();
   const [p, setP] = useState(undefined);
   const [roles, setRoles] = useState([]);
+  // Chambers on a term calendar (California) that Open States has updated since the new term began.
+  const [refreshed, setRefreshed] = useState(null);
   useEffect(() => {
     const pid = `ocd-person/${id}`;
     db.from("state_people").select("*").eq("id", pid).maybeSingle().then(({ data }) => {
@@ -29,11 +32,20 @@ export default function StatePerson() {
     db.from("state_roles").select("type,district,start_date,end_date").eq("person_id", pid)
       .order("start_date", { ascending: false, nullsFirst: false }).then(({ data }) => setRoles(data ?? []));
   }, [id]);
+  useEffect(() => {
+    if (!p) return;
+    const checks = calendarChecks(p.state, roles.filter(current), today);
+    if (!checks.length) { setRefreshed(new Set()); return; }
+    Promise.all(checks.map((c) => db.from("state_roles").select("person_id").eq("state", p.state).eq("type", c.type)
+      .gte("start_date", c.termStart).lte("start_date", today).limit(1)
+      .then(({ data }) => (data?.length ? `${c.type}|${c.termStart}` : null))))
+      .then((hits) => setRefreshed(new Set(hits.filter(Boolean))));
+  }, [p, roles]);
 
   if (p === undefined) return <main className="page"><p className="fine">{tr("Loading…", "Cargando…")}</p></main>;
   if (p === null) return <main className="page"><h1>{tr("Official not found", "Funcionario no encontrado")}</h1><p><Link to="/">{tr("Look up your address", "Buscar su dirección")}</Link></p></main>;
 
-  const now = roles.filter(current), upcoming = roles.filter((r) => r.start_date && r.start_date > today), past = roles.filter((r) => r.end_date && r.end_date < today);
+  const now = roles.filter(current), upcoming = roles.filter((r) => r.start_date && r.start_date > today), past = roles.filter((r) => r.end_date && r.end_date <= today);
   return (
     <main className="page wide">
       <p className="fine"><Link to="/">{tr("Home", "Inicio")}</Link> / {stateName(p.state)}</p>
@@ -50,9 +62,23 @@ export default function StatePerson() {
       <div className="split">
         <div className="split-main">
           <h2>{tr("Office", "Cargo")}</h2>
-          {now.length ? now.map((r) => (
-            <p key={`${r.type}${r.district}`} className="map-rep">{stateOfficeLabel(r, p.state)}{r.start_date && <span className="fine"> · {tr("since", "desde el")} {date(r.start_date)}</span>}{r.end_date && <span className="fine"> · {tr("term ends", "el período termina el")} {date(r.end_date)}</span>}</p>
-          )) : <p>{tr("Not currently in a state office listed here.", "Actualmente no ocupa un cargo estatal de los que aparecen aquí.")}</p>}
+          {now.length ? now.map((r) => {
+            // Until we know whether Open States is current for the new term, say nothing about it.
+            const stale = calendarStale(p.state, r, today, refreshed ?? new Set());
+            if (stale && !refreshed) return <p key={`${r.type}${r.district}`} className="fine">{tr("Loading…", "Cargando…")}</p>;
+            if (stale) {
+              const roster = rosterFor(p.state, r.type);
+              return (
+                <div key={`${r.type}${r.district}`}>
+                  <p className="map-rep">{tr("Most recent office on record:", "Último cargo registrado:")} {stateOfficeLabel(r, p.state)}{r.start_date && <span className="fine"> · {tr("since", "desde el")} {date(r.start_date)}</span>}</p>
+                  <p className="notice">{tr(`New term began ${date(stale)}; data updating. The member list we use (Open States) hasn't been updated for the new term yet, so it doesn't yet show who holds this seat now.`,
+                    `Comenzó un nuevo período el ${date(stale)}; datos en actualización. La lista de miembros que usamos (Open States) aún no se ha actualizado para el nuevo período, así que todavía no muestra quién ocupa este escaño ahora.`)}
+                    {roster && <> <a href={roster} rel="noopener">{tr("Official roster", "Lista oficial")}</a></>}</p>
+                </div>
+              );
+            }
+            return <p key={`${r.type}${r.district}`} className="map-rep">{stateOfficeLabel(r, p.state)}{r.start_date && <span className="fine"> · {tr("since", "desde el")} {date(r.start_date)}</span>}{r.end_date && <span className="fine"> · {tr("term ends", "el período termina el")} {date(r.end_date)}</span>}</p>;
+          }) : <p>{tr("Not currently in a state office listed here.", "Actualmente no ocupa un cargo estatal de los que aparecen aquí.")}</p>}
           {upcoming.map((r) => (
             <p key={`u${r.type}${r.district}`}>{tr("Takes office", "Asume el cargo el")} {date(r.start_date)}: {stateOfficeLabel(r, p.state)}</p>
           ))}

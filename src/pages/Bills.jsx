@@ -91,7 +91,12 @@ export default function Bills() {
       </div>
       {state.status === "error" && <p className="notice">{tr("Couldn't load bills right now.", "No se pudieron cargar los proyectos en este momento.")}</p>}
       {state.status === "loading" && state.rows.length === 0 && <p>{tr("Loading…", "Cargando…")}</p>}
-      {state.rows.length === 0 && state.status === "done" && <p>{tr("No bills match.", "Ningún proyecto coincide.")}</p>}
+      {state.rows.length === 0 && state.status === "done" && (congress === CURRENT && !issue && page === 0 ? (
+        // A new Congress (Jan 3) has no bills until members introduce them and GovInfo publishes them.
+        <p>{tr(`No bills from the ${ordinal(CURRENT)} Congress are in the record yet. Bills appear here as they're introduced and published by GovInfo. `,
+          `Todavía no hay proyectos del ${ordinal(CURRENT)} Congreso en el registro. Los proyectos aparecen aquí a medida que se presentan y GovInfo los publica. `)}
+          <Link to={`/bills?congress=${CURRENT - 1}`}>{tr(`Bills of the ${ordinal(CURRENT - 1)} Congress`, `Proyectos del ${ordinal(CURRENT - 1)} Congreso`)}</Link></p>
+      ) : <p>{tr("No bills match.", "Ningún proyecto coincide.")}</p>)}
       {state.rows.length > 0 && (
         <table className={`bill-table${state.status === "loading" ? " dim" : ""}`}>
           <thead><tr><th>{tr("Bill", "Proyecto")}</th><th>{tr("Sponsor", "Patrocinador")}</th><th>{tr("Latest action", "Última acción")}</th>{sort === "lobbying" && <th>{tr("Lobbying", "Cabildeo")}</th>}</tr></thead>

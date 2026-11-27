@@ -49,7 +49,7 @@ export default function EmbedMember() {
     <main className="embed">
       <h1><a href={full} target="_blank" rel="noopener">{name}</a></h1>
       <p className="fine">
-        {seat?.seat_status === "serving" ? <>{seatLabel(seat)} <PartyName party={seat.party} /></> : latest ? <>{tr("Former member", "Exmiembro")} · {seatLabel(latest)} <PartyName party={latest.party} /></> : ""}
+        {seat?.seat_status === "serving" ? <>{seatLabel(seat)} <PartyName party={seat.party} /></> : seat?.seat_status === "pending_update" ? <>{seatLabel(seat)} · {tr("New term began; data updating", "Comenzó un nuevo período; datos en actualización")}</> : latest ? <>{tr("Former member", "Exmiembro")} · {seatLabel(latest)} <PartyName party={latest.party} /></> : ""}
       </p>
       <AtAGlance terms={terms} voteStats={d.voteStats.filter((s) => servedInCongress(terms, s.chamber, s.congress))} medians={d.medians} billStats={d.billStats} laws={d.laws}
         finance={d.finance} bySize={d.bySize} tradeSummary={d.tradeSummary} delegate={latest?.chamber === "house" && TERRITORIES.has(latest.state)}

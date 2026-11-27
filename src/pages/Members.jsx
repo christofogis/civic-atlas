@@ -33,6 +33,19 @@ export default function Members() {
     return [...out].sort((a, z) => (STATE_NAMES[a[0]] ?? a[0]).localeCompare(STATE_NAMES[z[0]] ?? z[0]));
   }, [rows, state, chamber, former]);
   const count = groups.reduce((n, [, list]) => n + list.length, 0);
+  // Terms that ended in the last 30 days (Jan 3 for a Congress) with no newer term in the data yet:
+  // the source adds re-elected and new members' terms a day or more later. Those aren't shown as
+  // serving, and aren't described as having left either.
+  const today = new Date().toISOString().slice(0, 10);
+  const monthAgo = new Date(Date.now() - 30 * 864e5).toISOString().slice(0, 10);
+  // Only regular term ends (Jan 3), not a resignation or an appointment that ran out.
+  const justEnded = (m) => !m.serving && m.end_date?.endsWith("-01-03") && m.end_date <= today && m.end_date > monthAgo;
+  // Only while the new terms are missing (most House seats without a serving member); afterwards
+  // those still not serving left office, and read "served until" as usual.
+  const servingHouse = (rows ?? []).filter((m) => m.serving && m.chamber === "house").length;
+  const updating = rows && servingHouse < 390;
+  const endedCount = updating ? rows.filter(justEnded).length : 0;
+  const endedOn = (rows ?? []).filter(justEnded).map((m) => m.end_date).sort().at(-1);
   const states = useMemo(() => [...new Set((rows ?? []).map((m) => m.state))]
     .sort((a, z) => (STATE_NAMES[a] ?? a).localeCompare(STATE_NAMES[z] ?? z)), [rows]);
 
@@ -57,6 +70,10 @@ export default function Members() {
       </div>
       {error && <p className="notice">{tr("Couldn't load members right now.", "No se pudieron cargar los miembros en este momento.")}</p>}
       {!rows && !error && <p>{tr("Loading…", "Cargando…")}</p>}
+      {rows && endedCount > 0 && (
+        <p className="notice">{tr(`${endedCount} member${endedCount === 1 ? "'s term" : "s' terms"} ended on ${date(endedOn)} and the official member list doesn't have the new terms yet. Members who were re-elected are listed as serving once it adds them; until then everyone whose term ended appears only with former members.`,
+          `${endedCount} período${endedCount === 1 ? "" : "s"} de miembros terminó${endedCount === 1 ? "" : "ron"} el ${date(endedOn)} y la lista oficial de miembros aún no tiene los nuevos períodos. Los miembros reelegidos aparecerán en el cargo cuando se agreguen; mientras tanto, todos aquellos cuyo período terminó figuran solo con los exmiembros.`)}</p>
+      )}
       {rows && <p className="fine">{tr(`${count} member${count === 1 ? "" : "s"}.`, `${count} miembro${count === 1 ? "" : "s"}.`)}</p>}
       <DownloadCsv rows={groups.flatMap(([, list]) => list)} filename="members" columns={[
         ["Name", (m) => m.name], ["Party", (m) => m.party], ["Chamber", (m) => m.chamber], ["State", (m) => m.state],
@@ -69,7 +86,7 @@ export default function Members() {
           <ul className="plain columns">
             {list.map((m) => (
               <li key={m.bioguide_id}>
-                <Link to={`/member/${m.bioguide_id}`}>{m.name}</Link> <PartyTag p={m} /> <span className="fine">{m.chamber === "senate" ? tr(" · Senate", " · Senado") : ""}{m.serving ? "" : tr(` · served until ${date(m.end_date)}`, ` · en el cargo hasta el ${date(m.end_date)}`)}</span>
+                <Link to={`/member/${m.bioguide_id}`}>{m.name}</Link> <PartyTag p={m} /> <span className="fine">{m.chamber === "senate" ? tr(" · Senate", " · Senado") : ""}{m.serving ? "" : updating && justEnded(m) ? tr(` · term ended ${date(m.end_date)}; data updating`, ` · el período terminó el ${date(m.end_date)}; datos en actualización`) : tr(` · served until ${date(m.end_date)}`, ` · en el cargo hasta el ${date(m.end_date)}`)}</span>
               </li>
             ))}
           </ul>

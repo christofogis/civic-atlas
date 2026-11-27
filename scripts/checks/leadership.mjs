@@ -22,6 +22,9 @@ for (const [chamber, url] of Object.entries(PAGES)) {
   if (!page.ok) { console.log(`${url} returned ${page.status}; skipped`); continue; }
   const text = strip((await page.text()).replace(/<[^>]+>/g, " "));
   const mine = roles.filter((r) => r.chamber === chamber);
+  // After Jan 3 of a new Congress, the previous Congress's posts no longer count as current; an
+  // empty list means the source hasn't recorded the new Congress's leaders yet.
+  if (!mine.length) { console.log(`${chamber}: no current leadership posts on record (new Congress not yet in the source?).`); problems++; continue; }
   const missing = mine.filter((r) => !text.includes(strip(r.members.last_name)));
   for (const r of missing) console.log(`Not on ${url}: ${r.members.first_name} ${r.members.last_name}, "${r.title}" since ${r.start_date}.`);
   console.log(`${chamber}: ${mine.length - missing.length} of ${mine.length} current leaders found on the official page.`);
