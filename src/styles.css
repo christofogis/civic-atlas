@@ -960,8 +960,9 @@ ol.bare { list-style: none; padding: 0; margin: 0; }
 
 /* Style test (/style-test only): a darker "slate" look. Applied by a class on <html> while that page
    is open. Links and highlights are green, never blue, because blue marks Democrats. */
-/* [data-theme] keeps these test palettes above the site's dark/light settings. */
-html.slate-light, html.slate-light[data-theme] {
+/* The doubled class keeps these test palettes above every site theme rule, including
+   System mode on a dark device (no data-theme attribute). */
+:root.slate-light.slate-light {
   --bg: #f4f6f8; --surface: #ffffff; --text: #18212b; --muted: #55616d; --faint: #5f6b77;
   --border: #dde3e9; --border-strong: #c6cfd8; --accent: #157a4c; --accent-soft: #e4f3eb; --on-accent: #ffffff;
   --header-bg: rgba(244, 246, 248, 0.92); --shadow: rgba(16, 24, 32, 0.08);
@@ -973,7 +974,7 @@ html.slate-light .sl-lede, html.slate-light .sl-stat > div { color: #33404c; }
 html.slate-light .sl-pill { border-color: #b7dcc7; background: #eaf6ef; color: #146c43; }
 html.slate-light .sl-pill-amber { border-color: #ecd59a; background: #fbf3dc; color: #8a5a00; }
 html.slate-light .sl-card { box-shadow: 0 1px 2px var(--shadow); }
-html.slate, html.slate[data-theme] {
+:root.slate.slate {
   --bg: #0b1016; --surface: #131a22; --text: #e6edf3; --muted: #9aa7b4; --faint: #7d8a97;
   --border: #212b36; --border-strong: #2e3a47; --accent: #4cc38a; --accent-soft: #14281f; --on-accent: #08110c;
   --header-bg: rgba(11, 16, 22, 0.92); --shadow: rgba(0, 0, 0, 0.5);
