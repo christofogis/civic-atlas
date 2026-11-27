@@ -20,6 +20,7 @@ import { tr } from "../lib/lang.js";
 import { ballotYearFor, generalElectionDate } from "../../lib/upForElection.js";
 import { NotesList, NotesProvider, Ref } from "../components/Notes.jsx";
 import { PartyName } from "../components/PartyTag.jsx";
+import { termPartyPeriods } from "../../lib/partyPeriods.js";
 import { CandidateTable } from "./Elections.jsx";
 import { useCaResults, ResultsStatus, RaceResult, PartyKey } from "../components/CaResults.jsx";
 import { decodeEntities } from "../../lib/ptr.js";
@@ -610,7 +611,7 @@ export default function Member() {
         {terms.some((t) => t.chamber === "house" && t.state === "CA") && <CaHouseResult bioguide={m.bioguide_id} />}
         <ul className="plain">
           {terms.map((t) => (
-            <li key={`${t.chamber}-${t.start_date}`}>{seatLabel(t)} <PartyName party={t.party} /> · {date(t.start_date)} – {date(t.end_date)}</li>
+            <li key={`${t.chamber}-${t.start_date}`}><TermLine t={t} /></li>
           ))}
         </ul>
       </Section>
@@ -633,6 +634,22 @@ export default function Member() {
       <NotesList />
     </main>
     </NotesProvider>
+  );
+}
+
+// One term: seat, party, dates. When the member changed party during the term (the source lists
+// each stretch), every stretch is given with its dates, the last one "from" its start: "Democrat,
+// Jan 3, 2019 – May 31, 2024; Independent from May 31, 2024". Same wording for every member.
+function TermLine({ t }) {
+  const periods = termPartyPeriods(t);
+  if (periods.length === 1) return <>{seatLabel(t)} <PartyName party={periods[0].party} /> · {date(t.start_date)} – {date(t.end_date)}</>;
+  return (
+    <>{seatLabel(t)} · {date(t.start_date)} – {date(t.end_date)} · {periods.map((p, i) => (
+      <span key={p.start_date}>{i ? "; " : ""}<PartyName party={p.party} />
+        {i === periods.length - 1
+          ? tr(` from ${date(p.start_date)}`, ` desde el ${date(p.start_date)}`)
+          : `, ${date(p.start_date)} – ${date(p.end_date)}`}</span>
+    ))}</>
   );
 }
 

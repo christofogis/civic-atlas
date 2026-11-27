@@ -1,7 +1,15 @@
 {
-  "election": "2028-11-07",
   "state": "CA",
-  "election_name": "November 7, 2028, Statewide General Election",
+  "elections": [
+    {
+      "date": "2028-03-07",
+      "name": "March 7, 2028, Statewide Primary Election"
+    },
+    {
+      "date": "2028-11-07",
+      "name": "November 7, 2028, Statewide General Election"
+    }
+  ],
   "sources": {
     "qualified": "https://www.sos.ca.gov/elections/ballot-measures/qualified-ballot-measures",
     "eligible": "https://www.sos.ca.gov/elections/ballot-measures/initiative-and-referendum-status/eligible-statewide-initiative-measures",
@@ -10,7 +18,25 @@
   },
   "measures": [
     {
+      "id": "sb-895",
+      "election": "2028-03-07",
+      "kind": "bond",
+      "title": "California Science and Health Research Bond Act.",
+      "label": "SB 895 (Wiener), Ch. 1040, Statutes of 2026",
+      "status": "qualified",
+      "dates": [
+        {
+          "date": "2026-09-30",
+          "event": "chaptered",
+          "source": "https://elections.cdn.sos.ca.gov/ballot-measures/pdf/sb895-ch1040.pdf"
+        }
+      ],
+      "text_url": "https://elections.cdn.sos.ca.gov/ballot-measures/pdf/sb895-ch1040.pdf",
+      "text_scanned": true
+    },
+    {
       "id": "aca-7",
+      "election": "2028-11-07",
       "kind": "legislative_constitutional_amendment",
       "title": "Government preferences.",
       "label": "ACA 7 (Jackson), Res. Ch. 223, Statutes of 2026",
@@ -36,6 +62,7 @@
     },
     {
       "id": "1995",
+      "election": "2028-11-07",
       "kind": "initiative_constitutional_amendment",
       "title": "Requires University of California to provide downpayment home loans to certain staff.",
       "label": "Initiative 1995 (A.G. File No. 25-0018A1)",

@@ -59,7 +59,10 @@ export default function MethodsEs() {
       </ul>
       <p>
         El partido se toma a la fecha en que se presentó el proyecto (para el patrocinador) o en que se copatrocinó
-        (para el copatrocinador); los independientes cuentan con el partido con el que se agrupan. Los copatrocinios
+        (para el copatrocinador); los independientes cuentan con el partido con el que se agrupan. Cuando un miembro
+        cambió de partido durante un período, se usa el partido de esa fecha, según las fechas del conjunto de datos
+        congress-legislators (las mismas fechas aparecen en la lista de períodos de la página del miembro y junto a los
+        nombres en las páginas de proyectos). Los copatrocinios
         retirados no cuentan. Las tasas no se muestran con menos de 20 proyectos copatrocinados o 10 presentados.
         El copatrocinio refleja apoyo a la presentación de un proyecto, no cómo vota el miembro después.
       </p>

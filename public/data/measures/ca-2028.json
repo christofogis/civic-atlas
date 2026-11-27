@@ -1,7 +1,15 @@
 {
- "election": "2028-11-07",
  "state": "CA",
- "election_name": "November 7, 2028, Statewide General Election",
+ "elections": [
+  {
+   "date": "2028-03-07",
+   "name": "March 7, 2028, Statewide Primary Election"
+  },
+  {
+   "date": "2028-11-07",
+   "name": "November 7, 2028, Statewide General Election"
+  }
+ ],
  "sources": {
   "qualified": "https://www.sos.ca.gov/elections/ballot-measures/qualified-ballot-measures",
   "eligible": "https://www.sos.ca.gov/elections/ballot-measures/initiative-and-referendum-status/eligible-statewide-initiative-measures",
@@ -10,7 +18,25 @@
  },
  "measures": [
   {
+   "id": "sb-895",
+   "election": "2028-03-07",
+   "kind": "bond",
+   "title": "California Science and Health Research Bond Act.",
+   "label": "SB 895 (Wiener), Ch. 1040, Statutes of 2026",
+   "status": "qualified",
+   "dates": [
+    {
+     "date": "2026-09-30",
+     "event": "chaptered",
+     "source": "https://elections.cdn.sos.ca.gov/ballot-measures/pdf/sb895-ch1040.pdf"
+    }
+   ],
+   "text_url": "https://elections.cdn.sos.ca.gov/ballot-measures/pdf/sb895-ch1040.pdf",
+   "text_scanned": true
+  },
+  {
    "id": "aca-7",
+   "election": "2028-11-07",
    "kind": "legislative_constitutional_amendment",
    "title": "Government preferences.",
    "label": "ACA 7 (Jackson), Res. Ch. 223, Statutes of 2026",
@@ -30,6 +56,7 @@
   },
   {
    "id": "1995",
+   "election": "2028-11-07",
    "kind": "initiative_constitutional_amendment",
    "title": "Requires University of California to provide downpayment home loans to certain staff.",
    "label": "Initiative 1995 (A.G. File No. 25-0018A1)",
@@ -59,14 +86,14 @@
    "analysis_url": "https://lao.ca.gov/BallotAnalysis/BallotDetail?id=1495",
    "analysis_pdf": "https://lao.ca.gov/ballot/2025/250426.pdf",
    "funders_url": "https://elections.cdn.sos.ca.gov/ballot-measures/top-funders/1995-top-funders-05-01-26.pdf",
+   "funders_as_of": "2026-05-01",
    "official_title": "REQUIRES UNIVERSITY OF CALIFORNIA TO PROVIDE DOWNPAYMENT HOME LOANS TO CERTAIN STAFF. INITIATIVE CONSTITUTIONAL AMENDMENT.",
    "fiscal_estimate": "Costs to the University of California of about $30 million annually the first few years to provide new home loans, with annual costs decreasing over a few decades as loans are repaid.",
    "official_summary": [
-    "The University of California (UC) currently offers home loans to faculty and managers. This measure requires UC to provide no-interest 20% downpayment loans to non-faculty, non-managerial staff who are first-time homeowners with five years\u2019 experience working for UC. No monthly payments required; staff must repay loan\u2014plus 20% of any increase in home\u2019s value\u2014when home is sold or refinanced. Requires 75% of loans be made available to staff with household incomes at or below area median income. Prohibits using taxpayer funds, tuition, or General Fund to fund loans."
+    "The University of California (UC) currently offers home loans to faculty and managers. This measure requires UC to provide no-interest 20% downpayment loans to non-faculty, non-managerial staff who are first-time homeowners with five years’ experience working for UC. No monthly payments required; staff must repay loan—plus 20% of any increase in home’s value—when home is sold or refinanced. Requires 75% of loans be made available to staff with household incomes at or below area median income. Prohibits using taxpayer funds, tuition, or General Fund to fund loans."
    ],
-   "extracted_from": "https://oag.ca.gov/system/files/initiatives/pdfs/Title%20and%20Summary%20%2825-0018A1%29.pdf",
-   "funders_as_of": "2026-05-01"
+   "extracted_from": "https://oag.ca.gov/system/files/initiatives/pdfs/Title%20and%20Summary%20%2825-0018A1%29.pdf"
   }
  ],
- "built": "2026-11-25"
+ "built": "2026-11-27"
 }

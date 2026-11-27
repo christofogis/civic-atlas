@@ -69,7 +69,9 @@ export default function Methods() {
       </ul>
       <p>
         Party is taken as of the date the bill was introduced (for the sponsor) or cosponsored (for the
-        cosponsor); independents count with the party they caucus with. Withdrawn cosponsorships don't
+        cosponsor); independents count with the party they caucus with. When a member changed party during
+        a term, the party on that date is used, from the dates listed in the congress-legislators dataset
+        (the same dates appear in the member page's list of terms and beside names on bill pages). Withdrawn cosponsorships don't
         count. Rates aren't shown below 20 cosponsored or 10 introduced bills. Cosponsorship reflects
         support for introducing a bill, not how a member later votes on it.
       </p>
