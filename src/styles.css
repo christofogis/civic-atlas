@@ -12,6 +12,7 @@
   --faint: #5f6b77;      /* smallest text; meets WCAG AA on the page and on cards */
   --border: #dde3e9;      /* hairlines */
   --border-strong: #c6cfd8;
+  --field-edge: #7f8b97;   /* edges of text boxes and menus: 3:1 on the page and on cards (WCAG 1.4.11) */
   --surface: #ffffff;     /* cards sit white on the cool grey page */
   --accent: #157a4c;      /* green: links, headline figures and the active state */
   --accent-soft: #e4f3eb;
@@ -19,9 +20,9 @@
   --bg: #f4f6f8;
   --on-accent: #ffffff;   /* text on accent-colored buttons */
   --header-bg: rgba(244, 246, 248, 0.92);
-  --notice-bg: #fffaf0;  --notice-edge: #c48a00;
+  --notice-bg: #fffaf0;  --notice-edge: #b88200;
   --cal-senate-bg: #eef1f0;  --cal-senate-edge: #4b5853;
-  --cal-mine-bg: #fbefb8;  --cal-mine-edge: #b08a00;
+  --cal-mine-bg: #fbefb8;  --cal-mine-edge: #a07d00;
   --today-bg: #ffffff;
   --late: #8a4b00;
   --highlight: #fff6d6;
@@ -32,7 +33,7 @@
   --wide: 1200px;
   --measure: 72ch;
   font-family: "Public Sans", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-  font-size: 16px;
+  font-size: 100%;   /* the browser's own text size (16px unless the visitor changed it), so a larger default font setting is honored */
   color: var(--text);
   background: var(--bg);
   line-height: 1.55;
@@ -45,9 +46,10 @@
 :root[data-theme="dark"] {
   --text: #e6edf3;
   --muted: #9aa7b4;
-  --faint: #8d99a6;
+  --faint: #929eab;
   --border: #232c37;
   --border-strong: #323d4a;
+  --field-edge: #64717f;
   --surface: #151c24;
   --accent: #4cc38a;
   --accent-soft: #13281f;
@@ -70,9 +72,10 @@
   :root:not([data-theme="light"]) {
     --text: #e6edf3;
     --muted: #9aa7b4;
-    --faint: #8d99a6;
+    --faint: #929eab;
     --border: #232c37;
     --border-strong: #323d4a;
+    --field-edge: #64717f;
     --surface: #151c24;
     --accent: #4cc38a;
     --accent-soft: #13281f;
@@ -130,15 +133,16 @@ header.site nav a { color: var(--muted); text-decoration: none; font-size: 0.95r
 header.site nav a:hover { color: var(--text); }
 header.site nav a.active { color: var(--text); border-bottom-color: var(--accent); }
 .site-search { margin-left: auto; }
-.site-search input { padding: 7px 12px; border: 1px solid var(--border-strong); border-radius: 999px; font: inherit; font-size: 0.9rem; width: 240px; max-width: 100%; background: var(--bg); }
+.site-search input { padding: 7px 12px; border: 1px solid var(--field-edge); border-radius: 999px; font: inherit; font-size: 0.9rem; width: 240px; max-width: 100%; background: var(--bg); }
 .lang-switch { font-size: 0.85rem; white-space: nowrap; }
 .skip-link { position: absolute; left: -9999px; top: 0; background: var(--accent); color: var(--on-accent); padding: 8px 12px; z-index: 30; }
 .skip-link:focus { left: 8px; top: 8px; }
+#main:focus { outline: none; }   /* focused by script after a page change and by the skip link; not a control */
 
 .site-footer { border-top: 1px solid var(--border); margin-top: 56px; padding: 18px 0 32px; font-size: 0.82rem; }
 .site-footer .site-inner { gap: 8px 22px; align-items: flex-start; }
 .site-footer a { color: var(--muted); }
-.report textarea { width: 100%; max-width: 480px; display: block; margin: 6px 0; padding: 8px; font: inherit; border: 1px solid var(--border-strong); border-radius: 6px; }
+.report textarea { width: 100%; max-width: 480px; display: block; margin: 6px 0; padding: 8px; font: inherit; border: 1px solid var(--field-edge); border-radius: 6px; }
 .row-inline { display: flex; gap: 12px; align-items: center; }
 .report button[type=submit] { padding: 6px 14px; border: 0; border-radius: 6px; background: var(--accent); color: var(--on-accent); cursor: pointer; }
 
@@ -168,13 +172,15 @@ ul.columns li { break-inside: avoid; }
 table { width: 100%; border-collapse: collapse; font-size: 0.92rem; }
 th { text-align: left; font-weight: 500; font-size: 0.78rem; color: var(--faint); border-bottom: 1px solid var(--border-strong); padding: 8px 12px 8px 0; }
 td { border-bottom: 1px solid var(--border); padding: 10px 12px 10px 0; vertical-align: top; }
+/* A row's label cell, marked as its header for screen readers, looks like any other cell. */
+th.row-head { font-weight: 400; font-size: inherit; color: inherit; border-bottom: 1px solid var(--border); padding: 10px 12px 10px 0; vertical-align: top; }
 table.dim { opacity: 0.5; }
 
 .filters { display: flex; flex-wrap: wrap; gap: 10px 18px; align-items: center; margin: 18px 0; }
 .filters label { font-size: 0.85rem; color: var(--muted); }
 /* Every dropdown follows the theme; some phones draw a bare <select> white in dark mode. */
-select { font: inherit; color: var(--text); background-color: var(--bg); border: 1px solid var(--border-strong); border-radius: 6px; padding: 4px 8px; }
-.filters select, .filters input { font: inherit; font-size: 0.92rem; padding: 6px 10px; border: 1px solid var(--border-strong); border-radius: 6px; max-width: 300px; background: var(--bg); }
+select { font: inherit; color: var(--text); background-color: var(--bg); border: 1px solid var(--field-edge); border-radius: 6px; padding: 4px 8px; }
+.filters select, .filters input { font: inherit; font-size: 0.92rem; padding: 6px 10px; border: 1px solid var(--field-edge); border-radius: 6px; max-width: 300px; background: var(--bg); }
 .toggle { display: inline-flex; border: 1px solid var(--border-strong); border-radius: 999px; overflow: hidden; margin-bottom: 10px; }
 .toggle button { background: none; border: 0; padding: 6px 14px; font-size: 0.85rem; cursor: pointer; color: var(--muted); }
 .toggle button.on { background: var(--text); color: var(--bg); }
@@ -191,7 +197,7 @@ button.link { background: none; border: 0; padding: 0; color: var(--accent); tex
 .home-title h1 { margin-right: auto; }
 .lookup label { display: block; font-weight: 600; margin-bottom: 8px; }
 .row { display: flex; gap: 8px; }
-.row input, .address-input input { flex: 1; padding: 12px 14px; font: inherit; font-size: 1rem; border: 1px solid var(--border-strong); border-radius: 8px; }
+.row input, .address-input input { flex: 1; padding: 12px 14px; font: inherit; font-size: 1rem; border: 1px solid var(--field-edge); border-radius: 8px; }
 .row button { padding: 12px 22px; font-size: 1rem; border: 0; border-radius: 8px; background: var(--accent); color: var(--on-accent); cursor: pointer; }
 .turnstile { margin-top: 10px; min-height: 0; }
 .results { margin-top: 32px; }
@@ -293,18 +299,30 @@ button.link { background: none; border: 0; padding: 0; color: var(--accent); tex
 .kind { display: inline-block; font-size: 0.72rem; padding: 1px 7px; margin-right: 6px; border-radius: 999px; border: 1px solid var(--border-strong); color: var(--muted); white-space: nowrap; }
 .kind-passage, .kind-nomination { border-color: var(--accent); color: var(--accent); }
 button.kind { background: none; cursor: pointer; font-family: inherit; line-height: inherit; }
+/* Small text buttons get a larger invisible tap area (at least 24px tall, WCAG 2.5.8) without
+   changing how they look: an empty layer around the button that takes the clicks. */
+button.kind, .lang-switch, .cal-nav > button.link { position: relative; }
+button.kind::after, .lang-switch::after, .cal-nav > button.link::after { content: ""; position: absolute; inset: -5px -4px; }
 .explain { position: relative; }
-.explain-i { display: inline-flex; align-items: center; justify-content: center; background: none; border: 0; padding: 2px; margin-left: 2px; color: var(--muted); cursor: pointer; vertical-align: -2px; border-radius: 50%; }
+/* The (i) button's tap area is 25px (WCAG 2.5.8) while the icon stays 15px: padding, offset by negative margins so lines don't shift. */
+.explain-i { display: inline-flex; align-items: center; justify-content: center; background: none; border: 0; padding: 5px; margin: -3px -3px -3px -1px; color: var(--muted); cursor: pointer; vertical-align: -2px; border-radius: 50%; }
 .explain-i:hover, .explain-i[aria-expanded="true"] { color: var(--accent); }
 .explain-pop { position: absolute; z-index: 40; left: 0; top: calc(100% + 6px); width: min(18rem, 78vw); display: flex; flex-direction: column; gap: 4px;
   padding: 10px 30px 10px 12px; background: var(--bg); border: 1px solid var(--border-strong); border-radius: 8px; box-shadow: 0 8px 22px var(--shadow);
   font-size: 0.86rem; line-height: 1.45; font-weight: normal; color: var(--text); text-align: left; white-space: normal; }
 .explain-pop strong { font-size: 0.88rem; }
-.explain-close { position: absolute; top: 4px; right: 6px; background: none; border: 0; font-size: 1.1rem; line-height: 1; color: var(--muted); cursor: pointer; padding: 2px 4px; }
+.explain-close { position: absolute; top: 2px; right: 2px; background: none; border: 0; font-size: 1.1rem; line-height: 1; color: var(--muted); cursor: pointer; padding: 0; min-width: 28px; min-height: 28px; border-radius: 6px; }
 .notice-box { margin: 12px 0; padding: 10px 14px; border-left: 3px solid var(--notice-edge); background: var(--notice-bg); }
 .notice-box ul { margin: 4px 0 0; }
 .names { font-size: 0.85rem; margin: 0; }
 .names .mine, .mine-row { background: var(--mark); }
+/* Text on the yellow highlighter: links, grey notes and footnotes darken (light) or lighten (dark)
+   so they keep 4.5:1 on it; the highlighter color itself is unchanged. */
+.names .mine, .mine-row, .mine-note { --accent: #116640; --muted: #46525e; --faint: #46525e; }
+:root[data-theme="dark"] :is(.names .mine, .mine-row, .mine-note) { --accent: #7fdcab; --muted: #c3ced8; --faint: #c3ced8; }
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) :is(.names .mine, .mine-row, .mine-note) { --accent: #7fdcab; --muted: #c3ced8; --faint: #c3ced8; }
+}
 .breakdown { padding: 8px 0; }
 .breakdown table { margin: 8px 0; }
 .visually-hidden { position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
@@ -820,7 +838,7 @@ header.site .site-inner { position: relative; flex-wrap: nowrap; gap: 8px 14px; 
 
 /* Every part of the bill */
 .parts-search { display: grid; gap: 0.25rem; margin: 0.75rem 0; max-width: 32rem; }
-.parts-search input { padding: 8px 10px; border: 1px solid var(--border-strong); border-radius: 6px; font: inherit; background: var(--bg); color: var(--text); }
+.parts-search input { padding: 8px 10px; border: 1px solid var(--field-edge); border-radius: 6px; font: inherit; background: var(--bg); color: var(--text); }
 .parts-list { list-style: none; padding-left: 0; margin: 0; }
 .parts-path { margin: 1rem 0 0.25rem; font-weight: 600; font-size: 0.9rem; color: var(--muted); }
 .parts-section { border-bottom: 1px solid var(--border); }
