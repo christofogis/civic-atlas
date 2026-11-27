@@ -1049,3 +1049,15 @@ html.slate body { background: var(--bg); }
   .sl-stat { flex-direction: column; align-items: flex-start; gap: 4px; }
   .sl-stat strong { min-width: 0; }
 }
+
+/* AI plain-language bill summaries (bill_plain_summaries): the block on a bill page and /quiz, and the one-line lead in lists. */
+.plain-summary { margin: 0 0 0.8rem; padding: 0.6rem 0.85rem; border-left: 3px solid var(--border-strong); line-height: 1.5; }
+.plain-summary-lead { margin: 0; font-size: 1.05rem; }
+.plain-summary ul { margin: 0.35rem 0 0; padding-left: 1.2rem; }
+.plain-summary li { margin: 0.15rem 0; }
+.plain-summary .parts-ai-label { margin-top: 0.4rem; }
+.plain-lead { display: block; font-size: 0.88rem; line-height: 1.45; color: var(--muted); margin-top: 0.15rem; }
+.ai-tag { display: inline-block; font-size: 0.68rem; font-weight: 600; letter-spacing: 0.03em; padding: 0 0.3em; border: 1px solid var(--border-strong); border-radius: 3px; color: var(--muted); text-decoration: none; vertical-align: 0.08em; }
+.crs-official > summary { cursor: pointer; font-size: 0.9rem; color: var(--muted); }
+.bill-in-short { max-width: var(--measure); margin-top: -12px; }
+.bill-in-short h2 { font-size: 0.95rem; margin: 0 0 0.35rem; }

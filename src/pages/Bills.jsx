@@ -11,6 +11,8 @@ import { tr } from "../lib/lang.js";
 import { PartyTag } from "../components/PartyTag.jsx";
 import Clamp from "../components/Clamp.jsx";
 import { billTrack, trackShort } from "../../lib/billTrack.js";
+import { PlainLead } from "../components/PlainSummary.jsx";
+import { usePlainSummaries } from "../lib/plainSummaries.js";
 
 const SORTS = {
   action: { label: "Most recent action", es: "Acción más reciente", column: "latest_action_date" },
@@ -39,6 +41,7 @@ export default function Bills() {
   const sort = SORTS[params.get("sort")] ? params.get("sort") : "action";
   const page = Math.max(0, Number(params.get("page")) || 0);
   const [state, setState] = useState({ status: "loading", rows: [] });
+  const plain = usePlainSummaries(state.rows);
   const [stages, setStages] = useState({});
   const set = (k, v) => {
     const n = new URLSearchParams(params);
@@ -97,6 +100,7 @@ export default function Bills() {
               <tr key={`${b.bill_type}-${b.number}`}>
                 <td>
                   <Link to={`/bill/${b.congress}/${b.bill_type}/${b.number}`}>{billLabel(b)}</Link> <Clamp lines={2}>{b.short_title ?? b.title}</Clamp>
+                  <PlainLead map={plain} bill={b} />
                   {b.policy_area && <div className="fine"><Link to={`/topic/${topicSlug(b.policy_area)}?congress=${b.congress}`}>{areaName(b.policy_area)}</Link></div>}
                 {stages[`${b.bill_type}-${b.number}`] && (() => { const l = trackShort(billTrack(stages[`${b.bill_type}-${b.number}`]), date); return <div className="fine stage-line">{tr(l.en, l.es)}</div>; })()}
                 </td>

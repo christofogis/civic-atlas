@@ -173,7 +173,7 @@ export default function MethodsEs() {
       <p>
         Algunas secciones tienen un resumen breve en lenguaje sencillo, marcado como "Resumen generado por IA", con el
         texto oficial de la sección a un toque. El texto es el registro; el resumen es una ayuda para leerlo. El
-        resumen del Servicio de Investigación del Congreso, cuando existe, sigue arriba en la página del proyecto.
+        resumen del Servicio de Investigación del Congreso, cuando existe, sigue cerca del inicio de la página del proyecto.
       </p>
       <p>
         Los resúmenes se escriben de antemano con el modelo Claude Haiku de Anthropic, solo a partir del texto de la
@@ -185,6 +185,35 @@ export default function MethodsEs() {
         se muestra. No se resumen las secciones de menos de 40 palabras ni los índices. Cada resumen corresponde a una
         versión del texto, así que una versión nueva recibe resúmenes nuevos. Los resúmenes en español se escriben
         junto con los de inglés y se verifican contra ellos.
+      </p>
+
+      <h2 id="bill-summaries">Resúmenes de proyectos en lenguaje sencillo hechos por IA</h2>
+      <p>
+        Cuando el Servicio de Investigación del Congreso (CRS) ha publicado un resumen de un proyecto, el sitio puede
+        mostrar también una versión breve: una oración sobre lo que hace el proyecto y, cuando hace varias cosas
+        distintas, hasta cuatro puntos cortos. Aparece como "En pocas palabras" en la página del proyecto, en el
+        cuestionario y como una línea bajo el título oficial en las listas, siempre marcada como escrita por IA, con
+        el resumen del CRS y el texto oficial a un toque. Los títulos oficiales se muestran tal como se publicaron.
+      </p>
+      <p>
+        Se escriben de antemano con el modelo Claude Haiku de Anthropic, solo a partir del resumen del CRS (la versión
+        más reciente que el CRS ha publicado) y con las mismas instrucciones escritas para todos los proyectos:
+        palabras sencillas, a un nivel de lectura de octavo grado aproximadamente; quién debe o puede hacer qué, y los
+        montos y fechas tal como los indica el resumen del CRS; sin números de sección ni citas legales; sin
+        antecedentes ni datos externos; nunca el propósito, la intención, el efecto, el costo ni quién gana o pierde,
+        salvo que el propio resumen del CRS lo indique; sin palabras que juzguen. Luego una segunda consulta compara
+        cada uno con el resumen del CRS y enumera todo dato agregado, toda omisión que cambie el sentido, toda
+        afirmación de intención o impacto, toda palabra que juzgue y toda cita legal. Un resumen señalado se reescribe
+        una vez indicando esos problemas y se vuelve a verificar; si sigue fallando, no se muestra. Solo se muestran
+        los resúmenes que pasan la verificación. Las versiones en español se escriben junto con las de inglés y se
+        verifican contra ellas.
+      </p>
+      <p>
+        Cada resumen está ligado al texto exacto del CRS del que se escribió. Cuando el CRS publica un resumen nuevo
+        (por ejemplo, después de que un proyecto se aprueba en una cámara), la versión breve anterior deja de
+        mostrarse y se escribe y verifica una nueva. Los proyectos sin resumen del CRS no reciben uno. Incluye: los
+        proyectos con votación nominal, los que se convirtieron en ley y los que aparecen en Esta semana, desde el
+        118.º Congreso (2023).
       </p>
 
       <h2 id="bill-stage">En qué etapa está un proyecto</h2>
