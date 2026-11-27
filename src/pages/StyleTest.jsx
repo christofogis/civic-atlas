@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { tr } from "../lib/lang.js";
 import Portrait from "../components/Portrait.jsx";
@@ -8,17 +8,27 @@ import Portrait from "../components/Portrait.jsx";
 const P = (id) => `https://unitedstates.github.io/images/congress/225x275/${id}.jpg`;
 
 export default function StyleTest() {
+  const [mode, setMode] = useState("dark");
   useEffect(() => {
-    document.documentElement.classList.add("slate");
+    const html = document.documentElement;
+    html.classList.remove("slate", "slate-light");
+    html.classList.add(mode === "dark" ? "slate" : "slate-light");
+    return () => html.classList.remove("slate", "slate-light");
+  }, [mode]);
+  useEffect(() => {
     const robots = document.createElement("meta");
     robots.name = "robots"; robots.content = "noindex";
     document.head.appendChild(robots);
-    return () => { document.documentElement.classList.remove("slate"); robots.remove(); };
+    return () => robots.remove();
   }, []);
 
   return (
     <main className="page wide slate-test">
-      <p className="fine">{tr("Style test: a preview of a darker look. Sample content from the site; nothing else has changed.", "Prueba de estilo: una vista previa de un aspecto más oscuro. Contenido de muestra del sitio; nada más ha cambiado.")}</p>
+      <p className="fine">{tr("Style test: the new look in dark and light. The dark colors are now the site's dark mode; the light version is shown only here until it's approved.", "Prueba de estilo: el nuevo aspecto en oscuro y claro. Los colores oscuros ya son el modo oscuro del sitio; la versión clara se muestra solo aquí hasta que se apruebe.")}</p>
+      <div className="tabs" role="group" aria-label={tr("Version", "Versión")}>
+        <button type="button" className={mode === "dark" ? "on" : ""} aria-pressed={mode === "dark"} onClick={() => setMode("dark")}>{tr("Dark", "Oscuro")}</button>
+        <button type="button" className={mode === "light" ? "on" : ""} aria-pressed={mode === "light"} onClick={() => setMode("light")}>{tr("Light", "Claro")}</button>
+      </div>
 
       <section className="sl-card">
         <span className="sl-pill sl-mono"><span className="sl-dot" />{tr("Your member of Congress", "Su miembro del Congreso")}</span>

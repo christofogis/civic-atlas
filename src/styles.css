@@ -37,56 +37,57 @@
   font-variant-numeric: tabular-nums;
   -webkit-font-smoothing: antialiased;
 }
-/* Dark theme: the same tokens, darker. Chosen with the Light / Dark / System setting in the
+/* Dark theme (Chris, Nov 26, 2026): slate blue-black with card surfaces and a green accent, from a
+   style he picked. Links stay green, never blue: blue marks Democrats. Chosen with the Light / Dark / System setting in the
    footer (System follows the device). index.html sets data-theme before the page draws. */
 :root[data-theme="dark"] {
-  --text: #e4ebe8;
-  --muted: #a9b5b0;
-  --faint: #9ba7a2;
-  --border: #2a3430;
-  --border-strong: #3c4843;
-  --surface: #172019;
-  --accent: #6fcaa8;
-  --accent-soft: #19302a;
-  --mark: #5e4b10;
-  --bg: #0e1412;
-  --on-accent: #0b1310;
-  --header-bg: rgba(14, 20, 18, 0.92);
-  --notice-bg: #2a2412;  --notice-edge: #d9a62a;
-  --cal-senate-bg: #1d2623;  --cal-senate-edge: #8d9a95;
-  --cal-mine-bg: #3d3412;  --cal-mine-edge: #d9b23a;
-  --today-bg: #141c19;
+  --text: #e6edf3;
+  --muted: #9aa7b4;
+  --faint: #8d99a6;
+  --border: #232c37;
+  --border-strong: #323d4a;
+  --surface: #151c24;
+  --accent: #4cc38a;
+  --accent-soft: #13281f;
+  --mark: #5c4a12;
+  --bg: #0d1218;
+  --on-accent: #08110c;
+  --header-bg: rgba(13, 18, 24, 0.92);
+  --notice-bg: #262011;  --notice-edge: #e0b24a;
+  --cal-senate-bg: #1a222c;  --cal-senate-edge: #8b98a6;
+  --cal-mine-bg: #3a3112;  --cal-mine-edge: #d9b23a;
+  --today-bg: #111820;
   --late: #e0a35c;
-  --highlight: #3a3216;
-  --shadow: rgba(0, 0, 0, 0.5);
+  --highlight: #383017;
+  --shadow: rgba(0, 0, 0, 0.55);
   --chart-1: #00b894; --chart-2: #f47230; --chart-3: #7b61f0; --chart-4: #c98a00; --chart-5: #dc6a9c; --chart-6: #1f9a3a;
-  --chart-other: #6f7a76; --chart-in: #00b894; --chart-out: #f47230; --chart-deficit: #d1453b;
+  --chart-other: #6f7a86; --chart-in: #00b894; --chart-out: #f47230; --chart-deficit: #d1453b;
   color-scheme: dark;
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    --text: #e4ebe8;
-    --muted: #a9b5b0;
-    --faint: #9ba7a2;
-    --border: #2a3430;
-    --border-strong: #3c4843;
-    --surface: #172019;
-    --accent: #6fcaa8;
-    --accent-soft: #19302a;
-    --mark: #5e4b10;
-    --bg: #0e1412;
-    --on-accent: #0b1310;
-    --header-bg: rgba(14, 20, 18, 0.92);
-    --notice-bg: #2a2412;  --notice-edge: #d9a62a;
-    --cal-senate-bg: #1d2623;  --cal-senate-edge: #8d9a95;
-    --cal-mine-bg: #3d3412;  --cal-mine-edge: #d9b23a;
-    --today-bg: #141c19;
+    --text: #e6edf3;
+    --muted: #9aa7b4;
+    --faint: #8d99a6;
+    --border: #232c37;
+    --border-strong: #323d4a;
+    --surface: #151c24;
+    --accent: #4cc38a;
+    --accent-soft: #13281f;
+    --mark: #5c4a12;
+    --bg: #0d1218;
+    --on-accent: #08110c;
+    --header-bg: rgba(13, 18, 24, 0.92);
+    --notice-bg: #262011;  --notice-edge: #e0b24a;
+    --cal-senate-bg: #1a222c;  --cal-senate-edge: #8b98a6;
+    --cal-mine-bg: #3a3112;  --cal-mine-edge: #d9b23a;
+    --today-bg: #111820;
     --late: #e0a35c;
-    --highlight: #3a3216;
-    --shadow: rgba(0, 0, 0, 0.5);
+    --highlight: #383017;
+    --shadow: rgba(0, 0, 0, 0.55);
     --chart-1: #00b894; --chart-2: #f47230; --chart-3: #7b61f0; --chart-4: #c98a00; --chart-5: #dc6a9c; --chart-6: #1f9a3a;
-  --chart-other: #6f7a76; --chart-in: #00b894; --chart-out: #f47230; --chart-deficit: #d1453b;
-  color-scheme: dark;
+    --chart-other: #6f7a86; --chart-in: #00b894; --chart-out: #f47230; --chart-deficit: #d1453b;
+    color-scheme: dark;
   }
 }
 * { box-sizing: border-box; }
@@ -959,6 +960,18 @@ ol.bare { list-style: none; padding: 0; margin: 0; }
 
 /* Style test (/style-test only): a darker "slate" look. Applied by a class on <html> while that page
    is open. Links and highlights are green, never blue, because blue marks Democrats. */
+html.slate-light {
+  --bg: #f4f6f8; --surface: #ffffff; --text: #18212b; --muted: #55616d; --faint: #5f6b77;
+  --border: #dde3e9; --border-strong: #c6cfd8; --accent: #157a4c; --accent-soft: #e4f3eb; --on-accent: #ffffff;
+  --header-bg: rgba(244, 246, 248, 0.92); --shadow: rgba(16, 24, 32, 0.08);
+  color-scheme: light; background: var(--bg); color: var(--text);
+}
+html.slate-light body { background: var(--bg); }
+html.slate-light .sl-stat { background: #f7f9fb; }
+html.slate-light .sl-lede, html.slate-light .sl-stat > div { color: #33404c; }
+html.slate-light .sl-pill { border-color: #b7dcc7; background: #eaf6ef; color: #146c43; }
+html.slate-light .sl-pill-amber { border-color: #ecd59a; background: #fbf3dc; color: #8a5a00; }
+html.slate-light .sl-card { box-shadow: 0 1px 2px var(--shadow); }
 html.slate {
   --bg: #0b1016; --surface: #131a22; --text: #e6edf3; --muted: #9aa7b4; --faint: #7d8a97;
   --border: #212b36; --border-strong: #2e3a47; --accent: #4cc38a; --accent-soft: #14281f; --on-accent: #08110c;
