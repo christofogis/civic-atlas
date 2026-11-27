@@ -24,6 +24,7 @@ import { CandidateTable } from "./Elections.jsx";
 import { useCaResults, ResultsStatus, RaceResult, PartyKey } from "../components/CaResults.jsx";
 import { decodeEntities } from "../../lib/ptr.js";
 import VoteResult from "../components/VoteResult.jsx";
+import SaveToggle from "../components/SaveToggle.jsx";
 
 const BIOGUIDE = /^[A-Z][0-9]{6}$/;
 const TERRITORIES = new Set(["DC", "PR", "GU", "VI", "AS", "MP"]);
@@ -385,6 +386,7 @@ export default function Member() {
         ) : (
           <p className="lede">{tr("Not currently serving. Most recent", "No está en el cargo. Último cargo")}: {seatLabel(latest)}, {date(latest.start_date)} – {date(latest.end_date)} <PartyName party={latest.party} /></p>
         )}
+        <SaveToggle official={m.bioguide_id} />
       </header>
 
       <AtAGlance terms={terms} voteStats={voteStats} medians={medians} billStats={billStats} laws={laws}
