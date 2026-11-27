@@ -1,6 +1,7 @@
 import { congressOn } from "../../lib/congress.js";
 import LinkedText from "../components/LinkedText.jsx";
 import Portrait from "../components/Portrait.jsx";
+import LeadershipLine from "../components/LeadershipLine.jsx";
 import { noPhoto } from "../lib/photo.js";
 import { Fold } from "../components/Fold.jsx";
 import { memberPage } from "../lib/memberPage.js";
@@ -346,6 +347,7 @@ export default function Member() {
         <h1>{name}</h1>
         {seat?.seat_status === "serving" ? (
           <><p className="lede">{seatLabel(seat)}</p>
+          <LeadershipLine bioguideId={m.bioguide_id} />
           <p className="member-meta">{tr("Current term", "Período actual")} {date(seat.start_date)} – {date(seat.end_date)}</p>
           <BallotLine seat={seat} />
           <RaceFilers seat={seat} upIn={upIn} mode="line" /></>
