@@ -128,3 +128,19 @@ test("tallies by vote: the Clerk's top name is not a majority unless it has more
   assert.equal(m.get("h2").majority, "McCarthy"); // 216 of 428 named votes; Present not counted
   assert.equal(m.get("h2").cast, 428);
 });
+
+import { applyLeadershipCorrections } from "../scripts/ingest/members.mjs";
+test("leadership corrections apply until the dataset has them", () => {
+  const roles = [{ bioguide_id: "H1", chamber: "house", title: "Chair", start_date: "2025-01-03", end_date: null }];
+  const fixes = [
+    { action: "end", bioguide_id: "H1", title: "Chair", start_date: "2025-01-03", end_date: "2026-04-15", source: "s" },
+    { action: "add", bioguide_id: "O1", chamber: "house", title: "Chair", start_date: "2026-04-15", source: "s" },
+  ];
+  const a = applyLeadershipCorrections(roles, fixes);
+  assert.equal(a.roles.find((r) => r.bioguide_id === "H1").end_date, "2026-04-15");
+  assert.equal(a.roles.find((r) => r.bioguide_id === "O1").correction_source, "s");
+  assert.equal(a.retired.length, 0);
+  const b = applyLeadershipCorrections([{ ...roles[0], end_date: "2026-04-15" }, { bioguide_id: "O1", chamber: "house", title: "Chair", start_date: "2026-04-15", end_date: null }], fixes);
+  assert.equal(b.retired.length, 2);
+  assert.equal(b.roles.every((r) => r.correction_source === null), true);
+});

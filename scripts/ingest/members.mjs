@@ -103,7 +103,25 @@ export function mapLeadership(legislators) {
   }
   return [...rows.values()];
 }
-const ROLE_FIELDS = ["chamber", "end_date"];
+const ROLE_FIELDS = ["chamber", "end_date", "correction_source"];
+
+// Our corrections (data/corrections/leadership.json), each tied to an official source. One the
+// dataset already reflects is left out and reported, so it can be deleted from the file.
+export function applyLeadershipCorrections(roles, corrections) {
+  const out = roles.map((r) => ({ ...r, correction_source: null }));
+  const retired = [];
+  for (const c of corrections) {
+    if (c.action === "end") {
+      const r = out.find((x) => x.bioguide_id === c.bioguide_id && x.title === c.title && x.start_date === c.start_date);
+      if (!r || r.end_date) { retired.push(c); continue; }
+      Object.assign(r, { end_date: c.end_date, correction_source: c.source });
+    } else if (c.action === "add") {
+      if (out.some((x) => x.bioguide_id === c.bioguide_id && x.title === c.title)) { retired.push(c); continue; }
+      out.push({ bioguide_id: c.bioguide_id, chamber: c.chamber, title: c.title, start_date: c.start_date, end_date: c.end_date ?? null, correction_source: c.source });
+    }
+  }
+  return { roles: out, retired };
+}
 export const roleKey = (r) => `${r.bioguide_id}|${r.title}|${r.start_date}`;
 
 async function load(name, dir) {
@@ -124,7 +142,11 @@ async function main() {
   const recentFormer = (await load("legislators-historical.yaml", arg("--dir")))
     .filter((m) => m.terms.at(-1).end >= HISTORY_FROM);
   const social = mapSocial(await load("legislators-social-media.yaml", arg("--dir")));
-  const { members, terms, roles } = mapLegislators([...current, ...recentFormer], social);
+  const mapped = mapLegislators([...current, ...recentFormer], social);
+  const { members, terms } = mapped;
+  const corrections = JSON.parse(readFileSync(new URL("../../data/corrections/leadership.json", import.meta.url), "utf8")).corrections;
+  const { roles, retired } = applyLeadershipCorrections(mapped.roles, corrections);
+  for (const c of retired) console.log(`correction no longer needed (dataset has it; delete from data/corrections/leadership.json): ${c.action} ${c.bioguide_id} ${c.title}`);
   console.log(`source: ${current.length} current + ${recentFormer.length} former members, ${terms.length} terms, ${roles.length} leadership roles`);
 
   if (dryRun) {
@@ -179,7 +201,7 @@ async function syncLeadership(db, roles) {
     console.warn(`leadership_roles skipped: ${String(missing.message).slice(0, 120)}`);
     return { inserted: 0, written: 0, deleted: 0 };
   }
-  const existing = new Map((await fetchAll(db, "leadership_roles", "bioguide_id,title,start_date,chamber,end_date")).map((r) => [roleKey(r), r]));
+  const existing = new Map((await fetchAll(db, "leadership_roles", "bioguide_id,title,start_date,chamber,end_date,correction_source")).map((r) => [roleKey(r), r]));
   const writes = roles.filter((r) => !existing.has(roleKey(r)) || changed(r, existing.get(roleKey(r)), ROLE_FIELDS));
   await upsertBatches(db, "leadership_roles", writes, "bioguide_id,title,start_date");
   const keep = new Set(roles.map(roleKey));

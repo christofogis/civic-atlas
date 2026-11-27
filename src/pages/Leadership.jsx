@@ -24,7 +24,7 @@ export default function Leadership() {
     (async () => {
       const today = todayEastern();
       const [roles, votes, tallies, committees, posts] = await Promise.all([
-        db.from("leadership_roles").select("bioguide_id,chamber,title,start_date,end_date").limit(2000),
+        db.from("leadership_roles").select("bioguide_id,chamber,title,start_date,end_date,correction_source").limit(2000),
         db.from("votes").select("vote_id,congress,session,roll_number,voted_at,result,source_url")
           .eq("chamber", "house").eq("question", "Election of the Speaker").order("voted_at", { ascending: false }).limit(500),
         db.from("speaker_ballot_tallies").select("vote_id,position,position_category,votes").limit(5000),
@@ -121,13 +121,13 @@ function LeaderCard({ role, person }) {
       <p className="seat">{role.title}</p>
       <Portrait className="member-photo small" size="small" party={person?.party} src={photo(role.bioguide_id)} alt={person?.name ?? ""} width="60" height="73" loading="lazy" />
       <h3><PersonLink id={role.bioguide_id} person={person} /></h3>
-      <p className="meta">{tr(`Since ${date(role.start_date)}`, `Desde el ${date(role.start_date)}`)}</p>
+      <p className="meta">{tr(`Since ${date(role.start_date)}`, `Desde el ${date(role.start_date)}`)}{role.correction_source && <> · <Corrected url={role.correction_source} /></>}</p>
     </li>
   );
 }
 
 function RoleLine({ role, person }) {
-  return <li>{role.title}: <PersonLink id={role.bioguide_id} person={person} /> <span className="fine">{tr(`since ${date(role.start_date)}`, `desde el ${date(role.start_date)}`)}</span></li>;
+  return <li>{role.title}: <PersonLink id={role.bioguide_id} person={person} /> <span className="fine">{tr(`since ${date(role.start_date)}`, `desde el ${date(role.start_date)}`)}{role.correction_source && <> · <Corrected url={role.correction_source} /></>}</span></li>;
 }
 
 function SpeakerElection({ election: e, open }) {
@@ -207,4 +207,10 @@ function CommitteeLeaders({ committees, posts, people }) {
       </section>
     );
   });
+}
+
+// A role we corrected because the member dataset hadn't caught up yet: say so and link the
+// official page it rests on.
+function Corrected({ url }) {
+  return <a href={url}>{tr("updated from the official leadership page", "actualizado según la página oficial de liderazgo")}</a>;
 }

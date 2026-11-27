@@ -310,7 +310,10 @@ export default function Methods() {
         officers) come from the public-domain congress-legislators dataset, with titles shown as published there and
         the date each post began. A post counts as current from its start date until its end date; when the dataset
         lists no end date yet, it stays current until the dataset is updated. Member pages and lookup cards show
-        current posts only, in the same words for everyone.
+        current posts only, in the same words for everyone. Each week the leaders shown are checked against house.gov
+        and senate.gov. When the dataset is behind, we correct the post from the official page, mark it "updated from
+        the official leadership page" with a link, ask the dataset's volunteers to fix it, and drop our correction once
+        they have.
       </p>
       <p>
         Speaker elections are House roll calls the Clerk records as "Election of the Speaker", from 2023 on. Members

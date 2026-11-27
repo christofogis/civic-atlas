@@ -1,0 +1,23 @@
+{
+  "about": "Corrections to unitedstates/congress-legislators leadership_roles, applied by scripts/ingest/members.mjs until the dataset itself has the change. Each needs an official source. An entry retires itself once the dataset matches; delete it then.",
+  "corrections": [
+    {
+      "action": "end",
+      "bioguide_id": "H001082",
+      "title": "House Republican Policy Committee Chair",
+      "start_date": "2025-01-03",
+      "end_date": "2026-04-15",
+      "source": "https://www.house.gov/leadership",
+      "reported_upstream": null
+    },
+    {
+      "action": "add",
+      "bioguide_id": "O000019",
+      "chamber": "house",
+      "title": "House Republican Policy Committee Chair",
+      "start_date": "2026-04-15",
+      "source": "https://www.house.gov/leadership",
+      "reported_upstream": null
+    }
+  ]
+}

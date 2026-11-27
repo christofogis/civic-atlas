@@ -315,7 +315,10 @@ export default function MethodsEs() {
         inglés, con la fecha de inicio de cada cargo. Un cargo cuenta como actual desde su fecha de inicio hasta su
         fecha de fin; si el conjunto de datos aún no indica fecha de fin, sigue como actual hasta que se actualice. Las
         páginas de los miembros y las tarjetas de búsqueda muestran solo los cargos actuales, con las mismas palabras
-        para todos.
+        para todos. Cada semana los líderes que se muestran se comparan con house.gov y senate.gov. Cuando el conjunto
+        de datos está atrasado, corregimos el cargo según la página oficial, lo marcamos "actualizado según la página
+        oficial de liderazgo" con un enlace, pedimos a los voluntarios del conjunto de datos que lo corrijan y quitamos
+        nuestra corrección cuando lo hacen.
       </p>
       <p>
         Las elecciones del Presidente son votaciones nominales de la Cámara que el Secretario registra como "Election
