@@ -956,3 +956,42 @@ ol.bare { list-style: none; padding: 0; margin: 0; }
 .issues-card { margin: 1.2rem 0 0; padding: 12px 14px; border: 1px solid var(--border); border-radius: 10px; }
 .issues-card strong { display: block; font-weight: 600; }
 .issues-card p { margin: 0.2rem 0 0; font-size: 0.9rem; color: var(--muted); }
+
+/* Style test (/style-test only): a darker "slate" look. Applied by a class on <html> while that page
+   is open. Links and highlights are green, never blue, because blue marks Democrats. */
+html.slate {
+  --bg: #0b1016; --surface: #131a22; --text: #e6edf3; --muted: #9aa7b4; --faint: #7d8a97;
+  --border: #212b36; --border-strong: #2e3a47; --accent: #4cc38a; --accent-soft: #14281f; --on-accent: #08110c;
+  --header-bg: rgba(11, 16, 22, 0.92); --shadow: rgba(0, 0, 0, 0.5);
+  color-scheme: dark; background: var(--bg); color: var(--text);
+}
+html.slate body { background: var(--bg); }
+.slate-test { display: grid; gap: 18px; }
+.sl-card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 22px; display: grid; gap: 14px; }
+.sl-pill { justify-self: start; display: inline-flex; align-items: center; gap: 8px; padding: 4px 12px; border: 1px solid #23553d; border-radius: 6px; background: #0f2219; color: var(--accent); font-size: 0.78rem; }
+.sl-pill-amber { border-color: #5a4614; background: #221b09; color: #e0b24a; }
+.sl-mono { font-family: ui-monospace, "SF Mono", Menlo, monospace; letter-spacing: 0.14em; text-transform: uppercase; }
+.sl-dot { width: 7px; height: 7px; border-radius: 50%; background: currentColor; }
+.sl-label { color: var(--muted); font-size: 0.9rem; }
+.sl-title { margin: 0; font-size: 1.45rem; line-height: 1.25; }
+.sl-title a { color: var(--text); text-decoration: none; }
+.sl-lede { margin: 0; color: #b6c2cd; font-size: 1.05rem; line-height: 1.55; }
+.sl-person { display: flex; gap: 16px; align-items: center; }
+.sl-chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.sl-chips span { border: 1px solid var(--border-strong); border-radius: 999px; padding: 4px 14px; color: var(--muted); font-size: 0.9rem; }
+.sl-stat { display: flex; gap: 18px; align-items: center; background: #0f151c; border: 1px solid var(--border); border-radius: 12px; padding: 16px 18px; }
+.sl-stat strong { font-size: 2.2rem; color: var(--accent); font-weight: 700; min-width: 4.2ch; font-variant-numeric: tabular-nums; }
+.sl-stat > div { color: #c3ced8; }
+.sl-src { display: block; color: var(--faint); font-size: 0.82rem; margin-top: 4px; }
+.sl-stats-row { display: flex; gap: 32px; flex-wrap: wrap; }
+.sl-stats-row strong { display: block; font-size: 1.9rem; }
+.sl-stats-row span { color: var(--muted); font-size: 0.85rem; }
+.sl-track { list-style: none; margin: 0; padding: 0 0 0 14px; border-left: 2px solid var(--accent); display: grid; gap: 6px; }
+.sl-track span { color: var(--muted); font-size: 0.88rem; margin-left: 6px; }
+.sl-foot { display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--border); padding-top: 14px; color: var(--muted); font-size: 0.9rem; gap: 12px; flex-wrap: wrap; }
+.sl-foot a { font-weight: 600; text-decoration: none; }
+.sl-person .portrait { flex: none; }
+@media (max-width: 520px) {
+  .sl-stat { flex-direction: column; align-items: flex-start; gap: 4px; }
+  .sl-stat strong { min-width: 0; }
+}
