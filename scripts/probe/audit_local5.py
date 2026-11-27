@@ -14,7 +14,7 @@ for n in (24, 23, 22):
         st, h = get(f"https://www.livevoterturnout.com/ENR/orangecaenr/{n}/en/phkv4sV_Index_{n}.html")
     t = text(h)
     print(f"\n===== ENR {n}: {st}", t[:200])
-    for m in re.finditer(r"Contest: (CITY OF LOS ALAMITOS[^,]*|County Supervisor[^,]*|Assessor|Auditor-Controller|Clerk-Recorder|District Attorney[^,]*|Sheriff[^,]*|Treasurer-Tax Collector|County Superintendent[^,]*), VOTE FOR \d+ .*?(?=Contest: )", t):
+    for m in re.finditer(r"Contest: (CITY OF LOS ALAMITOS Member, City Council District \d|County Supervisor[^,]*|Assessor|Auditor-Controller|Clerk-Recorder|District Attorney[^,]*|Sheriff[^,]*|Treasurer-Tax Collector|County Superintendent[^,]*), VOTE FOR \d+ .*?(?=Contest: )", t):
         seg = m.group(0)
         seg = re.sub(r"Vote-by-Mail Ballots Vote Center Ballots Total --> Candidate Name Total Votes Percentage", "|", seg)
         print("  CONTEST", seg[:700])
