@@ -32,6 +32,9 @@ jobs:
       - name: Supreme Court justices still current
         if: always()
         run: node scripts/checks/justices.mjs
+      - name: Congressional leaders still current
+        if: always()
+        run: node scripts/checks/leadership.mjs
       - name: Orange County officials still current
         if: always()
         run: node scripts/checks/local.mjs
