@@ -12,7 +12,7 @@ import { myRepresentatives } from "../lib/myReps.js";
 import { useCaResults, ResultsStatus, RaceResult, MeasureResult, PartyKey, OFFICE_TITLES } from "../components/CaResults.jsx";
 import { resultsFor } from "../lib/results.js";
 import { shareOn, pctText } from "../../lib/electionResults.js";
-import { generalElectionDate, nextElectionYear, onBallot, senateClassFor, isGubernatorialYear, localOnBallot, yearOfLabel } from "../../lib/upForElection.js";
+import { ballotOutcome, outcomeKnownFor, generalElectionDate, nextElectionYear, onBallot, senateClassFor, isGubernatorialYear, localOnBallot, yearOfLabel } from "../../lib/upForElection.js";
 
 // Which seats are on the ballot in a given general-election year, and who holds each one now.
 // Worked out from term end dates, not from who is running: a seat on the ballot may have no
@@ -84,15 +84,9 @@ export default function UpForElection() {
   // After an election, once new terms have begun: did the holder return, and (Senate) who holds the seat now.
   // House districts can be redrawn between Congresses, so no House successor is named.
   const newTermsBegin = `${year + 1}-01-03`;
-  // Only once the new terms are in the member data, so a day's delay in the source never reads as "did not return".
-  const outcomeKnown = past && today >= newTermsBegin && (seats || []).some((t) => t.start_date >= newTermsBegin && t.start_date <= `${year + 1}-03-01`);
-  const outcome = (x) => {
-    if (!outcomeKnown) return null;
-    const within = (t) => t.start_date >= x.end_date && t.start_date <= `${year + 1}-03-01`;
-    if ((seats || []).some((t) => t.bioguide_id === x.bioguide_id && t.chamber === x.chamber && within(t))) return { returned: true };
-    const next = x.chamber === "senate" && (seats || []).find((t) => t.chamber === "senate" && t.state === x.state && t.senate_class === x.senate_class && t.bioguide_id !== x.bioguide_id && within(t));
-    return { returned: false, next: next || null };
-  };
+  // Only once each chamber's new terms are in the member data (see lib/upForElection.js).
+  const outcomeKnown = outcomeKnownFor(seats, "house", year, today) || outcomeKnownFor(seats, "senate", year, today);
+  const outcome = (x) => ballotOutcome(seats, x, year, today);
   const yours = [...senate, ...house].filter((x) => mine.has(x.bioguide_id));
   const supervisors = (local?.supervisors ?? []).filter((s) => localOnBallot(s.term_end, year));
   const councils = (local?.cities ?? []).map((c) => ({ ...c, up: (c.members ?? []).filter((m) => yearOfLabel(m.term_end_label) === year) })).filter((c) => c.up.length);
@@ -131,6 +125,9 @@ export default function UpForElection() {
       <p className="lede">
         {past && outcomeKnown
           ? tr(`The general election was held on ${date(generalElectionDate(year))}. These seats were on the ballot. Each shows whether the person who held it returned when the new terms began on ${date(newTermsBegin)}, and for the Senate, who holds it now.`, `La elección general se celebró el ${date(generalElectionDate(year))}. Estos escaños estuvieron en la boleta. Cada uno indica si quien lo ocupaba regresó cuando comenzaron los nuevos períodos el ${date(newTermsBegin)} y, en el Senado, quién lo ocupa ahora.`)
+          : past && today >= newTermsBegin
+          ? tr(`The general election was held on ${date(generalElectionDate(year))}. These seats were on the ballot; the people listed held them when the new terms began on ${date(newTermsBegin)}. Who returned is shown here once the official member list has the new terms; it's being updated.`,
+            `La elección general se celebró el ${date(generalElectionDate(year))}. Estos escaños estuvieron en la boleta; las personas indicadas los ocupaban cuando comenzaron los nuevos períodos el ${date(newTermsBegin)}. Quién regresó se mostrará aquí cuando la lista oficial de miembros tenga los nuevos períodos; se está actualizando.`)
           : past
           ? tr(`The general election was held on ${date(generalElectionDate(year))}. These seats were on the ballot; the people listed hold them until the new terms begin on ${date(newTermsBegin)}. Who won each seat is shown here from that day, from the official member list. Until then, each state's election office publishes the results.`, `La elección general se celebró el ${date(generalElectionDate(year))}. Estos escaños estuvieron en la boleta; las personas indicadas los ocupan hasta que comiencen los nuevos períodos el ${date(newTermsBegin)}. Quién ganó cada escaño se mostrará aquí desde ese día, según la lista oficial de miembros. Hasta entonces, la oficina electoral de cada estado publica los resultados.`)
           : tr(`General election: ${date(generalElectionDate(year))}. These seats are on the ballot, listed with who holds them now. A seat on the ballot doesn't mean its holder is running.`, `Elección general: ${date(generalElectionDate(year))}. Estos escaños están en la boleta, con quién los ocupa ahora. Que un escaño esté en la boleta no significa que su titular se presente.`)}
