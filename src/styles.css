@@ -1,29 +1,31 @@
 /* Civic Atlas — one stylesheet.
+   Colors (Chris, Nov 27, 2026): the light version of the slate style he picked for dark mode — white
+   cards on a cool grey page, a green accent.
    Direction (Nov 2026, Chris: "simple, modern, thin"): hairline rules instead of boxes, generous
    space, light-weight large headings, small muted footnotes, and the whole screen on desktop —
    wide pages split into a main column and a side column, while running text stays at a readable
    measure. No red or blue except the party badges on names. */
 
 :root {
-  --text: #1b2420;        /* ink */
-  --muted: #5f6b66;
-  --faint: #68726e;      /* smallest text; still meets WCAG AA (4.6:1 even on the pale surface) */
-  --border: #e1e6e3;      /* hairlines */
-  --border-strong: #c9d1cd;
-  --surface: #f5f7f6;
-  --accent: #0e5a4b;      /* ledger green: links and the active state */
-  --accent-soft: #e3efea;
+  --text: #18212b;        /* ink */
+  --muted: #55616d;
+  --faint: #5f6b77;      /* smallest text; meets WCAG AA on the page and on cards */
+  --border: #dde3e9;      /* hairlines */
+  --border-strong: #c6cfd8;
+  --surface: #ffffff;     /* cards sit white on the cool grey page */
+  --accent: #157a4c;      /* green: links, headline figures and the active state */
+  --accent-soft: #e4f3eb;
   --mark: #f4d35e;        /* highlighter: only for the visitor's own representatives */
-  --bg: #ffffff;
+  --bg: #f4f6f8;
   --on-accent: #ffffff;   /* text on accent-colored buttons */
-  --header-bg: rgba(255, 255, 255, 0.92);
+  --header-bg: rgba(244, 246, 248, 0.92);
   --notice-bg: #fffaf0;  --notice-edge: #c48a00;
   --cal-senate-bg: #eef1f0;  --cal-senate-edge: #4b5853;
   --cal-mine-bg: #fbefb8;  --cal-mine-edge: #b08a00;
-  --today-bg: #fbfcfb;
+  --today-bg: #ffffff;
   --late: #8a4b00;
   --highlight: #fff6d6;
-  --shadow: rgba(0, 0, 0, 0.12);
+  --shadow: rgba(16, 24, 32, 0.08);
   --chart-1: #00b894; --chart-2: #f47230; --chart-3: #6a4ce2; --chart-4: #f2a600; --chart-5: #ee7fac; --chart-6: #008a17;
   --chart-other: #b9c0bc; --chart-in: #00b894; --chart-out: #f47230; --chart-deficit: #d1453b;   /* checked for color-blind separation, light and dark */
   color-scheme: light;
