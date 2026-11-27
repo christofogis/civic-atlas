@@ -4,9 +4,9 @@ import { parsePas2, authorizedIndex, addRow, rankGivers } from "../scripts/inges
 
 // Real pas226 rows to Coons's principal committee C00475392 (In Our Hands, AIPAC PAC), as shown
 // by the probe, plus an independent expenditure and a contribution to an unrelated committee.
-const line = (cmte, tp, amt, other, cand = "S0DE00092", memo = "") =>
+const line = (cmte, tp, amt, other, cand = "S0DE00092", memo = "", text = "") =>
   [cmte, "N", "M4", "G2026", "202604209863241128", tp, "CCM", "CHRIS COONS FOR DELAWARE", "NEWARK", "DE", "19714", "", "",
-    "03232026", amt, other, cand, "T1", "1", memo, "", "1"].join("|");
+    "03232026", amt, other, cand, "T1", "1", memo, text, "1"].join("|");
 const ROWS = [
   line("C00761957", "24K", "5000", "C00475392"),
   line("C00761957", "24K", "5000", "C00475392"),
@@ -14,7 +14,8 @@ const ROWS = [
   line("C00761957", "24K", "-5000", "C00475392"),            // refund of an excessive contribution
   line("C00797670", "24K", "5000", "C00475392"),
   line("C00797670", "24K", "5000", "C00475392"),
-  line("C00797670", "24K", "-6", "C00475392"),               // void reported by the giver
+  line("C00797670", "24K", "-6", "C00475392", "S0DE00092", "", "VOID: REFUNDED EARMARK OF A DONOR. TRANSMITTED BY CHECK/EFT"), // earmark: not the PAC's gift
+  line("C00797670", "24K", "-250", "C00475392"),             // a void without earmark text: netted
   line("C00369751", "24K", "1000", "C00475392", "S0DE00092", "X"), // memo row: counted
   line("C00369751", "24Z", "500", "C00475392"),              // in-kind: counted
   line("C00999999", "24E", "90000", "", "S0DE00092"),        // independent expenditure: not a contribution
@@ -43,14 +44,14 @@ test("authorized committees: principal and authorized only, for the candidates a
   assert.deepEqual([...idx.keys()], ["C00475392"]);
 });
 
-test("totals: direct and in-kind contributions to the candidate's committees, net of negative entries", () => {
+test("totals: direct and in-kind contributions to the candidate's committees, net of negative entries, earmarks left out", () => {
   const idx = authorizedIndex(CCL, new Set(["S0DE00092"]));
   const totals = new Map();
   const counted = ROWS.filter((l) => addRow(totals, parsePas2(l), idx)).length;
   assert.equal(counted, 9);
   const coons = totals.get("S0DE00092");
   assert.deepEqual(coons.get("C00761957"), { cents: 1_000_000, contributions: 3 });
-  assert.deepEqual(coons.get("C00797670"), { cents: 999_400, contributions: 2 });
+  assert.deepEqual(coons.get("C00797670"), { cents: 975_000, contributions: 2 });
   assert.deepEqual(coons.get("C00369751"), { cents: 150_000, contributions: 2 });
   assert.equal(coons.has("C00999999"), false);
   assert.equal(coons.has("C00999997"), false);

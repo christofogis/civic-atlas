@@ -10,7 +10,9 @@
 // file, ccl{yy}.zip). Memo rows are included, as the FEC's file description advises for bulk
 // data (in pas226, Coons's had six memo 24K rows from corporate PACs, $1,000-$2,500 each).
 // Amounts are summed with their sign, so a refund or void the giving committee reported as a
-// negative entry is netted out. Not counted: independent expenditures (24E, 24A), party
+// negative entry is netted out. Rows whose memo text mentions an earmark are left out: an
+// earmarked contribution is the individual's money passed through the committee, not the
+// committee's own gift (AIPAC PAC reported a -$6 "VOID: REFUNDED EARMARK" row to Coons). Not counted: independent expenditures (24E, 24A), party
 // coordinated expenditures (24C), communication costs (24F, 24N) and other types in the file.
 //
 // Pure helpers are exported for tests; downloads stream the zip through `unzip -p`.
@@ -24,6 +26,7 @@ import { pipeline } from "node:stream/promises";
 
 export const BULK = "https://www.fec.gov/files/bulk-downloads";
 export const DIRECT_TYPES = new Set(["24K", "24Z"]);
+export const EARMARK = /EARMARK/i;
 const yy = (cycle) => String(cycle).slice(2);
 
 // pas2 columns (pipe-delimited, no header).
@@ -53,6 +56,7 @@ export function authorizedIndex(cclLines, wanted) {
 // Totals are kept in cents to avoid floating-point drift.
 export function addRow(totals, row, authorized) {
   if (!row || !DIRECT_TYPES.has(row.TRANSACTION_TP)) return false;
+  if (EARMARK.test(row.MEMO_TEXT ?? "")) return false;
   const cands = authorized.get(row.OTHER_ID);
   if (!cands) return false;
   const cents = Math.round(Number(row.TRANSACTION_AMT || 0) * 100);
@@ -124,12 +128,16 @@ export async function committeeGifts(cycle, candIds, log = console.log) {
 
     const asOf = await download(`${BULK}/${cycle}/pas2${y}.zip`, join(dir, "pas2.zip"));
     const totals = new Map();
-    let read = 0, counted = 0;
+    let read = 0, counted = 0, earmarks = 0;
     for await (const line of zipLines(join(dir, "pas2.zip"))) {
       read++;
-      if (addRow(totals, parsePas2(line), authorized)) counted++;
+      const row = parsePas2(line);
+      if (addRow(totals, row, authorized)) counted++;
+      else if (row && DIRECT_TYPES.has(row.TRANSACTION_TP) && authorized.has(row.OTHER_ID) && EARMARK.test(row.MEMO_TEXT)) {
+        if (++earmarks <= 5) log(`  earmark row left out: ${row.CMTE_ID} -> ${row.OTHER_ID} ${row.TRANSACTION_AMT} "${row.MEMO_TEXT}"`);
+      }
     }
-    log(`pas2 ${cycle} (FEC file dated ${asOf ?? "?"}): ${read} rows, ${counted} direct contributions to ${totals.size} of ${wanted.size} candidates' committees`);
+    log(`pas2 ${cycle} (FEC file dated ${asOf ?? "?"}): ${read} rows, ${counted} direct contributions to ${totals.size} of ${wanted.size} candidates' committees; ${earmarks} earmark rows left out`);
     return { asOf, totals, names, rowsCounted: counted };
   } finally {
     rmSync(dir, { recursive: true, force: true });
