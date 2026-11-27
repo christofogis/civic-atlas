@@ -23,6 +23,7 @@ const TITLES = {
   "/committee": ["Committee", "Comité"], "/member": ["Member of Congress", "Miembro del Congreso"],
   "/bill": ["Bill", "Proyecto de ley"], "/methods": ["How this site works", "Cómo funciona este sitio"],
   "/status": ["Site status", "Estado del sitio"], "/your-week": ["Your week", "Su semana"],
+  "/first-time-voter": ["First time voting?", "¿Va a votar por primera vez?"],
 };
 
 // The menu: the three things most visitors come for, then everything else in a few groups that open
@@ -33,6 +34,7 @@ const MENU_GROUPS = [
     ["/committees", "Committees", "Comités"], ["/nominations", "Nominations", "Nominaciones"],
     ["/compare", "Compare two members", "Comparar dos miembros"], ["/map", "Map", "Mapa"]] },
   { id: "elections", title: ["Elections", "Elecciones"], links: [
+    ["/first-time-voter", "First time voting?", "¿Va a votar por primera vez?"],
     ["/on-the-ballot", "On the ballot", "En la boleta"], ["/elections", "2028 candidates", "Candidatos 2028"],
     ["/measures", "2028 ballot measures (CA)", "Medidas en la boleta 2028 (CA)"]] },
   { id: "learn", title: ["Learn", "Aprender"], links: [

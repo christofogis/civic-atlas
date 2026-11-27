@@ -926,3 +926,11 @@ ol.bare { list-style: none; padding: 0; margin: 0; }
   .vote-table td.vt-q { order: 9; flex-basis: 100%; margin-top: 0.35rem; font-size: 0.95rem; }
   .vote-table tr.vt-detail td { flex-basis: 100%; }
 }
+
+/* First time voting: three numbered steps, one button each. */
+.voter-steps { list-style: none; counter-reset: step; padding: 0; margin: 0 0 28px; max-width: var(--measure); }
+.voter-steps > li { counter-increment: step; position: relative; padding: 0 0 20px 44px; margin: 0 0 20px; border-bottom: 1px solid var(--border); }
+.voter-steps > li::before { content: counter(step); position: absolute; left: 0; top: 0; width: 30px; height: 30px; border-radius: 50%; background: var(--accent); color: var(--bg); font-weight: 700; display: grid; place-items: center; }
+.voter-steps h2 { margin: 2px 0 6px; font-size: 1.2rem; }
+.voter-steps p { margin: 0 0 10px; }
+.voter-steps .cards { margin: 0 0 10px; }
