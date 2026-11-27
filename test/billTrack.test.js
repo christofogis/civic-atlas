@@ -65,6 +65,20 @@ test("vetoed bill: veto is the last step, override explained", () => {
   assert.match(trackSentence(t).en, /^Vetoed on 2025-03-10\. It becomes law only if two-thirds/);
 });
 
+test("vetoed bill whose override vote failed: the veto stands (H.R. 504, 119th)", () => {
+  const b = { congress: 119, bill_type: "hr", number: 504, introduced_date: "2025-01-16", passed_house_date: "2025-07-14",
+    passed_senate_date: "2025-12-10", presented_date: "2025-12-17", vetoed_date: "2025-12-29" };
+  const votes = [{ vote_id: "house-119-2-8", chamber: "house", voted_at: "2026-01-08T20:17:00+00:00",
+    question: "Passage, Objections of the President To The Contrary Notwithstanding", result: "Failed" }];
+  const t = billTrack(b, { votes, today: NOW });
+  assert.equal(t.status, "vetoed");
+  assert.deepEqual(t.override, { chamber: "house", date: "2026-01-08", vote_id: "house-119-2-8", source_url: undefined });
+  assert.match(trackSentence(t).en, /^Vetoed on 2025-12-29\. On 2026-01-08 the House voted on overriding the veto; .*the veto stands\.$/);
+  // A Senate override that was sustained reads the same way.
+  const s = billTrack(b, { votes: [{ chamber: "senate", voted_at: "2026-01-09T15:00:00Z", question: "On Overriding the Veto H.R. 504", result: "Veto Sustained (50-50, 2/3 majority required)" }], today: NOW });
+  assert.equal(s.override.chamber, "senate");
+});
+
 test("died at the end of a Congress", () => {
   const b = { congress: 118, bill_type: "hr", number: 77, introduced_date: "2023-03-01", passed_house_date: "2023-06-01" };
   const t = billTrack(b, { today: NOW });
