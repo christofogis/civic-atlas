@@ -304,6 +304,24 @@ export default function Methods() {
         that member's page.
       </p>
 
+      <h2 id="leadership">Leadership and Speaker elections</h2>
+      <p>
+        Leadership posts (Speaker, floor leaders, whips, President pro tempore, and party conference and caucus
+        officers) come from the public-domain congress-legislators dataset, with titles shown as published there and
+        the date each post began. A post counts as current from its start date until its end date; when the dataset
+        lists no end date yet, it stays current until the dataset is updated. Member pages and lookup cards show
+        current posts only, in the same words for everyone.
+      </p>
+      <p>
+        Speaker elections are House roll calls the Clerk records as "Election of the Speaker", from 2023 on. Members
+        answer with a name, so each position is a name as the Clerk recorded it, or "Present" or "Not Voting". We count
+        the positions on each ballot and show the Clerk's recorded result unchanged; on these ballots the Clerk's
+        result is the name with the most votes, whether or not it is a majority. A Speaker is elected by a majority of
+        the votes cast for a person by name, so we also show that number, worked out from the counts. Ballots are
+        numbered within each election, which ends with the ballot on which a candidate received a majority. Committee
+        chairs and ranking members are the full committees' rosters for the latest Congress on record.
+      </p>
+
       <h2 id="hearings">Committee hearings and meetings</h2>
       <p>
         Hearings, markups and business meetings in both chambers come from Congress.gov's committee meeting records,
