@@ -86,6 +86,7 @@ export default function MapPage() {
     setParams({ ...(v?.st ? { state: v.st, ...(v.cd != null ? { district: String(v.cd) } : {}) } : {}), ...(byParty ? { color: "party" } : {}) }, { replace: true });
   };
   const [people, setPeople] = useState([]);      // members for the selected state
+  const [peopleFor, setPeopleFor] = useState(null); // the state they were loaded for
   const mine = useMemo(() => myRepresentatives(), []);
   const [myDistrict, setMyDistrict] = useState(null);
   const [facts, setFacts] = useState(null);
@@ -95,7 +96,7 @@ export default function MapPage() {
   // Every serving House member, for the hover snapshot (about 440 rows).
   const reps = useRef(new Map());
   const live = useRef({});   // latest values for map event handlers
-  live.current = { facts, meta, congress, future: congress > CURRENT };
+  live.current = { facts, meta, congress, future: congress > CURRENT, current: congress === CURRENT };
 
   // Districts of the visitor's own representative (remembered from a lookup on this device), highlighted.
   useEffect(() => {
@@ -147,9 +148,11 @@ export default function MapPage() {
     const tip = new maplibregl.Popup({ closeButton: false, closeOnClick: false, className: "map-tip", maxWidth: "260px", offset: 14 });
     const fine = window.matchMedia?.("(hover: hover) and (pointer: fine)").matches;
     const snapshot = (st, cd) => {
-      const { facts: fx, meta: mt, congress: c, future } = live.current;
+      const { facts: fx, meta: mt, congress: c, future, current } = live.current;
       const f = factsFor(fx, mt, c, st, cd);
-      const rep = future ? null : reps.current.get(`${st}-${cd ?? 0}`);
+      // Members serving now belong to the current lines only (in a state whose lines changed, the
+      // same number on the previous Congress's map is a different area).
+      const rep = current ? reps.current.get(`${st}-${cd ?? 0}`) : null;
       let html = `<strong>${esc(districtName(st, cd))}</strong>`;
       if (rep) html += `<div class="map-tip-rep">${esc(rep.name)} <span class="party party-${KIND[rep.party] ?? "other"}">${esc(partyTag(rep))}</span></div>`;
       else if (future) html += `<div class="map-tip-rep">${esc(tr("New lines; members take office Jan. 3", "Líneas nuevas; los miembros asumen el 3 de enero"))}</div>`;
@@ -186,7 +189,7 @@ export default function MapPage() {
 
   // Party coloring: set or clear each district's party feature-state.
   const paintParty = (source, features) => {
-    const on = byParty && congress <= CURRENT && repsLoaded;
+    const on = byParty && congress === CURRENT && repsLoaded;
     features.forEach((f, i) => {
       const rep = reps.current.get(`${f.properties.st}-${f.properties.cd ?? 0}`);
       map.current.setFeatureState({ source, id: i }, { party: on ? (rep ? KIND[rep.party] ?? "other" : "vacant") : "" });
@@ -197,8 +200,8 @@ export default function MapPage() {
     if (!ready) return;
     paintParty("districts", loaded.current.districts);
     paintParty("detail", loaded.current.detail);
-    map.current.setPaintProperty("districts-line", "line-color", byParty && congress <= CURRENT ? "#ffffff" : colors.current.line);
-    map.current.setPaintProperty("detail-line", "line-color", byParty && congress <= CURRENT ? "#ffffff" : colors.current.line);
+    map.current.setPaintProperty("districts-line", "line-color", byParty && congress === CURRENT ? "#ffffff" : colors.current.line);
+    map.current.setPaintProperty("detail-line", "line-color", byParty && congress === CURRENT ? "#ffffff" : colors.current.line);
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [ready, byParty, repsLoaded, congress]);
 
@@ -241,7 +244,7 @@ export default function MapPage() {
   useEffect(() => {
     if (!sel?.st) { setPeople([]); return; }
     db.from("member_directory").select("bioguide_id,name,chamber,state,district,party,serving")
-      .eq("state", sel.st).eq("serving", true).order("district").then(({ data }) => setPeople(data ?? []));
+      .eq("state", sel.st).eq("serving", true).order("district").then(({ data }) => { setPeople(data ?? []); setPeopleFor(sel.st); });
   }, [sel?.st]);
 
   const senators = people.filter((p) => p.chamber === "senate");
@@ -277,7 +280,7 @@ export default function MapPage() {
           </select>
         </label>
         <label className="check">
-          <input type="checkbox" checked={byParty && !future} disabled={future}
+          <input type="checkbox" checked={byParty && congress === CURRENT} disabled={congress !== CURRENT}
             onChange={(e) => {
               setByParty(e.target.checked);
               const next = new URLSearchParams(params);
@@ -287,19 +290,23 @@ export default function MapPage() {
           {tr("Color districts by party of the current representative", "Colorear los distritos según el partido del representante actual")}
         </label>
       </div>
-      {byParty && !future && (
+      {byParty && congress === CURRENT && (
         <div className="fine map-legend">
-          {[["d", tr("D: Democrat", "D: Demócrata")], ["r", tr("R: Republican", "R: Republicano")], ["other", tr("Independent or other", "Independiente u otro")], ["vacant", tr("Vacant", "Vacante")]].map(([k, label]) => (
+          {[["d", tr("D: Democrat", "D: Demócrata")], ["r", tr("R: Republican", "R: Republicano")], ["other", tr("Independent or other", "Independiente u otro")], ["vacant", tr("Vacant, or new member being added", "Vacante, o se está agregando al nuevo miembro")]].map(([k, label]) => (
             <span key={k} className="map-legend-item"><span className="swatch" style={{ background: k === "vacant" ? colors.current.vacant : PARTY_FILL[k] }} aria-hidden="true" />{label}</span>
           ))}
           <p className="fine">{tr("Shows who holds each seat today, not vote margins. Hover or tap a district for its representative's name and party letter.",
             "Muestra quién ocupa cada escaño hoy, no márgenes de votación. Pase el cursor o toque un distrito para ver el nombre y la letra del partido de su representante.")}</p>
+          {repsLoaded && reps.current.size === 0 && (
+            <p className="notice">{tr(`No House member is listed as serving today. The ${ordinal(CURRENT)} Congress's members are colored in once the official member list adds their new terms.`,
+              `Hoy no figura ningún miembro de la Cámara en el cargo. Los miembros del ${ordinal(CURRENT)} Congreso se colorean cuando la lista oficial de miembros agregue sus nuevos períodos.`)}</p>
+          )}
         </div>
       )}
       {future && meta?.changed120 && (
         <p className="notice">
-          {tr(`These lines take effect when the ${ordinal(CURRENT + 1)} Congress begins on January 3, ${CURRENT === 119 ? 2027 : ""}. States with new lines: `,
-            `Estas líneas entran en vigor cuando comience el ${ordinal(CURRENT + 1)} Congreso, el 3 de enero de ${CURRENT === 119 ? 2027 : ""}. Estados con líneas nuevas: `)}
+          {tr(`These lines take effect when the ${ordinal(CURRENT + 1)} Congress begins on January 3, ${1787 + 2 * (CURRENT + 1)}. States with new lines: `,
+            `Estas líneas entran en vigor cuando comience el ${ordinal(CURRENT + 1)} Congreso, el 3 de enero de ${1787 + 2 * (CURRENT + 1)}. Estados con líneas nuevas: `)}
           {meta.changed120.map((st, i) => <span key={st}>{i ? ", " : ""}<button type="button" className="link" onClick={() => setSel({ st })}>{stateName(st)}</button></span>)}.
         </p>
       )}
@@ -343,7 +350,11 @@ export default function MapPage() {
                   </li>
                 ))}
               </ul>
-              {house.length === 0 && senators.length === 0 && <p className="fine">{tr("Loading…", "Cargando…")}</p>}
+              {house.length === 0 && senators.length === 0 && peopleFor !== sel.st && <p className="fine">{tr("Loading…", "Cargando…")}</p>}
+              {house.length === 0 && peopleFor === sel.st && (
+                <p className="fine">{tr("No House member is listed as serving for this state right now. After a new Congress begins (Jan 3), members appear once the official member list adds their new terms.",
+                  "No figura ningún miembro de la Cámara en el cargo para este estado en este momento. Después de que comienza un nuevo Congreso (3 de enero), los miembros aparecen cuando la lista oficial de miembros agrega sus nuevos períodos.")}</p>
+              )}
               {sel.cd != null && !house.some((p) => (p.district ?? 0) === sel.cd) && house.length > 0 && (
                 <p className="fine">{tr("This seat is vacant or its new member is being added.", "Este escaño está vacante o se está agregando a su nuevo miembro.")}</p>
               )}
