@@ -134,7 +134,7 @@ export async function committeeGifts(cycle, candIds, log = console.log) {
       const row = parsePas2(line);
       if (addRow(totals, row, authorized)) counted++;
       else if (row && DIRECT_TYPES.has(row.TRANSACTION_TP) && authorized.has(row.OTHER_ID) && EARMARK.test(row.MEMO_TEXT)) {
-        if (++earmarks <= 5) log(`  earmark row left out: ${row.CMTE_ID} -> ${row.OTHER_ID} ${row.TRANSACTION_AMT} "${row.MEMO_TEXT}"`);
+        earmarks++; // memo text often names the individual donor, so it isn't logged
       }
     }
     log(`pas2 ${cycle} (FEC file dated ${asOf ?? "?"}): ${read} rows, ${counted} direct contributions to ${totals.size} of ${wanted.size} candidates' committees; ${earmarks} earmark rows left out`);
