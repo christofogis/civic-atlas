@@ -490,6 +490,32 @@ header.site .site-inner { position: relative; flex-wrap: nowrap; gap: 8px 14px; 
   .site-menu.open .menu-search input { width: 100%; padding: 11px 14px; font-size: 1rem; }
 }
 
+/* ---- Search suggestions under the header search box. The list floats over the page from the
+   header (no layout shift); inside the phone menu it sits in the menu's own flow. */
+.suggest { position: relative; }
+.suggest-list { position: absolute; top: calc(100% + 6px); right: 0; width: min(28rem, calc(100vw - 32px)); max-height: min(70vh, 34rem); overflow-y: auto;
+  background: var(--bg); border: 1px solid var(--border); border-radius: 10px; box-shadow: 0 10px 24px var(--shadow); padding: 6px 0; z-index: 40; text-align: left; }
+.suggest-head { padding: 8px 14px 3px; font-size: 0.72rem; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; color: var(--muted); }
+.suggest-option { display: flex; align-items: baseline; gap: 0 6px; padding: 7px 14px; font-size: 0.92rem; line-height: 1.35; color: var(--text); cursor: pointer; min-width: 0; }
+.suggest-option.active { background: var(--accent-soft); }
+.suggest-option b { font-weight: 700; }
+.suggest-main { min-width: 0; overflow-wrap: anywhere; }
+.suggest-option .party { flex: none; }
+.suggest-num { flex: none; white-space: nowrap; }
+.suggest-title { flex: 1 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.suggest-meta { flex: none; color: var(--muted); font-size: 0.84rem; white-space: nowrap; }
+.suggest-search { border-top: 1px solid var(--border); margin-top: 6px; padding-top: 9px; color: var(--accent); }
+@media (max-width: 640px) {
+  /* While suggestions show, the menu's links step aside so the results sit right under the box,
+     not below the fold of a long menu. */
+  .site-menu.open:has(.suggest-list) nav { display: none; }
+  .site-menu.open:has(.suggest-list) .menu-search { margin-top: 6px; }
+  .menu-search .suggest-list { position: static; width: auto; max-height: none; margin-top: 8px; box-shadow: none; }
+  .menu-search .suggest-option { padding: 10px 12px; font-size: 1rem; }
+  .menu-search .suggest-head { padding: 10px 12px 3px; }
+  .menu-search .suggest-title { white-space: normal; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+}
+
 /* ---- Lookup results grouped by level of government ------------------------------------------- */
 .level { margin-top: 28px; }
 .level > h2 { margin-bottom: 2px; }

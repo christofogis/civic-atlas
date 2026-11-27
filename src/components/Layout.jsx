@@ -4,6 +4,7 @@ import ReportError from "./ReportError.jsx";
 // Every page can cite a source with <Ref id text>; the page puts <NotesList /> at its end.
 import { NotesProvider } from "./Notes.jsx";
 import ThemeSwitch from "./ThemeSwitch.jsx";
+import SearchSuggest from "./SearchSuggest.jsx";
 import { useLang } from "../lib/i18n.jsx";
 
 // Site header on every page: name, main sections, and a search box for members and bills.
@@ -45,6 +46,13 @@ const MENU_GROUPS = [
   { id: "about", title: ["About this site", "Sobre este sitio"], links: [
     ["/methods", "How this site works", "Cómo funciona este sitio"], ["/corrections", "Corrections", "Correcciones"],
     ["/status", "Site status", "Estado del sitio"]] },
+];
+
+// Site pages the search box can suggest by title: the menu's links and the three at its top.
+const SITE_PAGES = [
+  { to: "/", title: ["Find your officials", "Sus funcionarios"] }, { to: "/your-week", title: ["Your week", "Su semana"] },
+  { to: "/week", title: ["This week in Congress", "Esta semana en el Congreso"] },
+  ...MENU_GROUPS.flatMap((g) => g.links.map(([to, en, es]) => ({ to, title: [en, es] }))),
 ];
 
 export default function Layout() {
@@ -95,9 +103,9 @@ export default function Layout() {
           <Link to="/" className="brand">Civic Atlas</Link>
           {location.pathname !== "/search" && (
             <form onSubmit={submit} role="search" className="site-search header-search">
-              <input type="search" aria-label={t("Search members and bills", "Buscar miembros y proyectos de ley")}
-                placeholder={t("Name or bill (e.g. H.R. 1)", "Nombre o proyecto (p. ej., H.R. 1)")}
-                value={q} onChange={(e) => setQ(e.target.value)} />
+              <SearchSuggest id="hs" value={q} onValueChange={setQ} pages={SITE_PAGES}
+                ariaLabel={t("Search members and bills", "Buscar miembros y proyectos de ley")}
+                placeholder={t("Name or bill (e.g. H.R. 1)", "Nombre o proyecto (p. ej., H.R. 1)")} />
             </form>
           )}
           <div id="site-menu" className={`site-menu${menuOpen ? " open" : ""}`} ref={menuRef}>
@@ -114,9 +122,9 @@ export default function Layout() {
           </nav>
           {location.pathname !== "/search" && (
             <form onSubmit={submit} role="search" className="site-search menu-search">
-              <input type="search" aria-label={t("Search members and bills", "Buscar miembros y proyectos de ley")}
-                placeholder={t("Name or bill (e.g. H.R. 1)", "Nombre o proyecto (p. ej., H.R. 1)")}
-                value={q} onChange={(e) => setQ(e.target.value)} />
+              <SearchSuggest id="ms" value={q} onValueChange={setQ} pages={SITE_PAGES}
+                ariaLabel={t("Search members and bills", "Buscar miembros y proyectos de ley")}
+                placeholder={t("Name or bill (e.g. H.R. 1)", "Nombre o proyecto (p. ej., H.R. 1)")} />
             </form>
           )}
           </div>
