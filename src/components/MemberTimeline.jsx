@@ -5,6 +5,7 @@ import { billLabel, date } from "../lib/format.js";
 import { tr } from "../lib/lang.js";
 import { voteKind } from "../lib/voteKind.js";
 import { VoteMeaning } from "./Explain.jsx";
+import { decodeEntities } from "../../lib/ptr.js";
 
 // A member's record in date order: roll-call votes (their recorded position, the clerk's wording),
 // bills they introduced, their bills that became law, and stock trades they reported. Every member
@@ -79,7 +80,7 @@ function Entry({ e }) {
     <>
       <span className="tl-kind">{tr("Trade", "Operación")}</span>
       <span>
-        <span lang="en">{t.transaction_type}</span>{": "}<span lang="en">{t.asset_name}{t.ticker ? ` (${t.ticker})` : ""}</span>
+        <span lang="en">{t.transaction_type}</span>{": "}<span lang="en">{decodeEntities(t.asset_name).replace(/\s+/g, " ")}{t.ticker ? ` (${t.ticker})` : ""}</span>
         <span className="fine"> · {t.amount_text}{t.owner && t.owner !== "Self" ? ` · ${t.owner}` : ""} · {tr("reported", "declarada el")} {date(t.filed_date)} · <a href={t.source_url} rel="noopener">{tr("Filing", "Declaración")}</a></span>
       </span>
     </>
