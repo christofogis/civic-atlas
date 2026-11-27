@@ -64,14 +64,14 @@
       "summary_url": "https://oag.ca.gov/system/files/initiatives/pdfs/Title%20and%20Summary%20%2825-0018A1%29.pdf",
       "analysis_url": "https://lao.ca.gov/BallotAnalysis/BallotDetail?id=1495",
       "analysis_pdf": "https://lao.ca.gov/ballot/2025/250426.pdf",
-      "funders_url": "https://elections.cdn.sos.ca.gov/ballot-measures/top-funders/1995-top-funders-11-13-25.pdf",
+      "funders_url": "https://elections.cdn.sos.ca.gov/ballot-measures/top-funders/1995-top-funders-05-01-26.pdf",
       "extract": {
         "from": "summary_url",
         "start": "REQUIRES UNIVERSITY",
         "end": [],
         "field": "official_summary"
       },
-      "funders_as_of": "2025-11-13"
+      "funders_as_of": "2026-05-01"
     }
   ]
 }

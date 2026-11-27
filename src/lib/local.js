@@ -11,6 +11,8 @@ const OFFICES = {
   treasurer_tax_collector: ["Treasurer-Tax Collector", "Tesorero(a)-Recaudador(a) de Impuestos"],
 };
 export const officeName = (o) => tr(...(OFFICES[o] ?? [o, o]));
+// "Orange County" -> "Condado de Orange" for Spanish text.
+export const countyEs = (county) => `Condado de ${county.replace(/ County$/, "")}`;
 export const supervisorParts = (county, d) => [tr(`${county} Board of Supervisors`, `Junta de Supervisores del Condado de ${county.replace(/ County$/, "")}`), tr(`District ${d}`, `Distrito ${d}`)];
 export const supervisorSeat = (county, d) => supervisorParts(county, d).join(", ");
 export const roleName = (r) => (r === "chair" ? tr("Chair", "Presidente(a)") : r === "vice_chair" ? tr("Vice Chair", "Vicepresidente(a)") : null);
