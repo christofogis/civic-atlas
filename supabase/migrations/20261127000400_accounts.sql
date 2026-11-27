@@ -71,11 +71,14 @@ create table followed_bills (
 -- Triggers
 -- ---------------------------------------------------------------------------
 
--- A preferences row for every new account, everything off.
+-- A preferences row for every new account, everything off. Email language starts as the site
+-- language the person signed up in (sent by the email sign-in form), English otherwise.
 create or replace function public.create_account_prefs() returns trigger
 language plpgsql security definer set search_path = '' as $$
 begin
-  insert into public.account_prefs (user_id) values (new.id) on conflict do nothing;
+  insert into public.account_prefs (user_id, language)
+    values (new.id, case when new.raw_user_meta_data->>'lang' = 'es' then 'es' else 'en' end)
+    on conflict do nothing;
   return new;
 end;
 $$;

@@ -13,3 +13,11 @@ export const TURNSTILE_SITE_KEY = "0x4AAAAAAGQEsAL9bIX9fYmK";
 // (plus any custom domain) and to the Places API (New) only, with a daily quota cap.
 // Empty = plain address box, no suggestions.
 export const GOOGLE_PLACES_KEY = "";
+
+// Optional accounts (Supabase Auth). Off until the accounts migration is applied and the Supabase
+// dashboard is set up (docs/accounts-setup.md): Site URL, redirect URLs, email sign-in.
+// Off = no Sign in link, no Save buttons; the site works the same either way.
+export const ACCOUNTS_ENABLED = false;
+// Google sign-in button. Turn on only after the Google OAuth client exists and its IDs are in the
+// Supabase dashboard (Authentication > Sign In / Providers > Google).
+export const AUTH_GOOGLE_ENABLED = false;
