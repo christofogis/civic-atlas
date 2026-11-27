@@ -150,7 +150,7 @@ export default function SearchSuggest({ id, value, onValueChange, pages, ariaLab
         </>}
         {opt.kind === "bill" && <>
           <span className="suggest-num"><BillNumber bill={opt.b} typed={bills.ref} /></span>
-          <span className="suggest-title"> · {bills.byNumber ? (opt.b.short_title ?? opt.b.title) : <Marked text={opt.b.short_title ?? opt.b.title} q={q} />}</span>
+          <span className="suggest-title" lang="en"> · {bills.byNumber ? (opt.b.short_title ?? opt.b.title) : <Marked text={opt.b.short_title ?? opt.b.title} q={q} />}</span>
           <span className="suggest-meta"> ({ordinal(opt.b.congress)})</span>
         </>}
         {opt.kind === "state" && <>

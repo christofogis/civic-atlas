@@ -18,7 +18,7 @@ export default function MeetingList({ meetings, showCommittee = false, committee
           <span className="fine">{meetingTime(m)}{m.meeting_type && <> · {m.meeting_type}</>}
             {m.status && !/^scheduled$/i.test(m.status) && <strong> · {m.status}</strong>}
             {showCommittee && m.committee_ids?.[0] && <> · {committees[m.committee_ids[0]] ?? m.committee_ids[0]}</>}</span>
-          <div><Clamp lines={2}><Link to={`/hearing/${m.event_id}`}>{meetingHeading(m.title, m.meeting_type, itemsLabel).heading}</Link></Clamp></div>
+          <div><Clamp lines={2} lang={null}><Link to={`/hearing/${m.event_id}`}>{meetingHeading(m.title, m.meeting_type, itemsLabel).heading}</Link></Clamp></div>
         </li>
       ))}
     </ul>

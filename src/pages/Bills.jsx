@@ -103,7 +103,7 @@ export default function Bills() {
                 <td data-label={tr("Sponsor:", "Patrocinador:")}>{b.sponsor_bioguide_id
                   ? <><Link to={`/member/${b.sponsor_bioguide_id}`}>{b.sponsor_name}</Link>{b.sponsor_party && <> <PartyTag p={{ party: b.sponsor_party, chamber: b.sponsor_chamber, state: b.sponsor_state, district: b.sponsor_district }} /></>}</>
                   : ""}</td>
-                <td><span className="fine">{date(b.latest_action_date)}</span><div>{b.latest_action_text}</div></td>
+                <td><span className="fine">{date(b.latest_action_date)}</span><div lang="en">{b.latest_action_text}</div></td>
                 {sort === "lobbying" && <td>{b.lobbying_clients.toLocaleString()}</td>}
               </tr>
             ))}

@@ -149,7 +149,7 @@ function IssueSection({ issue, mine }) {
                   <li key={v.vote_id}>
                     <div className="fine">{date(v.voted_at)} · {v.chamber === "house" ? tr("House", "Cámara") : tr("Senate", "Senado")}</div>
                     <VoteMeaning v={v} />
-                    <div className="fine"><KindLabel v={v} /> <a href={v.source_url}>{v.question}</a>: {v.result}{v.yea_total != null && ` (${v.yea_total}–${v.nay_total})`}</div>
+                    <div className="fine"><KindLabel v={v} /> <a href={v.source_url} lang="en">{v.question}</a>: {v.result}{v.yea_total != null && ` (${v.yea_total}–${v.nay_total})`}</div>
                     <div className="fine">{billLink({ congress: v.bill_congress, bill_type: v.bill_type, number: v.bill_number })} {v.bill_title}</div>
                     {v.mine.length > 0 && (
                       <ul className="bare my-votes" aria-label={tr("How your members voted", "Cómo votaron sus miembros")}>

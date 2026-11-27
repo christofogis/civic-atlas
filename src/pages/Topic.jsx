@@ -99,7 +99,7 @@ export default function Topic() {
                   {state.votes.map((v) => (
                     <tr key={v.vote_id}>
                       <td>{date(v.voted_at)}<div className="fine">{v.chamber === "house" ? tr("House", "Cámara") : tr("Senate", "Senado")}</div></td>
-                      <td><VoteMeaning v={v} /><KindLabel v={v} /> <a href={v.source_url}>{v.question}</a>
+                      <td><VoteMeaning v={v} /><KindLabel v={v} /> <a href={v.source_url} lang="en">{v.question}</a>
                         <div className="fine">{link({ congress: v.bill_congress, bill_type: v.bill_type, number: v.bill_number })} {v.bill_title}</div></td>
                       <td>{v.result}<div className="fine">{v.yea_total}–{v.nay_total}</div></td>
                     </tr>

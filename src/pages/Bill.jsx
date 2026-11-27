@@ -195,7 +195,7 @@ export default function Bill() {
     <main className="page full">
       <header className="page-head">
         <p className="fine">{billLabel(b)} · {ordinal(b.congress)} {tr("Congress", "Congreso")} · <Explain id="bill-types">{tr(`What's an ${billLabel(b).replace(/\s*\d+$/, "")}?`, `¿Qué es un ${billLabel(b).replace(/\s*\d+$/, "")}?`)}</Explain></p>
-        <h1 className="bill-title">{b.short_title ?? b.title}</h1>
+        <h1 className="bill-title" lang="en">{b.short_title ?? b.title}</h1>
         {b.short_title && b.short_title !== b.title && <p className="lede"><Clamp lines={3}>{b.title}</Clamp></p>}
       </header>
 
@@ -295,7 +295,7 @@ export default function Bill() {
                     <td>{v.chamber === "house" ? tr("House", "Cámara") : tr("Senate", "Senado")}</td>
                     <td className="vt-q">
                       <VoteMeaning v={v} />
-                      <a href={v.source_url}>{v.question}</a>
+                      <a href={v.source_url} lang="en">{v.question}</a>
                       <div><button className="link fine" aria-expanded={openVote === v.vote_id}
                         onClick={() => setOpenVote(openVote === v.vote_id ? null : v.vote_id)}>
                         {openVote === v.vote_id ? tr("Hide how members voted", "Ocultar cómo votaron") : tr("How members voted", "Cómo votaron los miembros")}

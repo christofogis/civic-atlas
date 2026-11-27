@@ -145,7 +145,7 @@ export default function MemberVotes() {
                       <td className="vt-q">
                         <VoteMeaning v={v} />
                         <KindLabel v={v} />
-                        <a href={v.source_url}>{v.question}</a>
+                        <a href={v.source_url} lang="en">{v.question}</a>
                         <div className="fine">
                           {v.bill_type
                             ? <><Link to={`/bill/${v.bill_congress}/${v.bill_type}/${v.bill_number}`}>{billLabel({ bill_type: v.bill_type, number: v.bill_number })}</Link>{v.bill_title && <> · {v.bill_title}</>}{v.policy_area && <> · {areaName(v.policy_area)}</>}</>

@@ -145,7 +145,7 @@ export default function Week() {
             {laws.length === 0 ? <p>{tr("None this week.", "Ninguno esta semana.")}</p> : (
               <ul className="bare items">{laws.map((b) => <li key={`${b.bill_type}${b.number}`} className="item"><span className="item-head">{billLink(b)} <span className="fine">· {b.law_number} · {tr("signed", "firmado el")} {date(b.became_law_date)}</span></span><Clamp lines={2}>{b.short_title ?? b.title}</Clamp></li>)}</ul>
             )}
-            {vetoed.length > 0 && <p>{tr("Vetoed", "Vetados")}: {vetoed.map((b, i) => <span key={b.number}>{i ? "; " : ""}{billLink(b)} {b.short_title ?? b.title} ({date(b.vetoed_date)})</span>)}</p>}
+            {vetoed.length > 0 && <p>{tr("Vetoed", "Vetados")}: {vetoed.map((b, i) => <span key={b.number}>{i ? "; " : ""}{billLink(b)} <span lang="en">{b.short_title ?? b.title}</span> ({date(b.vetoed_date)})</span>)}</p>}
           </section>
       </Fold>
       <Fold id="passed" title={tr("Passed a chamber", "Aprobados por una cámara")} open={open.has("passed")} onToggle={toggle} status={loading ? "loading" : undefined}
@@ -175,7 +175,7 @@ export default function Week() {
                       <td>{date(v.voted_at)}<div className="fine">{v.chamber === "house" ? tr("House", "Cámara") : tr("Senate", "Senado")}</div></td>
                       <td>
                         <VoteMeaning v={v} />
-                        <KindLabel v={v} /> <a href={v.source_url}>{v.question}</a>
+                        <KindLabel v={v} /> <a href={v.source_url} lang="en">{v.question}</a>
                         <div className="fine">{v.bill_type ? billLink({ congress: v.bill_congress, bill_type: v.bill_type, number: v.bill_number }) : <LinkedText text={v.description} congress={congressOn(new Date(v.voted_at))} />}</div>
                       </td>
                       <td><VoteResult v={v} /><div className="fine">{v.yea_total}–{v.nay_total}</div></td>

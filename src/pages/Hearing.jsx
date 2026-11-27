@@ -110,7 +110,7 @@ export default function Hearing() {
               return (
                 <li key={`${r.congress}-${r.bill_type}-${r.number}`}>
                   {b ? <Link to={`/bill/${r.congress}/${r.bill_type}/${r.number}`}>{label}</Link> : label}
-                  {b && <> · {b.short_title ?? b.title}</>}
+                  {b && <> · <span lang="en">{b.short_title ?? b.title}</span></>}
                 </li>
               );
             })}
