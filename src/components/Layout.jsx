@@ -1,5 +1,5 @@
 import { Suspense, useEffect, useRef, useState } from "react";
-import { Link, NavLink, Outlet, useNavigate, useLocation } from "react-router-dom";
+import { Link, NavLink, Outlet, useNavigate, useLocation, useNavigationType } from "react-router-dom";
 import ReportError from "./ReportError.jsx";
 // Every page can cite a source with <Ref id text>; the page puts <NotesList /> at its end.
 import { NotesProvider } from "./Notes.jsx";
@@ -64,15 +64,31 @@ export default function Layout() {
   const [menuOpen, setMenuOpen] = useState(false);
   useEffect(() => setMenuOpen(false), [location.pathname, location.search]);
   const menuRef = useRef(null);
+  const menuButton = useRef(null);
   useEffect(() => {
     if (!menuOpen) return undefined;
     const close = (e) => {
-      if (e.type === "keydown" ? e.key === "Escape" : !menuRef.current?.contains(e.target) && !e.target.closest?.(".menu-button")) setMenuOpen(false);
+      if (e.type === "keydown" ? e.key === "Escape" : !menuRef.current?.contains(e.target) && !e.target.closest?.(".menu-button")) {
+        // Escape from inside the menu: focus goes back to the Menu button instead of being lost.
+        if (e.type === "keydown" && menuRef.current?.contains(document.activeElement)) menuButton.current?.focus();
+        setMenuOpen(false);
+      }
     };
     document.addEventListener("pointerdown", close);
     document.addEventListener("keydown", close);
     return () => { document.removeEventListener("pointerdown", close); document.removeEventListener("keydown", close); };
   }, [menuOpen]);
+  // After following a link to another page, start at the top with focus on the page content, so a
+  // screen reader announces the new page and Tab continues from it (not from the old link's spot).
+  // Back and Forward keep the browser's own scroll position; links to a #section keep theirs.
+  const navType = useNavigationType();
+  const firstPage = useRef(true);
+  useEffect(() => {
+    if (firstPage.current) { firstPage.current = false; return; }
+    if (navType !== "PUSH" || location.hash) return;
+    document.getElementById("main")?.focus({ preventScroll: true });
+    window.scrollTo(0, 0);
+  }, [location.pathname]);
   // A plain title for each section, so tabs, bookmarks and search results say where they lead.
   // Pages with a record (a member, a bill, a county) replace it with the record's name once loaded.
   useEffect(() => {
@@ -93,7 +109,7 @@ export default function Layout() {
         <div className="site-inner">
           {/* One menu on every screen size (a three-line button, like Wikipedia's), so the header
               stays quiet; the search box stays in the header on wider screens. */}
-          <button type="button" className="menu-button" aria-expanded={menuOpen} aria-controls="site-menu"
+          <button type="button" ref={menuButton} className="menu-button" aria-expanded={menuOpen} aria-controls="site-menu"
             aria-label={menuOpen ? t("Close menu", "Cerrar menú") : t("Menu", "Menú")} onClick={() => setMenuOpen(!menuOpen)}>
             <svg viewBox="0 0 20 20" width="20" height="20" aria-hidden="true" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round">
               {menuOpen ? <><line x1="5" y1="5" x2="15" y2="15" /><line x1="15" y1="5" x2="5" y2="15" /></>

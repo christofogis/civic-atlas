@@ -2,16 +2,20 @@ import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { GLOSSARY } from "../lib/glossary.js";
 import { voteKind, positionMeaning } from "../lib/voteKind.js";
 import { voteMeaning } from "../lib/voteMeaning.js";
-import { useLang } from "../lib/i18n.jsx";
+import { useLang, tr } from "../lib/i18n.jsx";
 
 // Open/close state for a small pop-up that closes on a tap outside or Escape.
 function usePop() {
   const [open, setOpen] = useState(false);
   const ref = useRef(null);
+  const trigger = useRef(null);
+  // Closing from the keyboard or the × puts focus back on the button that opened it, so keyboard and
+  // screen-reader users don't lose their place when the pop-up's content disappears.
+  const close = () => { setOpen(false); trigger.current?.focus(); };
   useEffect(() => {
     if (!open) return;
     const away = (e) => { if (ref.current && !ref.current.contains(e.target)) setOpen(false); };
-    const esc = (e) => { if (e.key === "Escape") setOpen(false); };
+    const esc = (e) => { if (e.key === "Escape") { setOpen(false); if (ref.current?.contains(document.activeElement)) trigger.current?.focus(); } };
     document.addEventListener("pointerdown", away);
     document.addEventListener("keydown", esc);
     return () => { document.removeEventListener("pointerdown", away); document.removeEventListener("keydown", esc); };
@@ -25,27 +29,27 @@ function usePop() {
     const over = r.right - (document.documentElement.clientWidth - 12);
     if (over > 0) pop.style.left = `${-Math.min(over, r.left - 12)}px`;
   }, [open]);
-  return [open, setOpen, ref];
+  return [open, setOpen, ref, trigger, close];
 }
 
 // A term with an (i) that opens a small pop-up explanation. Tap or click to open; tap outside, press
 // Escape or the close button to close. Works on phones, where hover tooltips don't.
 export function Explain({ id, children }) {
-  const [open, setOpen, ref] = usePop();
+  const [open, setOpen, ref, trigger, close] = usePop();
   const { t } = useLang();
   const g = GLOSSARY[id];
   if (!g) return children ?? null;
   return (
     <span className="explain" ref={ref}>
       {children ?? t(g.term, g.term_es)}
-      <button type="button" className="explain-i" aria-expanded={open} aria-label={t(`What is "${g.term}"?`, `¿Qué es "${g.term_es}"?`)} onClick={() => setOpen(!open)}>
+      <button type="button" ref={trigger} className="explain-i" aria-expanded={open} aria-label={t(`What is "${g.term}"?`, `¿Qué es "${g.term_es}"?`)} onClick={() => setOpen(!open)}>
         <svg viewBox="0 0 16 16" width="15" height="15" aria-hidden="true"><circle cx="8" cy="8" r="7" fill="none" stroke="currentColor" strokeWidth="1.3" /><circle cx="8" cy="4.9" r="0.95" fill="currentColor" /><rect x="7.25" y="6.9" width="1.5" height="4.8" rx="0.7" fill="currentColor" /></svg>
       </button>
       {open && (
-        <span className="explain-pop" role="dialog" aria-label={t(g.term, g.term_es)}>
+        <span className="explain-pop">
           <strong>{t(g.term, g.term_es)}</strong>
           <span>{t(g.text, g.text_es)}</span>
-          <button type="button" className="explain-close" aria-label={t("Close", "Cerrar")} onClick={() => setOpen(false)}>×</button>
+          <button type="button" className="explain-close" aria-label={t("Close", "Cerrar")} onClick={close}>×</button>
         </span>
       )}
     </span>
@@ -54,13 +58,13 @@ export function Explain({ id, children }) {
 
 // The vote-type label on a roll call ("Cloture", "Procedural: rule for debate"), tappable.
 export function KindLabel({ v }) {
-  const [open, setOpen, ref] = usePop();
+  const [open, setOpen, ref, trigger, close] = usePop();
   const k = voteKind(v);
   return (
     <span className="explain" ref={ref}>
-      <button type="button" className={`kind kind-${k.kind}`} aria-expanded={open} onClick={() => setOpen(!open)}>{k.label}</button>
-      {open && <span className="explain-pop" role="dialog" aria-label={k.label}><span>{k.explain}</span>
-        <button type="button" className="explain-close" aria-label="Close" onClick={() => setOpen(false)}>×</button></span>}
+      <button type="button" ref={trigger} className={`kind kind-${k.kind}`} aria-expanded={open} onClick={() => setOpen(!open)}>{k.label}</button>
+      {open && <span className="explain-pop"><span>{k.explain}</span>
+        <button type="button" className="explain-close" aria-label={tr("Close", "Cerrar")} onClick={close}>×</button></span>}
     </span>
   );
 }
