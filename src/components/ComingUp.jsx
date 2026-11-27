@@ -6,6 +6,7 @@ import { date, shortCommittee } from "../lib/format.js";
 import Clamp from "./Clamp.jsx";
 import { Explain } from "./Explain.jsx";
 import { tr, locale } from "../lib/lang.js";
+import { MineCommittee } from "./Mine.jsx";
 
 const todayEastern = () => new Intl.DateTimeFormat("en-CA", { timeZone: "America/New_York" }).format(new Date());
 const KIND = () => ({ hearing: tr("Hearing", "Audiencia"), markup: tr("Markup", "Sesión de enmiendas"), meeting: tr("Meeting", "Reunión") });
@@ -88,6 +89,7 @@ export default function ComingUp({ myCommittees = new Set(), floor: showFloor = 
           <ul className="bare events">
             {list.map((e) => (
               <li key={e.event_id} className={`event-row${myCommittees.has(e.committee_id) || myCommittees.has(e.committee_id?.slice(0, 4)) ? " mine-row" : ""}`}>
+                {(myCommittees.has(e.committee_id) || myCommittees.has(e.committee_id?.slice(0, 4))) && <MineCommittee />}
                 <span className="event-time">{tidy(e.event_time)}</span>
                 <span className="event-body">
                   <span className="event-meta">

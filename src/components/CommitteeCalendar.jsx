@@ -6,6 +6,7 @@ import { tr, locale } from "../lib/lang.js";
 import { meetingHeading } from "../../lib/meetings.js";
 import { itemsLabel } from "../lib/meetingLabels.js";
 import ComingUp from "./ComingUp.jsx";
+import { MineCommittee } from "./Mine.jsx";
 
 // Committee hearings and markups as a calendar: a week with time slots (like a work calendar), a
 // month with each day's meetings, or the list. All times are Eastern, as Congress publishes them.
@@ -136,7 +137,7 @@ function WeekGrid({ start, mine, onGoTo }) {
                 className={`cal-event ${m.chamber}${isMine(m, mine) ? " mine" : ""}${/postpon|cancel/i.test(m.status ?? "") ? " off" : ""}`}
                 style={{ top: ((m.min - startHour * 60) / 60) * HOUR_PX + 1, height: (BLOCK_MIN / 60) * HOUR_PX - 3,
                   left: `calc(${(100 / m.lanes) * m.lane}% + 2px)`, width: `calc(${100 / m.lanes}% - 4px)` }}>
-                <span className="cal-event-committee">{committeeOf(m, names) || (m.chamber === "house" ? tr("House", "Cámara") : tr("Senate", "Senado"))}</span>
+                {isMine(m, mine) && <MineCommittee />}<span className="cal-event-committee">{committeeOf(m, names) || (m.chamber === "house" ? tr("House", "Cámara") : tr("Senate", "Senado"))}</span>
                 <span className="cal-event-title">{heading(m)}</span>
               </Link>
             ))}
@@ -151,6 +152,7 @@ function WeekGrid({ start, mine, onGoTo }) {
             <ul className="bare events">
               {rows.filter((m) => m.day === d).map((m) => (
                 <li key={m.event_id} className={`event-row${isMine(m, mine) ? " mine-row" : ""}`}>
+                  {isMine(m, mine) && <MineCommittee />}
                   <span className="event-time">{m.min ? timeLabel(m.min) : ""}</span>
                   <span className="event-body">
                     <span className="event-meta">{committeeOf(m, names)}<span className="fine"> · {m.chamber === "house" ? tr("House", "Cámara") : tr("Senate", "Senado")}</span></span>
@@ -181,15 +183,17 @@ function MonthGrid({ month, mine }) {
   const show = picked ?? (byDay[today] && today.startsWith(month) ? today : null);
   return (
     <>
-      <div className="cal-month" role="grid">
-        {weekdays.map((w) => <div key={w} className="cal-weekday" role="columnheader">{w}</div>)}
+      {/* Plain buttons, not an ARIA grid: each day's label already names its weekday and date, and a
+          grid role would need rows and arrow-key handling that a seven-column layout doesn't need. */}
+      <div className="cal-month">
+        {weekdays.map((w) => <div key={w} className="cal-weekday" aria-hidden="true">{w}</div>)}
         {cells.map((d) => {
           const list = byDay[d] ?? [];
           return (
-            <button key={d} type="button" role="gridcell" aria-pressed={show === d}
+            <button key={d} type="button" aria-pressed={show === d}
               className={`cal-cell${d.startsWith(month) ? "" : " out"}${d === today ? " today" : ""}${show === d ? " on" : ""}${list.some((m) => isMine(m, mine)) ? " mine" : ""}`}
               onClick={() => setPicked(d)} disabled={list.length === 0}
-              aria-label={`${dayLabel(d, { weekday: "long", month: "long", day: "numeric" })}: ${list.length} ${tr("meetings", "reuniones")}`}>
+              aria-label={`${dayLabel(d, { weekday: "long", month: "long", day: "numeric" })}: ${list.length} ${tr("meetings", "reuniones")}${list.some((m) => isMine(m, mine)) ? tr(", including your representatives' committees", ", incluidos comités de sus representantes") : ""}`}>
               <span className="cal-num">{dayLabel(d, { day: "numeric" })}</span>
               {list.length > 0 && <span className="cal-count">{list.length}<span className="cal-count-label"> {tr(list.length === 1 ? "meeting" : "meetings", list.length === 1 ? "reunión" : "reuniones")}</span></span>}
             </button>
@@ -202,6 +206,7 @@ function MonthGrid({ month, mine }) {
           <ul className="bare events">
             {byDay[show].map((m) => (
               <li key={m.event_id} className={`event-row${isMine(m, mine) ? " mine-row" : ""}`}>
+                {isMine(m, mine) && <MineCommittee />}
                 <span className="event-time">{m.min ? timeLabel(m.min) : ""}</span>
                 <span className="event-body">
                   <span className="event-meta">{committeeOf(m, names)}<span className="fine"> · {m.chamber === "house" ? tr("House", "Cámara") : tr("Senate", "Senado")}{m.meeting_type && ` · ${m.meeting_type}`}{m.status && !/^scheduled$/i.test(m.status) && ` · ${m.status}`}</span></span>

@@ -5,6 +5,7 @@ import { db } from "../lib/db.js";
 import { tr } from "../lib/lang.js";
 import { myRepresentatives } from "../lib/myReps.js";
 import { PartyTag } from "./PartyTag.jsx";
+import { MineRep } from "./Mine.jsx";
 
 const PREVIEW = 6;   // per side, before "show all"
 
@@ -57,7 +58,7 @@ export default function CommitteeRoster({ committeeIds = [], congress }) {
             <ul className="bare">
               {(all ? list : list.slice(0, PREVIEW)).map((r) => (
                 <li key={r.bioguide_id} className={mine.has(r.bioguide_id) ? "mine-row" : ""}>
-                  <Link to={`/member/${r.bioguide_id}`}>{r.person.name}</Link> <PartyTag p={r.person} />
+                  {mine.has(r.bioguide_id) && <MineRep />}<Link to={`/member/${r.bioguide_id}`}>{r.person.name}</Link> <PartyTag p={r.person} />
                   {r.title && <span className="fine"> · {r.title}</span>}
                 </li>
               ))}
