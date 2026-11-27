@@ -1,13 +1,17 @@
-// Statewide ballot measures for an election: reads the hand-kept list in data/measures/ca-2028.json,
+// Statewide ballot measures for California's 2028 elections (March 7 primary, November 7 general;
+// each measure carries its election date): reads the hand-kept list in data/measures/ca-2028.json,
 // pulls the official wording out of each measure's official PDF (the Attorney General's title and
 // summary for an initiative, the Legislative Counsel's Digest for a legislative measure) with
 // pdftotext, and writes public/data/measures/ca-2028.json for the site. The words shown are the
 // official documents' own; nothing here summarizes or rewrites them.
 // Then compares the list with the Secretary of State's qualified and eligible pages, and fails if
-// the state lists a 2028 measure we don't have (or no longer lists one we do).
+// the state lists a 2028 measure we don't have, lists it for another election, or no longer lists
+// one we do. A measure whose official PDF is a scan (text_scanned) gets no extracted wording: OCR
+// errors would be shown as the official text.
 //   node scripts/data/measures.mjs
 import { readFileSync, writeFileSync, mkdirSync } from "node:fs";
 import { execFileSync } from "node:child_process";
+import { pageText, electionSections, compareSections } from "../../lib/measures.js";
 
 const IN = "data/measures/ca-2028.json", OUT = "public/data/measures/ca-2028.json";
 const UA = { "User-Agent": "civic-atlas measures build (github.com/christofogis/civic-atlas)" };
@@ -60,20 +64,18 @@ for (const m of src.measures) {
 mkdirSync("public/data/measures", { recursive: true });
 writeFileSync(OUT, JSON.stringify({ ...src, measures, built: new Date().toISOString().slice(0, 10) }, null, 1));
 
-// Compare with the Secretary of State's lists for this election.
-const yearRe = /November\s+7,?\s+2028|November 2028/i;
+// Compare with the Secretary of State's lists: every 2028 election section on each page (the
+// qualified page has one per election date, e.g. March 7 and November 7), each measure under the
+// election our list has it on, and every measure of ours still listed on its status's page.
 for (const [name, url] of [["qualified", src.sources.qualified], ["eligible", src.sources.eligible]]) {
   const res = await fetch(url, { headers: UA }).catch(() => null);
   if (!res?.ok) { console.log(`${name} page unavailable; not compared`); continue; }
-  const text = (await res.text()).replace(/<[^>]+>/g, "\n").replace(/&nbsp;|&#160;/g, " ").replace(/[ \t]+/g, " ");
-  const at = text.search(yearRe);
-  if (at < 0) { console.log(`${name}: no 2028 section`); continue; }
-  const section = text.slice(at, at + 6000).split(/\n(?=November \d|As new initiatives|For those measures)/)[0];
-  const ids = [...section.matchAll(/\b(A|S)CA\s?\d+|\bA[BJ]R?\s?\d+|\bSB\s?\d+|\b(19|20)\d{2}\.\s?\(\d{2}-\d{4}/g)].map((x) => x[0].replace(/\s/g, "").replace(/\.\(.*$/, "").toLowerCase());
-  console.log(`${name} (2028): ${ids.join(", ") || "none listed"}`);
-  for (const id of ids) {
-    const key = id.replace(/^(a|s)ca/, "$1ca-");
-    if (!measures.some((m) => m.id === key || m.id === id)) problems.push(`${name} page lists ${id}, which isn't in ${IN}`);
+  const sections = electionSections(pageText(await res.text()), 2028);
+  if (!sections.length) { console.log(`${name}: no 2028 section`); continue; }
+  for (const sct of sections) console.log(`${name}: ${sct.heading}: ${sct.ids.join(", ") || "none listed"}`);
+  problems.push(...compareSections(sections, measures, name));
+  for (const m of measures.filter((x) => x.status === name)) {
+    if (!sections.some((sct) => sct.ids.includes(m.id))) problems.push(`${m.id} is ${name} in ${IN}, but the ${name} page no longer lists it for 2028`);
   }
 }
 
