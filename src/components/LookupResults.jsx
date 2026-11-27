@@ -85,7 +85,7 @@ export default function LookupResults({ result, sectionRef, shared = false }) {
               "La legislatura estatal redacta las leyes y el presupuesto del estado (escuelas, carreteras, salud, derecho penal). El gobernador y otros funcionarios estatales dirigen el gobierno del estado.")}<Ref id="state" /></p>
             {/* Your own legislators as cards; the other state officials (statewide offices, Board of Equalization) as a compact list. */}
             <ul className="cards">
-              {result.state_officials.filter((o) => LEGISLATIVE.has(o.type)).map((o) => <StateOfficialCard key={`${o.type}-${o.id}`} official={o} state={result.state} />)}
+              {result.state_officials.filter((o) => LEGISLATIVE.has(o.type)).map((o) => <StateOfficialCard key={`${o.type}-${o.district}-${o.id}`} official={o} state={result.state} />)}
               {emptySeats(result.state, result.state_officials, result.state_districts).map((e) => <EmptySeatCard key={`empty-${e.type}-${e.key}`} seat={e} state={result.state} />)}
             </ul>
             <h3 className="compact-head">{t("Other state officials", "Otros funcionarios estatales")}</h3>

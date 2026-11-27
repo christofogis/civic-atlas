@@ -97,7 +97,7 @@ export async function fetchStatePeople(q, signal) {
   const { data: roles, error: e2 } = await db.from("state_roles").select("person_id,type,district,start_date,end_date")
     .in("person_id", people.map((p) => p.id)).abortSignal(signal);
   if (e2) throw e2;
-  const current = (id) => (roles ?? []).filter((r) => r.person_id === id && (!r.end_date || r.end_date >= today))
+  const current = (id) => (roles ?? []).filter((r) => r.person_id === id && (!r.end_date || r.end_date > today))
     .sort((a, b) => (b.start_date ?? "").localeCompare(a.start_date ?? ""))[0] ?? null;
   return people.map((p) => ({ ...p, role: current(p.id) }));
 }

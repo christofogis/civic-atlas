@@ -1,0 +1,29 @@
+{
+  "about": "Rows copied from the live database on 2026-11-27 (read-only SQL), trimmed to the columns the transition logic reads. Used by test/transition2027.test.js and test/stateleg.calendar.test.js to rehearse Dec 7, 2026 (California Legislature) and Jan 3, 2027 (120th Congress).",
+  "state_roles_ca": [
+    { "person_id": "ocd-person/75229920-399d-4216-9b76-c27ea398665a", "name": "Tri Ta", "party": "Republican", "active": true, "type": "lower", "district": "70", "district_key": "70", "start_date": "2022-12-05", "end_date": null },
+    { "person_id": "ocd-person/0c4e1b43-c3d7-4a13-87c4-92e29903cb73", "name": "Diane Dixon", "party": "Republican", "active": true, "type": "lower", "district": "72", "district_key": "72", "start_date": "2022-12-05", "end_date": null },
+    { "person_id": "ocd-person/3dae8bef-7fb2-40a0-afee-78d79212521b", "name": "Tony Strickland", "party": "Republican", "active": true, "type": "upper", "district": "36", "district_key": "36", "start_date": "2025-03-11", "end_date": null },
+    { "person_id": "ocd-person/ea5c3b3d-bbad-41f6-a912-69f60f1553a4", "name": "Brian Jones", "party": "Republican", "active": true, "type": "upper", "district": "38", "district_key": "38", "start_date": "2018-12-03", "end_date": "2022-12-05" },
+    { "person_id": "ocd-person/39e3ce0f-c2e2-4480-9e99-76e1e62f366d", "name": "Catherine Blakespear", "party": "Democratic", "active": true, "type": "upper", "district": "38", "district_key": "38", "start_date": "2022-12-05", "end_date": null }
+  ],
+  "terms": [
+    { "bioguide_id": "M001241", "chamber": "house", "state": "CA", "district": 47, "senate_class": null, "party": "Democrat", "start_date": "2025-01-03", "end_date": "2027-01-03", "how": null },
+    { "bioguide_id": "T000491", "chamber": "house", "state": "CA", "district": 45, "senate_class": null, "party": "Democrat", "start_date": "2025-01-03", "end_date": "2027-01-03", "how": null },
+    { "bioguide_id": "P000145", "chamber": "senate", "state": "CA", "district": null, "senate_class": 3, "party": "Democrat", "start_date": "2023-01-03", "end_date": "2029-01-03", "how": null },
+    { "bioguide_id": "S001150", "chamber": "senate", "state": "CA", "district": null, "senate_class": 1, "party": "Democrat", "start_date": "2025-01-03", "end_date": "2031-01-03", "how": null },
+    { "bioguide_id": "D000563", "chamber": "senate", "state": "IL", "district": null, "senate_class": 2, "party": "Democrat", "start_date": "2021-01-03", "end_date": "2027-01-03", "how": null },
+    { "bioguide_id": "D000622", "chamber": "senate", "state": "IL", "district": null, "senate_class": 3, "party": "Democrat", "start_date": "2023-01-03", "end_date": "2029-01-03", "how": null },
+    { "bioguide_id": "V000137", "chamber": "senate", "state": "OH", "district": null, "senate_class": 3, "party": "Republican", "start_date": "2023-01-03", "end_date": "2025-01-09", "how": null },
+    { "bioguide_id": "M001242", "chamber": "senate", "state": "OH", "district": null, "senate_class": 1, "party": "Republican", "start_date": "2025-01-03", "end_date": "2031-01-03", "how": null },
+    { "bioguide_id": "H001104", "chamber": "senate", "state": "OH", "district": null, "senate_class": 3, "party": "Republican", "start_date": "2025-01-21", "end_date": "2026-12-15", "how": "appointment" }
+  ],
+  "leadership_roles": [
+    { "bioguide_id": "J000299", "chamber": "house", "title": "Speaker of the House", "start_date": "2025-01-03", "end_date": null },
+    { "bioguide_id": "S001176", "chamber": "house", "title": "House Majority Leader", "start_date": "2025-01-03", "end_date": null },
+    { "bioguide_id": "J000294", "chamber": "house", "title": "House Minority Leader", "start_date": "2025-01-03", "end_date": null },
+    { "bioguide_id": "O000019", "chamber": "house", "title": "House Republican Policy Committee Chair", "start_date": "2026-04-15", "end_date": null },
+    { "bioguide_id": "T000250", "chamber": "senate", "title": "Senate Majority Leader", "start_date": "2025-01-03", "end_date": null },
+    { "bioguide_id": "G000386", "chamber": "senate", "title": "President Pro Tempore of the Senate", "start_date": "2025-01-03", "end_date": null }
+  ]
+}
