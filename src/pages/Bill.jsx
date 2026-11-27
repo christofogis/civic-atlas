@@ -19,6 +19,7 @@ import StatusBar from "../components/StatusBar.jsx";
 import Follow from "../components/Follow.jsx";
 import { Explain, VoteMeaning } from "../components/Explain.jsx";
 import { PartyTag } from "../components/PartyTag.jsx";
+import { PlainSummary } from "../components/PlainSummary.jsx";
 
 const TYPES = new Set(["hr", "s", "hres", "sres", "hjres", "sjres", "hconres", "sconres"]);
 const LOBBY_PREVIEW = 40;
@@ -29,7 +30,7 @@ async function loadBill(congress, type, number) {
   const one = (q) => q.then(({ data, error }) => { if (error) throw error; return data; });
   const key = (q) => q.eq("congress", congress).eq("bill_type", type).eq("number", number);
   const weekAgo = new Date(Date.now() - 7 * 864e5).toISOString().slice(0, 10);
-  const [bill, sponsor, cosponsors, votes, lobbying, lobbyCount, freshness, scheduled, meetings, former, referrals] = await Promise.all([
+  const [bill, sponsor, cosponsors, votes, lobbying, lobbyCount, freshness, scheduled, meetings, former, referrals, plain] = await Promise.all([
     one(key(db.from("bills").select("*")).maybeSingle()),
     one(key(db.from("bill_sponsor_details").select("*")).maybeSingle()),
     one(key(db.from("bill_cosponsor_details").select("*")).order("sponsored_date").order("last_name")),
@@ -47,8 +48,10 @@ async function loadBill(congress, type, number) {
       .order("lobbyist_name").limit(500)).catch(() => []),
     // Committee referrals, for the "Committee" step and the record behind the track.
     one(key(db.from("bill_committees").select("committee_id,first_activity_date,activities,committees(name,parent_id)")).order("first_activity_date")).catch(() => []),
+    // The AI plain-language summary, if one passed its check (an aid; the page shows without it).
+    one(key(db.from("bill_plain_summaries").select("lead_en,lead_es,points_en,points_es")).maybeSingle()).catch(() => null),
   ]);
-  return { bill, sponsor, cosponsors, votes, lobbying, lobbyTotal: lobbyCount?.clients ?? lobbying?.length ?? 0, freshness, scheduled, meetings, former, referrals };
+  return { plain, bill, sponsor, cosponsors, votes, lobbying, lobbyTotal: lobbyCount?.clients ?? lobbying?.length ?? 0, freshness, scheduled, meetings, former, referrals };
 }
 
 // A section's source goes in the page's notes, cited from its heading.
@@ -175,7 +178,7 @@ export default function Bill() {
   if (state.status === "missing") return <main className="page"><h1>{tr("Bill not found", "Proyecto no encontrado")}</h1><p>{tr("Bills from the 118th Congress (2023) on are covered.", "Se incluyen los proyectos desde el 118.º Congreso (2023).")} <Link to="/">{tr("Back to search", "Volver a la búsqueda")}</Link></p></main>;
   if (state.status === "error") return <main className="page"><p className="notice">{tr("Couldn't load this page right now. Try again shortly.", "No se pudo cargar esta página. Inténtelo de nuevo en un momento.")}</p></main>;
 
-  const { bill: b, sponsor, cosponsors, votes, lobbying, lobbyTotal, freshness, scheduled, meetings, former, referrals } = state.data;
+  const { bill: b, sponsor, cosponsors, votes, lobbying, lobbyTotal, freshness, scheduled, meetings, former, referrals, plain } = state.data;
   // Floor items are dated by the Monday of their week, so this week's stay; other events must be ahead.
   const today = new Date().toISOString().slice(0, 10);
   const ahead = scheduled.filter((e) => e.kind === "floor" || e.event_date >= today);
@@ -197,6 +200,12 @@ export default function Bill() {
         <p className="fine">{billLabel(b)} · {ordinal(b.congress)} {tr("Congress", "Congreso")} · <Explain id="bill-types">{tr(`What's an ${billLabel(b).replace(/\s*\d+$/, "")}?`, `¿Qué es un ${billLabel(b).replace(/\s*\d+$/, "")}?`)}</Explain></p>
         <h1 className="bill-title">{b.short_title ?? b.title}</h1>
         {b.short_title && b.short_title !== b.title && <p className="lede"><Clamp lines={3}>{b.title}</Clamp></p>}
+        {plain && b.crs_summary && (
+          <section className="bill-in-short" aria-labelledby="in-short">
+            <h2 id="in-short">{tr("In short", "En pocas palabras")}</h2>
+            <PlainSummary row={plain} bill={b} />
+          </section>
+        )}
       </header>
 
       <div className="split">
@@ -232,11 +241,13 @@ export default function Bill() {
 
       <BillGlance b={b} sponsor={sponsor} cosponsors={current.length} votes={votes.length} lobbyTotal={lobbying ? lobbyTotal : null} />
 
-      <Section title={tr("Summary", "Resumen")} source={<>{tr("Congressional Research Service, via GovInfo Bill Status.", "Servicio de Investigación del Congreso, vía GovInfo Bill Status. Los resúmenes se publican solo en inglés.")} <Explain id="crs-summary">{tr("About these summaries", "Sobre estos resúmenes")}</Explain></>}>
+      <div id="crs-summary">
+      <Section title={plain ? tr("Official summary (CRS)", "Resumen oficial (CRS)") : tr("Summary", "Resumen")} source={<>{tr("Congressional Research Service, via GovInfo Bill Status.", "Servicio de Investigación del Congreso, vía GovInfo Bill Status. Los resúmenes se publican solo en inglés.")} <Explain id="crs-summary">{tr("About these summaries", "Sobre estos resúmenes")}</Explain></>}>
         {b.crs_summary
           ? <p><Clamp lines={6}><LinkedText text={b.crs_summary} congress={b.congress} /></Clamp></p>
           : <p>{tr("The Congressional Research Service hasn't published a summary of this bill yet. The bill text is at Congress.gov.", "El Servicio de Investigación del Congreso todavía no ha publicado un resumen de este proyecto. El texto está en Congress.gov.")}</p>}
       </Section>
+      </div>
 
       <p className="fold-hint">{tr("Tap a topic to see the details and records.", "Toque un tema para ver los detalles y registros.")}</p>
       <div className="folds">
