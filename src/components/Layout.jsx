@@ -15,7 +15,7 @@ const TITLES = {
   "/quiz": ["Quiz", "Cuestionario"], "/topics": ["Topics", "Temas"], "/topic": ["Topic", "Tema"],
   "/issues": ["Issues you care about", "Los temas que le importan"],
   "/elections": ["2028 candidates", "Candidatos de 2028"], "/on-the-ballot": ["On the ballot", "En la boleta"], "/corrections": ["Corrections", "Correcciones"],
-  "/nominations": ["Nominations", "Nominaciones"], "/story": ["Look up a news story", "Buscar una noticia"],
+  "/nominations": ["Nominations", "Nominaciones"], "/leadership": ["Congressional leadership", "Liderazgo del Congreso"], "/story": ["Look up a news story", "Buscar una noticia"],
   "/hearing": ["Hearing", "Audiencia"], "/map": ["Map", "Mapa"],
   "/government": ["Three branches of government", "Los tres poderes del gobierno"],
   "/budget": ["Federal budget", "Presupuesto federal"], "/measures": ["California ballot measures", "Medidas en la boleta de California"],
@@ -32,7 +32,7 @@ const TITLES = {
 const MENU_GROUPS = [
   { id: "congress", title: ["Congress", "Congreso"], also: ["/member/", "/bill/", "/committee/", "/hearing/", "/topic/"], links: [
     ["/members", "Members", "Miembros"], ["/bills", "Bills", "Proyectos de ley"], ["/issues", "Your issues", "Sus temas"], ["/topics", "Topics", "Temas"],
-    ["/committees", "Committees", "Comités"], ["/nominations", "Nominations", "Nominaciones"],
+    ["/committees", "Committees", "Comités"], ["/leadership", "Leadership", "Liderazgo"], ["/nominations", "Nominations", "Nominaciones"],
     ["/compare", "Compare two members", "Comparar dos miembros"], ["/map", "Map", "Mapa"]] },
   { id: "elections", title: ["Elections", "Elecciones"], links: [
     ["/first-time-voter", "First time voting?", "¿Va a votar por primera vez?"],

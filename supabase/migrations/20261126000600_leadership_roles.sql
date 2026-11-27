@@ -21,3 +21,13 @@ comment on table leadership_roles is 'Leadership posts as published in unitedsta
 
 alter table leadership_roles enable row level security;
 create policy "public read" on leadership_roles for select using (true);
+
+-- Speaker elections: how many members recorded each position (a candidate's name as the Clerk
+-- records it, "Present" or "Not Voting") on every "Election of the Speaker" roll call, so the
+-- /leadership page reads a few hundred rows instead of every member's position on every ballot.
+create view speaker_ballot_tallies with (security_invoker = true) as
+select v.vote_id, p.position, p.position_category, count(*)::integer as votes
+from votes v
+join vote_positions p using (vote_key)
+where v.chamber = 'house' and v.question = 'Election of the Speaker'
+group by v.vote_id, p.position, p.position_category;
