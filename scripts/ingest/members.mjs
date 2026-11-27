@@ -6,6 +6,7 @@
 //   node scripts/ingest/members.mjs --dry-run   # fetch + map only, print counts
 //   node scripts/ingest/members.mjs --dry-run --dir local/ --out rows.json
 //
+// Also loads leadership_roles (Speaker, floor leaders, whips, conference officers).
 // Idempotent: rows are inserted or updated only when something changed. Members who
 // leave Congress are kept (their votes and history still reference them).
 import { readFileSync, writeFileSync } from "node:fs";
@@ -86,8 +87,24 @@ export function mapLegislators(legislators, social = new Map()) {
       });
     }
   }
-  return { members, terms };
+  return { members, terms, roles: mapLeadership(legislators) };
 }
+
+// Leadership posts (Speaker, floor leaders, whips, conference officers), title verbatim.
+// The same title starting on the same day twice for one member is one row.
+export function mapLeadership(legislators) {
+  const rows = new Map();
+  for (const m of legislators) {
+    for (const r of m.leadership_roles ?? []) {
+      if (!r.title || !r.start || !["house", "senate"].includes(r.chamber)) continue;
+      const row = { bioguide_id: m.id.bioguide, chamber: r.chamber, title: r.title, start_date: r.start, end_date: r.end ?? null };
+      rows.set(roleKey(row), row);
+    }
+  }
+  return [...rows.values()];
+}
+const ROLE_FIELDS = ["chamber", "end_date"];
+export const roleKey = (r) => `${r.bioguide_id}|${r.title}|${r.start_date}`;
 
 async function load(name, dir) {
   if (dir) return YAML.parse(readFileSync(`${dir}/${name}`, "utf8"));
@@ -107,11 +124,11 @@ async function main() {
   const recentFormer = (await load("legislators-historical.yaml", arg("--dir")))
     .filter((m) => m.terms.at(-1).end >= HISTORY_FROM);
   const social = mapSocial(await load("legislators-social-media.yaml", arg("--dir")));
-  const { members, terms } = mapLegislators([...current, ...recentFormer], social);
-  console.log(`source: ${current.length} current + ${recentFormer.length} former members, ${terms.length} terms`);
+  const { members, terms, roles } = mapLegislators([...current, ...recentFormer], social);
+  console.log(`source: ${current.length} current + ${recentFormer.length} former members, ${terms.length} terms, ${roles.length} leadership roles`);
 
   if (dryRun) {
-    if (arg("--out")) writeFileSync(arg("--out"), JSON.stringify({ members, terms }));
+    if (arg("--out")) writeFileSync(arg("--out"), JSON.stringify({ members, terms, roles }));
     console.log("dry run: nothing written");
     return;
   }
@@ -138,15 +155,48 @@ async function main() {
     await upsertBatches(db, "members", memberWrites, "bioguide_id");
     await upsertBatches(db, "terms", termWrites, "bioguide_id,chamber,start_date");
 
+    const leadership = await syncLeadership(db, roles);
+
     const inserted =
       memberWrites.filter((m) => !existingMembers.has(m.bioguide_id)).length +
-      termWrites.filter((t) => !existingTerms.has(termKey(t))).length;
-    return { rows_inserted: inserted, rows_updated: memberWrites.length + termWrites.length - inserted };
+      termWrites.filter((t) => !existingTerms.has(termKey(t))).length + leadership.inserted;
+    return {
+      rows_inserted: inserted,
+      rows_updated: memberWrites.length + termWrites.length + leadership.written - inserted,
+      rows_deleted: leadership.deleted,
+    };
   });
   console.log(`done: ${counts.rows_inserted} inserted, ${counts.rows_updated} updated`);
 }
 
-main().catch((err) => {
-  console.error(err.message);
-  process.exit(1);
-});
+// Mirror the source: write new or changed roles, delete roles the source no longer lists (all
+// members we load are loaded in full, so a missing role was removed or corrected upstream).
+async function syncLeadership(db, roles) {
+  const { error: missing } = await db.from("leadership_roles").select("bioguide_id").limit(1);
+  if (missing && !/schema cache|does not exist/i.test(missing.message)) throw new Error(`read leadership_roles: ${missing.message}`);
+  if (missing) {
+    // Migration not applied yet: keep the members run working and say so in the log.
+    console.warn(`leadership_roles skipped: ${String(missing.message).slice(0, 120)}`);
+    return { inserted: 0, written: 0, deleted: 0 };
+  }
+  const existing = new Map((await fetchAll(db, "leadership_roles", "bioguide_id,title,start_date,chamber,end_date")).map((r) => [roleKey(r), r]));
+  const writes = roles.filter((r) => !existing.has(roleKey(r)) || changed(r, existing.get(roleKey(r)), ROLE_FIELDS));
+  await upsertBatches(db, "leadership_roles", writes, "bioguide_id,title,start_date");
+  const keep = new Set(roles.map(roleKey));
+  const stale = [...existing.values()].filter((r) => !keep.has(roleKey(r)));
+  for (const r of stale) {
+    const { error } = await db.from("leadership_roles").delete()
+      .eq("bioguide_id", r.bioguide_id).eq("title", r.title).eq("start_date", r.start_date);
+    if (error) throw new Error(`delete leadership_roles: ${error.message}`);
+  }
+  const inserted = writes.filter((r) => !existing.has(roleKey(r))).length;
+  console.log(`leadership roles: ${inserted} inserted, ${writes.length - inserted} updated, ${stale.length} deleted`);
+  return { inserted, written: writes.length, deleted: stale.length };
+}
+
+if (import.meta.url === `file://${process.argv[1]}`) {
+  main().catch((err) => {
+    console.error(err.message);
+    process.exit(1);
+  });
+}

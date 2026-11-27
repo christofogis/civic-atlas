@@ -48,6 +48,7 @@ const UpForElection = lazy(() => import("./pages/UpForElection.jsx"));
 const StyleTest = lazy(() => import("./pages/StyleTest.jsx"));
 const Corrections = lazy(() => import("./pages/Corrections.jsx"));
 const Nominations = lazy(() => import("./pages/Nominations.jsx"));
+const Leadership = lazy(() => import("./pages/Leadership.jsx"));
 const ExplainStory = lazy(() => import("./pages/ExplainStory.jsx"));
 const Hearing = lazy(() => import("./pages/Hearing.jsx"));
 const Government = lazy(() => import("./pages/Government.jsx"));
@@ -85,6 +86,7 @@ createRoot(document.getElementById("root")).render(
         <Route path="/style-test" element={<StyleTest />} />
         <Route path="/corrections" element={<Corrections />} />
         <Route path="/nominations" element={<Nominations />} />
+        <Route path="/leadership" element={<Leadership />} />
         <Route path="/story" element={<ExplainStory />} />
         <Route path="/hearing/:id" element={<Hearing />} />
         <Route path="/map" element={<MapPage />} />

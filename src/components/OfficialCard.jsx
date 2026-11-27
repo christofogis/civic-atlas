@@ -2,6 +2,7 @@ import Portrait from "./Portrait.jsx";
 import { Link } from "react-router-dom";
 import { seatParts, date } from "../lib/format.js";
 import Seat from "./Seat.jsx";
+import LeadershipLine from "./LeadershipLine.jsx";
 import { useLang } from "../lib/i18n.jsx";
 import { PartyName } from "./PartyTag.jsx";
 
@@ -22,6 +23,7 @@ export default function OfficialCard({ official }) {
       <Portrait className="member-photo small" size="small" party={official.party} src={`https://unitedstates.github.io/images/congress/225x275/${official.bioguide_id}.jpg`} alt={official.name} width="60" height="73" loading="lazy" />
       <h3><Link to={`/member/${official.bioguide_id}`}>{official.name}</Link></h3>
       <p className="meta">{t("Current term began", "Período actual desde el")} {date(official.start_date)}</p>
+      <LeadershipLine bioguideId={official.bioguide_id} className="meta" />
       {official.phone && <p className="fine card-phone"><a href={`tel:${official.phone.replace(/[^\d+]/g, "")}`}>{official.phone}</a> <span className="print-only">· {official.url}</span></p>}
     </li>
   );

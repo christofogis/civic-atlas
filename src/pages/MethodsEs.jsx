@@ -307,6 +307,28 @@ export default function MethodsEs() {
         pertenece; si no, se descarta, y esa contienda puede no aparecer en la página de ese miembro.
       </p>
 
+      <h2 id="leadership">Liderazgo y elecciones del Presidente de la Cámara</h2>
+      <p>
+        Los cargos de liderazgo (Presidente de la Cámara o Speaker, líderes de bancada en el pleno, coordinadores o
+        whips, Presidente pro tempore y funcionarios de las conferencias y bancadas de los partidos) provienen del
+        conjunto de datos congress-legislators, de dominio público. Los títulos se muestran como allí se publican, en
+        inglés, con la fecha de inicio de cada cargo. Un cargo cuenta como actual desde su fecha de inicio hasta su
+        fecha de fin; si el conjunto de datos aún no indica fecha de fin, sigue como actual hasta que se actualice. Las
+        páginas de los miembros y las tarjetas de búsqueda muestran solo los cargos actuales, con las mismas palabras
+        para todos.
+      </p>
+      <p>
+        Las elecciones del Presidente son votaciones nominales de la Cámara que el Secretario registra como "Election
+        of the Speaker", desde 2023. Los miembros responden con un nombre, así que cada posición es un nombre tal como
+        lo registró el Secretario, o "Present" o "Not Voting". Contamos las posiciones de cada votación y mostramos sin
+        cambios el resultado registrado por el Secretario; en estas votaciones, ese resultado es el nombre con más
+        votos, tenga o no la mayoría. Se elige Presidente con la mayoría de los votos emitidos por una persona por su
+        nombre, así que también mostramos esa cifra, calculada a partir de los conteos. Las votaciones se numeran
+        dentro de cada elección, que termina con la votación en la que un candidato recibió la mayoría. Los presidentes
+        y miembros de mayor rango de la minoría de los comités salen de las listas de los comités en pleno del
+        Congreso más reciente registrado.
+      </p>
+
       <h2 id="hearings">Audiencias y reuniones de comités</h2>
       <p>
         Las audiencias, sesiones de enmiendas y reuniones de trabajo de ambas cámaras provienen de los registros de
