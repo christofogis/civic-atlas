@@ -10,6 +10,7 @@ import { rememberRepresentatives, myRepresentatives, representativesOutdated, fo
 import HomePersonal from "../components/HomePersonal.jsx";
 import AddressInput from "../components/AddressInput.jsx";
 import HomeDashboard from "../components/HomeDashboard.jsx";
+import IssuesCard from "../components/IssuesCard.jsx";
 import { BallotDrawing, MapDrawing, BranchesDrawing, WeekDrawing } from "../components/FeatureDrawings.jsx";
 
 // Lookup errors come from /api/lookup in English; these are their Spanish versions.
@@ -157,6 +158,7 @@ export default function Home() {
         </p>
 
         {lookupForm}
+        {status !== "done" && <IssuesCard />}
         </>}
 
       </div>
