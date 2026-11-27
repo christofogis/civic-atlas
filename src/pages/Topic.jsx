@@ -8,6 +8,8 @@ import { congressOn, congressYears } from "../../lib/congress.js";
 import { KindLabel, VoteMeaning } from "../components/Explain.jsx";
 import { tr } from "../lib/lang.js";
 import Clamp from "../components/Clamp.jsx";
+import { PlainLead } from "../components/PlainSummary.jsx";
+import { usePlainSummaries } from "../lib/plainSummaries.js";
 
 const CURRENT = congressOn();
 const BILL = "congress,bill_type,number,title,short_title,latest_action_date,latest_action_text,became_law_date,law_number,passed_house_date,passed_senate_date";
@@ -20,6 +22,7 @@ export default function Topic() {
   const congress = Number(params.get("congress")) || CURRENT;
   const area = areaFromSlug(slug);
   const [state, setState] = useState({ status: "loading" });
+  const plain = usePlainSummaries([...(state.laws ?? []), ...(state.passed ?? []), ...(state.lobbied ?? [])]);
 
   useEffect(() => {
     if (!area) { setState({ status: "missing" }); return; }
@@ -67,7 +70,7 @@ export default function Topic() {
           <section className="section">
             <h2>{tr("Became law", "Se convirtieron en ley")}</h2>
             {state.laws.length === 0 ? <p>{tr("None yet.", "Ninguno todavía.")}</p> : (
-              <ul className="bare items">{state.laws.map((b) => <li key={b.number + b.bill_type} className="item"><span className="item-head">{link(b)} <span className="fine">· {b.law_number}, {date(b.became_law_date)}</span></span><Clamp lines={2}>{b.short_title ?? b.title}</Clamp></li>)}</ul>
+              <ul className="bare items">{state.laws.map((b) => <li key={b.number + b.bill_type} className="item"><span className="item-head">{link(b)} <span className="fine">· {b.law_number}, {date(b.became_law_date)}</span></span><Clamp lines={2}>{b.short_title ?? b.title}</Clamp><PlainLead map={plain} bill={b} /></li>)}</ul>
             )}
           </section>
 
@@ -76,6 +79,7 @@ export default function Topic() {
             {state.passed.length === 0 ? <p>{tr("None.", "Ninguno.")}</p> : (
               <ul className="plain">{state.passed.map((b) => (
                 <li key={b.number + b.bill_type} className="item">{link(b)} <Clamp lines={2}>{b.short_title ?? b.title}</Clamp>
+                  <PlainLead map={plain} bill={b} />
                   <div className="fine">{[b.passed_house_date && tr(`Passed House ${date(b.passed_house_date)}`, `Aprobado por la Cámara el ${date(b.passed_house_date)}`), b.passed_senate_date && tr(`Passed Senate ${date(b.passed_senate_date)}`, `Aprobado por el Senado el ${date(b.passed_senate_date)}`)].filter(Boolean).join(" · ")}</div></li>
               ))}</ul>
             )}
@@ -85,7 +89,7 @@ export default function Topic() {
           <section className="section">
             <h2>{tr("Bills the most organizations lobbied on", "Proyectos con más organizaciones haciendo cabildeo")}</h2>
             {state.lobbied.length === 0 ? <p>{tr("No lobbying reports name bills on this topic yet.", "Ningún informe de cabildeo menciona todavía proyectos sobre este tema.")}</p> : (
-              <ul className="bare items">{state.lobbied.map((b) => <li key={b.number + b.bill_type} className="item"><span className="item-head">{link(b)} <span className="fine">· {b.lobbying_clients.toLocaleString()} {tr("organizations", "organizaciones")}</span></span><Clamp lines={2}>{b.short_title ?? b.title}</Clamp></li>)}</ul>
+              <ul className="bare items">{state.lobbied.map((b) => <li key={b.number + b.bill_type} className="item"><span className="item-head">{link(b)} <span className="fine">· {b.lobbying_clients.toLocaleString()} {tr("organizations", "organizaciones")}</span></span><Clamp lines={2}>{b.short_title ?? b.title}</Clamp><PlainLead map={plain} bill={b} /></li>)}</ul>
             )}
             <p className="fine">{tr("From LD-2 lobbying reports that name the bill. A listing doesn't say whether the organization supported or opposed it. The Senate Office of Public Records can't vouch for data or analyses derived from these reports after they're retrieved.", "De informes de cabildeo LD-2 que mencionan el proyecto. La mención no dice si la organización lo apoyaba o se oponía. La Oficina de Registros Públicos del Senado no puede garantizar los datos ni los análisis derivados de estos informes después de obtenerlos.")}</p>
           </section>

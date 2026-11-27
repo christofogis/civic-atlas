@@ -10,6 +10,8 @@ import { voteKind, isFinal } from "../lib/voteKind.js";
 import { areaName } from "../lib/policyAreas.js";
 import { tr } from "../lib/lang.js";
 import VoteResult from "../components/VoteResult.jsx";
+import { PlainLead } from "../components/PlainSummary.jsx";
+import { usePlainSummaries, voteBill } from "../lib/plainSummaries.js";
 
 const BIOGUIDE = /^[A-Z][0-9]{6}$/;
 const PAGE = 50;
@@ -91,6 +93,7 @@ export default function MemberVotes() {
     for (const v of filtered) t.set(v.position, (t.get(v.position) ?? 0) + 1);
     return [...t].sort((a, z) => z[1] - a[1]);
   }, [filtered]);
+  const plain = usePlainSummaries(filtered.slice(0, shown).map(voteBill).filter(Boolean));
 
   if (state.status === "missing") return <main className="page"><h1>{tr("Member not found", "Miembro no encontrado")}</h1><p><Link to="/">{tr("Back to search", "Volver a la búsqueda")}</Link></p></main>;
   if (state.status === "error") return <main className="page"><p className="notice">{tr("Couldn't load votes right now. Try again shortly.", "No se pudieron cargar los votos. Inténtelo de nuevo en un momento.")}</p></main>;
@@ -151,6 +154,7 @@ export default function MemberVotes() {
                             ? <><Link to={`/bill/${v.bill_congress}/${v.bill_type}/${v.bill_number}`}>{billLabel({ bill_type: v.bill_type, number: v.bill_number })}</Link>{v.bill_title && <> · {v.bill_title}</>}{v.policy_area && <> · {areaName(v.policy_area)}</>}</>
                             : <LinkedText text={v.description} congress={v.congress} />}
                         </div>
+                        <PlainLead map={plain} bill={voteBill(v)} />
                       </td>
                       <td data-label={tr("Vote:", "Voto:")}><Position v={v} position={v.position} /></td>
                       <td data-label={tr("Result:", "Resultado:")}><VoteResult v={v} /></td>
