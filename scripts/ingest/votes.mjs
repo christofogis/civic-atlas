@@ -171,6 +171,26 @@ async function senateCount(congress, session) {
   return votes.reduce((mx, v) => Math.max(mx, int(v.vote_number) ?? 0), 0);
 }
 
+// Which Congresses a run reads. Normally the one in session, from a few roll calls before the last
+// stored. Around Jan 3 of a new Congress:
+//   - for EARLY_DAYS days it re-reads the new Congress from roll call 1: members sworn in on Jan 3
+//     reach the member list a day or more later, and their positions on the first votes (the
+//     Speaker election) are skipped until then, so those votes are read again once they're known;
+//   - for CATCH_UP_DAYS days it also reads the previous Congress, for votes taken in its last
+//     hours that the last run before the switch hadn't seen.
+// congresses: rows { number, start_date, end_date } (null in a dry run: worked out from the date).
+export const EARLY_DAYS = 21, CATCH_UP_DAYS = 7;
+export function votesPlan(today, congresses, explicit = null) {
+  if (explicit) return [{ congress: explicit, fromStart: false }];
+  const list = congresses ?? [118, 119, 120, 121, 122].map((n) => ({ number: n, start_date: `${1787 + 2 * n}-01-03`, end_date: `${1789 + 2 * n}-01-03` }));
+  const cur = list.find((c) => c.start_date <= today && today < c.end_date);
+  if (!cur) return [];
+  const days = (Date.parse(today) - Date.parse(cur.start_date)) / 864e5;
+  const plan = [{ congress: cur.number, fromStart: days < EARLY_DAYS }];
+  if (days < CATCH_UP_DAYS && list.some((c) => c.number === cur.number - 1)) plan.unshift({ congress: cur.number - 1, fromStart: false });
+  return plan;
+}
+
 async function main() {
   const args = process.argv.slice(2);
   const arg = (n) => (args.includes(n) ? args[args.indexOf(n) + 1] : undefined);
@@ -178,21 +198,20 @@ async function main() {
   const limit = arg("--limit") ? parseInt(arg("--limit"), 10) : Infinity;
 
   const db = dryRun ? null : getClient();
-  let congress = arg("--congress") ? parseInt(arg("--congress"), 10) : null;
-  if (!congress) {
-    const today = new Date().toISOString().slice(0, 10);
-    if (db) {
-      const { data, error } = await db.from("congresses").select("number").lte("start_date", today).gt("end_date", today).single();
-      if (error) throw new Error(`no congress covers ${today}`);
-      congress = data.number;
-    } else {
-      congress = Math.floor((new Date().getUTCFullYear() - 1789) / 2) + 1;
-    }
+  const today = new Date().toISOString().slice(0, 10);
+  let congresses = null;
+  if (db) {
+    const { data, error } = await db.from("congresses").select("number,start_date,end_date");
+    if (error) throw new Error(`read congresses: ${error.message}`);
+    congresses = data;
   }
+  const plan = votesPlan(today, congresses, arg("--congress") ? parseInt(arg("--congress"), 10) : null);
+  if (!plan.length) throw new Error(`no congress covers ${today}`);
   const currentYear = new Date().getUTCFullYear();
-  const sessions = [1, 2].filter((s) => yearFor(congress, s) <= currentYear);
 
-  const run = async () => {
+  const makeRun = (congress, fromStart) => async () => {
+    const sessions = [1, 2].filter((s) => yearFor(congress, s) <= currentYear);
+    if (fromStart) console.log(`Congress ${congress} began less than ${EARLY_DAYS} days ago: re-reading its roll calls from the first, so positions of members added since are filled in`);
     // Map Senate LIS ids and known bioguide ids to members.
     const members = db ? await fetchAll(db, "members", "bioguide_id,lis_id") : [];
     const known = new Set(members.map((m) => m.bioguide_id));
@@ -249,7 +268,7 @@ async function main() {
     for (const s of sessions) {
       // House: walk roll numbers until the clerk returns 404.
       const year = yearFor(congress, s);
-      for (let n = Math.max(1, maxStored("house", s) - REFETCH_LAST + 1); fetched < MAX_FETCHES_PER_RUN && voteCount < limit; n++) {
+      for (let n = fromStart ? 1 : Math.max(1, maxStored("house", s) - REFETCH_LAST + 1); fetched < MAX_FETCHES_PER_RUN && voteCount < limit; n++) {
         const url = houseUrl(year, n);
         const xml = await get(url);
         fetched++;
@@ -260,7 +279,7 @@ async function main() {
       // Senate: the session menu says how many votes exist.
       const total = await senateCount(congress, s);
       fetched++;
-      for (let n = Math.max(1, maxStored("senate", s) - REFETCH_LAST + 1); n <= total && fetched < MAX_FETCHES_PER_RUN && voteCount < limit * 2; n++) {
+      for (let n = fromStart ? 1 : Math.max(1, maxStored("senate", s) - REFETCH_LAST + 1); n <= total && fetched < MAX_FETCHES_PER_RUN && voteCount < limit * 2; n++) {
         const url = senateUrl(congress, s, n);
         const xml = await get(url);
         fetched++;
@@ -281,8 +300,11 @@ async function main() {
     return { rows_inserted: voteCount + positionCount, rows_updated: 0 };
   };
 
-  if (dryRun) await run();
-  else await withRun(db, `votes-${congress}`, run);
+  for (const { congress, fromStart } of plan) {
+    const run = makeRun(congress, fromStart);
+    if (dryRun) await run();
+    else await withRun(db, `votes-${congress}`, run);
+  }
 }
 
 if (import.meta.url === `file://${process.argv[1]}`) {
