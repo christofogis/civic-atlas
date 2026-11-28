@@ -1,0 +1,66 @@
+name: Bill simple summaries (AI)
+
+# The simpler version of each bill's AI summary ("Explain it simply" / "Explícalo fácil"): two or
+# three short sentences in everyday words, written by Claude through Anthropic's Batch API from the
+# bill's CRS summary and checked against it before publishing. Only bills whose plain summary is
+# published; the quiz's bills first, then the rest. Daily, after the plain-summary job has had time
+# to collect its own batch (that one starts at 02:07 UTC and waits up to 90 minutes).
+on:
+  schedule:
+    - cron: "37 4 * * *"   # 8:37pm PST / 9:37pm PDT
+  workflow_dispatch:
+    inputs:
+      bills:
+        description: "Bills to write, e.g. 119-hr-1,119-s-2 (blank: quiz bills first, then the rest with a published plain summary)"
+        type: string
+        default: ""
+      limit:
+        description: "New simple versions per run when no list is given"
+        type: string
+        default: "100"
+      wait:
+        description: "Minutes to wait for the batch before leaving it for the next run"
+        type: string
+        default: "90"
+      redo:
+        description: "Write again and replace existing simple versions (after the instructions change)"
+        type: boolean
+        default: false
+      dry_run:
+        description: "Build the requests, print one and a cost estimate; send nothing, write nothing"
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+concurrency:
+  group: bill-simple-summaries
+  cancel-in-progress: false
+
+jobs:
+  simplify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 240
+    env:
+      SUPABASE_URL: https://fkbzxaoeyrtzviyfzulq.supabase.co
+      SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+      # A dry run never calls the API, so it gets no key.
+      ANTHROPIC_API_KEY: ${{ !inputs.dry_run && secrets.ANTHROPIC_API_KEY || '' }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Write simple versions
+        env:
+          BILLS: ${{ inputs.bills }}
+          LIMIT: ${{ inputs.limit || '100' }}
+          WAIT: ${{ inputs.wait || '90' }}
+          DRY_RUN: ${{ inputs.dry_run && '--dry-run' || '' }}
+          REDO: ${{ inputs.redo && '--redo' || '' }}
+        run: |
+          if [ -n "$BILLS" ]; then node scripts/ingest/bill-simple-summaries.mjs --bills "$BILLS" --wait "$WAIT" $DRY_RUN $REDO
+          else node scripts/ingest/bill-simple-summaries.mjs --limit "$LIMIT" --wait "$WAIT" $DRY_RUN $REDO; fi

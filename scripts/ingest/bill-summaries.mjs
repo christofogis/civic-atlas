@@ -266,7 +266,7 @@ async function collect(db) {
 }
 
 // Bill rows with their CRS summary, for a list of keys, a few dozen per request.
-async function billsWithText(db, keys) {
+export async function billsWithText(db, keys) {
   const out = new Map();
   const cols = "congress,bill_type,number,title,short_title,crs_summary";
   for (let i = 0; i < keys.length; i += 60) {
