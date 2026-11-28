@@ -8,6 +8,7 @@ for (const { spec, portrait } of workerData.jobs) {
   try {
     writeFileSync(`${workerData.out}${spec.path.slice(1)}`, await renderCard(spec, portrait));
     written++;
+    if (written % 1000 === 0) console.log(`og: worker ${workerData.id}: ${written} of ${workerData.jobs.length}`);
   } catch (e) {
     failed++;
     if (failed <= 5) console.log(`og: ${spec.path} failed: ${e.message}`);

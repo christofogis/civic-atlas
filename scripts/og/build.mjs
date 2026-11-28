@@ -96,8 +96,8 @@ async function portraits(ids) {
 async function draw(jobs) {
   const n = Math.max(1, Math.min(availableParallelism(), 8, Math.ceil(jobs.length / 200)));
   const slices = Array.from({ length: n }, (_, k) => jobs.filter((_, j) => j % n === k));
-  const results = await Promise.all(slices.map((slice) => new Promise((resolve) => {
-    const w = new Worker(new URL("./worker.mjs", import.meta.url), { workerData: { jobs: slice, out: OUT.pathname } });
+  const results = await Promise.all(slices.map((slice, id) => new Promise((resolve) => {
+    const w = new Worker(new URL("./worker.mjs", import.meta.url), { workerData: { id, jobs: slice, out: OUT.pathname } });
     w.on("message", resolve);
     w.on("error", (e) => { console.log(`og: worker failed: ${e.message}`); resolve({ written: 0, failed: slice.length }); });
   })));

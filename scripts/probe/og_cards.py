@@ -5,16 +5,17 @@ import json, os, subprocess, time
 
 def run(cmd, env=None):
     t = time.time()
-    p = subprocess.run(cmd, shell=True, capture_output=True, text=True, env={**os.environ, **(env or {})})
-    print(f"$ {cmd}  ({time.time() - t:.0f} s, exit {p.returncode})")
-    print("\n".join((p.stdout + p.stderr).strip().splitlines()[-25:]))
-    return p.returncode
+    print(f"$ {cmd}", flush=True)
+    code = subprocess.run(f"{cmd} 2>&1 | tail -n 40", shell=True, env={**os.environ, **(env or {})}).returncode
+    print(f"  ({time.time() - t:.0f} s, exit {code})", flush=True)
+    os.system("free -m | head -2")
+    return code
 
-print("cpus:", os.cpu_count())
+print("cpus:", os.cpu_count(), flush=True)
 run("node -v")
 run("npm ci --no-audit --no-fund")
 run("npx vite build")
-run("node scripts/og/build.mjs", {"OG_CARDS": "1"})
+run("/usr/bin/time -v node scripts/og/build.mjs 2>&1 | grep -E '^og|Maximum resident|Elapsed'", {"OG_CARDS": "1"})
 files = sizes = 0
 per = {}
 for root, _, names in os.walk("dist"):
