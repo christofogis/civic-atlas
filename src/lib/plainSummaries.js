@@ -21,17 +21,24 @@ export function plainFilter(bills) {
   });
 }
 
-export async function fetchPlainSummaries(bills) {
+async function fetchRows(table, cols, bills) {
   const out = new Map();
   const groups = plainFilter(bills);
   // A few groups per request keeps the URL short; lists have one or a handful of groups anyway.
   for (let i = 0; i < groups.length; i += 8) {
-    const { data, error } = await db.from("bill_plain_summaries").select(COLS).or(groups.slice(i, i + 8).join(","));
+    const { data, error } = await db.from(table).select(cols).or(groups.slice(i, i + 8).join(","));
     if (error) return out;   // the summaries are an aid; the list shows as before without them
     for (const r of data ?? []) out.set(plainKey(r.congress, r.bill_type, r.number), r);
   }
   return out;
 }
+
+export const fetchPlainSummaries = (bills) => fetchRows("bill_plain_summaries", COLS, bills);
+
+// The simpler version ("Explain it simply", bill_simple_summaries, written by
+// scripts/ingest/bill-simple-summaries.mjs from the same CRS summary). Same read policy.
+export const SIMPLE_COLS = "congress,bill_type,number,text_en,text_es";
+export const fetchSimpleSummaries = (bills) => fetchRows("bill_simple_summaries", SIMPLE_COLS, bills);
 
 // Map of plainKey -> row for the bills given (an empty Map until loaded, or if none).
 export function usePlainSummaries(bills) {

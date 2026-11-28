@@ -2,21 +2,21 @@ import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { db } from "../lib/db.js";
 import { billLabel, date, partyTag } from "../lib/format.js";
-import { voteKind } from "../lib/voteKind.js";
+import { quizCandidates, QUIZ_QUESTIONS } from "../lib/quizPick.js";
 import { myRepresentatives } from "../lib/myReps.js";
 import { congressOn } from "../../lib/congress.js";
 import { tr } from "../lib/lang.js";
 import { PartyTag } from "../components/PartyTag.jsx";
 import Clamp from "../components/Clamp.jsx";
 import { PlainSummary } from "../components/PlainSummary.jsx";
-import { fetchPlainSummaries, plainKey } from "../lib/plainSummaries.js";
+import { fetchPlainSummaries, fetchSimpleSummaries, plainKey } from "../lib/plainSummaries.js";
+import { Terms } from "../components/Terms.jsx";
 
-const QUESTIONS = 10;
-const MIN_SHARE = 0.1;   // each side needs at least 10% of the votes, so the vote was contested
+const QUESTIONS = QUIZ_QUESTIONS;
 
-// The fixed rule for which bills appear (no one picks them): the most recent final-passage roll
-// calls in the current Congress that were contested and are on a bill with a CRS summary.
-// One question per bill; a bill voted on in both chambers is compared in each.
+// The fixed rule for which bills appear (no one picks them; src/lib/quizPick.js): the most recent
+// final-passage roll calls in the current Congress that were contested and are on a bill with a CRS
+// summary. One question per bill; a bill voted on in both chambers is compared in each.
 async function loadQuestions() {
   const congress = congressOn();
   const { data: votes, error } = await db.from("votes")
@@ -24,18 +24,7 @@ async function loadQuestions() {
     .eq("congress", congress).not("bill_type", "is", null)
     .order("voted_at", { ascending: false }).limit(1000);
   if (error) throw error;
-  const contested = votes.filter((v) => {
-    const cast = (v.yea_total ?? 0) + (v.nay_total ?? 0);
-    return voteKind(v).kind === "passage" && cast > 0 && Math.min(v.yea_total, v.nay_total) / cast >= MIN_SHARE;
-  });
-  const byBill = new Map();
-  for (const v of contested) {
-    const k = `${v.bill_congress}-${v.bill_type}-${v.bill_number}`;
-    const entry = byBill.get(k) ?? { key: k, votes: {} };
-    entry.votes[v.chamber] ??= v;   // latest final vote in each chamber
-    byBill.set(k, entry);
-  }
-  const candidates = [...byBill.values()].slice(0, 40);
+  const candidates = quizCandidates(votes);
   const bills = await Promise.all(candidates.map(async (c) => {
     const [cg, t, n] = c.key.split("-");
     const { data } = await db.from("bills").select("congress,bill_type,number,title,short_title,crs_summary,law_number,source_url")
@@ -44,8 +33,13 @@ async function loadQuestions() {
   }));
   const qs = bills.filter(Boolean).slice(0, QUESTIONS);
   // Short AI summaries where one has been published; the CRS text stays one tap away.
-  const plain = await fetchPlainSummaries(qs.map((q) => q.bill)).catch(() => new Map());
-  return qs.map((q) => ({ ...q, plain: plain.get(plainKey(q.bill.congress, q.bill.bill_type, q.bill.number)) ?? null }));
+  // The simpler version ("Explain it simply") only where a plain summary is shown too.
+  const [plain, simple] = await Promise.all([
+    fetchPlainSummaries(qs.map((q) => q.bill)).catch(() => new Map()),
+    fetchSimpleSummaries(qs.map((q) => q.bill)).catch(() => new Map()),
+  ]);
+  const k = (b) => plainKey(b.congress, b.bill_type, b.number);
+  return qs.map((q) => ({ ...q, plain: plain.get(k(q.bill)) ?? null, simple: simple.get(k(q.bill)) ?? null }));
 }
 
 async function loadPositions(voteIds) {
@@ -60,13 +54,13 @@ async function loadPositions(voteIds) {
 function Summary({ q }) {
   const b = q.bill;
   const crsId = `crs-${q.key}`;
-  if (!q.plain) return <p lang="en"><Clamp lines={3}>{b.crs_summary}</Clamp></p>;
+  if (!q.plain) return <p lang="en"><Clamp lines={3}><Terms text={b.crs_summary} lang="en" /></Clamp></p>;
   return (
     <>
-      <PlainSummary row={q.plain} bill={b} crsHref={`#${crsId}`} />
+      <PlainSummary row={q.plain} simple={q.simple} bill={b} crsHref={`#${crsId}`} />
       <details className="crs-official" id={crsId}>
         <summary>{tr("Official summary (CRS)", "Resumen oficial (CRS, en inglés)")}</summary>
-        <p lang="en">{b.crs_summary}</p>
+        <p lang="en"><Terms text={b.crs_summary} lang="en" /></p>
       </details>
     </>
   );
