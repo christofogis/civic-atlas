@@ -4,3 +4,7 @@
 # deploy gets new names, and index.html (not cached this way) points to them.
 /assets/*
   Cache-Control: public, max-age=31536000, immutable
+
+# Link-preview cards (scripts/og/build.mjs), redrawn on each deploy: a bill's status line can change daily.
+/og/*
+  Cache-Control: public, max-age=3600

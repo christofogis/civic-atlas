@@ -27,8 +27,12 @@ test("member: name, office, party letter, portrait", () => {
   assert.equal(m.title, "Alex Padilla · Civic Atlas");
   assert.equal(m.description, "Alex Padilla, U.S. Senator from California (D). Votes, bills, committees and campaign money from official records.");
   assert.equal(m.canonical, "https://civic-atlas-cub.pages.dev/member/P000145");
-  assert.equal(m.image, "https://unitedstates.github.io/images/congress/450x550/P000145.jpg");
-  assert.equal(m.card, "summary");
+  // The member's own card, with the portrait as the fallback when the card wasn't drawn.
+  assert.equal(m.image, "https://civic-atlas-cub.pages.dev/og/member/P000145.png");
+  assert.equal(m.card, "summary_large_image");
+  assert.equal(m.imageAlt, "Civic Atlas card: Member of Congress · Alex Padilla · U.S. Senator from California, party D (Democrat)");
+  assert.equal(m.fallback.image, "https://unitedstates.github.io/images/congress/450x550/P000145.jpg");
+  assert.equal(m.fallback.card, "summary");
 });
 
 test("member: House seat, former member, member-elect, same wording for every party", () => {
@@ -55,7 +59,8 @@ test("bill: number, short title, introduced, latest action", () => {
     introduced_date: "2025-05-20", latest_action_date: "2025-07-04", latest_action_text: "Became Public Law No: 119-21.", law_number: "119-21" }, { url: url("/bill/119/hr/1") });
   assert.equal(b.title, "H.R. 1: One Big Beautiful Bill Act · Civic Atlas");
   assert.equal(b.description, "Public Law 119-21 · Introduced May 20, 2025 · latest action (Jul 4, 2025): Became Public Law No: 119-21.");
-  assert.equal(b.image, "https://civic-atlas-cub.pages.dev/og/site.png");
+  assert.equal(b.image, "https://civic-atlas-cub.pages.dev/og/bill/119-hr-1.png");
+  assert.equal(b.fallback.image, "https://civic-atlas-cub.pages.dev/og/site.png");
   const long = billMeta({ congress: 118, bill_type: "s", number: 9, title: "x ".repeat(200), latest_action_text: "y ".repeat(400) }, { url: url("/") });
   assert.ok(long.ogTitle.length <= 120 && long.description.length <= 300 && long.description.endsWith("…"));
 });
@@ -108,5 +113,7 @@ test("rewrite handlers replace the shell's generic tags in index.html", () => {
   assert.equal((html.match(/name="description"/g) ?? []).length, 1);
   assert.match(html, /<title>Alex Padilla · Civic Atlas<\/title>/);
   assert.match(html, /property="og:site_name" content="Civic Atlas"/);
-  assert.match(html, /og:image" content="https:\/\/unitedstates\.github\.io/);
+  assert.match(html, /og:image" content="https:\/\/civic-atlas-cub\.pages\.dev\/og\/member\/P000145\.png"/);
+  assert.match(html, /og:image:type" content="image\/png"/);
+  assert.match(html, /og:image:width" content="1200"/);
 });
