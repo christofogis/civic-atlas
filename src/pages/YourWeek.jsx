@@ -77,6 +77,8 @@ export default function YourWeek() {
           {" · "}<Link to={`/your-week?${saved}`}>{tr("Link to this page", "Enlace a esta página")}</Link>
           {" · "}<Link to="/">{tr("Look up another address", "Buscar otra dirección")}</Link>
         </p>
+        {/* The calendar comes first and can run long; this gets straight to what already happened. */}
+        <p><a href="#last-7-days">{tr("Skip to what your members of Congress did in the last 7 days", "Ir a lo que hicieron sus miembros del Congreso en los últimos 7 días")}</a></p>
         {result === false && <p className="notice">{tr("Your officials didn't load. Reload the page to try again.", "Sus funcionarios no se cargaron. Vuelva a cargar la página.")}</p>}
 
         <section>
@@ -112,7 +114,7 @@ export default function YourWeek() {
           {election && <p>{tr("Next statewide election:", "Próxima elección estatal:")} <strong>{date(election)}</strong> · <Link to="/measures">{tr("Ballot measures so far", "Medidas en la boleta hasta ahora")}</Link></p>}
         </section>
 
-        <section>
+        <section id="last-7-days">
           <h2>{tr("Your members of Congress: the last 7 days", "Sus miembros del Congreso: los últimos 7 días")}</h2>
           {result && <MyReps ids={ids} embedded />}
         </section>

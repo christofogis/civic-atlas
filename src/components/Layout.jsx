@@ -38,7 +38,7 @@ const MENU_GROUPS = [
     ["/committees", "Committees", "Comités"], ["/leadership", "Leadership", "Liderazgo"], ["/nominations", "Nominations", "Nominaciones"],
     ["/compare", "Compare two members", "Comparar dos miembros"], ["/map", "Map", "Mapa"]] },
   { id: "elections", title: ["Elections", "Elecciones"], links: [
-    ["/first-time-voter", "First time voting?", "¿Va a votar por primera vez?"],
+    ["/first-time-voter", "First time voting? How to register", "¿Primera vez? Cómo inscribirse"],
     ["/on-the-ballot", "On the ballot", "En la boleta"], ["/elections", "2028 candidates", "Candidatos 2028"],
     ["/measures", "2028 ballot measures (CA)", "Medidas en la boleta 2028 (CA)"]] },
   { id: "learn", title: ["Learn", "Aprender"], links: [
