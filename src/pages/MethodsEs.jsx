@@ -290,7 +290,9 @@ export default function MethodsEs() {
         proyecto unitedstates. Los funcionarios estatales aparecen con la foto que enlaza Open States solo cuando está en el
         sitio de la legislatura o del estado (una dirección .gov o .us, o el sitio oficial de la legislatura); se omiten
         las fotos de sitios de campaña, de bancadas, de noticias o de búsqueda de imágenes, para que las fotos de ningún
-        partido vengan de sus propios sitios. Cuando una fuente no tiene foto, no se muestra ninguna. Los
+        partido vengan de sus propios sitios. Si en la Cámara o el Senado de un estado la proporción de demócratas con foto
+        y la de republicanos con foto difieren en más de 20 puntos (con al menos cinco de cada uno), nadie de esa cámara
+        aparece con foto, para que ningún partido se vea más completo. Esto se revisa cada vez que se actualizan los datos. Cuando una fuente no tiene foto, no se muestra ninguna. Los
         funcionarios de condados y ciudades aparecen sin foto en todas partes, porque ninguna fuente las reúne para
         todos los lugares.
       </p>

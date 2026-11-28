@@ -6,6 +6,7 @@ import { join } from "node:path";
 import { parse } from "yaml";
 import { getClient, fetchAll, upsertBatches, withRun } from "./lib.mjs";
 import { districtKey } from "../../lib/stateleg.js";
+import { unevenChambers } from "../../lib/photoBalance.js";
 
 // Photos only from the state's or legislature's own site (Chris, Nov 28, 2026). About a fifth of
 // Open States photo links point to campaign, caucus, news or image-search sites, and in some chambers
@@ -56,6 +57,11 @@ await withRun(db, "state-people", async () => {
       }
     }
   }
+  // Even photo coverage between the parties in each legislative chamber (lib/photoBalance.js).
+  const { hide, chambers } = unevenChambers(people, roles);
+  for (const p of people) if (hide.has(p.id)) p.image_url = null;
+  console.log(`photos hidden in ${chambers.length} chambers with uneven party coverage: ${chambers.map((c) => `${c.state}-${c.type} D${c.d}/R${c.r}`).join(", ")}`);
+
   const seen = new Set(people.map((p) => p.id));
   const dedupe = (rows, k) => [...new Map(rows.map((r) => [k(r), r])).values()];
   await upsertBatches(db, "state_people", dedupe(people, (p) => p.id), "id");

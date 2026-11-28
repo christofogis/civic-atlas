@@ -288,7 +288,9 @@ export default function Methods() {
         Members of Congress are shown with their official portraits, from the public-domain collection kept by the
         unitedstates project. State officials are shown with the photo Open States links to only when it is on the
         legislature's or state's own website (a .gov or .us address, or the legislature's official site); photos from
-        campaign, caucus, news or image-search sites are left out, so no party's photos come from its own sites. Where a source has no photo, none is shown. County and city officials
+        campaign, caucus, news or image-search sites are left out, so no party's photos come from its own sites. If, in a state's House or Senate, the share of Democrats with a photo
+        and the share of Republicans with one differ by more than 20 points (with at least five of each), no one in that
+        chamber is shown with a photo, so neither party looks more complete. This is rechecked whenever the data updates. Where a source has no photo, none is shown. County and city officials
         are shown without photos everywhere, because no source collects them for every place.
       </p>
 
