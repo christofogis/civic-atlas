@@ -68,6 +68,7 @@ Neutrality:
 - Use only what the CRS summary says. Add no background, history, context, or outside facts, and no descriptive phrases of your own.
 - Keep the summary's own actors and groups; don't make a group broader or narrower.
 - When the CRS summary lists several items of the same kind (such as the bills a rule provides for, or a list of programs), name them all or none of them; never single some out or describe only some of them.
+- A measure's official title, or the title of a bill a rule provides for, may state a purpose or a claim (such as "to ensure access to affordable health insurance" or "that will break the gridlock"). Never use such title wording as your own description: say what the measure does or amends, or give the title in quotation marks as its title.
 - Use the summary's own figures, dates, and names exactly. Do not round, total, convert, or estimate.
 - Never describe purpose, intent, motive, effect, impact, cost, benefit, fairness, or who gains or loses. If the CRS summary reports a stated purpose, you may say "States that its purpose is ...".
 - No words that judge or rate, such as significant, major, sweeping, landmark, controversial, harmful, important, modest, strict, generous, loophole, crackdown. A term the measure itself uses (such as "major disaster") is fine.
@@ -84,6 +85,7 @@ List every problem you find. Look for:
 - facts, names, numbers, amounts, or dates that differ from the CRS summary, or that it doesn't contain;
 - who does what: a different actor, or a broader or narrower group than the CRS summary names;
 - singling out: when the CRS summary lists several items of the same kind (such as the bills a rule provides for), naming or describing only some of them;
+- title wording that states a purpose or claim (such as "to ensure access to affordable health insurance") used as the summary's own description instead of being quoted as a title;
 - added background, context, or descriptions that are not in the CRS summary;
 - leaving something out in a way that changes the meaning: a requirement stated without a condition, limit, or exception that the CRS summary attaches to it, or a lead that makes the measure seem to do something other than its main subject. Leaving out minor or secondary provisions is allowed and is not a problem;
 - any statement of purpose, intent, motive, effect, impact, cost, or benefit that the CRS summary does not itself report;
