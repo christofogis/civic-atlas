@@ -9,6 +9,7 @@ import MyReps from "../components/MyReps.jsx";
 import { StatePartyTag, statePersonPath } from "../components/StateOfficialCard.jsx";
 import { NotesList, Ref } from "../components/Notes.jsx";
 import { nextElection } from "../../lib/measures.js";
+import SectionCard from "../components/SectionCard.jsx";
 
 // "Your week": everything coming up for the officials from the visitor's last lookup, at every
 // level, on one list (and as a calendar file), followed by what their members of Congress did in
@@ -81,8 +82,8 @@ export default function YourWeek() {
         <p><a href="#last-7-days">{tr("Skip to what your members of Congress did in the last 7 days", "Ir a lo que hicieron sus miembros del Congreso en los últimos 7 días")}</a></p>
         {result === false && <p className="notice">{tr("Your officials didn't load. Reload the page to try again.", "Sus funcionarios no se cargaron. Vuelva a cargar la página.")}</p>}
 
-        <section>
-          <h2>{tr("Coming up", "Próximamente")}<Ref id="sources" text={tr("Congress: committee and floor schedules from the House and Senate, matched to the committees your members of Congress sit on. California: the state constitution (the Legislature convenes the first Monday of December in even-numbered years) and the Secretary of State. County and city: the Board of Supervisors' adopted schedule and the city's meeting rule; special meetings and cancellations are posted on each agenda page. Times are local to where the meeting is held.", "Congreso: agendas de comités y del pleno de la Cámara y el Senado, según los comités en que están sus miembros del Congreso. California: la constitución estatal (la Legislatura se reúne el primer lunes de diciembre de los años pares) y el Secretario de Estado. Condado y ciudad: el calendario adoptado por la Junta de Supervisores y la regla de reuniones de la ciudad; las reuniones especiales y cancelaciones se publican en cada página de agenda. Las horas son las del lugar de la reunión.")} /></h2>
+        <SectionCard id="coming-up" title={tr("Coming up", "Próximamente")} sub={tr("The next 45 days, by day.", "Los próximos 45 días, por día.")}
+          headExtra={<Ref id="sources" text={tr("Congress: committee and floor schedules from the House and Senate, matched to the committees your members of Congress sit on. California: the state constitution (the Legislature convenes the first Monday of December in even-numbered years) and the Secretary of State. County and city: the Board of Supervisors' adopted schedule and the city's meeting rule; special meetings and cancellations are posted on each agenda page. Times are local to where the meeting is held.", "Congreso: agendas de comités y del pleno de la Cámara y el Senado, según los comités en que están sus miembros del Congreso. California: la constitución estatal (la Legislatura se reúne el primer lunes de diciembre de los años pares) y el Secretario de Estado. Condado y ciudad: el calendario adoptado por la Junta de Supervisores y la regla de reuniones de la ciudad; las reuniones especiales y cancelaciones se publican en cada página de agenda. Las horas son las del lugar de la reunión.")} />}>
           {items === null ? <p>{tr("Loading…", "Cargando…")}</p> : items.length === 0 ? <p>{tr("Nothing on the calendar in the next 45 days.", "Nada en el calendario en los próximos 45 días.")}</p> : (
             <>
               <ul className="agenda">
@@ -112,21 +113,20 @@ export default function YourWeek() {
             </>
           )}
           {election && <p>{tr("Next statewide election:", "Próxima elección estatal:")} <strong>{date(election)}</strong> · <Link to="/measures">{tr("Ballot measures so far", "Medidas en la boleta hasta ahora")}</Link></p>}
-        </section>
+        </SectionCard>
 
-        <section id="last-7-days">
-          <h2>{tr("Your members of Congress: the last 7 days", "Sus miembros del Congreso: los últimos 7 días")}</h2>
+        <SectionCard id="last-7-days" title={tr("Your members of Congress: the last 7 days", "Sus miembros del Congreso: los últimos 7 días")}
+          sub={tr("Roll calls, bills introduced and committee meetings.", "Votaciones nominales, proyectos presentados y reuniones de comités.")}>
           {result && <MyReps ids={ids} embedded />}
-        </section>
+        </SectionCard>
 
         {legislators.length > 0 && (
-          <section>
-            <h2>{tr(`Your ${stateName(result.state)} legislators`, `Sus legisladores de ${stateName(result.state)}`)}</h2>
-            <ul className="plain">
+          <SectionCard title={tr(`Your ${stateName(result.state)} legislators`, `Sus legisladores de ${stateName(result.state)}`)}>
+            <ul className="dots">
               {legislators.map((o) => <li key={o.id ?? o.name}>{o.id ? <Link to={statePersonPath(o.id)}>{o.name}</Link> : o.name}{o.party && <> <StatePartyTag party={o.party} /></>}</li>)}
             </ul>
             <p className="fine">{tr("State legislators' votes and bills aren't on Civic Atlas yet.", "Los votos y proyectos de los legisladores estatales aún no están en Civic Atlas.")}</p>
-          </section>
+          </SectionCard>
         )}
         <NotesList />
     </main>
