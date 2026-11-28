@@ -17,7 +17,7 @@ export default function Glossary() {
         {entries.map(([id, g]) => (
           <div key={id} id={id}>
             <dt>{term(g)}</dt>
-            <dd>{t(g.text, g.text_es)}</dd>
+            <dd>{t(g.text, g.text_es)}{g.source && <>{" "}<a href={g.source} rel="noopener" className="fine">{t("Constitution Annotated", "Constitución Anotada (en inglés)")}</a></>}</dd>
           </div>
         ))}
       </dl>
