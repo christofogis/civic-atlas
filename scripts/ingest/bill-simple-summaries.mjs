@@ -69,6 +69,7 @@ Simple words:
 Neutrality:
 - Use only what the CRS summary says. Add no background, history, context, or outside facts.
 - Keep the summary's own actors and groups; don't make a group broader or narrower.
+- When the CRS summary lists several items of the same kind (such as the bills a rule provides for, or a list of programs), name them all or none of them; never single some out or describe only some of them.
 - Use the summary's own figures, dates, and names exactly. Do not round, total, convert, or estimate.
 - Never describe purpose, intent, motive, effect, impact, cost, benefit, fairness, or who gains or loses. If the CRS summary reports a stated purpose, you may say "It says its purpose is ...".
 - No words that judge or rate, such as significant, major, big, important, good, bad, harmful, helpful, strict, generous, fair, unfair. A term the measure itself uses (such as "major disaster") is fine.
@@ -86,6 +87,7 @@ The explanation is meant to be simpler than the CRS summary, so it may leave out
 List every problem you find. Look for:
 - any statement that is not true to the CRS summary: facts, names, numbers, amounts, or dates that differ from it or that it doesn't contain;
 - who does what: a different actor, or a broader or narrower group than the CRS summary names;
+- singling out: when the CRS summary lists several items of the same kind (such as the bills a rule provides for), naming or describing only some of them;
 - "must" where the CRS summary says "may", or "may" where it says "must";
 - a statement that leaves out a condition, limit, or exception so that the statement itself becomes untrue, or an explanation whose main subject is not the measure's main subject;
 - anything added: background, context, outside facts, or descriptions not in the CRS summary;
