@@ -7,15 +7,48 @@ import Clamp from "./Clamp.jsx";
 import { Explain } from "./Explain.jsx";
 import { tr, locale } from "../lib/lang.js";
 import { MineCommittee } from "./Mine.jsx";
+import { PlainLead } from "./PlainSummary.jsx";
+import { usePlainSummaries } from "../lib/plainSummaries.js";
 
 const todayEastern = () => new Intl.DateTimeFormat("en-CA", { timeZone: "America/New_York" }).format(new Date());
 const KIND = () => ({ hearing: tr("Hearing", "Audiencia"), markup: tr("Markup", "Sesión de enmiendas"), meeting: tr("Meeting", "Reunión") });
-const FLOOR_GROUPS = [
-  ["suspension", <>{tr("Fast-track votes (need two-thirds)", "Votaciones por vía rápida (requieren dos tercios)")} <Explain id="suspension" /></>],
-  ["rule", <>{tr("Debated under a rule", "Debatidos bajo una regla")} <Explain id="rule" /></>],
-  ["other", tr("Other items", "Otros asuntos")],
+// The House's own grouping of the week's items (docs.house.gov), in its words, with what each means.
+const FLOOR_GROUPS = () => [
+  ["suspension", <>{tr("Under suspension of the rules", "Bajo suspensión de las reglas")} <Explain id="suspension" /></>, tr("Limited debate, no amendments; two-thirds must vote yes.", "Debate limitado, sin enmiendas; se necesitan dos tercios a favor.")],
+  ["rule", <>{tr("Under a rule", "Bajo una regla")} <Explain id="rule" /></>, tr("Debate and amendments as set by a House resolution (the rule).", "Debate y enmiendas según una resolución de la Cámara (la regla).")],
+  ["other", tr("Other items", "Otros asuntos"), null],
 ];
 const billPath = (ref) => { const [c, t, n] = ref.split("-"); return `/bill/${c}/${t}/${n}`; };
+const refBill = (ref) => { if (!ref) return null; const [c, t, n] = ref.split("-"); return { congress: +c, bill_type: t, number: +n }; };
+
+// One week's House floor items, grouped the way the House lists them (suspension, rule, other).
+// Each item: the bill number as a link, the short title as published, and the AI one-line lead
+// where a checked summary exists. The House posts the list by week, not by day.
+export function FloorItems({ items }) {
+  const plain = usePlainSummaries(items.map((e) => refBill(e.bill_refs?.[0])).filter(Boolean));
+  return FLOOR_GROUPS().map(([cat, label, what]) => {
+    const list = items.filter((e) => (e.category ?? "other") === cat);
+    return list.length > 0 && (
+      <div key={cat} className="list-group">
+        <h4 className="list-group-head">{label} <span className="fold-count">{list.length}</span></h4>
+        {what && <p className="fine list-group-sub">{what}</p>}
+        <ul className="dots">
+          {list.map((e) => {
+            const [num, ...rest] = e.title.split(":");
+            const name = rest.join(":").trim();
+            return (
+              <li key={e.event_id}>
+                {e.bill_refs?.[0] ? <Link to={billPath(e.bill_refs[0])} className="item-num">{num}</Link> : <span className="item-num">{num}</span>}
+                {name && <> <span lang="en">{name}</span></>}
+                <PlainLead map={plain} bill={refBill(e.bill_refs?.[0])} />
+              </li>
+            );
+          })}
+        </ul>
+      </div>
+    );
+  });
+}
 
 // What Congress has scheduled: House floor items, when the Senate meets, and committee
 // hearings and markups. Committees the visitor's representatives sit on are marked.
@@ -61,19 +94,7 @@ export default function ComingUp({ myCommittees = new Set(), floor: showFloor = 
         : weeks.map((wk) => (
           <div key={wk}>
             <p><strong>{tr("Week of", "Semana del")} {date(wk)}</strong> <span className="fine">· {tr("may be considered; the schedule can change", "podría considerarse; la agenda puede cambiar")}</span></p>
-            {FLOOR_GROUPS.map(([cat, label]) => {
-              const items = floor.filter((e) => e.event_date === wk && e.category === cat);
-              return items.length > 0 && (
-                <div key={cat}>
-                  <p className="fine">{label}</p>
-                  <ul className="plain">
-                    {items.map((e) => (
-                      <li key={e.event_id}>{e.bill_refs[0] ? <Link to={billPath(e.bill_refs[0])}>{e.title.split(":")[0]}</Link> : e.title.split(":")[0]}{e.title.includes(":") && <> · {e.title.split(":").slice(1).join(":").trim()}</>}</li>
-                    ))}
-                  </ul>
-                </div>
-              );
-            })}
+            <FloorItems items={floor.filter((e) => e.event_date === wk)} />
           </div>
         ))}
 
