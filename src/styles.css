@@ -1142,3 +1142,23 @@ button.term:hover, button.term[aria-expanded="true"] { text-decoration-color: va
 .next-steps h3 { margin: 0 0 6px; font-size: 1rem; }
 .next-steps li a { display: block; padding: 10px 0; }
 .next-steps li + li { border-top: 1px solid var(--border); }
+
+/* ---- Your 2028 ballot: deadlines box, one card per contest; prints as a plain list for the polls -- */
+.ballot-deadlines { border: 1px solid var(--border-strong); border-radius: 10px; padding: 14px 18px; margin: 16px 0 8px; background: var(--surface); }
+.ballot-deadlines h2 { margin-top: 0; }
+.ballot-dates { border-collapse: collapse; width: 100%; font-size: 0.92rem; margin: 6px 0 8px; }
+.ballot-dates th, .ballot-dates td { text-align: left; padding: 6px 8px 6px 0; border-bottom: 1px solid var(--border); vertical-align: top; }
+.ballot-dates thead th { font-weight: 600; }
+.ballot-dates tbody th { font-weight: 500; width: 40%; }
+.ballot-unpublished { color: var(--muted); font-style: italic; }
+.ballot-rules > li { margin: 6px 0; }
+.ballot-links { margin-bottom: 0; }
+.ballot-contest .ballot-holder { margin-top: 6px; }
+.ballot-contest .ballot-candidates { clear: both; margin-top: 8px; }
+.ballot-measures > li { margin: 6px 0; }
+@media print {
+  .my-ballot .ballot-deadlines { background: none; border-color: #999; padding: 6px 8px; }
+  .my-ballot .ballot-election { break-inside: auto; }
+  .my-ballot .ballot-election h2 { break-after: avoid; }
+  .my-ballot .ballot-contest { break-inside: avoid; }
+}
