@@ -1,0 +1,6 @@
+# Cloudflare Pages response headers for static files.
+# Vite names every built file in /assets after a hash of its contents, so a file there never
+# changes: phones can keep it for a year instead of re-checking it on every visit. A new
+# deploy gets new names, and index.html (not cached this way) points to them.
+/assets/*
+  Cache-Control: public, max-age=31536000, immutable

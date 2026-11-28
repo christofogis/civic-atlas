@@ -11,6 +11,7 @@ import { flushSync } from "react-dom";
 import { useLang } from "../lib/i18n.jsx";
 import { Fold } from "./Fold.jsx";
 import { NotesList, NotesProvider, Ref } from "./Notes.jsx";
+import { Link } from "react-router-dom";
 
 // Everyone elected to represent a place, grouped by level of government. Used after an address
 // or location lookup on the home page, and on /officials for a saved or shared link.
@@ -70,6 +71,7 @@ export default function LookupResults({ result, sectionRef, shared = false }) {
           </p>
         )}
 
+        <p className="fine no-print">{t("Tap a level to open or close it.", "Toque un nivel para abrirlo o cerrarlo.")}</p>
         <div className="folds levels">
         <Fold id="level-federal" title={t("Federal: U.S. Congress", "Federal: Congreso de EE. UU.")} summary={fedNames} open={open.has("level-federal")} onToggle={toggle}>
           <p className="level-what">{t("Writes national laws, sets the federal budget and taxes, and oversees federal agencies. Every state has two senators; each House member represents one district.",
@@ -103,6 +105,18 @@ export default function LookupResults({ result, sectionRef, shared = false }) {
           <LocalOfficials local={result.local} approximate={result.approximate} />
         </Fold>
         </div>
+        {/* The next things most people come for, after seeing who represents them. */}
+        {!shared && (
+          <nav className="next-steps no-print" aria-label={t("What next", "Qué sigue")}>
+            <h3>{t("What next?", "¿Qué sigue?")}</h3>
+            <ul className="plain">
+              <li><Link to="/your-week">{t("What your officials did this week, and what's coming up", "Lo que hicieron sus funcionarios esta semana y lo que viene")}</Link></li>
+              <li><Link to="/on-the-ballot">{t("What's on your next ballot", "Qué hay en su próxima boleta")}</Link></li>
+              <li><Link to="/quiz">{t("Do you vote like your representatives? Take the quiz", "¿Vota usted como sus representantes? Haga el cuestionario")}</Link></li>
+              <li><Link to="/first-time-voter">{t("First time voting? How to register", "¿Va a votar por primera vez? Cómo inscribirse")}</Link></li>
+            </ul>
+          </nav>
+        )}
         <p className="no-print"><button type="button" className="button-secondary" onClick={printList}>{t("Print this list", "Imprimir esta lista")}</button></p>
         {!shared && <ShareResults result={result} />}
         <NotesList />      </section>

@@ -9,7 +9,7 @@ import { tr } from "../lib/lang.js";
 import { PartyTag } from "../components/PartyTag.jsx";
 import Clamp from "../components/Clamp.jsx";
 import { PlainSummary } from "../components/PlainSummary.jsx";
-import { fetchPlainSummaries, fetchSimpleSummaries, plainKey } from "../lib/plainSummaries.js";
+import { fetchPlainSummaries, fetchSimpleSummaries, plainKey, plainFilter } from "../lib/plainSummaries.js";
 import { Terms } from "../components/Terms.jsx";
 
 const QUESTIONS = QUIZ_QUESTIONS;
@@ -25,13 +25,21 @@ async function loadQuestions() {
     .order("voted_at", { ascending: false }).limit(1000);
   if (error) throw error;
   const candidates = quizCandidates(votes);
-  const bills = await Promise.all(candidates.map(async (c) => {
-    const [cg, t, n] = c.key.split("-");
-    const { data } = await db.from("bills").select("congress,bill_type,number,title,short_title,crs_summary,law_number,source_url")
-      .eq("congress", cg).eq("bill_type", t).eq("number", n).maybeSingle();
-    return data?.crs_summary ? { ...c, bill: data } : null;
-  }));
-  const qs = bills.filter(Boolean).slice(0, QUESTIONS);
+  // Two requests instead of one per candidate (up to 40, each with its own CORS preflight, which
+  // made this the slowest page on a phone): first which candidates have a CRS summary, then the
+  // full rows for the ten asked about.
+  const asBill = (k) => { const [congress, bill_type, number] = k.split("-"); return { congress, bill_type, number }; };
+  const { data: withSummary, error: e1 } = await db.from("bills").select("congress,bill_type,number")
+    .not("crs_summary", "is", null).or(plainFilter(candidates.map((c) => asBill(c.key))).join(","));
+  if (e1) throw e1;
+  const has = new Set((withSummary ?? []).map((b) => plainKey(b.congress, b.bill_type, b.number)));
+  const picked = candidates.filter((c) => has.has(c.key.toLowerCase())).slice(0, QUESTIONS);
+  if (!picked.length) return [];
+  const { data: rows, error: e2 } = await db.from("bills").select("congress,bill_type,number,title,short_title,crs_summary,law_number,source_url")
+    .or(plainFilter(picked.map((c) => asBill(c.key))).join(","));
+  if (e2) throw e2;
+  const byKey = new Map((rows ?? []).map((b) => [plainKey(b.congress, b.bill_type, b.number), b]));
+  const qs = picked.map((c) => ({ ...c, bill: byKey.get(c.key.toLowerCase()) })).filter((q) => q.bill?.crs_summary);
   // Short AI summaries where one has been published; the CRS text stays one tap away.
   // The simpler version ("Explain it simply") only where a plain summary is shown too.
   const [plain, simple] = await Promise.all([

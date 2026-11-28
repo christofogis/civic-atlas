@@ -137,6 +137,12 @@ export default function MemberVotes() {
             {tr(`${filtered.length.toLocaleString()} vote${filtered.length === 1 ? "" : "s"}`, `${filtered.length.toLocaleString()} voto${filtered.length === 1 ? "" : "s"}`)}
             {tally.length > 0 && <>: {tally.map(([p, n]) => `${p} ${n}`).join(", ")}</>}.
           </p>
+          {/* The words are the Clerk's, kept as recorded; first-time readers ask why there are four. */}
+          {tally.some(([p]) => /^(Aye|No)$/.test(p)) && tally.some(([p]) => /^(Yea|Nay)$/.test(p)) && (
+            <p className="fine">{tr("Yea and Aye both mean yes, and Nay and No both mean no: the House records different words for different kinds of votes.",
+              "Yea y Aye significan sí, y Nay y No significan no: la Cámara registra palabras distintas según el tipo de votación.")}
+              {tally.some(([p]) => !/^(Yea|Aye|Nay|No|Present|Not Voting|Guilty|Not Guilty)$/i.test(p)) && tr(" A person's name is a vote for that person in an election for Speaker.", " Un nombre de persona es un voto por esa persona en una elección para Presidente de la Cámara.")}</p>
+          )}
           {filtered.length > 0 && (
             <table className="vote-table">
               <thead><tr><th>{tr("Date", "Fecha")}</th><th>{tr("Question", "Asunto")}</th><th>{tr("Vote", "Voto")}</th><th>{tr("Result", "Resultado")}</th></tr></thead>

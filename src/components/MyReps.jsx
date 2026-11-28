@@ -102,7 +102,7 @@ export default function MyReps({ ids, onForget, embedded = false }) {
                   </li>
                 ) : (
                   <li>
-                    {t("No roll-call votes this week.", "No hubo votaciones nominales esta semana.")}
+                    {t("No recorded votes in the last 7 days.", "No hubo votaciones registradas en los últimos 7 días.")}
                     {v && (
                       <div className="fine">
                         {t("Latest vote", "Último voto")}, {date(v.voted_at)}: <Position v={v} position={v.position} /> · <KindLabel v={v} />{" "}
@@ -111,6 +111,7 @@ export default function MyReps({ ids, onForget, embedded = false }) {
                           : v.description ?? v.question}
                       </div>
                     )}
+                    <div className="fine"><Link to={`/member/${p.bioguide_id}/votes`}>{t("All their votes", "Todos sus votos")}</Link></div>
                   </li>
                 )}
                 {w.bills.length > 0 && (

@@ -9,6 +9,7 @@ import { PartyName, partyClass } from "../components/PartyTag.jsx";
 import { partyName } from "../lib/format.js";
 import { NotesList, Ref } from "../components/Notes.jsx";
 import { myRepresentatives } from "../lib/myReps.js";
+import { savedDistricts } from "../lib/savedDistricts.js";
 import { useCaResults, ResultsStatus, RaceResult, MeasureResult, PartyKey, OFFICE_TITLES } from "../components/CaResults.jsx";
 import { resultsFor } from "../lib/results.js";
 import { byElection, electionNameEs } from "../../lib/measures.js";
@@ -31,6 +32,8 @@ export default function UpForElection() {
   const [local, setLocal] = useState(null);
   const [measures, setMeasures] = useState(null);
   const mine = useMemo(() => myRepresentatives(), []);
+  // District numbers from this device's last lookup (never an address): marks the visitor's own seats.
+  const my = useMemo(() => new URLSearchParams(savedDistricts() ?? ""), []);
   const caResults = useCaResults();
   // Official results for this year's election, once published (FEC or House Clerk), and each
   // member's FEC candidate IDs to find the seat holder among the candidates.
@@ -91,6 +94,9 @@ export default function UpForElection() {
   const outcomeKnown = outcomeKnownFor(seats, "house", year, today) || outcomeKnownFor(seats, "senate", year, today);
   const outcome = (x) => ballotOutcome(seats, x, year, today);
   const yours = [...senate, ...house].filter((x) => mine.has(x.bioguide_id));
+  // California's primary is in March in presidential years and in June otherwise (California
+  // Elections Code; the site's 2028 measures list has March 7); county races are on the same ballot.
+  const primaryMonth = year % 4 === 0 ? ["March", "marzo"] : ["June", "junio"];
   const supervisors = (local?.supervisors ?? []).filter((s) => localOnBallot(s.term_end, year));
   const councils = (local?.cities ?? []).map((c) => ({ ...c, up: (c.members ?? []).filter((m) => yearOfLabel(m.term_end_label) === year) })).filter((c) => c.up.length);
 
@@ -143,17 +149,43 @@ export default function UpForElection() {
           <Link to="/methods#election-results">{tr("How", "Cómo")}</Link>
         </p>
       )}
-      {seats && <SeatChart years={years} year={year} counts={years.map((y) => [y, held(senateIn(y))])} onPick={(y) => set({ year: y, state: "" })} />}
+      {/* Room for the chart while the seats load, so the page doesn't jump when it appears. */}
+      {seats ? <SeatChart years={years} year={year} counts={years.map((y) => [y, held(senateIn(y))])} onPick={(y) => set({ year: y, state: "" })} />
+        : seats === null && <div className="seat-chart-slot" aria-hidden="true" />}
       <div className="tabs" role="group" aria-label={tr("Election year", "Año de la elección")}>
         {years.map((y) => <button key={y} type="button" className={y === year ? "on" : ""} aria-pressed={y === year} onClick={() => set({ year: y, state: "" })}>{y}</button>)}
       </div>
 
       {seats === false ? <p className="notice">{tr("Couldn't load seats right now.", "No se pudieron cargar los escaños en este momento.")}</p> : !seats ? <p>{tr("Loading…", "Cargando…")}</p> : (
         <>
-          {yours.length > 0 && (
-            <section className="section">
+          {(yours.length > 0 || my.get("st")) && (
+            <section className="section" id="yours">
               <h2>{tr("Your members of Congress", "Sus miembros del Congreso")}</h2>
-              <ul className="plain">{yours.map((x) => <li key={x.bioguide_id}>{seatLabel(x)}: <Holder x={x} /></li>)}</ul>
+              {yours.length > 0 && <ul className="plain">{yours.map((x) => <li key={x.bioguide_id}>{seatLabel(x)}: <Holder x={x} /></li>)}</ul>}
+              {/* Every House seat is on every ballot; before the new Congress the holder isn't known yet. */}
+              {my.get("cd") && house.length === 0 && (
+                <p>{tr(`Your U.S. House seat is on this ballot too, as every House seat is. Who holds it will be listed once the new Congress begins on ${date(`${year - 1}-01-03`)}.`,
+                  `Su escaño en la Cámara de EE. UU. también está en esta boleta, como todos los escaños de la Cámara. Quién lo ocupa se mostrará cuando comience el nuevo Congreso el ${date(`${year - 1}-01-03`)}.`)}</p>
+              )}
+              <p className="fine jump-links">
+                {my.get("st") === "CA" && <><a href="#california">{tr("Your California ballot", "Su boleta de California")}</a>{" · "}</>}
+                {my.get("co") === "ca-orange" && local && (supervisors.length > 0 || councils.length > 0) && <><a href="#orange-county">{tr("Orange County", "Condado de Orange")}</a>{" · "}</>}
+                <Link to="/first-time-voter">{tr("How to register", "Cómo inscribirse")}</Link>
+              </p>
+            </section>
+          )}
+
+          {!my.get("st") && yours.length === 0 && (
+            <p className="notice">{tr("This page lists every seat in Congress on this ballot. ", "Esta página muestra todos los escaños del Congreso en esta boleta. ")}
+              <Link to="/">{tr("Look up your address", "Busque su dirección")}</Link>{tr(" to see yours first. ", " para ver primero los suyos. ")}
+              <Link to="/first-time-voter">{tr("How to register", "Cómo inscribirse")}</Link></p>
+          )}
+
+          {year % 4 === 0 && (
+            <section className="section">
+              <h2>{tr("President and Vice President", "Presidente y Vicepresidente")}</h2>
+              <p>{tr(`Elected every four years, in this election. The new term begins on January 20, ${year + 1} `, `Se eligen cada cuatro años, en esta elección. El nuevo período comienza el 20 de enero de ${year + 1} `)}
+                (<a href="https://constitution.congress.gov/constitution/amendment-20/">{tr("20th Amendment", "Enmienda 20")}</a>).</p>
             </section>
           )}
 
@@ -197,7 +229,7 @@ export default function UpForElection() {
             )}
           </section>
 
-          <section className="section">
+          <section className="section" id="california">
             <h2>{tr("California", "California")}</h2>
             <ul className="plain">
               {isGubernatorialYear(year) && <li>{tr("Governor, Lieutenant Governor, Attorney General, Secretary of State, Controller, Treasurer, Insurance Commissioner, Superintendent of Public Instruction, and the Board of Equalization: four-year terms, elected in these years.", "Gobernador(a), Vicegobernador(a), Procurador(a) General, Secretario(a) de Estado, Contralor(a), Tesorero(a), Comisionado(a) de Seguros, Superintendente de Instrucción Pública y la Junta de Igualación: períodos de cuatro años, elegidos en estos años.")}</li>}
@@ -211,19 +243,19 @@ export default function UpForElection() {
           </section>
 
           {local && (supervisors.length > 0 || councils.length > 0) && (
-            <section className="section">
+            <section className="section" id="orange-county">
               <h2>{tr("Orange County", "Condado de Orange")}</h2>
               {supervisors.length > 0 && (
                 <>
                   <h3>{tr("Board of Supervisors", "Junta de Supervisores")}</h3>
-                  <ul className="plain">{supervisors.map((s) => <li key={s.district}>{tr(`District ${s.district}`, `Distrito ${s.district}`)}: {s.name} · {tr("term ends", "fin del período")} {date(s.term_end)}</li>)}</ul>
-                  <p className="fine">{tr(`Supervisor seats are nonpartisan. A candidate who wins a majority in the June ${year} primary is elected then; only seats where no one did go on to the November ballot. The Registrar's results show which.`, `Los cargos de supervisor son no partidistas. Quien obtiene la mayoría en la primaria de junio de ${year} queda elegido; solo los cargos donde nadie la obtuvo pasan a la boleta de noviembre. Los resultados del Registro de Votantes muestran cuáles.`)}</p>
+                  <ul className="plain">{supervisors.map((s) => <li key={s.district}>{tr(`District ${s.district}`, `Distrito ${s.district}`)}: {s.name} · {tr("term ends", "fin del período")} {date(s.term_end)}{String(s.district) === my.get("sd") && <> · <strong>{tr("your district", "su distrito")}</strong></>}</li>)}</ul>
+                  <p className="fine">{tr(`Supervisor seats are nonpartisan. A candidate who wins a majority in the ${primaryMonth[0]} ${year} primary is elected then; only seats where no one did go on to the November ballot. The Registrar's results show which.`, `Los cargos de supervisor son no partidistas. Quien obtiene la mayoría en la primaria de ${primaryMonth[1]} de ${year} queda elegido; solo los cargos donde nadie la obtuvo pasan a la boleta de noviembre. Los resultados del Registro de Votantes muestran cuáles.`)}</p>
                 </>
               )}
               {councils.map((c) => (
                 <div key={c.id}>
                   <h3>{tr(`${c.name} City Council`, `Concejo Municipal de ${c.name}`)}</h3>
-                  <ul className="plain">{c.up.map((m) => <li key={m.district ?? m.name}>{m.district ? tr(`District ${m.district}`, `Distrito ${m.district}`) : ""}{m.district ? ": " : ""}{m.name}</li>)}</ul>
+                  <ul className="plain">{c.up.map((m) => <li key={m.district ?? m.name}>{m.district ? tr(`District ${m.district}`, `Distrito ${m.district}`) : ""}{m.district ? ": " : ""}{m.name}{m.district && c.name === my.get("pl") && String(m.district) === my.get("cc") && <> · <strong>{tr("your district", "su distrito")}</strong></>}</li>)}</ul>
                 </div>
               ))}
               <p className="fine">{tr("County officers and other cities' councils will be added as their term dates are recorded.", "Los funcionarios del condado y los concejos de otras ciudades se agregarán cuando se registren las fechas de sus períodos.")} <a href={local.results_url}>{tr("Orange County Registrar of Voters", "Registro de Votantes del Condado de Orange")}</a></p>
