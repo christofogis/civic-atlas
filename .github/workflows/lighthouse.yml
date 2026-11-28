@@ -8,6 +8,9 @@ on:
       paths:
         description: "Comma-separated paths"
         default: "/,/member/P000145,/bill/119/hr/1,/budget,/week,/local/ca-orange"
+      base_url:
+        description: "Site URL (e.g. a branch preview)"
+        default: "https://civic-atlas-cub.pages.dev"
 
 jobs:
   run:
@@ -20,10 +23,12 @@ jobs:
       - name: Lighthouse
         env:
           PATHS: ${{ inputs.paths }}
+          BASE_URL: ${{ inputs.base_url }}
+          CHROME_PATH: /usr/bin/google-chrome
         run: |
           IFS=',' read -ra P <<< "$PATHS"
           for p in "${P[@]}"; do
-            npx -y lighthouse@12 "https://civic-atlas-cub.pages.dev$p" --quiet --output=json --output-path=lh.json \
+            npx -y lighthouse@12 "${BASE_URL:-https://civic-atlas-cub.pages.dev}$p" --quiet --output=json --output-path=lh.json \
               --only-categories=performance,accessibility,best-practices,seo --chrome-flags="--headless=new --no-sandbox" || { echo "$p: lighthouse failed"; continue; }
             node -e '
               const r = require("./lh.json"); const c = r.categories, a = r.audits;
@@ -37,6 +42,12 @@ jobs:
               const phases = a["largest-contentful-paint-element"]?.details?.items?.[1]?.items;
               if (phases) console.log("  LCP phases: " + phases.map((x) => `${x.phase} ${Math.round(x.timing)}ms`).join(", "));
               const reqs = (a["network-requests"]?.details?.items ?? []).filter((x) => x.url.includes("supabase")).map((x) => Math.round(x.networkEndTime)).sort((p, q) => q - p);
+              const items = a["network-requests"]?.details?.items ?? [];
+              const js = items.filter((x) => x.resourceType === "Script").reduce((n, x) => n + (x.transferSize || 0), 0);
+              const font = items.filter((x) => x.resourceType === "Font").reduce((n, x) => n + (x.transferSize || 0), 0);
+              const img = items.filter((x) => x.resourceType === "Image").reduce((n, x) => n + (x.transferSize || 0), 0);
+              console.log(`  JS transferred: ${Math.round(js / 1024)} KB (${items.filter((x) => x.resourceType === "Script").length} files), fonts ${Math.round(font / 1024)} KB, images ${Math.round(img / 1024)} KB, total ${Math.round(items.reduce((n, x) => n + (x.transferSize || 0), 0) / 1024)} KB`);
+              console.log(`  LCP ${Math.round(a["largest-contentful-paint"].numericValue)}ms  CLS ${a["cumulative-layout-shift"].numericValue.toFixed(3)}  TBT ${Math.round(a["total-blocking-time"].numericValue)}ms`);
               if (reqs.length) console.log(`  database requests: ${reqs.length}, last finished at ${reqs[0]}ms`);
             ' "$p"
           done
