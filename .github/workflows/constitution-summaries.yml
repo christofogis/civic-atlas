@@ -1,0 +1,62 @@
+name: Constitution summaries (AI)
+
+# By hand only: the Constitution's text never changes, so its AI summaries are written once into
+# data/constitution/us.json (scripts/data/constitution-summaries.mjs) and committed. Each summary is
+# checked against the verbatim text; flagged ones are rewritten once, then held. Only passed ones show.
+# A run that runs out of wait leaves its batch listed in the file; run again to collect it.
+on:
+  workflow_dispatch:
+    inputs:
+      parts:
+        description: "Parts to write, e.g. amend14,art1-s8 (blank: every part still needing work)"
+        type: string
+        default: ""
+      wait:
+        description: "Minutes to wait for batches before committing what is done"
+        type: string
+        default: "120"
+      redo:
+        description: "Write again and replace (after the instructions change)"
+        type: boolean
+        default: false
+      dry_run:
+        description: "Print one request and a cost estimate; send nothing, commit nothing"
+        type: boolean
+        default: true
+
+permissions:
+  contents: write
+
+concurrency:
+  group: constitution-summaries
+  cancel-in-progress: false
+
+jobs:
+  summarize:
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
+    env:
+      ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Summarize
+        env:
+          PARTS: ${{ inputs.parts }}
+          WAIT: ${{ inputs.wait || '120' }}
+          DRY_RUN: ${{ inputs.dry_run && '--dry-run' || '' }}
+          REDO: ${{ inputs.redo && '--redo' || '' }}
+        run: |
+          if [ -n "$PARTS" ]; then node scripts/data/constitution-summaries.mjs --parts "$PARTS" --wait "$WAIT" $DRY_RUN $REDO
+          else node scripts/data/constitution-summaries.mjs --wait "$WAIT" $DRY_RUN $REDO; fi
+      - name: Commit
+        if: ${{ always() && !inputs.dry_run }}
+        run: |
+          git config user.name "civic-atlas bot"
+          git config user.email "christofogis@users.noreply.github.com"
+          git add data/constitution/us.json
+          git diff --cached --quiet || (git commit -m "Constitution summaries written and checked (AI)" && git push)
