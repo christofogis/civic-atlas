@@ -19,7 +19,7 @@ const TITLES = {
   "/elections": ["2028 candidates", "Candidatos de 2028"], "/on-the-ballot": ["On the ballot", "En la boleta"], "/my-ballot": ["Your 2028 ballot", "Su boleta de 2028"], "/corrections": ["Corrections", "Correcciones"],
   "/nominations": ["Nominations", "Nominaciones"], "/leadership": ["Congressional leadership", "Liderazgo del Congreso"], "/story": ["Look up a news story", "Buscar una noticia"],
   "/hearing": ["Hearing", "Audiencia"], "/map": ["Map", "Mapa"],
-  "/government": ["Three branches of government", "Los tres poderes del gobierno"],
+  "/government": ["Three branches of government", "Los tres poderes del gobierno"], "/constitution": ["The Constitution", "La Constitución"],
   "/budget": ["Federal budget", "Presupuesto federal"], "/measures": ["California ballot measures", "Medidas en la boleta de California"],
   "/officials": ["Elected officials", "Funcionarios electos"], "/local": ["Local officials", "Funcionarios locales"],
   "/state": ["State official", "Funcionario estatal"], "/committees": ["Committees", "Comités"],
@@ -42,7 +42,7 @@ const MENU_GROUPS = [
     ["/my-ballot", "Your 2028 ballot", "Su boleta de 2028"], ["/on-the-ballot", "On the ballot", "En la boleta"], ["/elections", "2028 candidates", "Candidatos 2028"],
     ["/measures", "2028 ballot measures (CA)", "Medidas en la boleta 2028 (CA)"]] },
   { id: "learn", title: ["Learn", "Aprender"], links: [
-    ["/government", "Three branches", "Los tres poderes"], ["/budget", "Federal budget", "Presupuesto federal"],
+    ["/government", "Three branches", "Los tres poderes"], ["/constitution", "The Constitution", "La Constitución"], ["/budget", "Federal budget", "Presupuesto federal"],
     ["/glossary", "Glossary", "Glosario"], ["/quiz", "Quiz: do you vote like them?", "Cuestionario: ¿vota como ellos?"],
     ["/story", "Look up a news story", "Buscar una noticia"]] },
   { id: "about", title: ["About this site", "Sobre este sitio"], links: [

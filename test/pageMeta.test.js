@@ -1,7 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
-import { matchPage, memberMeta, billMeta, committeeMeta, statePersonMeta, ballotMeta, headTags, rewriteHandlers, SHELL_TAGS } from "../lib/pageMeta.js";
+import { matchPage, memberMeta, billMeta, committeeMeta, statePersonMeta, ballotMeta, constitutionMeta, headTags, rewriteHandlers, SHELL_TAGS } from "../lib/pageMeta.js";
 import { getLang } from "../src/lib/lang.js";
 
 const url = (p) => new URL(p, "https://civic-atlas-cub.pages.dev");
@@ -109,4 +109,15 @@ test("rewrite handlers replace the shell's generic tags in index.html", () => {
   assert.match(html, /<title>Alex Padilla · Civic Atlas<\/title>/);
   assert.match(html, /property="og:site_name" content="Civic Atlas"/);
   assert.match(html, /og:image" content="https:\/\/unitedstates\.github\.io/);
+});
+
+test("Constitution: fixed title and description in both languages, canonical keeps ?lang=es only", () => {
+  assert.deepEqual(matchPage("/constitution"), { kind: "constitution" });
+  const m = constitutionMeta({ url: url("/constitution?x=1") });
+  assert.equal(m.title, "The Constitution of the United States · Civic Atlas");
+  assert.equal(m.canonical, "https://civic-atlas-cub.pages.dev/constitution");
+  assert.match(m.description, /National Archives/);
+  const es = constitutionMeta({ url: url("/constitution?lang=es"), lang: "es" });
+  assert.equal(es.ogTitle, "La Constitución de los Estados Unidos");
+  assert.equal(es.canonical, "https://civic-atlas-cub.pages.dev/constitution?lang=es");
 });

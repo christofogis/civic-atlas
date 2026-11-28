@@ -58,14 +58,15 @@ export default function Government() {
           "Fuentes: miembros del Congreso, el Presidente y el Vicepresidente de unitedstates/congress-legislators; órdenes ejecutivas del Registro Federal; magistrados del sitio web de la Corte Suprema. Letras de partido: D Demócrata, R Republicano, I Independiente.")}</>} /></h1>
       <p className="lede">
         {tr("The Constitution divides the federal government into three branches. Congress writes the laws, the President carries them out, and the courts decide what they mean. Each branch has powers that check the others.",
-          "La Constitución divide el gobierno federal en tres poderes. El Congreso redacta las leyes, el Presidente las ejecuta y los tribunales deciden qué significan. Cada poder tiene facultades que limitan a los otros.")}
+          "La Constitución divide el gobierno federal en tres poderes. El Congreso redacta las leyes, el Presidente las ejecuta y los tribunales deciden qué significan. Cada poder tiene facultades que limitan a los otros.")}{" "}
+        <Link to="/constitution">{tr("Read the Constitution, part by part", "Lea la Constitución, parte por parte")}</Link>
       </p>
 
       <div className="branches">
         <section className="branch" aria-labelledby="b-leg">
           <Capitol />
           <h2 id="b-leg">{tr("Legislative branch", "Poder legislativo")}</h2>
-          <p className="fine">{tr("Congress · Article I of the Constitution", "El Congreso · Artículo I de la Constitución")}</p>
+          <p className="fine">{tr("Congress · ", "El Congreso · ")}<Link to="/constitution#art1-s1">{tr("Article I of the Constitution", "Artículo I de la Constitución")}</Link></p>
           <p>{tr("Writes and passes federal laws, sets taxes and spending, and can declare war. The Senate also confirms the President's nominees and approves treaties.",
             "Redacta y aprueba las leyes federales, fija los impuestos y el gasto, y puede declarar la guerra. El Senado además confirma a los nominados del Presidente y aprueba los tratados.")}</p>
           <h3 className="small">{tr("Who serves now", "Quiénes sirven ahora")}</h3>
@@ -85,7 +86,7 @@ export default function Government() {
         <section className="branch" aria-labelledby="b-exec">
           <WhiteHouse />
           <h2 id="b-exec">{tr("Executive branch", "Poder ejecutivo")}</h2>
-          <p className="fine">{tr("The President · Article II of the Constitution", "El Presidente · Artículo II de la Constitución")}</p>
+          <p className="fine">{tr("The President · ", "El Presidente · ")}<Link to="/constitution#art2-s1">{tr("Article II of the Constitution", "Artículo II de la Constitución")}</Link></p>
           <p>{tr("Carries out and enforces federal laws, commands the armed forces, conducts foreign policy and runs federal departments and agencies. The Vice President presides over the Senate and breaks tie votes there.",
             "Ejecuta y hace cumplir las leyes federales, dirige las fuerzas armadas, conduce la política exterior y administra los departamentos y agencias federales. El Vicepresidente preside el Senado y desempata sus votaciones.")}</p>
           <h3 className="small">{tr("Who serves now", "Quiénes sirven ahora")}</h3>
@@ -113,7 +114,7 @@ export default function Government() {
         <section className="branch" aria-labelledby="b-jud">
           <SupremeCourt />
           <h2 id="b-jud">{tr("Judicial branch", "Poder judicial")}</h2>
-          <p className="fine">{tr("The federal courts · Article III of the Constitution", "Los tribunales federales · Artículo III de la Constitución")}</p>
+          <p className="fine">{tr("The federal courts · ", "Los tribunales federales · ")}<Link to="/constitution#art3-s1">{tr("Article III of the Constitution", "Artículo III de la Constitución")}</Link></p>
           <p>{tr("Decides cases about the Constitution and federal law. The Supreme Court is the highest court; below it are 13 courts of appeals and 94 district courts. Federal judges are nominated by the President, confirmed by the Senate, and serve for life.",
             "Decide casos sobre la Constitución y las leyes federales. La Corte Suprema es el tribunal más alto; debajo están 13 tribunales de apelaciones y 94 tribunales de distrito. Los jueces federales son nominados por el Presidente, confirmados por el Senado y sirven de por vida.")}</p>
           <h3 className="small">{tr("The Supreme Court", "La Corte Suprema")}</h3>

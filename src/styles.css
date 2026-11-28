@@ -1161,4 +1161,36 @@ button.term:hover, button.term[aria-expanded="true"] { text-decoration-color: va
   .my-ballot .ballot-election { break-inside: auto; }
   .my-ballot .ballot-election h2 { break-after: avoid; }
   .my-ballot .ballot-contest { break-inside: avoid; }
+/* The Constitution page: one card per part, summary first, the original text in a disclosure. */
+.constitution .const-search { margin: 16px 0 8px; }
+.constitution .const-search label { display: block; font-weight: 600; margin-bottom: 4px; }
+.constitution .const-search input { width: 100%; max-width: 28rem; padding: 9px 12px; border: 1px solid var(--field-edge); border-radius: 8px; font: inherit; background: var(--surface); color: var(--text); }
+.const-toc { border: 1px solid var(--border); border-radius: 10px; padding: 12px 16px; background: var(--surface); margin: 12px 0 8px; }
+.const-toc h2 { font-size: 0.95rem; margin: 0 0 6px; }
+.const-toc li { margin: 6px 0; line-height: 2; }
+.const-chip { display: inline-block; min-width: 2.2em; text-align: center; padding: 0 6px; margin: 0 4px 4px 0; border: 1px solid var(--border-strong); border-radius: 6px; text-decoration: none; font-size: 0.88rem; line-height: 1.9; }
+.const-group > h2 { margin-top: 32px; padding-bottom: 8px; border-bottom: 1px solid var(--border); }
+.const-card { border: 1px solid var(--border); border-radius: 10px; padding: 14px 16px; margin: 12px 0; background: var(--surface); scroll-margin-top: 72px; }
+.const-card h3 { margin: 0 0 6px; font-size: 1.1rem; }
+.const-anchor { color: inherit; text-decoration: none; }
+.const-anchor:hover { text-decoration: underline; }
+.const-dates { margin: 0 0 8px; }
+.const-nosummary { margin: 0 0 8px; }
+.const-notes { margin: 0 0 8px; padding-left: 1.1rem; }
+.const-notes li { margin: 2px 0; }
+.const-disclosure { border-top: 1px solid var(--border); margin-top: 6px; }
+.const-disclosure > summary { padding: 8px 0; font-weight: 600; font-size: 0.95rem; margin: 0; }
+.const-disclosure-body { padding: 0 0 4px; }
+.const-text p { margin: 0 0 0.7em; font-family: Georgia, "Times New Roman", serif; line-height: 1.55; }
+.const-clause { font-family: "Public Sans", system-ui, sans-serif; font-size: 0.82rem; font-weight: 600; color: var(--muted); }
+mark.const-changed { background: color-mix(in srgb, var(--muted) 18%, transparent); color: inherit; padding: 1px 0; border-radius: 2px; }
+.const-links { margin: 6px 0 0; }
+.const-source { margin-top: 28px; }
+@media (max-width: 480px) { .const-card { padding: 12px; margin: 10px -4px; } .const-links-why { display: block; } }
+@media print {
+  .const-card { border: 0; padding: 0; margin: 0 0 10pt; break-inside: avoid-page; background: none; }
+  .const-disclosure { border: 0; }
+  .const-disclosure > summary { display: none; }
+  .const-text p { font-size: 10pt; }
+  .const-links a::after { content: " (" attr(href) ")"; font-size: 8pt; }
 }

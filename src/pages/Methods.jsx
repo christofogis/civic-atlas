@@ -255,6 +255,29 @@ export default function Methods() {
         the procedure only and follow the Congress.gov and Senate glossaries in plain words.
       </p>
 
+      <h2 id="constitution">The Constitution page</h2>
+      <p>
+        The <Link to="/constitution">Constitution page</Link> shows the full text, split into the Preamble, each
+        section of Articles I to VII and each of the 27 amendments. The words are the National Archives
+        transcriptions of the Constitution, the Bill of Rights and Amendments XI to XXVII, with their original
+        spelling, capitalization and punctuation (such as "defence" and "chuse"); clauses are numbered where a
+        section has more than one paragraph. Ratification dates are the ones the National Archives gives. Where a
+        later amendment changed words of an earlier part, the page marks those words and names the amendment
+        exactly as the National Archives marks them, and says nothing about what the change means.
+      </p>
+      <p>
+        Each part has an AI summary of what its words say and a simpler "Explain it simply" version, in English and
+        Spanish, written once by Claude Haiku with the same written instructions for every part: who must, may or may
+        not do what, as the text says it ("shall" stays "must"); the text's own numbers and groups; every item of a
+        list or none; and no purpose, importance, history, court readings, present-day examples, analogies or
+        judging words. For an amendment that changed earlier text, the summary may say what it changed, using only
+        the words of both parts. A second request checks each one against the verbatim text and lists anything the
+        text doesn't support; a flagged summary is rewritten once and checked again, and if it still fails it is not
+        shown. Only summaries that pass are shown, and only while the text they were written from is unchanged.
+        A part without one shows its original text open. How courts have interpreted each part is left to the
+        Constitution Annotated (Library of Congress), linked from every part.
+      </p>
+
       <h2 id="bill-stage">Where a bill stands</h2>
       <p>
         The track at the top of a bill page is built from the bill's official action list in GovInfo Bill Status. Each

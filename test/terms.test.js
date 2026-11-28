@@ -54,3 +54,14 @@ test("every marked term has both languages", () => {
     assert.ok(GLOSSARY[id]?.match, id);
   }
 });
+
+test("constitutional terms are marked in the Constitution's own wording", () => {
+  assert.deepEqual(ids(markTerms("No Bill of Attainder or ex post facto Law shall be passed.")), ["bill-of-attainder:Bill of Attainder", "ex-post-facto:ex post facto Law"]);
+  assert.deepEqual(ids(markTerms("The Privilege of the Writ of Habeas Corpus shall not be suspended")), ["habeas-corpus:Writ of Habeas Corpus"]);
+  assert.deepEqual(ids(markTerms("no Attainder of Treason shall work Corruption of Blood")), []);
+  assert.deepEqual(ids(markTerms("sin el debido proceso legal", { lang: "es" })), ["due-process:debido proceso legal"]);
+  for (const id of ["habeas-corpus", "bill-of-attainder", "ex-post-facto", "letters-of-marque", "emoluments", "due-process", "equal-protection", "naturalization", "impeachment"]) {
+    assert.match(GLOSSARY[id].source, /^https:\/\/constitution\.congress\.gov\/browse\//, id);
+    assert.ok(GLOSSARY[id].text_es && GLOSSARY[id].term_es, id);
+  }
+});

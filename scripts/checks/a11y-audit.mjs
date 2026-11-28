@@ -13,7 +13,7 @@ const TAGS = ["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "wcag22aa", ...(proces
 
 // Every route in src/main.jsx: the checked pages plus the routes they don't cover.
 const EXTRA = ["/issues", "/elections", "/on-the-ballot", "/first-time-voter", "/map", "/style-test",
-  "/committee/HSAG", "/topic/defense", "/no-such-page", "/first-time-voter?lang=es", "/on-the-ballot?lang=es", "/my-ballot"];
+  "/committee/HSAG", "/topic/defense", "/no-such-page", "/first-time-voter?lang=es", "/on-the-ballot?lang=es", "/constitution", "/constitution?lang=es, "/my-ballot"];
 const paths = [...new Set([...PAGES.map(([p]) => p.split("#")[0]), ...EXTRA])];
 
 const browser = await chromium.launch(process.env.CHROME_PATH ? { executablePath: process.env.CHROME_PATH } : {});
