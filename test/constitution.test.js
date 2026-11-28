@@ -149,3 +149,16 @@ test("cost estimate for the whole job stays under $1", () => {
   assert.equal(e.requests, data.parts.length * 4);
   assert.ok(e.usd > 0.1 && e.usd < 1, String(e.usd));
 });
+
+import { publicData } from "../lib/constitution.js";
+test("the served copy keeps the text and only summaries that may be shown", () => {
+  const d = { title: "T", parts: [
+    { id: "a", text_hash: "h", blocks: [{ text: "x" }], summary: { en: "E", es: "S", status: "passed", text_hash: "h", check_notes: null }, simple: { en: "e", es: "s", status: "held", text_hash: "h" } },
+    { id: "b", text_hash: "h", blocks: [{ text: "y" }], summary: { en: "E", es: "S", status: "flagged", text_hash: "h" }, simple: { en: "e", es: "s", status: "passed", text_hash: "h" } },
+  ], batches: [{ id: "x" }] };
+  const p = publicData(d);
+  assert.equal(p.batches, undefined);
+  assert.deepEqual(p.parts[0], { id: "a", blocks: [{ text: "x" }], summary: { en: "E", es: "S" } });
+  assert.deepEqual(p.parts[1], { id: "b", blocks: [{ text: "y" }] });
+  assert.equal(publicData(data).parts.length, 52);
+});
