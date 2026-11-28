@@ -793,8 +793,6 @@ h4.small { font-size: 0.95rem; margin: 14px 0 4px; }
 @media print { .home-features { display: none; } }
 
 /* This week: reserve the summary's space so the topics below don't jump as its lines arrive. */
-.week-glance { min-height: 17rem; }
-@media (max-width: 640px) { .week-glance { min-height: 26rem; } }
 
 /* Budget bars that open in place to show what's inside */
 .hbar-label .swatch { display: inline-block; width: 0.7rem; height: 0.7rem; border-radius: 2px; margin-right: 0.4rem; vertical-align: -1px; }
@@ -927,10 +925,6 @@ ol.bare { list-style: none; padding: 0; margin: 0; }
 }
 .cards.compact { max-width: 60rem; }
 .cards.compact > li.card { width: 100%; box-sizing: border-box; }
-.week-glance h2 { font-size: 1.05rem; margin: 1rem 0 0.35rem; }
-.week-glance h2:first-child { margin-top: 0; }
-.glance-laws li { padding: 0.3rem 0; border-bottom: 1px solid var(--border); }
-.glance-laws .clamp2-inline { display: -webkit-inline-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; vertical-align: top; }
 .recent-meetings { margin-top: 1.4rem; } .recent-meetings li { padding: 0.4rem 0; border-bottom: 1px solid var(--border); }
 .board-actions { margin: 0.4rem 0 0.2rem; }
 .board-actions summary { cursor: pointer; color: var(--accent); }
@@ -1142,3 +1136,99 @@ button.term:hover, button.term[aria-expanded="true"] { text-decoration-color: va
 .next-steps h3 { margin: 0 0 6px; font-size: 1rem; }
 .next-steps li a { display: block; padding: 10px 0; }
 .next-steps li + li { border-top: 1px solid var(--border); }
+
+/* ---- Cards and disclosures (Chris, Nov 28, 2026) ---------------------------------------------
+   One frame for every list-heavy page, phone first: each section of a page is a card with a bold
+   heading and a short line under it (SectionCard.jsx); a topic that opens in place is a card with
+   a bold title, a count and a chevron, its contents indented inside (Fold.jsx, also exported as
+   Disclosure). Items that belong under one heading are an indented bulleted list with no lines
+   between them, so the group reads as one section. Lines stay only in tables, menus and calendars. */
+.section { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 18px 20px 20px; margin-top: 20px; }
+.section > h2, .sec-head > h2, .section > .sec-head :is(h2, h3) { margin: 0; padding: 0; border: 0; font-size: 1.15rem; font-weight: 700; line-height: 1.3; }
+.section > h2 + *, .sec-head + * { margin-top: 12px; }
+.sec-sub { margin: 4px 0 0; color: var(--muted); font-size: 0.9rem; }
+:root:not([data-theme="dark"]) .section { box-shadow: 0 1px 2px var(--shadow); }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .section { box-shadow: none; } }
+/* A section inside a card or an open topic is part of it: no second card. */
+:is(.section, .fold-body, .sec-card, .cards, .glance-tile) .section { background: none; border: 0; border-radius: 0; padding: 0; margin-top: 20px; box-shadow: none; }
+:is(.section, .fold-body) .section > h2 { font-size: 1.02rem; }
+.section > :last-child { margin-bottom: 0; }
+@media (max-width: 640px) { .section { padding: 14px 14px 16px; border-radius: 12px; margin-top: 14px; } }
+
+/* Headline figures: green numbers, what each counts under it; a figure that is a link opens its items. */
+.stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(9.5rem, 1fr)); gap: 10px; margin: 14px 0; }
+.stat { display: flex; flex-direction: column; gap: 2px; padding: 10px 12px; border: 1px solid var(--border); border-radius: 10px; background: var(--bg); color: var(--text); text-decoration: none; }
+.stat strong { font-size: 1.75rem; line-height: 1.1; color: var(--accent); font-weight: 700; font-variant-numeric: tabular-nums; }
+.stat span { color: var(--muted); font-size: 0.85rem; line-height: 1.35; }
+a.stat-link:hover { border-color: var(--accent); }
+a.stat-link:hover span { color: var(--text); }
+a.stat-link:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+a.stat-link span::after { content: " ›"; color: var(--accent); }
+.facts { list-style: none; padding: 0; margin: 0 0 4px; display: grid; gap: 4px; font-size: 0.95rem; }
+
+/* Topics that open in place. On the page: one card each, with space between. Inside a section
+   card: rows of that card, set off by a light line inside its padding. */
+.folds { border: 0; display: grid; gap: 12px; margin-top: 16px; }
+.fold { border: 1px solid var(--border); border-radius: 14px; background: var(--surface); }
+.fold > summary { padding: 14px 44px 14px 18px; border-radius: 14px; }
+.fold > summary::after { right: 20px; top: 21px; }
+.fold[open] > summary::after { top: 25px; }
+.fold > summary :is(h2, h3) { display: inline; font-size: 1.08rem; font-weight: 700; margin: 0; }
+.fold > summary:hover :is(h2, h3) { text-decoration: none; }
+.fold > summary:hover { background: color-mix(in srgb, var(--accent) 5%, transparent); }
+.fold > summary:hover::after { border-color: var(--accent); }
+.fold-summary { font-size: 0.9rem; }
+.fold-count { display: inline-block; margin-left: 8px; padding: 0 8px; border-radius: 999px; background: var(--accent-soft); color: var(--text); font-size: 0.8rem; font-weight: 600; line-height: 1.6; vertical-align: 0.12em; font-variant-numeric: tabular-nums; }
+.fold-body { padding: 2px 18px 18px; }
+.fold[open] > summary { border-bottom-left-radius: 0; border-bottom-right-radius: 0; }
+.fold > .fold-body > :first-child { margin-top: 0; }
+.sec-card .folds, .section .folds { gap: 0; margin: 16px -20px -20px; border-top: 1px solid var(--border); }
+.sec-card .fold, .section .fold { border: 0; border-radius: 0; background: none; box-shadow: none; }
+.sec-card .fold + .fold, .section .fold + .fold { border-top: 1px solid var(--border); }
+.sec-card .fold > summary, .section .fold > summary { padding-left: 20px; border-radius: 0; }
+.sec-card .fold:last-child > summary:not(:focus-visible) { border-radius: 0 0 14px 14px; }
+.sec-card .fold-body, .section .fold-body { padding: 0 20px 18px; }
+@media (max-width: 640px) {
+  .fold > summary { padding: 12px 40px 12px 14px; }
+  .fold > summary::after { right: 16px; top: 19px; }
+  .fold[open] > summary::after { top: 23px; }
+  .fold-body { padding: 2px 14px 16px; }
+  .sec-card .folds, .section .folds { margin: 14px -14px -16px; }
+  .sec-card .fold > summary, .section .fold > summary { padding-left: 14px; }
+  .sec-card .fold-body, .section .fold-body { padding: 0 14px 16px; }
+}
+
+/* A group of items under one heading: an indented bulleted list, no lines between items. */
+.list-group { margin-top: 18px; }
+.list-group-head { margin: 0 0 6px; font-size: 1rem; font-weight: 700; }
+h4.list-group-head { font-size: 0.95rem; }
+.list-group-sub { margin: -2px 0 6px; }
+ul.dots { list-style: disc; padding-left: 1.25rem; margin: 6px 0 0; }
+ul.dots > li { margin: 0 0 10px; padding-left: 2px; max-width: none; }
+ul.dots > li::marker { color: var(--faint); }
+ul.dots > li:last-child { margin-bottom: 0; }
+.item-num { font-weight: 600; white-space: nowrap; }
+.item-meta { display: block; font-size: 0.85rem; color: var(--muted); }
+#coming-up, #last-week, #your-members, #laws, #passed, #votes { scroll-margin-top: 72px; }
+
+/* Lists of items under one heading elsewhere: same rule, space instead of a line between items. */
+ul.items li.item, .glance li, .events li.event-row, .roster li, .recent-meetings li, .record-items li,
+.issue-list > li, .my-reps li, .my-reps-list > li, .corrections li, .agenda-items li, .next-up li, .home-card, .tl-day {
+  border-bottom: 0; }
+ul.items { list-style: disc; padding-left: 1.25rem; }
+ul.items li.item { display: list-item; padding: 0 0 0 2px; margin: 0 0 10px; }
+ul.items li.item::marker { color: var(--faint); }
+.events li.event-row { padding: 6px 0; }
+.my-reps-list > li + li, .tl-day + .tl-day { border-top: 1px solid var(--border); }
+.glance h2 { border-bottom: 0; padding-bottom: 0; }
+.glance li { padding: 6px 0; }
+.agenda > li > ul { list-style: disc; padding-left: 1.25rem; }
+.agenda > li > ul > li::marker { color: var(--faint); }
+.agenda-day { color: var(--text); font-weight: 700; }
+/* "At a glance" blocks (home, bill and member pages) are section cards too. */
+.glance { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 18px 20px 20px; }
+.glance > h2 { margin-top: 0; font-size: 1.15rem; font-weight: 700; }
+@media (max-width: 640px) { .glance { padding: 14px 14px 16px; border-radius: 12px; } }
+.glance > ul { list-style: disc; padding-left: 1.25rem; }
+.glance > ul > li { padding: 3px 0 3px 2px; }
+.glance > ul > li::marker { color: var(--faint); }
