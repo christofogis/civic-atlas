@@ -111,7 +111,8 @@ export default function LookupResults({ result, sectionRef, shared = false }) {
             <h3>{t("What next?", "¿Qué sigue?")}</h3>
             <ul className="plain">
               <li><Link to="/your-week">{t("What your officials did this week, and what's coming up", "Lo que hicieron sus funcionarios esta semana y lo que viene")}</Link></li>
-              <li><Link to="/on-the-ballot">{t("What's on your next ballot", "Qué hay en su próxima boleta")}</Link></li>
+              <li><Link to="/my-ballot">{t("Your 2028 ballot: every contest and measure you'll vote on, and the deadlines", "Su boleta de 2028: cada contienda y medida en la que votará, y las fechas límite")}</Link></li>
+              <li><Link to="/on-the-ballot">{t("Every seat on the next ballot nationwide", "Todos los escaños en la próxima boleta en el país")}</Link></li>
               <li><Link to="/quiz">{t("Do you vote like your representatives? Take the quiz", "¿Vota usted como sus representantes? Haga el cuestionario")}</Link></li>
               <li><Link to="/first-time-voter">{t("First time voting? How to register", "¿Va a votar por primera vez? Cómo inscribirse")}</Link></li>
             </ul>

@@ -59,7 +59,9 @@ export default function FirstTimeVoter() {
           <h2>{t("Know your ballot", "Conozca su boleta")}</h2>
           <p>{t(`The next general election is ${date(generalElectionDate(year))}. See which seats are on the ballot and who holds them now.`,
             `La próxima elección general es el ${date(generalElectionDate(year))}. Vea qué escaños están en la boleta y quién los ocupa ahora.`)}</p>
-          <p><Link className="button-primary" to={`/on-the-ballot?year=${year}`}>{t(`On the ballot in ${year}`, `En la boleta en ${year}`)}</Link></p>
+          <p><Link className="button-primary" to="/my-ballot">{t("Your 2028 ballot", "Su boleta de 2028")}</Link></p>
+          <p className="fine">{t("Every contest and statewide measure for your address, in ballot order, with the official deadlines. ", "Cada contienda y medida estatal para su dirección, en el orden de la boleta, con las fechas límite oficiales. ")}
+            <Link to={`/on-the-ballot?year=${year}`}>{t(`Every seat on the ${year} ballot nationwide`, `Todos los escaños en la boleta de ${year} en el país`)}</Link></p>
           {state === "CA" && year === 2028 && (
             <p className="fine"><Link to="/measures">{t("California's 2028 ballot measures: March 7 primary and November 7 general election", "Medidas en la boleta de California en 2028: primaria del 7 de marzo y elección general del 7 de noviembre")}</Link></p>
           )}

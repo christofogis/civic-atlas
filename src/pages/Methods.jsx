@@ -320,6 +320,27 @@ export default function Methods() {
         will be added only from official sources.
       </p>
 
+      <h2 id="my-ballot">Your 2028 ballot</h2>
+      <p>
+        Your 2028 ballot lists every contest and statewide measure a visitor will vote on in 2028, grouped by election
+        (in California, the March 7 primary and the November 7 general), in the order California ballots list them:
+        President, U.S. Senate, U.S. House, state Senate, Assembly, then county and city offices, then measures. It is
+        built from the district numbers of the visitor's last lookup on this device; the address is never stored or sent
+        anywhere new, and nothing personal goes in the page's address. Which seats are up comes from the same rules as
+        On the ballot: each official's term end date, the California Constitution's term calendar (all 80 Assembly seats;
+        odd-numbered state Senate districts in presidential years), and the Orange County and city term dates on file.
+        Each contest shows who holds the seat now, never a list of candidates: candidates are known only once filing
+        closes and the election office certifies them. A seat whose holder for this ballot hasn't taken office yet (House
+        members elected in 2026 take office on January 3, 2027; Assembly members on December 7, 2026) says when it will be
+        shown. California and eight other states redraw congressional districts for the 120th Congress, so a lookup made
+        on the earlier lines asks the visitor to look up again rather than guessing the new district. Deadlines and filing
+        dates are shown only once the Secretary of State or the county Registrar publishes them; as of November 28, 2026
+        neither had published any 2028 dates, and the page says so. The rules it lists (the 15-day registration deadline,
+        same-day registration, vote by mail, pre-registration at 16) are quoted from those offices' pages and linked.
+        Outside California, the page shows the federal contests in the same layout and says that state and local contests
+        aren't covered yet.
+      </p>
+
       <h2 id="ca-results">California election results</h2>
       <p>
         Results for California's November 3, 2026 general election come from the California Secretary of State. While

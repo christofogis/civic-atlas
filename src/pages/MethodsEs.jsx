@@ -325,6 +325,29 @@ export default function MethodsEs() {
         2026. Los enlaces propios de otros estados se agregarán solo desde fuentes oficiales.
       </p>
 
+      <h2 id="my-ballot">Su boleta de 2028</h2>
+      <p>
+        Su boleta de 2028 muestra cada contienda y medida estatal en la que votará en 2028, por elección (en California, la
+        primaria del 7 de marzo y la general del 7 de noviembre), en el orden de las boletas de California: Presidente,
+        Senado de EE. UU., Cámara de EE. UU., Senado estatal, Asamblea, luego los cargos del condado y la ciudad, y luego las
+        medidas. Se arma con los números de distrito de la última búsqueda en este dispositivo; la dirección nunca se guarda
+        ni se envía a ningún lugar nuevo, y la dirección de la página no lleva nada personal. Qué escaños están en la boleta
+        sale de las mismas reglas que En la boleta: la fecha de fin del período de cada funcionario, el calendario de
+        períodos de la Constitución de California (los 80 escaños de la Asamblea; los distritos impares del Senado estatal
+        en los años presidenciales) y las fechas de los períodos del Condado de Orange y de las ciudades. Cada contienda
+        muestra quién ocupa el escaño ahora, nunca una lista de candidatos: los candidatos se conocen solo cuando cierra la
+        inscripción y la oficina electoral los certifica. Un escaño cuyo titular para esta boleta aún no asume (los miembros
+        de la Cámara elegidos en 2026 asumen el 3 de enero de 2027; los de la Asamblea, el 7 de diciembre de 2026) indica
+        cuándo se mostrará. California y otros ocho estados cambian sus distritos del Congreso para el 120.º Congreso, así
+        que una búsqueda hecha con los límites anteriores pide buscar de nuevo en lugar de adivinar el nuevo distrito. Las
+        fechas límite y de inscripción de candidatos se muestran solo cuando la Secretaría de Estado o el Registro de
+        Votantes del condado las publican; al 28 de noviembre de 2026 ninguno había publicado fechas de 2028, y la página
+        lo dice. Las reglas que muestra (la fecha límite de inscripción de 15 días, la inscripción el mismo día, el voto por
+        correo y la preinscripción a los 16 años) siguen las páginas de esas oficinas y las enlazan. Fuera de California, la
+        página muestra las contiendas federales con el mismo diseño y dice que las contiendas estatales y locales aún no
+        están cubiertas.
+      </p>
+
       <h2 id="ca-results">Resultados electorales de California</h2>
       <p>
         Los resultados de la elección general del 3 de noviembre de 2026 en California provienen de la Secretaría de

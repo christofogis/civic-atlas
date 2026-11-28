@@ -16,7 +16,7 @@ const TITLES = {
   "/week": ["This week in Congress", "Esta semana en el Congreso"], "/glossary": ["Glossary", "Glosario"],
   "/quiz": ["Quiz", "Cuestionario"], "/topics": ["Topics", "Temas"], "/topic": ["Topic", "Tema"],
   "/issues": ["Issues you care about", "Los temas que le importan"],
-  "/elections": ["2028 candidates", "Candidatos de 2028"], "/on-the-ballot": ["On the ballot", "En la boleta"], "/corrections": ["Corrections", "Correcciones"],
+  "/elections": ["2028 candidates", "Candidatos de 2028"], "/on-the-ballot": ["On the ballot", "En la boleta"], "/my-ballot": ["Your 2028 ballot", "Su boleta de 2028"], "/corrections": ["Corrections", "Correcciones"],
   "/nominations": ["Nominations", "Nominaciones"], "/leadership": ["Congressional leadership", "Liderazgo del Congreso"], "/story": ["Look up a news story", "Buscar una noticia"],
   "/hearing": ["Hearing", "Audiencia"], "/map": ["Map", "Mapa"],
   "/government": ["Three branches of government", "Los tres poderes del gobierno"],
@@ -39,7 +39,7 @@ const MENU_GROUPS = [
     ["/compare", "Compare two members", "Comparar dos miembros"], ["/map", "Map", "Mapa"]] },
   { id: "elections", title: ["Elections", "Elecciones"], links: [
     ["/first-time-voter", "First time voting? How to register", "¿Primera vez? Cómo inscribirse"],
-    ["/on-the-ballot", "On the ballot", "En la boleta"], ["/elections", "2028 candidates", "Candidatos 2028"],
+    ["/my-ballot", "Your 2028 ballot", "Su boleta de 2028"], ["/on-the-ballot", "On the ballot", "En la boleta"], ["/elections", "2028 candidates", "Candidatos 2028"],
     ["/measures", "2028 ballot measures (CA)", "Medidas en la boleta 2028 (CA)"]] },
   { id: "learn", title: ["Learn", "Aprender"], links: [
     ["/government", "Three branches", "Los tres poderes"], ["/budget", "Federal budget", "Presupuesto federal"],
