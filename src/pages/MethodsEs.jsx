@@ -255,6 +255,30 @@ export default function MethodsEs() {
         glosarios de Congress.gov y del Senado en palabras sencillas.
       </p>
 
+      <h2 id="constitution">La página de la Constitución</h2>
+      <p>
+        La <Link to="/constitution">página de la Constitución</Link> muestra el texto completo, dividido en el
+        Preámbulo, cada sección de los Artículos I a VII y cada una de las 27 enmiendas. Las palabras son las
+        transcripciones de los Archivos Nacionales de la Constitución, la Carta de Derechos y las Enmiendas XI a XXVII,
+        en inglés y con su ortografía, mayúsculas y puntuación originales (como "defence" y "chuse"); las cláusulas se
+        numeran cuando una sección tiene más de un párrafo. Las fechas de ratificación son las que dan los Archivos
+        Nacionales. Cuando una enmienda posterior cambió palabras de una parte anterior, la página marca esas palabras
+        y nombra la enmienda tal como lo hacen los Archivos Nacionales, sin decir nada sobre lo que significa el cambio.
+      </p>
+      <p>
+        Cada parte tiene un resumen hecho por IA de lo que dicen sus palabras y una versión más sencilla ("Explícalo
+        fácil"), en inglés y en español, escritos una sola vez por Claude Haiku con las mismas instrucciones escritas para
+        todas las partes: quién debe, puede o no puede hacer qué, como lo dice el texto ("shall" sigue siendo
+        "debe"); los números y grupos del propio texto; todos los elementos de una lista o ninguno; y nada de
+        propósito, importancia, historia, interpretaciones de los tribunales, ejemplos actuales, analogías ni palabras
+        que juzguen. Para una enmienda que cambió texto anterior, el resumen puede decir qué cambió, usando solo las
+        palabras de ambas partes. Una segunda solicitud verifica cada uno contra el texto literal y enumera todo lo que el
+        texto no respalda; un resumen señalado se reescribe una vez y se verifica de nuevo, y si vuelve a fallar no se
+        muestra. Solo se muestran los resúmenes que pasan, y solo mientras el texto del que se escribieron no cambie.
+        Una parte sin resumen muestra su texto original abierto. Cómo han interpretado los tribunales cada parte se
+        deja a la Constitución Anotada (Biblioteca del Congreso), enlazada desde cada parte.
+      </p>
+
       <h2 id="bill-stage">En qué etapa está un proyecto</h2>
       <p>
         Las etapas en la parte superior de la página de un proyecto se construyen a partir de la lista oficial de acciones
