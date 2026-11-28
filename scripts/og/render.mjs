@@ -1,16 +1,20 @@
 // Draw one link-preview card (1200x630 PNG) from a spec made by lib/ogCard.js: satori lays the
-// card out as SVG with the site's own font (Public Sans, from node_modules), resvg rasterizes it.
+// card out as SVG with the site's own font (Public Sans, from node_modules; text becomes paths), and
+// resvg (WebAssembly) rasterizes it.
 // Runs at build time only (scripts/og/build.mjs), never in a Pages Function: both are far over the
 // free plan's 10 ms CPU per request.
 import { readFileSync } from "node:fs";
 import { createRequire } from "node:module";
 import satori from "satori";
-import { Resvg } from "@resvg/resvg-js";
+import { initWasm, Resvg } from "@resvg/resvg-wasm";
 import { CARD_W, CARD_H, PARTY_COLORS } from "../../lib/ogCard.js";
 
 const require = createRequire(import.meta.url);
 const FONT_DIR = require.resolve("@fontsource/public-sans/package.json").replace(/package\.json$/, "files/");
 const font = (subset, weight) => ({ name: "Public Sans", weight, style: "normal", data: readFileSync(`${FONT_DIR}public-sans-${subset}-${weight}-normal.woff`) });
+// resvg's WebAssembly build: the native @resvg/resvg-js keeps ~3 MB per render until exit (a run of
+// 10,000 cards was killed for memory); here each render's memory is freed explicitly.
+await initWasm(readFileSync(require.resolve("@resvg/resvg-wasm/index_bg.wasm")));
 const FONTS = [font("latin", 400), font("latin", 700), font("latin-ext", 400), font("latin-ext", 700)];
 
 const INK = "#18212b", MUTED = "#55616d", ACCENT = "#157a4c", RULE = "#dde3e9";
@@ -57,5 +61,7 @@ export function cardElement(spec, portraitDataUri) {
 export async function renderCard(spec, portrait = null) {
   const uri = portrait ? `data:image/jpeg;base64,${Buffer.from(portrait).toString("base64")}` : null;
   const svg = await satori(cardElement(spec, uri), { width: CARD_W, height: CARD_H, fonts: FONTS });
-  return new Resvg(svg, { fitTo: { mode: "width", value: CARD_W }, font: { loadSystemFonts: false } }).render().asPng();
+  const resvg = new Resvg(svg, { fitTo: { mode: "width", value: CARD_W } });
+  const image = resvg.render();
+  try { return Buffer.from(image.asPng()); } finally { image.free(); resvg.free(); }
 }
