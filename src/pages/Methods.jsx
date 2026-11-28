@@ -286,8 +286,9 @@ export default function Methods() {
       <h2 id="photos">Photos</h2>
       <p>
         Members of Congress are shown with their official portraits, from the public-domain collection kept by the
-        unitedstates project. State officials are shown with the official photo Open States links to, loaded from the
-        legislature's or office's own website. Where a source has no photo, none is shown. County and city officials
+        unitedstates project. State officials are shown with the photo Open States links to only when it is on the
+        legislature's or state's own website (a .gov or .us address, or the legislature's official site); photos from
+        campaign, caucus, news or image-search sites are left out, so no party's photos come from its own sites. Where a source has no photo, none is shown. County and city officials
         are shown without photos everywhere, because no source collects them for every place.
       </p>
 

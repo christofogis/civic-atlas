@@ -39,8 +39,9 @@ Two goals; every feature should serve at least one. More data sources are not a 
   supervisors, agendas and minutes; OC Public Works GIS for city boundaries. State officials come first,
   because a resident's lookup must show every level the same way.
 - Photos (Chris, Nov 26, 2026): official portraits only where a data source provides them for a whole
-  level: Congress (unitedstates/images) and state officials (Open States photo links, loaded from the
-  official site). No photos for county or city officials anywhere, so every place looks the same; don't
+  level: Congress (unitedstates/images) and state officials (Open States photo links, only when hosted on a
+  government site: .gov/.us or the legislature's official domain; decided Nov 28, 2026, because campaign and
+  caucus photo links made coverage differ by party). No photos for county or city officials anywhere, so every place looks the same; don't
   collect them by hand or ask offices for them. A missing photo just isn't shown.
 - Party is shown as a letter badge (D blue, R red, independents and others neutral grey), always with
   the letter, on names only — never as page or section color. One exception (Chris, Nov 24, 2026): the

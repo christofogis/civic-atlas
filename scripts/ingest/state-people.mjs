@@ -7,6 +7,18 @@ import { parse } from "yaml";
 import { getClient, fetchAll, upsertBatches, withRun } from "./lib.mjs";
 import { districtKey } from "../../lib/stateleg.js";
 
+// Photos only from the state's or legislature's own site (Chris, Nov 28, 2026). About a fifth of
+// Open States photo links point to campaign, caucus, news or image-search sites, and in some chambers
+// one party's photos come from its caucus site while the other has none, so coverage differed by
+// party. Government hosts (.gov, .us) plus official legislature sites on other domains.
+const OFFICIAL_PHOTO_HOSTS = ["senate.mn", "lawmakerdocuments.blob.core.usgovcloudapi.net"];
+export function officialPhoto(url) {
+  if (!/^https:\/\//.test(url ?? "")) return null;
+  let host;
+  try { host = new URL(url).hostname.toLowerCase(); } catch { return null; }
+  const ok = /\.(gov|us)$/.test(host) || OFFICIAL_PHOTO_HOSTS.some((h) => host === h || host.endsWith(`.${h}`));
+  return ok ? url : null;
+}
 const DIR = join(process.env.OPENSTATES_DIR ?? "/tmp/osp", "data");
 const db = getClient();
 const iso = (d) => (d == null ? null : d instanceof Date ? d.toISOString().slice(0, 10) : String(d).slice(0, 10));
@@ -25,8 +37,8 @@ await withRun(db, "state-people", async () => {
         people.push({
           id: y.id, state, name: y.name, given_name: y.given_name ?? null, family_name: y.family_name ?? null, party,
           email: y.email ?? null,
-          // Official photo link as Open States lists it; only https links, so pages never load mixed content.
-          image_url: /^https:\/\//.test(y.image ?? "") ? y.image : null,
+          // Photo only from an official government site (see officialPhoto); https only.
+          image_url: officialPhoto(y.image),
           offices: (y.offices ?? []).map(({ classification, address, voice, fax }) => ({ classification, address, voice, fax })),
           links: (y.links ?? []).map((l) => l.url).filter(Boolean),
           sources: (y.sources ?? []).map((l) => l.url).filter(Boolean),

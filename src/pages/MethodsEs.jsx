@@ -287,8 +287,10 @@ export default function MethodsEs() {
       <h2 id="photos">Fotos</h2>
       <p>
         Los miembros del Congreso aparecen con su retrato oficial, de la colección de dominio público que mantiene el
-        proyecto unitedstates. Los funcionarios estatales aparecen con la foto oficial que enlaza Open States, cargada
-        desde el sitio de la legislatura o de la oficina. Cuando una fuente no tiene foto, no se muestra ninguna. Los
+        proyecto unitedstates. Los funcionarios estatales aparecen con la foto que enlaza Open States solo cuando está en el
+        sitio de la legislatura o del estado (una dirección .gov o .us, o el sitio oficial de la legislatura); se omiten
+        las fotos de sitios de campaña, de bancadas, de noticias o de búsqueda de imágenes, para que las fotos de ningún
+        partido vengan de sus propios sitios. Cuando una fuente no tiene foto, no se muestra ninguna. Los
         funcionarios de condados y ciudades aparecen sin foto en todas partes, porque ninguna fuente las reúne para
         todos los lugares.
       </p>
