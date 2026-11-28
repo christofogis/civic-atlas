@@ -1132,3 +1132,13 @@ button.term:hover, button.term[aria-expanded="true"] { text-decoration-color: va
 .glance-tile .glance-link a:focus-visible, .cards > .card > h3 > a:focus-visible { outline: none; }
 .glance-tile .glance-link a:focus-visible::after,
 .cards > .card > h3 > a:focus-visible::after { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+/* On the ballot: the chart's room while seats load (no layout shift when it appears). */
+.seat-chart-slot { height: 290px; margin: 8px 0 18px; }
+@media (min-width: 700px) { .seat-chart-slot { height: 260px; } }
+
+/* After a lookup: the next things to do, as full-width rows that are easy to tap. */
+.next-steps { margin: 20px 0; padding: 14px 16px; border: 1px solid var(--border); border-radius: 8px; background: var(--surface); }
+.next-steps h3 { margin: 0 0 6px; font-size: 1rem; }
+.next-steps li a { display: block; padding: 10px 0; }
+.next-steps li + li { border-top: 1px solid var(--border); }
