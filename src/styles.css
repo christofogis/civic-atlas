@@ -1214,13 +1214,13 @@ ul.dots > li:last-child { margin-bottom: 0; }
 
 /* Lists of items under one heading elsewhere: same rule, space instead of a line between items. */
 ul.items li.item, .glance li, .events li.event-row, .roster li, .recent-meetings li, .record-items li,
-.issue-list > li, .my-reps li, .my-reps-list > li, .corrections li, .agenda-items li, .next-up li, .home-card, .tl-day {
+.issue-list > li, .my-reps li, .my-reps-list > li, .corrections li, .agenda-items li, .next-up li {
   border-bottom: 0; }
 ul.items { list-style: disc; padding-left: 1.25rem; }
 ul.items li.item { display: list-item; padding: 0 0 0 2px; margin: 0 0 10px; }
 ul.items li.item::marker { color: var(--faint); }
 .events li.event-row { padding: 6px 0; }
-.my-reps-list > li + li, .tl-day + .tl-day { border-top: 1px solid var(--border); }
+.my-reps-list > li + li { border-top: 1px solid var(--border); }
 .glance h2 { border-bottom: 0; padding-bottom: 0; }
 .glance li { padding: 6px 0; }
 .agenda > li > ul { list-style: disc; padding-left: 1.25rem; }
