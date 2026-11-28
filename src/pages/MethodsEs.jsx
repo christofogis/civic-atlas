@@ -439,8 +439,8 @@ export default function MethodsEs() {
       <p>
         Cada semana, un programa elige datos al azar de este sitio (cómo votaron los miembros, quién patrocinó y copatrocinó
         proyectos, números de ley, ingresos de campaña) y compara cada uno con el registro original del Secretario de la Cámara,
-        el Senado, GovInfo y la FEC. Toda diferencia se investiga, y los errores que encontramos se listan en la página de
-        correcciones.
+        el Senado, GovInfo y la FEC. Toda diferencia se investiga, y los errores que encontramos se listan en la
+        {" "}<Link to="/corrections">página de correcciones</Link>.
       </p>
       <AccuracyStatus />
 
@@ -649,9 +649,17 @@ export default function MethodsEs() {
         de un miembro indica cuándo se actualizó. La cobertura empieza con el 118.º Congreso (enero de 2023).
       </p>
 
-      <h2>Correcciones</h2>
+      <h2 id="corrections">Correcciones</h2>
       <p>
-        Si algo aquí está mal, se corregirá y la corrección se anotará en el <Link to="/corrections">registro público de correcciones</Link>.
+        Si algo aquí está mal, se corregirá y la corrección se anotará en el <Link to="/corrections">registro público de
+        correcciones</Link>: la fecha, qué mostraba el sitio, qué muestra ahora, la fuente oficial y si la causa fue nuestro
+        propio código, un conjunto de datos que leemos o el propio registro oficial. Cada entrada enlaza el cambio en el código
+        público del sitio. El registro se guarda en el repositorio de código del sitio, así que no se puede editar sin que
+        quede constancia pública, y también se publica como <a href="/data/corrections.json">datos</a>. Nuestras correcciones
+        al conjunto de datos congress-legislators se listan automáticamente, indicando si las informamos al conjunto de datos
+        y si este ya tiene el cambio. Para informar un error, abra un caso (issue)
+        en <a href="https://github.com/christofogis/civic-atlas/issues/new">GitHub</a> o use "Informar un error en esta
+        página" al pie de cualquier página.
       </p>
     </main>
   );

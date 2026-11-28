@@ -1,0 +1,346 @@
+{
+  "about": "Public corrections log, shown at /corrections (newest first) and published as /data/corrections.json. One entry for each fix that changed a fact the site showed the public. 'shown' is what the site showed, 'now' what it shows after the fix, in plain words, without overstating. cause: code (our own code or AI text), upstream (a dataset we read, such as congress-legislators or Open States, differed from the official record) or source (the official record itself was wrong and was later corrected). Each entry links its commit(s) and the official source. Leadership corrections to congress-legislators are added automatically from data/corrections/leadership.json. Add an entry here in the same commit as the fix.",
+  "entries": [
+    {
+      "id": "state-photo-sources",
+      "date": "2026-11-28",
+      "area": "state",
+      "shown": {
+        "en": "About a fifth of state officials' photos came from campaign, caucus, news or image-search sites, and in some legislative chambers one party had photos far more often than the other (for example, Indiana House: Republicans 100%, Democrats 7%).",
+        "es": "Cerca de una quinta parte de las fotos de funcionarios estatales venían de sitios de campañas, bancadas, noticias o buscadores de imágenes, y en algunas cámaras legislativas un partido tenía foto mucho más a menudo que el otro (por ejemplo, la Cámara de Indiana: republicanos 100 %, demócratas 7 %)."
+      },
+      "now": {
+        "en": "Only photos hosted on a government site are shown, and no one gets a photo in a chamber where the two parties' photo coverage differs by more than 20 points.",
+        "es": "Solo se muestran fotos alojadas en un sitio del gobierno, y nadie tiene foto en una cámara donde la cobertura de fotos de los dos partidos difiere en más de 20 puntos."
+      },
+      "cause": "upstream",
+      "commits": ["2960e0d11c50", "52b57274ab10"],
+      "sources": [{ "label": "Open States people data", "url": "https://github.com/openstates/people" }]
+    },
+    {
+      "id": "ai-summaries-audit-2026-11",
+      "date": "2026-11-28",
+      "area": "ai",
+      "shown": {
+        "en": "Eight AI-written bill summaries named only some of the bills a rule resolution covers (H.Res. 951, H.Res. 1275), repeated bills' purpose-stating titles as if they were descriptions (H.Res. 780, 953, 1042, 1423), commented on the source instead of the bill (S. 1318), or stated an effect the CRS summary does not (H.R. 2913, \"helps Ukraine\").",
+        "es": "Ocho resúmenes de proyectos de ley escritos por IA nombraban solo algunos de los proyectos que cubre una resolución de reglas (H.Res. 951, H.Res. 1275), repetían como descripción títulos que afirman un propósito (H.Res. 780, 953, 1042, 1423), comentaban la fuente en vez del proyecto (S. 1318) o afirmaban un efecto que el resumen del CRS no menciona (H.R. 2913, \"ayuda a Ucrania\")."
+      },
+      "now": {
+        "en": "All eight were taken down and sent back for rewriting. The rules for writing and checking summaries now require naming every bill in such a list or none, and giving a title only in quotation marks as a title.",
+        "es": "Los ocho se retiraron y se devolvieron para reescribirlos. Las reglas para escribir y revisar resúmenes ahora exigen nombrar todos los proyectos de esa lista o ninguno, y dar un título solo entre comillas, como título."
+      },
+      "cause": "code",
+      "commits": ["17d9562e5097", "b5f42c324fe7", "b19504eea098"],
+      "sources": [
+        { "label": "H.Res. 951 (119th Congress), Congress.gov", "url": "https://www.congress.gov/bill/119th-congress/house-resolution/951" },
+        { "label": "H.R. 2913 (119th Congress), Congress.gov", "url": "https://www.congress.gov/bill/119th-congress/house-bill/2913" }
+      ]
+    },
+    {
+      "id": "roll-call-dates-eastern",
+      "date": "2026-11-27",
+      "area": "votes",
+      "shown": {
+        "en": "Roll calls taken after about 7 p.m. Eastern were dated the next day in member timelines, CSV downloads and the quiz (for example, House roll call 25 of 2023, taken at 9:23 p.m. on Jan 9, 2023), and votes taken after midnight could show the previous day to readers on Pacific time.",
+        "es": "Las votaciones nominales realizadas después de las 7 p. m. hora del Este aparecían con la fecha del día siguiente en las cronologías de los miembros, las descargas CSV y el cuestionario (por ejemplo, la votación 25 de 2023 de la Cámara, a las 9:23 p. m. del 9 de enero de 2023), y las votaciones después de medianoche podían mostrar el día anterior a lectores en la hora del Pacífico."
+      },
+      "now": {
+        "en": "Every roll call is dated by the day in Washington when it was taken.",
+        "es": "Cada votación nominal lleva la fecha del día en Washington en que se realizó."
+      },
+      "cause": "code",
+      "commits": ["2a68f3a417cb"],
+      "sources": [{ "label": "House roll call 25, 2023 (Clerk of the House)", "url": "https://clerk.house.gov/Votes/202325" }]
+    },
+    {
+      "id": "gaetz-119th-attendance",
+      "date": "2026-11-27",
+      "area": "votes",
+      "shown": {
+        "en": "Matt Gaetz's page said he had voted on 0% of roll calls in the 119th Congress, counted from the opening quorum call where the Clerk lists members-elect; he resigned in November 2024 and never took that seat.",
+        "es": "La página de Matt Gaetz decía que había votado en el 0 % de las votaciones nominales del 119.º Congreso, contando la llamada de quórum inicial en la que el Secretario lista a los miembros electos; renunció en noviembre de 2024 y nunca ocupó ese escaño."
+      },
+      "now": {
+        "en": "Vote figures are shown only for a Congress the member served in. The roll call itself is still listed as recorded.",
+        "es": "Las cifras de votación se muestran solo para un Congreso en el que el miembro sirvió. La votación misma sigue listada como se registró."
+      },
+      "cause": "code",
+      "commits": ["6d6a73237bfc"],
+      "sources": [{ "label": "House roll call 1, 2025 (Clerk of the House)", "url": "https://clerk.house.gov/Votes/20251" }],
+      "page": "/member/G000578"
+    },
+    {
+      "id": "special-senate-elections",
+      "date": "2026-11-27",
+      "area": "elections",
+      "shown": {
+        "en": "On the ballot left out Nebraska's 2024 and Florida's 2026 special Senate elections, because the appointed senator's term ends on the day of the special election.",
+        "es": "En la boleta omitía las elecciones especiales al Senado de Nebraska en 2024 y de Florida en 2026, porque el período del senador designado termina el día de la elección especial."
+      },
+      "now": {
+        "en": "Both special elections are listed in their years.",
+        "es": "Ambas elecciones especiales aparecen en sus años."
+      },
+      "cause": "code",
+      "commits": ["4a76be1e77a6"],
+      "sources": [
+        { "label": "Pete Ricketts, Biographical Directory of the U.S. Congress", "url": "https://bioguide.congress.gov/search/bio/R000618" },
+        { "label": "Ashley Moody, Biographical Directory of the U.S. Congress", "url": "https://bioguide.congress.gov/search/bio/M001244" }
+      ],
+      "page": "/on-the-ballot?year=2026"
+    },
+    {
+      "id": "failed-veto-overrides",
+      "date": "2026-11-27",
+      "area": "bills",
+      "shown": {
+        "en": "The pages for H.R. 504 and H.R. 131 (119th Congress) said each would become law only if both chambers overrode the veto, as if that were still ahead, though the House override votes failed on Jan 8, 2026.",
+        "es": "Las páginas de H.R. 504 y H.R. 131 (119.º Congreso) decían que cada uno se convertiría en ley solo si ambas cámaras anulaban el veto, como si eso estuviera pendiente, aunque las votaciones de la Cámara para anularlo fracasaron el 8 de enero de 2026."
+      },
+      "now": {
+        "en": "The pages say the override vote failed and the veto stands.",
+        "es": "Las páginas dicen que la votación para anular el veto fracasó y que el veto se mantiene."
+      },
+      "cause": "code",
+      "commits": ["090bfecc3a55"],
+      "sources": [
+        { "label": "House roll call 8, 2026 (Clerk of the House)", "url": "https://clerk.house.gov/Votes/20268" },
+        { "label": "House roll call 9, 2026 (Clerk of the House)", "url": "https://clerk.house.gov/Votes/20269" }
+      ],
+      "page": "/bill/119/hr/504"
+    },
+    {
+      "id": "pac-totals",
+      "date": "2026-11-27",
+      "area": "money",
+      "shown": {
+        "en": "The list of PACs and other committees that gave the most to a campaign was built from the campaign's 100 largest single contributions, so it was not a ranking: committees that gave in several smaller amounts were left out (for example, two of Sen. Coons's larger 2026-cycle givers).",
+        "es": "La lista de PAC y otros comités que más dieron a una campaña se armaba con las 100 contribuciones individuales más grandes de la campaña, así que no era una clasificación: quedaban fuera comités que dieron en varias cantidades menores (por ejemplo, dos de los mayores donantes del senador Coons en el ciclo 2026)."
+      },
+      "now": {
+        "en": "Each committee's total for the cycle comes from the FEC's bulk file of contributions from committees to candidates.",
+        "es": "El total de cada comité en el ciclo viene del archivo masivo de la FEC de contribuciones de comités a candidatos."
+      },
+      "cause": "code",
+      "commits": ["e6c8b54e9191", "604da9eaa277"],
+      "sources": [{ "label": "FEC bulk data: contributions from committees to candidates", "url": "https://www.fec.gov/data/browse-data/?tab=bulk-data" }],
+      "page": "/member/C001088"
+    },
+    {
+      "id": "lobbying-old-bill-numbers",
+      "date": "2026-11-27",
+      "area": "lobbying",
+      "shown": {
+        "en": "Lobbying reports that cite a bill by its number from an earlier Congress were linked to the unrelated bill with that number in the current Congress (for example, \"Equality Act (H.R. 5 / S. 393)\" in Amazon's Q4 2023 report linked to the Parents Bill of Rights Act).",
+        "es": "Los informes de cabildeo que citan un proyecto por su número de un Congreso anterior se vinculaban al proyecto sin relación que tiene ese número en el Congreso actual (por ejemplo, \"Equality Act (H.R. 5 / S. 393)\" en el informe de Amazon del 4.º trimestre de 2023 se vinculaba a la Parents Bill of Rights Act)."
+      },
+      "now": {
+        "en": "When a bill's name is written next to its number, the number is linked only if the name fits that bill's title. Stored links are rechecked as each filing is read again.",
+        "es": "Cuando el nombre de un proyecto aparece junto a su número, el número se vincula solo si el nombre coincide con el título de ese proyecto. Los vínculos guardados se revisan a medida que se vuelve a leer cada informe."
+      },
+      "cause": "code",
+      "commits": ["3e9cc4d48fa5"],
+      "sources": [
+        { "label": "LDA.gov lobbying disclosures", "url": "https://lda.gov/" },
+        { "label": "Equality Act, H.R. 15 (118th Congress), Congress.gov", "url": "https://www.congress.gov/bill/118th-congress/house-bill/15" }
+      ]
+    },
+    {
+      "id": "oc-board-supplemental-items",
+      "date": "2026-11-27",
+      "area": "local",
+      "shown": {
+        "en": "On the Orange County page, supplemental agenda items (such as S25A) and their votes from the Oct 27, Nov 3 and Nov 17, 2026 Board of Supervisors meetings were merged into the regular item printed before them, so some supervisors' recorded votes appeared under the wrong item.",
+        "es": "En la página del Condado de Orange, los asuntos suplementarios de la agenda (como S25A) y sus votaciones de las reuniones de la Junta de Supervisores del 27 de octubre y del 3 y 17 de noviembre de 2026 se unían al asunto regular impreso antes, así que algunas votaciones registradas de los supervisores aparecían bajo el asunto equivocado."
+      },
+      "now": {
+        "en": "The 18 supplemental items are their own items, each with the votes the minutes record for it.",
+        "es": "Los 18 asuntos suplementarios son asuntos propios, cada uno con las votaciones que las actas registran para él."
+      },
+      "cause": "code",
+      "commits": ["922823d1f691", "4619dac330ea"],
+      "sources": [{ "label": "Board of Supervisors minutes, Oct 27, 2026 (County of Orange)", "url": "https://ocagendaext.oc.gov/ExtDocViewer/89d6e8b9-5fe6-4874-92b0-2849cacde37a" }],
+      "page": "/local/ca-orange"
+    },
+    {
+      "id": "ca-statewide-since",
+      "date": "2026-11-27",
+      "area": "state",
+      "shown": {
+        "en": "The address lookup said California's governor, lieutenant governor, attorney general and secretary of state had been in office since Jan 2, 2023, the start of their current terms.",
+        "es": "La búsqueda por dirección decía que el gobernador, la vicegobernadora, el fiscal general y la secretaria de estado de California estaban en el cargo desde el 2 de enero de 2023, el inicio de sus períodos actuales."
+      },
+      "now": {
+        "en": "Back-to-back terms in the same office are counted together: Gavin Newsom and Eleni Kounalakis since Jan 7, 2019, Rob Bonta since Apr 23, 2021, and Shirley Weber since Jan 29, 2021.",
+        "es": "Los períodos consecutivos en el mismo cargo se cuentan juntos: Gavin Newsom y Eleni Kounalakis desde el 7 de enero de 2019, Rob Bonta desde el 23 de abril de 2021 y Shirley Weber desde el 29 de enero de 2021."
+      },
+      "cause": "code",
+      "commits": ["19c2ec8fc226"],
+      "sources": [{ "label": "Open States: California executive officers", "url": "https://github.com/openstates/people/tree/main/data/ca/executive" }]
+    },
+    {
+      "id": "ca-vacant-seats",
+      "date": "2026-11-27",
+      "area": "state",
+      "shown": {
+        "en": "An address in California Senate District 10 or Assembly District 3, both vacant, showed no state senator or Assembly member and nothing saying a seat was missing.",
+        "es": "Una dirección en el Distrito 10 del Senado o el Distrito 3 de la Asamblea de California, ambos vacantes, no mostraba senador estatal ni asambleísta, ni nada que dijera que faltaba un escaño."
+      },
+      "now": {
+        "en": "The seat appears with a note that no one is listed and that it may be vacant or awaiting a new member.",
+        "es": "El escaño aparece con una nota de que no hay nadie listado y de que puede estar vacante o en espera de un nuevo miembro."
+      },
+      "cause": "code",
+      "commits": ["1194bb99725c"],
+      "sources": [
+        { "label": "California State Senate: senators", "url": "https://www.senate.ca.gov/senators" },
+        { "label": "California State Assembly: members", "url": "https://www.assembly.ca.gov/assemblymembers" }
+      ]
+    },
+    {
+      "id": "party-changes-within-term",
+      "date": "2026-11-27",
+      "area": "members",
+      "shown": {
+        "en": "Members who changed party partway through a term were shown with their later party for the whole term (for example, Kevin Kiley's bills and cosponsorships from before Mar 9, 2026 listed him as an Independent, and Joe Manchin's term list said Independent from 2019).",
+        "es": "Los miembros que cambiaron de partido a mitad de un período aparecían con su partido posterior durante todo el período (por ejemplo, los proyectos y copatrocinios de Kevin Kiley anteriores al 9 de marzo de 2026 lo mostraban como independiente, y la lista de períodos de Joe Manchin decía independiente desde 2019)."
+      },
+      "now": {
+        "en": "Each stretch is shown with its dates, and bill pages use the party a sponsor or cosponsor had on that day.",
+        "es": "Cada tramo se muestra con sus fechas, y las páginas de proyectos usan el partido que el patrocinador o copatrocinador tenía ese día."
+      },
+      "cause": "code",
+      "commits": ["90edee17daf1"],
+      "sources": [
+        { "label": "Kevin Kiley, Biographical Directory of the U.S. Congress", "url": "https://bioguide.congress.gov/search/bio/K000401" },
+        { "label": "Joe Manchin III, Biographical Directory of the U.S. Congress", "url": "https://bioguide.congress.gov/search/bio/M001183" }
+      ],
+      "page": "/member/K000401"
+    },
+    {
+      "id": "sb895-march-2028",
+      "date": "2026-11-27",
+      "area": "measures",
+      "shown": {
+        "en": "The California 2028 ballot measures page left out SB 895 (California Science and Health Research Bond Act), which the Secretary of State lists for the March 7, 2028 ballot, because only the November section of the state's list was read.",
+        "es": "La página de medidas en la boleta de California 2028 omitía SB 895 (California Science and Health Research Bond Act), que la Secretaría de Estado lista para la boleta del 7 de marzo de 2028, porque solo se leía la sección de noviembre de la lista estatal."
+      },
+      "now": {
+        "en": "Every 2028 election on the state's lists is read, SB 895 is listed for March 7, 2028, and each measure shows its election.",
+        "es": "Se leen todas las elecciones de 2028 de las listas estatales, SB 895 aparece para el 7 de marzo de 2028 y cada medida muestra su elección."
+      },
+      "cause": "code",
+      "commits": ["4cac0aecb8d5", "fd3369b4fd37"],
+      "sources": [{ "label": "California Secretary of State: qualified statewide ballot measures", "url": "https://www.sos.ca.gov/elections/ballot-measures/qualified-ballot-measures" }],
+      "page": "/measures"
+    },
+    {
+      "id": "small-fixes-2026-11-27",
+      "date": "2026-11-27",
+      "area": "several",
+      "shown": {
+        "en": "Smaller fixes: a senator's money summary said \"raised for the 2026 election\" for two-year cycle totals; the FEC's smallest donation size was labeled \"under $200\" instead of \"$200 and under\"; 17 donor employer entries such as \"SELF - EMPLOYED\" or \"RETIRED.\" appeared as employers; 132 Senate trade asset names showed raw HTML codes such as \"&nbsp;\"; and On the ballot implied every Orange County supervisor seat was on the November 2026 ballot, though District 2 was decided in the June primary.",
+        "es": "Correcciones menores: el resumen de dinero de un senador decía \"recaudó para la elección de 2026\" con totales del ciclo de dos años; el tamaño más pequeño de donación de la FEC decía \"menos de $200\" en vez de \"$200 o menos\"; 17 empleadores de donantes como \"SELF - EMPLOYED\" o \"RETIRED.\" aparecían como empleadores; 132 nombres de activos en operaciones del Senado mostraban códigos HTML como \"&nbsp;\"; y En la boleta daba a entender que todos los escaños de supervisor del Condado de Orange estaban en la boleta de noviembre de 2026, aunque el Distrito 2 se decidió en la primaria de junio."
+      },
+      "now": {
+        "en": "Money figures say \"in the 2025–2026 election cycle\"; the size label matches the FEC's; those entries are no longer shown as employers; the names read as filed; and the page says how supervisor seats are decided, with a link to the Registrar's results.",
+        "es": "Las cifras de dinero dicen \"en el ciclo electoral 2025–2026\"; la etiqueta de tamaño coincide con la de la FEC; esas entradas ya no aparecen como empleadores; los nombres se leen como se presentaron; y la página explica cómo se deciden los escaños de supervisor, con un enlace a los resultados del Registro de Votantes."
+      },
+      "cause": "code",
+      "commits": ["e6c8b54e9191", "82a2491ee10e", "686bf6474955", "1edf46a795aa"],
+      "sources": [
+        { "label": "FEC: campaign finance data", "url": "https://www.fec.gov/data/" },
+        { "label": "Senate financial disclosures (eFD)", "url": "https://efdsearch.senate.gov/" },
+        { "label": "Orange County Registrar of Voters", "url": "https://www.ocvote.gov/" }
+      ]
+    },
+    {
+      "id": "on-the-ballot-2026-past-senators",
+      "date": "2026-11-26",
+      "area": "elections",
+      "shown": {
+        "en": "On the ballot's 2026 list showed 39 Senate seats, because senators who left in early 2025 (for example, to join the administration) were counted along with their successors.",
+        "es": "La lista de 2026 de En la boleta mostraba 39 escaños del Senado, porque se contaban senadores que se fueron a principios de 2025 (por ejemplo, para unirse al gobierno) junto con sus sucesores."
+      },
+      "now": {
+        "en": "For an election that has passed, only the people who held each seat on election day are listed.",
+        "es": "Para una elección pasada, solo se listan las personas que ocupaban cada escaño el día de la elección."
+      },
+      "cause": "code",
+      "commits": ["4342671d5cc1"],
+      "sources": [{ "label": "U.S. Senate: senators by class", "url": "https://www.senate.gov/senators/index.htm" }],
+      "page": "/on-the-ballot?year=2026"
+    },
+    {
+      "id": "three-branches-vacancies",
+      "date": "2026-11-24",
+      "area": "members",
+      "shown": {
+        "en": "The Three branches page said 433 House members were serving in a way that read as if the House had 433 seats.",
+        "es": "La página de los tres poderes decía que 433 miembros servían en la Cámara de una forma que daba a entender que la Cámara tenía 433 escaños."
+      },
+      "now": {
+        "en": "It shows 435 seats and how many are vacant.",
+        "es": "Muestra 435 escaños y cuántos están vacantes."
+      },
+      "cause": "code",
+      "commits": ["a52587a0a1c7"],
+      "sources": [{ "label": "Clerk of the House: House membership", "url": "https://clerk.house.gov/Members" }],
+      "page": "/government"
+    },
+    {
+      "id": "short-titles",
+      "date": "2026-11-24",
+      "area": "bills",
+      "shown": {
+        "en": "Bill pages showed the long official title even when a bill had a short title (for example \"To amend title 38...\" instead of the bill's name).",
+        "es": "Las páginas de proyectos mostraban el título oficial largo aunque el proyecto tuviera un título corto (por ejemplo \"To amend title 38...\" en vez del nombre del proyecto)."
+      },
+      "now": {
+        "en": "Short titles are read from the Library of Congress record for about 30,000 bills.",
+        "es": "Los títulos cortos se leen del registro de la Biblioteca del Congreso para unos 30,000 proyectos."
+      },
+      "cause": "code",
+      "commits": ["7f489565a381"],
+      "sources": [{ "label": "GovInfo Bill Status bulk data", "url": "https://www.govinfo.gov/bulkdata/BILLSTATUS" }],
+      "page": "/bills"
+    },
+    {
+      "id": "senate-amendment-votes",
+      "date": "2026-11-24",
+      "area": "votes",
+      "shown": {
+        "en": "173 Senate votes on amendments, motions to table and budget waivers were not linked to the bill they concerned, so they had no issue and did not appear on bill pages.",
+        "es": "173 votaciones del Senado sobre enmiendas, mociones para dejar sobre la mesa y dispensas presupuestarias no estaban vinculadas al proyecto al que se referían, así que no tenían tema y no aparecían en las páginas de proyectos."
+      },
+      "now": {
+        "en": "Each is linked to its bill using the amended document listed in the Senate's record.",
+        "es": "Cada una está vinculada a su proyecto mediante el documento enmendado que figura en el registro del Senado."
+      },
+      "cause": "code",
+      "commits": ["e5d0b77a1476", "a81bfe70f6e5"],
+      "sources": [{ "label": "U.S. Senate roll call votes", "url": "https://www.senate.gov/legislative/votes_new.htm" }],
+      "page": "/bill/119/hr/1"
+    },
+    {
+      "id": "118th-votes-missing",
+      "date": "2026-11-24",
+      "area": "votes",
+      "shown": {
+        "en": "Roll-call votes from 2023 and 2024 (the 118th Congress) were missing, although the site said its coverage started in 2023, so attendance and party-line figures for that Congress were not shown.",
+        "es": "Faltaban las votaciones nominales de 2023 y 2024 (el 118.º Congreso), aunque el sitio decía que su cobertura empezaba en 2023, así que no se mostraban las cifras de asistencia y de votación con el partido de ese Congreso."
+      },
+      "now": {
+        "en": "All 1,241 House and 691 Senate roll calls from the 118th Congress were added and the figures recalculated.",
+        "es": "Se agregaron las 1,241 votaciones de la Cámara y las 691 del Senado del 118.º Congreso y se recalcularon las cifras."
+      },
+      "cause": "code",
+      "commits": ["4ab8967a82e5"],
+      "sources": [
+        { "label": "Clerk of the House: roll call votes", "url": "https://clerk.house.gov/Votes" },
+        { "label": "U.S. Senate roll call votes", "url": "https://www.senate.gov/legislative/votes_new.htm" }
+      ],
+      "page": "/member/S000033"
+    }
+  ]
+}

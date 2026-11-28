@@ -23,7 +23,7 @@ export const PAGES = [
   ["/search?q=padilla", ["Alex Padilla"]],
   ["/compare?a=P000145&b=S000033", ["Votes where they differed"]],
   ["/glossary", ["Cloture"]],
-  ["/corrections", ["What was wrong"]],
+  ["/corrections", ["What the site showed", "How to report an error", "Official source"]],
   ["/nominations", ["Nominations", "Confirmation"]],
   ["/hearing/118927", ["Before the Whistle", "Witnesses", "Mike Sena", "Written statement", "Watch", "Committee members", "Majority"]],
   ["/hearing/338900", ["export controls", "Senate committees post witness lists", "committee's website"]],

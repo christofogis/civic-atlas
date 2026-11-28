@@ -422,7 +422,7 @@ export default function Methods() {
         Every week, a program picks random facts from this site (how members voted, who sponsored and cosponsored
         bills, law numbers, campaign receipts) and compares each with the original record at the House Clerk,
         the Senate, GovInfo and the FEC. Any difference is investigated, and errors we find are listed on the
-        corrections page.
+        {" "}<Link to="/corrections">corrections page</Link>.
       </p>
       <AccuracyStatus />
 
@@ -626,10 +626,18 @@ export default function Methods() {
         page shows when it was last updated. Coverage starts with the 118th Congress (January 2023).
       </p>
 
-      <h2>Corrections</h2>
+      <h2 id="corrections">Corrections</h2>
       <p>
         If something here is wrong, it will be corrected and the correction noted in the
-        public <Link to="/corrections">corrections log</Link>.
+        public <Link to="/corrections">corrections log</Link>: the date, what the site showed, what it shows now,
+        the official source, and whether the cause was our own code, a dataset we read, or the official record
+        itself. Each entry links the change in the site's public code. The log is kept in the site's code
+        repository, so it can't be edited without a public record, and it is also published
+        as <a href="/data/corrections.json">data</a>. Our corrections to the congress-legislators dataset are
+        listed automatically, with whether we've reported them to the dataset and whether the dataset has
+        caught up. To report an error, open an issue
+        on <a href="https://github.com/christofogis/civic-atlas/issues/new">GitHub</a> or use "Report an error on
+        this page" at the bottom of any page.
       </p>
     </main>
   );

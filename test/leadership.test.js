@@ -148,3 +148,10 @@ test("leadership corrections apply until the dataset has them", () => {
   assert.equal(b.retired.length, 2);
   assert.equal(b.roles.every((r) => r.correction_source === null), true);
 });
+
+test("a retired leadership correction is no longer applied", () => {
+  const roles = [{ bioguide_id: "H1", chamber: "house", title: "Chair", start_date: "2025-01-03", end_date: null }];
+  const out = applyLeadershipCorrections(roles, [{ action: "end", bioguide_id: "H1", title: "Chair", start_date: "2025-01-03", end_date: "2026-04-15", source: "s", retired: "2026-12-01" }]);
+  assert.equal(out.roles[0].end_date, null);
+  assert.equal(out.retired.length, 0);
+});

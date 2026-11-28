@@ -120,11 +120,13 @@ export function mapLeadership(legislators) {
 const ROLE_FIELDS = ["chamber", "end_date", "correction_source"];
 
 // Our corrections (data/corrections/leadership.json), each tied to an official source. One the
-// dataset already reflects is left out and reported, so it can be deleted from the file.
+// dataset already reflects is left out and reported, so its 'retired' date can be set in the file
+// (kept there for the public corrections log). Retired entries are skipped.
 export function applyLeadershipCorrections(roles, corrections) {
   const out = roles.map((r) => ({ ...r, correction_source: null }));
   const retired = [];
   for (const c of corrections) {
+    if (c.retired) continue;
     if (c.action === "end") {
       const r = out.find((x) => x.bioguide_id === c.bioguide_id && x.title === c.title && x.start_date === c.start_date);
       if (!r || r.end_date) { retired.push(c); continue; }
@@ -160,7 +162,7 @@ async function main() {
   const { members, terms, periods } = mapped;
   const corrections = JSON.parse(readFileSync(new URL("../../data/corrections/leadership.json", import.meta.url), "utf8")).corrections;
   const { roles, retired } = applyLeadershipCorrections(mapped.roles, corrections);
-  for (const c of retired) console.log(`correction no longer needed (dataset has it; delete from data/corrections/leadership.json): ${c.action} ${c.bioguide_id} ${c.title}`);
+  for (const c of retired) console.log(`correction no longer needed (dataset has it; set its 'retired' date in data/corrections/leadership.json): ${c.action} ${c.bioguide_id} ${c.title}`);
   console.log(`source: ${current.length} current + ${recentFormer.length} former members, ${terms.length} terms (${periods.length} party periods), ${roles.length} leadership roles`);
 
   if (dryRun) {
