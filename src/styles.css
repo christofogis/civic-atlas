@@ -1085,6 +1085,18 @@ html.slate body { background: var(--bg); }
 .plain-summary ul { margin: 0.35rem 0 0; padding-left: 1.2rem; }
 .plain-summary li { margin: 0.15rem 0; }
 .plain-summary .parts-ai-label { margin-top: 0.4rem; }
+/* "Explain it simply": swaps the summary text in place. A 24px tap target (WCAG 2.5.8). */
+.plain-summary .simple-toggle { display: inline-block; margin-top: 0.35rem; padding-block: 3px; font-size: 0.88rem; }
+/* A glossary term inside a summary or vote question: the words as printed, dotted underline, tap for
+   the definition. Same color as the text around it, so it doesn't read as a link to another page. */
+.term-wrap { position: relative; }
+button.term { background: none; border: 0; padding: 0; margin: 0; font: inherit; color: inherit; line-height: inherit; text-align: inherit; cursor: pointer;
+  text-decoration: underline dotted; text-decoration-color: var(--muted); text-underline-offset: 3px; text-decoration-thickness: 1.5px; position: relative; border-radius: 3px; }
+button.term::after { content: ""; position: absolute; inset: -4px -2px; }
+button.term:hover, button.term[aria-expanded="true"] { text-decoration-color: var(--accent); color: var(--accent); }
+/* Placed on screen under the word by Terms.jsx, so a clamped text box can't cut it off. */
+.explain-pop.term-pop { position: fixed; top: 0; left: 0; }
+.term-pop a { font-size: 0.84rem; }
 .plain-lead { display: block; font-size: 0.88rem; line-height: 1.45; color: var(--muted); margin-top: 0.15rem; }
 .ai-tag { display: inline-block; font-size: 0.68rem; font-weight: 600; letter-spacing: 0.03em; padding: 0 0.3em; border: 1px solid var(--border-strong); border-radius: 3px; color: var(--muted); text-decoration: none; vertical-align: 0.08em; }
 .crs-official > summary { cursor: pointer; font-size: 0.9rem; color: var(--muted); }

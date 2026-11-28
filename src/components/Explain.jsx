@@ -5,7 +5,7 @@ import { voteMeaning } from "../lib/voteMeaning.js";
 import { useLang, tr } from "../lib/i18n.jsx";
 
 // Open/close state for a small pop-up that closes on a tap outside or Escape.
-function usePop() {
+export function usePop() {
   const [open, setOpen] = useState(false);
   const ref = useRef(null);
   const trigger = useRef(null);
