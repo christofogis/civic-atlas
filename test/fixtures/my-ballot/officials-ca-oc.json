@@ -1,0 +1,15 @@
+{
+  "state": "CA", "districts": [45], "congress": 120,
+  "officials": [
+    { "bioguide_id": "P000145", "chamber": "senate", "state": "CA", "party": "Democrat", "start_date": "2023-01-03", "end_date": "2029-01-03", "seat_status": "current", "name": "Alex Padilla" },
+    { "bioguide_id": "S001150", "chamber": "senate", "state": "CA", "party": "Democrat", "start_date": "2025-01-03", "end_date": "2031-01-03", "seat_status": "current", "name": "Adam B. Schiff" },
+    { "bioguide_id": "X000045", "chamber": "house", "state": "CA", "district": 45, "party": "Republican", "start_date": "2027-01-03", "end_date": "2029-01-03", "seat_status": "current", "name": "Test House Member" }
+  ],
+  "state_districts": { "upper": ["35"], "lower": ["72"], "boe": [4] },
+  "local": { "covered": true, "id": "ca-orange", "county": "Orange County", "supervisor_district": 1, "place": { "name": "Los Alamitos", "type": "city" }, "city": { "id": "los-alamitos", "name": "Los Alamitos", "council_district": 2 } },
+  "state_officials": [
+    { "id": "ocd-person/aaaa", "type": "upper", "district": "35", "name": "Test Senator", "party": "Democratic", "image": "https://www.senate.ca.gov/x.jpg", "start_date": "2024-12-02" },
+    { "id": "ocd-person/bbbb", "type": "lower", "district": "72", "name": "Test Assemblymember", "party": "Republican", "image": null, "start_date": "2026-12-07" },
+    { "id": "ocd-person/cccc", "type": "governor", "district": null, "name": "Test Governor", "party": "Democratic" }
+  ]
+}

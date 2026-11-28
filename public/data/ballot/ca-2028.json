@@ -1,0 +1,65 @@
+{
+  "note": "Official voting rules and 2028 dates for the Your 2028 ballot page, hand-kept from the California Secretary of State and the Orange County Registrar of Voters. A date goes in only once one of those offices publishes it; null means not published yet. Checked with scripts/probe/ballot_dates_2028.py and ballot_dates_2028b.py.",
+  "checked": "2026-11-28",
+  "elections_source": "https://www.sos.ca.gov/elections/ballot-measures/qualified-ballot-measures",
+  "rules": [
+    {
+      "id": "register",
+      "en": "The deadline to register to vote for any election is 15 days before Election Day.",
+      "es": "La fecha límite para inscribirse para votar en cualquier elección es 15 días antes del día de la elección.",
+      "source": "https://www.sos.ca.gov/elections/voter-registration",
+      "source_title": "Secretary of State: Register to vote"
+    },
+    {
+      "id": "same-day",
+      "en": "After that deadline, eligible citizens can register and vote on the same day (conditional voter registration) within 14 days of an election, at the county elections office, a polling place or a vote center.",
+      "es": "Después de esa fecha, los ciudadanos elegibles pueden inscribirse y votar el mismo día (inscripción condicional) dentro de los 14 días antes de una elección, en la oficina electoral del condado, un lugar de votación o un centro de votación.",
+      "source": "https://www.sos.ca.gov/elections/voter-registration/same-day-reg",
+      "source_title": "Secretary of State: Same Day Voter Registration"
+    },
+    {
+      "id": "vote-by-mail",
+      "en": "County elections officials mail a vote-by-mail ballot to every active registered voter.",
+      "es": "Los funcionarios electorales del condado envían por correo una boleta de voto por correo a cada votante inscrito activo.",
+      "source": "https://www.sos.ca.gov/elections/voter-registration/vote-mail",
+      "source_title": "Secretary of State: Voting by mail"
+    },
+    {
+      "id": "early",
+      "en": "Voting locations open in every county before Election Day.",
+      "es": "Los lugares de votación abren en todos los condados antes del día de la elección.",
+      "source": "https://www.sos.ca.gov/elections/voter-registration/vote-mail",
+      "source_title": "Secretary of State: Voting by mail"
+    },
+    {
+      "id": "early-oc",
+      "county": "ca-orange",
+      "en": "In Orange County you can vote in person at any vote center in the county, including on weekends before Election Day.",
+      "es": "En el Condado de Orange puede votar en persona en cualquier centro de votación del condado, incluso los fines de semana antes del día de la elección.",
+      "source": "https://ocvote.gov/",
+      "source_title": "Orange County Registrar of Voters"
+    },
+    {
+      "id": "preregister",
+      "en": "Californians who are 16 or 17 and meet the other requirements can pre-register; the registration becomes active on their 18th birthday.",
+      "es": "Los californianos de 16 o 17 años que cumplen los demás requisitos pueden preinscribirse; la inscripción se activa el día en que cumplen 18 años.",
+      "source": "https://www.sos.ca.gov/elections/pre-register-16-vote-18",
+      "source_title": "Secretary of State: Pre-register at 16, vote at 18"
+    }
+  ],
+  "dates": {
+    "2028-03-07": { "registration_deadline": null, "vote_by_mail_mailing": null, "early_voting": null, "candidate_filing": null },
+    "2028-11-07": { "registration_deadline": null, "vote_by_mail_mailing": null, "early_voting": null, "candidate_filing": null }
+  },
+  "dates_where": [
+    { "en": "Secretary of State: upcoming elections", "es": "Secretaría de Estado: próximas elecciones", "url": "https://www.sos.ca.gov/elections/upcoming-elections" },
+    { "en": "Secretary of State: registration deadlines", "es": "Secretaría de Estado: fechas límite de inscripción", "url": "https://www.sos.ca.gov/elections/voter-registration" },
+    { "en": "Orange County Registrar: elections", "es": "Registro de Votantes del Condado de Orange: elecciones", "url": "https://ocvote.gov/elections", "county": "ca-orange" },
+    { "en": "Orange County Registrar: candidate filing", "es": "Registro de Votantes del Condado de Orange: inscripción de candidatos", "url": "https://ocvote.gov/candidates", "county": "ca-orange" }
+  ],
+  "links": [
+    { "id": "register", "en": "Register to vote (registertovote.ca.gov)", "es": "Inscribirse para votar (registertovote.ca.gov)", "url": "https://registertovote.ca.gov/", "url_es": "https://registertovote.ca.gov/es" },
+    { "id": "status", "en": "Check your registration (My Voter Status)", "es": "Consultar su inscripción (My Voter Status)", "url": "https://voterstatus.sos.ca.gov/" },
+    { "id": "ocvote", "county": "ca-orange", "en": "Orange County Registrar of Voters (ocvote.gov)", "es": "Registro de Votantes del Condado de Orange (ocvote.gov)", "url": "https://ocvote.gov/" }
+  ]
+}
