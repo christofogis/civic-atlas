@@ -123,8 +123,8 @@ export default function Week() {
     const total = chamberVotes(m.chamber);
     const where = m.chamber === "senate" ? tr("Senate", "del Senado") : tr("House", "de la Cámara");
     if (!total) return tr(`No ${where} roll calls that week.`, `No hubo votaciones nominales ${where} esa semana.`);
-    return tr(`On ${own.length} of ${total} ${where} roll calls${nv ? `; listed as Not Voting on ${nv}` : ""}.`,
-      `En ${own.length} de ${total} votaciones nominales ${where}${nv ? `; figura como Not Voting en ${nv}` : ""}.`);
+    return tr(`Recorded as voting on ${own.length - nv} of ${total} ${where} roll calls${nv ? `; Not Voting on ${nv}` : ""}.`,
+      `Registrado como votante en ${own.length - nv} de ${total} votaciones nominales ${where}${nv ? `; Not Voting en ${nv}` : ""}.`);
   };
 
   return (
@@ -137,11 +137,11 @@ export default function Week() {
         {!up ? <p className="fine">{wait}</p> : !up.ok ? <p className="notice">{tr("Couldn't load the schedule right now.", "No se pudo cargar la agenda en este momento.")}</p> : <>
           <Stats>
             {up.floorWeek
-              ? <Stat n={nFloor} href="#floor" onOpen={() => reveal("floor")} label={tr(`${s(nFloor, "item", "items")} on the House floor, week of ${date(up.floorWeek)}`, `${s(nFloor, "asunto", "asuntos")} en el pleno de la Cámara, semana del ${date(up.floorWeek)}`)} />
+              ? <Stat n={nFloor} href="#floor" onOpen={() => reveal("floor")} label={tr(`House floor ${s(nFloor, "item", "items")}`, `${s(nFloor, "asunto", "asuntos")} en el pleno`)} />
               : null}
-            <Stat n={up.meetings.length} href="#committees" onOpen={() => reveal("committees")} label={tr(`committee ${s(up.meetings.length, "hearing or meeting", "hearings and meetings")}, next two weeks`, `${s(up.meetings.length, "audiencia o reunión", "audiencias y reuniones")} de comités, próximas dos semanas`)} />
+            <Stat n={up.meetings.length} href="#committees" onOpen={() => reveal("committees")} label={tr(`committee ${s(up.meetings.length, "meeting", "meetings")}, next 2 weeks`, `${s(up.meetings.length, "reunión", "reuniones")} de comités, 2 semanas`)} />
           </Stats>
-          <ul className="facts">
+          <ul className="next-sessions">
             <li><strong>{tr("House", "Cámara")}:</strong> {up.floorWeek ? tr(`floor schedule posted for the week of ${date(up.floorWeek)}.`, `agenda del pleno publicada para la semana del ${date(up.floorWeek)}.`) : tr("hasn't posted its next floor schedule yet. It usually comes out the Friday before.", "aún no ha publicado su próxima agenda del pleno. Suele publicarse el viernes anterior.")}</li>
             <li><strong>{tr("Senate", "Senado")}:</strong> {up.convene ? tr(`next meets ${date(up.convene.event_date)}${up.convene.event_time ? ` at ${up.convene.event_time}` : ""}.`, `se reúne el ${date(up.convene.event_date)}${up.convene.event_time ? ` a las ${up.convene.event_time}` : ""}.`) : tr("hasn't announced when it next meets.", "no ha anunciado cuándo se reúne de nuevo.")}</li>
           </ul>
@@ -166,8 +166,8 @@ export default function Week() {
         {loading ? <p className="fine">{wait}</p> : !happened ? <p>{tr("No votes on record yet.", "Todavía no hay votos registrados.")}</p> : <>
           <Stats>
             <Stat n={laws.length} href="#laws" label={tr(s(laws.length, "became law", "became law"), s(laws.length, "se convirtió en ley", "se convirtieron en ley"))} />
-            <Stat n={passed.length} href="#passed" onOpen={() => reveal("passed")} label={tr("passed the House or Senate", "aprobados por la Cámara o el Senado")} />
-            <Stat n={votes.length} href="#votes" onOpen={() => reveal("votes")} label={tr(`roll-call ${s(votes.length, "vote", "votes")}, ${finals} final`, `${s(votes.length, "votación nominal", "votaciones nominales")}, ${finals} ${s(finals, "final", "finales")}`)} />
+            <Stat n={passed.length} href="#passed" onOpen={() => reveal("passed")} label={tr("passed a chamber", "aprobados por una cámara")} />
+            <Stat n={votes.length} href="#votes" onOpen={() => reveal("votes")} label={tr(`roll-call ${s(votes.length, "vote", "votes")}`, s(votes.length, "votación nominal", "votaciones nominales"))} />
           </Stats>
 
           <div id="laws" className="list-group">
@@ -175,7 +175,7 @@ export default function Week() {
             {laws.length === 0 ? <p>{tr("None that week.", "Ninguno esa semana.")}</p> : (
               <ul className="dots">{laws.map((b) => (
                 <li key={`${b.bill_type}${b.number}`}>
-                  {billLink(b)} <span lang="en">{b.short_title ?? b.title}</span>
+                  {billLink(b)} <Clamp lines={2}>{b.short_title ?? b.title}</Clamp>
                   <span className="fine item-meta">{b.law_number} · {tr("signed", "firmado el")} {date(b.became_law_date)}</span>
                   <PlainLead map={plain} bill={b} />
                 </li>

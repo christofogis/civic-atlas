@@ -14,8 +14,8 @@ const todayEastern = () => new Intl.DateTimeFormat("en-CA", { timeZone: "America
 const KIND = () => ({ hearing: tr("Hearing", "Audiencia"), markup: tr("Markup", "Sesión de enmiendas"), meeting: tr("Meeting", "Reunión") });
 // The House's own grouping of the week's items (docs.house.gov), in its words, with what each means.
 const FLOOR_GROUPS = () => [
-  ["suspension", <>{tr("Under suspension of the rules", "Bajo suspensión de las reglas")} <Explain id="suspension" /></>, tr("Limited debate, no amendments; two-thirds must vote yes.", "Debate limitado, sin enmiendas; se necesitan dos tercios a favor.")],
-  ["rule", <>{tr("Under a rule", "Bajo una regla")} <Explain id="rule" /></>, tr("Debate and amendments as set by a House resolution (the rule).", "Debate y enmiendas según una resolución de la Cámara (la regla).")],
+  ["suspension", <Explain id="suspension">{tr("Under suspension of the rules", "Bajo suspensión de las reglas")}</Explain>, tr("Limited debate, no amendments; two-thirds must vote yes.", "Debate limitado, sin enmiendas; se necesitan dos tercios a favor.")],
+  ["rule", <Explain id="rule">{tr("Under a rule", "Bajo una regla")}</Explain>, tr("Debate and amendments as set by a House resolution (the rule).", "Debate y enmiendas según una resolución de la Cámara (la regla).")],
   ["other", tr("Other items", "Otros asuntos"), null],
 ];
 const billPath = (ref) => { const [c, t, n] = ref.split("-"); return `/bill/${c}/${t}/${n}`; };
