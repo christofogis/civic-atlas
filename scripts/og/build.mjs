@@ -16,8 +16,9 @@
 //
 // Runs only on Cloudflare Pages (CF_PAGES=1) or with OG_CARDS=1; a plain `npm run build` skips it.
 // Never fails the build: on any error it logs and leaves the generic card in place.
-// Options (env): OG_LIMIT=n (cards per kind, for trial runs), OG_KINDS=member,bill (subset).
-import { mkdirSync, writeFileSync, existsSync } from "node:fs";
+// Options (env): OG_LIMIT=n (cards per kind, for trial runs), OG_KINDS=member,bill (subset),
+// OG_MAX_SECONDS (default 600: drawing stops there and the cards not drawn use the generic image).
+import { mkdirSync, writeFileSync, existsSync, readdirSync, unlinkSync } from "node:fs";
 import { availableParallelism } from "node:os";
 import { Worker } from "node:worker_threads";
 import { SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY } from "../../src/lib/config.js";
@@ -28,6 +29,7 @@ const OUT = new URL("../../dist/", import.meta.url);
 const PAGE = 1000;
 const BILL_FIELDS = "congress,bill_type,number,title,short_title,introduced_date,reported_date,passed_house_date,failed_house_date,passed_senate_date,failed_senate_date,presented_date,vetoed_date,became_law_date,law_number";
 const LIMIT = Number(process.env.OG_LIMIT) || Infinity;
+const MAX_SECONDS = Number(process.env.OG_MAX_SECONDS) || 600;   // keep the deploy well inside Pages' 20-minute build limit
 const KINDS = new Set((process.env.OG_KINDS || "member,bill,committee,state,ballot").split(","));
 
 async function rest(path, attempt = 1) {
@@ -95,12 +97,18 @@ async function portraits(ids) {
 // Spread the drawing over worker threads; each writes its own files.
 async function draw(jobs) {
   const n = Math.max(1, Math.min(availableParallelism(), 8, Math.ceil(jobs.length / 200)));
+  console.log(`og: drawing ${jobs.length} cards on ${n} threads`);
   const slices = Array.from({ length: n }, (_, k) => jobs.filter((_, j) => j % n === k));
+  const workers = [];
+  const timer = setTimeout(() => { console.log(`og: time limit (${MAX_SECONDS} s) reached; stopping`); for (const w of workers) w.terminate(); }, MAX_SECONDS * 1000);
   const results = await Promise.all(slices.map((slice, id) => new Promise((resolve) => {
     const w = new Worker(new URL("./worker.mjs", import.meta.url), { workerData: { id, jobs: slice, out: OUT.pathname } });
+    workers.push(w);
     w.on("message", resolve);
     w.on("error", (e) => { console.log(`og: worker failed: ${e.message}`); resolve({ written: 0, failed: slice.length }); });
+    w.on("exit", () => resolve({ written: 0, failed: slice.length }));   // stopped at the time limit (counts are approximate)
   })));
+  clearTimeout(timer);
   return results.reduce((a, r) => ({ written: a.written + r.written, failed: a.failed + r.failed }), { written: 0, failed: 0 });
 }
 
@@ -127,6 +135,9 @@ async function main() {
 
   for (const dir of new Set(jobs.map((j) => j.spec.path.split("/")[2]))) mkdirSync(new URL(`og/${dir}/`, OUT), { recursive: true });
   const { written, failed } = await draw(jobs);
+  for (const dir of readdirSync(new URL("og/", OUT))) {
+    if (!dir.includes(".")) for (const f of readdirSync(new URL(`og/${dir}/`, OUT))) if (f.endsWith(".tmp")) unlinkSync(new URL(`og/${dir}/${f}`, OUT));
+  }
   const counts = jobs.reduce((m, j) => ({ ...m, [j.spec.kind]: (m[j.spec.kind] ?? 0) + 1 }), {});
   console.log(`og: ${written} cards written, ${failed} failed, in ${Math.round((Date.now() - t0) / 1000)} s (${Object.entries(counts).map(([k, v]) => `${k} ${v}`).join(", ")})`);
   writeFileSync(new URL("og/cards.json", OUT), JSON.stringify({ built: new Date().toISOString(), counts, written, failed }));
