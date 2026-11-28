@@ -223,6 +223,38 @@ export default function Methods() {
         became law, and bills on This week, from the 118th Congress (2023) on.
       </p>
 
+      <h2 id="simple-summaries">"Explain it simply"</h2>
+      <p>
+        Where a bill has a short AI summary, it may also have a simpler version: two or three short sentences in
+        everyday words, at about a 5th-grade reading level. The "Explain it simply" button under the summary, on the
+        bill's page and on the quiz, swaps it in place of the summary, and "Show the full summary" swaps back. It is
+        labeled "Simpler AI summary", with the CRS summary and the official text one tap away.
+      </p>
+      <p>
+        It is written separately, by the same Claude Haiku model, from the same CRS summary (not from the short
+        summary), with the same written instructions for every bill: the main things the bill does, in order; who
+        must or may do what, keeping "must" and "may" as CRS has them; figures, dates and names exactly as CRS states
+        them; no jargon, legal terms or citations; no analogies, comparisons or examples, because they can change
+        the meaning or carry an opinion; and, as with the short summary, never purpose, intent, effect, cost or who
+        gains or loses unless CRS reports it, and no words that judge. A second request checks it against the CRS
+        summary. It may leave out minor details, but every statement must be true to the CRS summary: the check lists
+        any fact that differs or was added, any change in who does what or between "must" and "may", any dropped
+        condition that makes a statement untrue, any analogy or comparison, any statement of intent or impact, any
+        judging word and any citation, and whether the Spanish says the same as the English. A flagged version is
+        rewritten once and checked again; if it still fails, it is not shown. Only versions that pass are shown, and,
+        like the short summary, only while they match the CRS summary on the page. Only bills with a published short
+        summary get one, the quiz's bills first.
+      </p>
+
+      <h2 id="terms">Tap-to-define words</h2>
+      <p>
+        In the AI summaries, in the CRS summary on a bill's page and on the quiz, and in a bill's roll-call questions,
+        some legislative terms (such as cloture, appropriations or joint resolution) have a dotted underline. Tapping
+        one opens its definition from the <Link to="/glossary">glossary</Link>, the first time it appears in each
+        summary or question. The words stay as published; only the definition is added. The definitions describe
+        the procedure only and follow the Congress.gov and Senate glossaries in plain words.
+      </p>
+
       <h2 id="bill-stage">Where a bill stands</h2>
       <p>
         The track at the top of a bill page is built from the bill's official action list in GovInfo Bill Status. Each

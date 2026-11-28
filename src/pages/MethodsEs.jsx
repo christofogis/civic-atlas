@@ -220,6 +220,41 @@ export default function MethodsEs() {
         118.º Congreso (2023).
       </p>
 
+      <h2 id="simple-summaries">"Explícalo fácil"</h2>
+      <p>
+        Cuando un proyecto tiene un resumen breve hecho por IA, puede tener también una versión más sencilla: dos o tres
+        oraciones cortas con palabras de todos los días, a un nivel de lectura de quinto grado aproximadamente. El botón
+        "Explícalo fácil" bajo el resumen, en la página del proyecto y en el cuestionario, la muestra en lugar del
+        resumen, y "Mostrar el resumen completo" vuelve a él. Está marcada como "Resumen más sencillo hecho por IA", con
+        el resumen del CRS y el texto oficial a un toque.
+      </p>
+      <p>
+        Se escribe por separado, con el mismo modelo Claude Haiku, a partir del mismo resumen del CRS (no del resumen
+        breve) y con las mismas instrucciones escritas para todos los proyectos: lo principal que hace el proyecto, en
+        orden; quién debe o puede hacer qué, manteniendo "debe" y "puede" como los dice el CRS; cifras, fechas y nombres
+        exactamente como los indica el CRS; sin jerga, términos legales ni citas; sin analogías, comparaciones ni
+        ejemplos, porque pueden cambiar el sentido o llevar una opinión; y, como en el resumen breve, nunca el propósito,
+        la intención, el efecto, el costo ni quién gana o pierde, salvo que el CRS lo indique, y sin palabras que
+        juzguen. Una segunda consulta la verifica contra el resumen del CRS. Puede omitir detalles menores, pero cada
+        afirmación debe ser fiel al resumen del CRS: la verificación enumera todo dato distinto o agregado, todo cambio
+        en quién hace qué o entre "debe" y "puede", toda condición omitida que haga falsa una afirmación, toda analogía
+        o comparación, toda afirmación de intención o impacto, toda palabra que juzgue y toda cita, y si el español dice
+        lo mismo que el inglés. Una versión señalada se reescribe una vez y se vuelve a verificar; si sigue fallando, no
+        se muestra. Solo se muestran las versiones que pasan y, como el resumen breve, solo mientras coinciden con el
+        resumen del CRS de la página. Solo la reciben los proyectos con un resumen breve publicado, primero los del
+        cuestionario.
+      </p>
+
+      <h2 id="terms">Palabras con definición</h2>
+      <p>
+        En los resúmenes hechos por IA, en el resumen del CRS de la página de un proyecto y del cuestionario, y en las
+        preguntas de las votaciones nominales de un proyecto, algunos términos legislativos (como cloture,
+        appropriations o joint resolution) tienen un subrayado punteado. Al tocar uno se abre su definición del{" "}
+        <Link to="/glossary">glosario</Link>, la primera vez que aparece en cada resumen o pregunta. Las palabras quedan
+        como se publicaron; solo se agrega la definición. Las definiciones describen solo el procedimiento y siguen los
+        glosarios de Congress.gov y del Senado en palabras sencillas.
+      </p>
+
       <h2 id="bill-stage">En qué etapa está un proyecto</h2>
       <p>
         Las etapas en la parte superior de la página de un proyecto se construyen a partir de la lista oficial de acciones
