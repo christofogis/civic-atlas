@@ -10,11 +10,17 @@ import "@fontsource/public-sans/600.css";
 import "@fontsource/public-sans/700.css";
 import "./styles.css";
 import { memberPage } from "./lib/memberPage.js";
+import { loadBill } from "./lib/billPage.js";
 
-// On a member page, start fetching its data now, while the page's own code is still downloading.
+// On a member or bill page, start fetching its data now, while the page's own code is still downloading.
 {
   const m = /^\/member\/([A-Z]\d{6})\/?$/.exec(window.location.pathname);
   if (m) memberPage(m[1]).catch(() => {});
+  // Same for a bill page (the type and number as the page reads them from its URL).
+  const b = /^\/bill\/(\d+)\/([a-z]+)\/(\d+)\/?$/i.exec(window.location.pathname);
+  if (b && ["hr", "s", "hres", "sres", "hjres", "sjres", "hconres", "sconres"].includes(b[2].toLowerCase()) && Number(b[3]) > 0) {
+    loadBill(Number(b[1]), b[2].toLowerCase(), Number(b[3])).catch(() => {});
+  }
 }
 
 // Each page loads its own code when first visited, so phones download less up front. If a
