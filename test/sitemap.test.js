@@ -20,4 +20,5 @@ test("XML: escaped locations, optional lastmod", () => {
   assert.match(x, /<lastmod>2025-07-04<\/lastmod>/);
   assert.match(sitemapIndex("https://e.x", ["/sitemap/main.xml"]), /<sitemapindex[^>]*>\n  <sitemap><loc>https:\/\/e\.x\/sitemap\/main\.xml<\/loc><\/sitemap>/);
   assert.ok(STATIC_PAGES.includes("/on-the-ballot"));
+  assert.ok(STATIC_PAGES.includes("/constitution"));
 });
