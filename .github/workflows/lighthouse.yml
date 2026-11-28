@@ -48,6 +48,7 @@ jobs:
               const img = items.filter((x) => x.resourceType === "Image").reduce((n, x) => n + (x.transferSize || 0), 0);
               console.log(`  JS transferred: ${Math.round(js / 1024)} KB (${items.filter((x) => x.resourceType === "Script").length} files), fonts ${Math.round(font / 1024)} KB, images ${Math.round(img / 1024)} KB, total ${Math.round(items.reduce((n, x) => n + (x.transferSize || 0), 0) / 1024)} KB`);
               console.log(`  LCP ${Math.round(a["largest-contentful-paint"].numericValue)}ms  CLS ${a["cumulative-layout-shift"].numericValue.toFixed(3)}  TBT ${Math.round(a["total-blocking-time"].numericValue)}ms`);
+              for (const x of (a["layout-shifts"]?.details?.items ?? []).slice(0, 3)) console.log(`  shift ${x.score?.toFixed?.(3)}: ${x.node?.snippet ?? ""}`);
               if (reqs.length) console.log(`  database requests: ${reqs.length}, last finished at ${reqs[0]}ms`);
             ' "$p"
           done
